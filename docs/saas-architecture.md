@@ -73,11 +73,22 @@ docker compose up --build
 
 1. **定价分层**（已实现，`backend/billing.py`）：产品的核心价值是优化引擎本身，因此**按每月优化次数计量分层**；达人库容量对所有档位不设限（数据积累期库容量不构成卖点，反而不该成为使用门槛）：
    - Free：**10 次优化/月** —— 新商家免费体验完整六算法能力，获客与自传播；
-   - Pro（$49/月）：**300 次优化/月**、校准闭环、活动归因、3 席位；
-   - Team（$199/月）：**不限优化次数**、多席位多店铺、API 访问、优先支持。
+   - Pro（$5/月）：**300 次优化/月**、校准闭环、活动归因、3 席位；
+   - Team（$20/月）：**不限优化次数**、多席位多店铺、API 访问、优先支持。
+
+   > 定价对标东南亚中小商家的支付能力：$5 约为一次达人合作费用的零头，决策成本低、转化摩擦小；$20 档给代理/多店铺商家，靠量取胜。
 
    配额在服务端强制（`tenant_plans` + `usage_counters` 两张表）：超限返回 **HTTP 402**，前端全局拦截并引导到 Plan & Billing 页升级；前端含落地页 Pricing 区块、控制台计费页（当前套餐 + 用量进度条 + 三档对比卡）与侧边栏套餐徽章。
-2. **计费接入**：`POST /billing/checkout` 目前直接切换套餐（预览版行为），接 Stripe 时在该端点创建 Checkout Session、在支付成功 webhook 里落套餐即可（东南亚可加 Xendit/2C2P 收当地货币）。
+2. **计费与商家付款方式**：`POST /billing/checkout` 目前直接切换套餐（预览版行为）。正式收款分两层：
+
+   | 层 | 服务商 | 覆盖的付款方式 | 适用 |
+   |---|---|---|---|
+   | 订阅主干 | **Stripe**（Checkout + Billing） | Visa/Mastercard、Apple Pay / Google Pay、GrabPay（SG/MY）、Alipay | 新加坡/马来西亚及持国际卡商家，支持自动月扣 |
+   | 本地渠道 | **Xendit**（ID/PH）、**2C2P**（TH） | GoPay / OVO / DANA（印尼）、GCash / Maya（菲）、PromptPay（泰）、Touch 'n Go（马）、银行虚拟账户转账 | 无国际卡的中小商家（东南亚占比很高） |
+
+   - Stripe 接入方式：`/billing/checkout` 创建 Checkout Session → 商家在 Stripe 托管页付款 → `invoice.paid` webhook 落套餐、`invoice.payment_failed` / 订阅取消 webhook 降回 Free。系统只保存 Stripe customer id 与订阅状态，卡号不经过我们（无 PCI 合规负担）。
+   - 本地钱包/转账多为**一次性扣款、不支持自动续订**，建议以「预付套餐包」形式出售（如 Pro 年付一次性收 $50，到期自动降 Free），而非月订阅。
+   - 落地节奏：先只接 Stripe（一周内可上线，覆盖付费意愿最强的群体），验证转化后再接 Xendit 打开印尼/菲律宾市场。
 3. **安全加固**（上线前必做）：
    - `JWT_SECRET` 强随机值；`CORS_ORIGINS` 收紧到正式域名；全站 HTTPS；
    - 登录/注册接口加限流（如 slowapi 或网关层），防撞库；

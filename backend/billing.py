@@ -50,7 +50,7 @@ PLANS = {
     },
     "pro": {
         "name": "Pro",
-        "price_usd": 49,
+        "price_usd": 5,
         "max_creators": None,
         "monthly_optimizations": 300,
         "seats": 3,
@@ -64,7 +64,7 @@ PLANS = {
     },
     "team": {
         "name": "Team",
-        "price_usd": 199,
+        "price_usd": 20,
         "max_creators": None,
         "monthly_optimizations": None,
         "seats": 10,
