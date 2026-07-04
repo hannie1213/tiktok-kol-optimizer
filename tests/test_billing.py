@@ -42,8 +42,9 @@ def test_new_tenant_starts_on_free_plan():
     assert set(d["plans"].keys()) == {"free", "pro", "team"}
     assert d["limits"]["monthly_optimizations"] == billing.PLANS["free"]["monthly_optimizations"]
     assert d["usage"]["optimize_runs"] == 0
-    # Seeded starter library counts toward usage and fits inside the free cap.
-    assert 0 < d["usage"]["creators"] <= d["limits"]["max_creators"]
+    # Optimization runs are the metered axis; the library is not capped.
+    assert d["limits"]["max_creators"] is None
+    assert d["usage"]["creators"] > 0
 
 
 def test_billing_requires_auth():

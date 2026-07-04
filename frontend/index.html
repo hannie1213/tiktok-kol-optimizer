@@ -536,15 +536,15 @@
             <section class="lp-section" id="pricing">
                 <div class="lp-eyebrow lp-reveal">PRICING</div>
                 <h2 class="lp-h2 lp-reveal">Start free, scale when it pays off</h2>
-                <p class="lp-section-sub lp-reveal">Every plan runs all six algorithms with explainable picks. Upgrade for a bigger library, unlimited runs and team seats.</p>
+                <p class="lp-section-sub lp-reveal">Every plan runs all six algorithms on an unlimited creator library. Pay only for what powers your growth — optimization runs.</p>
                 <div class="lp-reveal" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;margin-top:36px;text-align:left">
                     <div class="lp-glass" style="border-radius:18px;padding:28px;display:flex;flex-direction:column;gap:14px">
                         <p style="font-size:12px;letter-spacing:.12em;color:#87867d;font-weight:700">FREE</p>
                         <p style="font-size:34px;font-weight:800;line-height:1">$0<span style="font-size:13px;color:#87867d;font-weight:500"> / month</span></p>
                         <ul style="font-size:13px;color:#b5b3a9;display:flex;flex-direction:column;gap:8px;list-style:none;padding:0;flex:1">
-                            <li>✓ 500-creator library</li>
-                            <li>✓ 10 optimization runs / month</li>
+                            <li>✓ <b style="color:#e5e2da">10 optimization runs</b> / month</li>
                             <li>✓ All 6 algorithms + explainability</li>
+                            <li>✓ Unlimited creator library</li>
                             <li>✓ CSV / Excel import &amp; export</li>
                         </ul>
                         <button class="lp-btn lp-btn-ghost" style="width:100%;justify-content:center" onclick="enterApp()">Start free</button>
@@ -554,10 +554,10 @@
                         <p style="font-size:12px;letter-spacing:.12em;color:#FF4D79;font-weight:700">PRO</p>
                         <p style="font-size:34px;font-weight:800;line-height:1">$49<span style="font-size:13px;color:#87867d;font-weight:500"> / month</span></p>
                         <ul style="font-size:13px;color:#b5b3a9;display:flex;flex-direction:column;gap:8px;list-style:none;padding:0;flex:1">
-                            <li>✓ 5,000-creator library</li>
-                            <li>✓ Unlimited optimization runs</li>
+                            <li>✓ <b style="color:#e5e2da">300 optimization runs</b> / month</li>
                             <li>✓ Self-calibrating GMV predictions</li>
                             <li>✓ Campaign attribution &amp; accuracy</li>
+                            <li>✓ Unlimited creator library</li>
                             <li>✓ 3 team seats</li>
                         </ul>
                         <button class="lp-btn lp-btn-primary" style="width:100%;justify-content:center" onclick="enterApp()">Upgrade in console</button>
@@ -566,10 +566,10 @@
                         <p style="font-size:12px;letter-spacing:.12em;color:#A855F7;font-weight:700">TEAM</p>
                         <p style="font-size:34px;font-weight:800;line-height:1">$199<span style="font-size:13px;color:#87867d;font-weight:500"> / month</span></p>
                         <ul style="font-size:13px;color:#b5b3a9;display:flex;flex-direction:column;gap:8px;list-style:none;padding:0;flex:1">
-                            <li>✓ Unlimited creator library</li>
-                            <li>✓ Unlimited optimization runs</li>
+                            <li>✓ <b style="color:#e5e2da">Unlimited optimization runs</b></li>
                             <li>✓ 10 seats &amp; multi-store support</li>
                             <li>✓ API access</li>
+                            <li>✓ Unlimited creator library</li>
                             <li>✓ Priority support</li>
                         </ul>
                         <button class="lp-btn lp-btn-ghost" style="width:100%;justify-content:center" onclick="enterApp()">Upgrade in console</button>
@@ -1874,7 +1874,7 @@
             const pct = unlimited ? 0 : Math.min(100, Math.round(used / limit * 100));
             const color = unlimited ? '#00C853' : pct >= 100 ? '#FF0050' : pct >= 80 ? '#ffb400' : '#00C853';
             const right = unlimited
-                ? `<span class="text-[11px] font-bold" style="color:#00C853">Unlimited</span>`
+                ? `<span class="text-[11px] font-data-mono text-on-surface">${used.toLocaleString('en-US')} <span class="font-bold" style="color:#00C853">· Unlimited</span></span>`
                 : `<span class="text-[11px] font-data-mono text-on-surface">${used.toLocaleString('en-US')} / ${limit.toLocaleString('en-US')}</span>`;
             return `<div class="space-y-xs">
                 <div class="flex justify-between items-center">
@@ -1920,9 +1920,10 @@
             document.getElementById('billing-plan-name').textContent = info.plan_name;
             const price = (info.plans[info.plan] || {}).price_usd || 0;
             document.getElementById('billing-plan-price').textContent = price > 0 ? `$${price} / month` : 'free forever';
+            // Optimization runs are the metered product value — show them first.
             document.getElementById('billing-usage').innerHTML =
-                usageMeter('group', 'Creator library', info.usage.creators, info.limits.max_creators) +
-                usageMeter('bolt', `Optimizations · ${info.usage.month}`, info.usage.optimize_runs, info.limits.monthly_optimizations);
+                usageMeter('bolt', `Optimizations · ${info.usage.month}`, info.usage.optimize_runs, info.limits.monthly_optimizations) +
+                usageMeter('group', 'Creator library', info.usage.creators, info.limits.max_creators);
             document.getElementById('billing-plans').innerHTML = PLAN_ORDER.map(id => planCard(id, info)).join('');
         }
 

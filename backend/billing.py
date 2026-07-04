@@ -2,10 +2,11 @@
 Subscription plans, metered usage, and quota enforcement.
 
 Tiers follow the commercialization roadmap (docs/saas-architecture.md):
-Free is the acquisition tier, Pro unlocks the full library + unlimited
-optimizations, Team adds seats/API. Quotas are enforced server-side and
-surfaced with HTTP 402 so the frontend can route the merchant to the
-upgrade page.
+optimization runs are the product's core value and therefore the metered
+axis — Free gives 10 runs/month to hook new merchants, Pro raises the
+quota, Team removes it and adds seats/API. Quotas are enforced
+server-side and surfaced with HTTP 402 so the frontend can route the
+merchant to the upgrade page.
 
 Payment provider note: POST /billing/checkout switches the plan directly —
 it is the integration point where a real deployment creates a Stripe
@@ -29,33 +30,35 @@ from backend.auth import require_tenant
 router = APIRouter()
 
 # Plan catalog. None = unlimited. Prices in USD/month.
-# Free's library cap must stay above the seeded starter library (~430
-# creators) so a brand-new merchant is never blocked out of the box.
+# The product's value is the optimization engine, so optimization runs are
+# the metered axis tiers differentiate on. The creator library is unlimited
+# on every plan (max_creators stays in the schema so a cap could return, and
+# check_creator_capacity below no-ops while it is None).
 PLANS = {
     "free": {
         "name": "Free",
         "price_usd": 0,
-        "max_creators": 500,
+        "max_creators": None,
         "monthly_optimizations": 10,
         "seats": 1,
         "features": [
-            "Up to 500 creators in your library",
             "10 optimization runs / month",
             "All 6 algorithms + explainable picks",
+            "Unlimited creator library",
             "CSV / Excel import & export",
         ],
     },
     "pro": {
         "name": "Pro",
         "price_usd": 49,
-        "max_creators": 5000,
-        "monthly_optimizations": None,
+        "max_creators": None,
+        "monthly_optimizations": 300,
         "seats": 3,
         "features": [
-            "Up to 5,000 creators in your library",
-            "Unlimited optimization runs",
+            "300 optimization runs / month",
             "Self-calibrating GMV predictions",
             "Campaign attribution & accuracy tracking",
+            "Unlimited creator library",
             "3 team seats",
         ],
     },
@@ -66,10 +69,10 @@ PLANS = {
         "monthly_optimizations": None,
         "seats": 10,
         "features": [
-            "Unlimited creator library",
             "Unlimited optimization runs",
             "10 team seats & multi-store support",
             "API access",
+            "Unlimited creator library",
             "Priority support",
         ],
     },
@@ -92,7 +95,7 @@ def check_and_consume_optimize(tenant_id: str):
         raise HTTPException(
             status_code=402,
             detail=f"Monthly optimization limit reached ({limit} runs on your plan). "
-                   "Upgrade to run unlimited optimizations.",
+                   "Upgrade for more optimization runs.",
         )
     repo.optimize_consume(tenant_id, _month())
 

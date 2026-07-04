@@ -87,7 +87,7 @@ The platform is organised into three product modules backed by two intelligence 
 | 👥 **Creator Management** | Build, import, and curate your own KOL database | CRUD · CSV/Excel import · price backfill · metric-trend sparklines |
 | 📈 **Campaign Attribution** | Closes the loop by comparing predicted vs actual GMV | Accuracy % · **self-calibrating predictions** |
 | 🔐 **Merchant Accounts** | Email/password login; each merchant's data is fully isolated | JWT auth · per-tenant library & campaigns |
-| 💳 **Plans & Billing** | Free / Pro / Team subscription tiers with server-enforced quotas | usage meters · in-app upgrades · landing-page pricing |
+| 💳 **Plans & Billing** | Free / Pro / Team tiers metered by optimization runs (10 / 300 / unlimited per month) — the creator library is never capped | usage meters · in-app upgrades · landing-page pricing |
 | 🧠 **Explainable AI** | Plain-English justification for every pick | 3+ data-driven reasons per creator |
 | ⭐ **CreatorScore & Tiers** | Composite quality score + tier classification | Leaderboards · badges · ranking |
 
