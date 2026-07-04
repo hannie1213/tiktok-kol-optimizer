@@ -25,13 +25,13 @@ client = TestClient(app)
 # --- Fixtures ---
 
 @pytest.fixture(autouse=True)
-def isolated_history_file(tmp_path, monkeypatch):
-    """Each test gets a fresh kol_history.json to prevent pollution."""
-    import backend.tenancy as tenancy_module
-    tmp_file = tmp_path / "kol_history.json"
-    tmp_file.write_text("[]")
-    monkeypatch.setattr(tenancy_module, "history_path", lambda: str(tmp_file))
-    yield str(tmp_file)
+def isolated_history():
+    """Each test starts with an empty snapshot table to prevent pollution."""
+    from sqlalchemy import delete
+    from backend.db import KolSnapshot, SessionLocal
+    with SessionLocal.begin() as s:
+        s.execute(delete(KolSnapshot))
+    yield
 
 
 def _get_first_kol_id() -> int:

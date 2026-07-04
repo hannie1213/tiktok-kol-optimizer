@@ -12,7 +12,6 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from fastapi.testclient import TestClient
 from backend.main import app
-import backend.tenancy as tenancy_module
 
 client = TestClient(app)
 
@@ -21,12 +20,13 @@ client = TestClient(app)
 # ────────────────────────────────────────────────────────────
 
 @pytest.fixture(autouse=True)
-def isolated_campaigns_file(tmp_path, monkeypatch):
-    """Each test gets its own empty campaigns.json so tests don't interfere."""
-    tmp_file = tmp_path / "campaigns.json"
-    tmp_file.write_text("[]")
-    monkeypatch.setattr(tenancy_module, "campaigns_path", lambda: str(tmp_file))
-    yield str(tmp_file)
+def isolated_campaigns():
+    """Each test starts with an empty campaigns table so tests don't interfere."""
+    from sqlalchemy import delete
+    from backend.db import Campaign, SessionLocal
+    with SessionLocal.begin() as s:
+        s.execute(delete(Campaign))
+    yield
 
 
 SAMPLE_CAMPAIGN = {

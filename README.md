@@ -50,7 +50,9 @@ Structured search beats naïve hill-climbing by **49–201%**, and the advantage
 | **Backend API** | FastAPI + Pydantic — 25+ typed REST endpoints, auto-generated Swagger docs |
 | **Auth & multi-tenancy** | JWT (PyJWT) + `pbkdf2_sha256` (passlib); per-merchant isolated data tenants |
 | **Frontend** | Single-page app (vanilla JS + Tailwind CSS), served directly by FastAPI — no separate web server |
-| **Data & analytics** | NumPy; JSON persistence; CSV/Excel import (openpyxl) + export; calibrated SEA market model with actual-vs-predicted feedback |
+| **Database** | SQLAlchemy 2.0 — SQLite by default (zero-config), PostgreSQL via `DATABASE_URL` for production; row-level tenant isolation with indexed per-market queries; legacy JSON data auto-migrates on first access |
+| **Data & analytics** | NumPy; CSV/Excel import (openpyxl) + export; calibrated SEA market model with actual-vs-predicted feedback |
+| **Deployment** | Docker + docker-compose (multi-worker uvicorn + PostgreSQL); env-driven config — see [`docs/saas-architecture.md`](docs/saas-architecture.md) |
 | **Experiments** | Matplotlib figure pipeline; seeded, fully reproducible benchmarks |
 | **Quality** | 128 pytest tests (isolated from production data); GitHub Actions CI on every push |
 

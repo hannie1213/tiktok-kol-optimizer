@@ -20,3 +20,8 @@ data/temp_*.csv
 data/users.json
 data/tenants/
 
+# SQLite database (default DATABASE_URL) + WAL side files.
+data/kol_saas.db
+data/kol_saas.db-wal
+data/kol_saas.db-shm
+

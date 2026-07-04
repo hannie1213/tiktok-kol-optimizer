@@ -14,6 +14,10 @@ passlib==1.7.4           # pbkdf2_sha256 password hashing (pure-python)
 # ── HTTP client (FastAPI TestClient in the test suite) ────────────
 httpx==0.28.1
 
+# ── Database (multi-tenant SaaS persistence) ──────────────────────
+SQLAlchemy==2.0.51       # ORM; SQLite by default, PostgreSQL via DATABASE_URL
+psycopg[binary]==3.3.4   # PostgreSQL driver for production deployments
+
 # ── Data processing ───────────────────────────────────────────────
 numpy==2.4.6
 openpyxl==3.1.5          # read/write .xlsx for Excel creator import/export

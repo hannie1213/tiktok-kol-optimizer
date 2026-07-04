@@ -1,12 +1,23 @@
+"""
+Tenant context & provisioning.
+
+The request-scoped current tenant is stored in a contextvar (set by
+backend.auth.require_tenant); the repository layer (backend/repo.py) scopes
+every database query by it. The legacy per-tenant JSON folders under
+data/tenants/{id}/ are no longer written — they are only read once, on a
+tenant's first database access, to migrate pre-database deployments in place.
+"""
 import contextvars
+import json
 import os
 
-# Root data directory (overridable for tests).
+# Root data directory (overridable for tests). Holds the seed template, the
+# default SQLite database file, and any legacy JSON tenant folders.
 DATA_DIR = os.environ.get("KOL_DATA_DIR") or os.path.join(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data"
 )
 TENANTS_DIR = os.path.join(DATA_DIR, "tenants")
-USERS_PATH = os.path.join(DATA_DIR, "users.json")
+USERS_PATH = os.path.join(DATA_DIR, "users.json")   # legacy store, import-only
 
 # The library every new tenant is seeded from (the curated FastMoss seed + fill).
 TEMPLATE_SEED = os.path.join(DATA_DIR, "seed_kols.json")
@@ -30,49 +41,31 @@ def current_tenant() -> str:
     return tid
 
 
-# ── Per-tenant path resolvers ─────────────────────────────────────
 def tenant_dir(tenant_id: str = None) -> str:
+    """Legacy JSON folder for a tenant — read-only, used for one-time import."""
     return os.path.join(TENANTS_DIR, tenant_id or current_tenant())
 
 
-def data_path() -> str:
-    return os.path.join(tenant_dir(), "sample_kols.json")
-
-
-def seed_path() -> str:
-    return os.path.join(tenant_dir(), "seed_kols.json")
-
-
-def history_path() -> str:
-    return os.path.join(tenant_dir(), "kol_history.json")
-
-
-def campaigns_path() -> str:
-    return os.path.join(tenant_dir(), "campaigns.json")
+def load_template_seed() -> list:
+    """The template creator library new tenants start from."""
+    if not os.path.exists(TEMPLATE_SEED):
+        return []
+    try:
+        with open(TEMPLATE_SEED, encoding="utf-8") as f:
+            return json.load(f)
+    except (json.JSONDecodeError, OSError):
+        return []
 
 
 # ── Provisioning ──────────────────────────────────────────────────
 def provision_tenant(tenant_id: str):
-    """Create a fresh data folder for a new tenant, seeded from the template."""
-    d = tenant_dir(tenant_id)
-    os.makedirs(d, exist_ok=True)
-
-    seed = "[]"
-    if os.path.exists(TEMPLATE_SEED):
-        with open(TEMPLATE_SEED, encoding="utf-8") as f:
-            seed = f.read()
-
-    for name, content in (
-        ("sample_kols.json", seed),
-        ("seed_kols.json", seed),
-        ("kol_history.json", "[]"),
-        ("campaigns.json", "[]"),
-    ):
-        p = os.path.join(d, name)
-        if not os.path.exists(p):
-            with open(p, "w", encoding="utf-8") as f:
-                f.write(content)
+    """Create a fresh tenant seeded from the template library. Idempotent."""
+    from backend import repo  # local import: repo imports this module
+    from datetime import datetime, timezone
+    repo.provision_tenant(tenant_id, load_template_seed(),
+                          created_at=datetime.now(timezone.utc).isoformat())
 
 
 def tenant_exists(tenant_id: str) -> bool:
-    return os.path.isdir(tenant_dir(tenant_id))
+    from backend import repo
+    return repo.tenant_exists(tenant_id)

@@ -14,7 +14,6 @@ Run:  uvicorn backend.main:app --reload
 Docs: http://localhost:8000/docs
 """
 
-import json
 import math
 import os
 import sys
@@ -38,8 +37,7 @@ from engine.optimization.tabu_search import tabu_search
 from engine.optimization.greedy_ranking import greedy_ranking
 from engine.scoring.creator_score import compute_creator_score
 from engine.scoring.explainer import generate_reasons, get_tier
-from backend import tenancy
-from backend import calibration
+from backend import calibration, repo, tenancy
 from backend.auth import router as auth_router, require_tenant
 from backend.crud import router as crud_router
 from backend.campaigns import router as campaigns_router
@@ -50,9 +48,12 @@ app = FastAPI(
     version="2.0",
 )
 
+# Production: set CORS_ORIGINS to a comma-separated list of your frontend
+# origins (e.g. "https://app.example.com"). The default "*" is dev-only.
+_CORS_ORIGINS = [o.strip() for o in os.environ.get("CORS_ORIGINS", "*").split(",") if o.strip()]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=_CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -233,19 +234,17 @@ def _kol_meta() -> dict:
     return _KOL_META_VAR.get() or {}
 
 
-def load_kols() -> List[KOL]:
-    try:
-        with open(tenancy.data_path(), encoding="utf-8") as f:
-            raw = json.load(f)
-        _refresh_meta(raw)
-        return [_dict_to_kol(d) for d in raw]
-    except (FileNotFoundError, json.JSONDecodeError) as e:
-        raise HTTPException(status_code=500, detail=f"Data file error: {e}")
+def load_kols(countries: Optional[List[str]] = None,
+              category: Optional[str] = None) -> List[KOL]:
+    """Current tenant's creators, with any country/category filter pushed down
+    to an indexed SQL query instead of loading the whole library."""
+    raw = repo.kols_all(tenancy.current_tenant(), countries=countries, category=category)
+    _refresh_meta(raw)
+    return [_dict_to_kol(d) for d in raw]
 
 
 def load_raw_kols() -> List[dict]:
-    with open(tenancy.data_path(), encoding="utf-8") as f:
-        raw = json.load(f)
+    raw = repo.kols_all(tenancy.current_tenant())
     _refresh_meta(raw)
     return raw
 
@@ -631,9 +630,7 @@ def optimize(req: OptimizeRequest, _t: str = Depends(require_tenant)):
         raise HTTPException(status_code=422, detail="category must be one of: beauty, fashion, home, fmcg")
 
     active_countries = set(req.countries) if req.countries else set(VALID_COUNTRIES)
-    all_kols = load_kols()
-    filtered = [k for k in all_kols
-                if k.country in active_countries and k.category == req.category]
+    filtered = load_kols(countries=list(active_countries), category=req.category)
 
     if not filtered:
         return OptimizeResponse(
@@ -718,9 +715,7 @@ def optimize_plans(req: OptimizeRequest, _t: str = Depends(require_tenant)):
         raise HTTPException(status_code=422, detail="category must be one of: beauty, fashion, home, fmcg")
 
     active_countries = set(req.countries) if req.countries else set(VALID_COUNTRIES)
-    all_kols = load_kols()
-    filtered = [k for k in all_kols
-                if k.country in active_countries and k.category == req.category]
+    filtered = load_kols(countries=list(active_countries), category=req.category)
 
     if not filtered:
         return OptimizePlansResponse(
@@ -822,14 +817,9 @@ def get_kols(
     if tier is not None and tier not in VALID_TIERS:
         raise HTTPException(status_code=422, detail="tier must be one of: Mega, Macro, Micro, Nano")
 
-    all_kols = load_kols()
+    all_kols = load_kols(countries=[country] if country else None, category=category)
 
-    filtered = [
-        k for k in all_kols
-        if (country is None or k.country == country)
-        and (category is None or k.category == category)
-        and (tier is None or get_tier(k) == tier)
-    ]
+    filtered = [k for k in all_kols if tier is None or get_tier(k) == tier]
 
     scores = compute_creator_score(filtered)
     page = filtered[offset:offset + limit]
@@ -886,12 +876,7 @@ def top_kols(
     if category is not None and category not in VALID_CATEGORIES:
         raise HTTPException(status_code=422, detail="category must be one of: beauty, fashion, home, fmcg")
 
-    all_kols = load_kols()
-    filtered = [
-        k for k in all_kols
-        if (country is None or k.country == country)
-        and (category is None or k.category == category)
-    ]
+    filtered = load_kols(countries=[country] if country else None, category=category)
 
     if not filtered:
         return TopKOLResponse(country=country, category=category, top_kols=[])

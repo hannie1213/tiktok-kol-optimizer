@@ -8,42 +8,19 @@ Endpoints
   GET    /campaigns/{id}              Get single campaign detail
   PUT    /campaigns/{id}/actual       Record actual GMV after campaign ends
   DELETE /campaigns/{id}              Delete a campaign
+
+Campaigns persist to the `campaigns` table, scoped per-tenant (backend/repo.py).
 """
-import json
-import os
 from datetime import datetime
 from typing import List, Optional
 
 from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
 
-from backend import tenancy
-from backend import calibration
+from backend import calibration, repo, tenancy
 from backend.auth import require_tenant
 
 router = APIRouter()
-
-# Campaign storage is resolved per-tenant at call time (backend/tenancy.py).
-
-
-# ════════════════════════════════════════════════════════════════
-#  Helpers
-# ════════════════════════════════════════════════════════════════
-def _load() -> List[dict]:
-    path = tenancy.campaigns_path()
-    if not os.path.exists(path):
-        return []
-    with open(path, encoding="utf-8") as f:
-        return json.load(f)
-
-
-def _save(data: List[dict]):
-    with open(tenancy.campaigns_path(), "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2, ensure_ascii=False)
-
-
-def _next_id(data: List[dict]) -> int:
-    return max((d["id"] for d in data), default=0) + 1
 
 
 # ════════════════════════════════════════════════════════════════
@@ -88,9 +65,7 @@ class ActualResultsUpdate(BaseModel):
 @router.post("/campaigns")
 def save_campaign(req: CampaignCreate, _t: str = Depends(require_tenant)):
     """Persist an optimization result as a trackable campaign."""
-    data = _load()
     campaign = {
-        "id":             _next_id(data),
         "name":           req.name,
         "created_at":     datetime.utcnow().isoformat(),
         "countries":      req.countries,
@@ -108,23 +83,20 @@ def save_campaign(req: CampaignCreate, _t: str = Depends(require_tenant)):
         "completed_at":     None,
         "status":           "active",   # active | completed
     }
-    data.append(campaign)
-    _save(data)
-    return campaign
+    return repo.campaigns_add(tenancy.current_tenant(), campaign)
 
 
 @router.get("/campaigns")
 def list_campaigns(_t: str = Depends(require_tenant)):
     """Return all campaigns sorted newest-first."""
-    data = _load()
+    data = repo.campaigns_all(tenancy.current_tenant())
     data.sort(key=lambda d: d["created_at"], reverse=True)
     return data
 
 
 @router.get("/campaigns/{campaign_id}")
 def get_campaign(campaign_id: int, _t: str = Depends(require_tenant)):
-    data = _load()
-    c = next((d for d in data if d["id"] == campaign_id), None)
+    c = repo.campaigns_get(tenancy.current_tenant(), campaign_id)
     if not c:
         raise HTTPException(status_code=404, detail=f"Campaign {campaign_id} not found")
     return c
@@ -136,12 +108,11 @@ def record_actual(campaign_id: int, req: ActualResultsUpdate, _t: str = Depends(
     Record actual GMV after the campaign finishes.
     Computes accuracy_pct = actual / predicted × 100.
     """
-    data = _load()
-    idx = next((i for i, d in enumerate(data) if d["id"] == campaign_id), None)
-    if idx is None:
+    tenant = tenancy.current_tenant()
+    c = repo.campaigns_get(tenant, campaign_id)
+    if c is None:
         raise HTTPException(status_code=404, detail="Campaign not found")
 
-    c = data[idx]
     c["actual_total_gmv"] = req.actual_total_gmv
     if req.kol_actuals:
         c["kol_actuals"] = [k.model_dump() for k in req.kol_actuals]
@@ -152,7 +123,7 @@ def record_actual(campaign_id: int, req: ActualResultsUpdate, _t: str = Depends(
     c["status"] = "completed"
     c["completed_at"] = datetime.utcnow().isoformat()
 
-    _save(data)
+    repo.campaigns_put(tenant, campaign_id, c)
 
     # Close the loop: fold this outcome into the tenant's GMV calibration so
     # future predictions self-correct — at the campaign level (segment) and,
@@ -175,10 +146,6 @@ def record_actual(campaign_id: int, req: ActualResultsUpdate, _t: str = Depends(
 
 @router.delete("/campaigns/{campaign_id}")
 def delete_campaign(campaign_id: int, _t: str = Depends(require_tenant)):
-    data = _load()
-    before = len(data)
-    data = [d for d in data if d["id"] != campaign_id]
-    if len(data) == before:
+    if not repo.campaigns_delete(tenancy.current_tenant(), campaign_id):
         raise HTTPException(status_code=404, detail=f"Campaign {campaign_id} not found")
-    _save(data)
     return {"deleted": True, "id": campaign_id}

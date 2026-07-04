@@ -1,7 +1,8 @@
 """
 Authentication & tenant resolution for the multi-tenant API.
 
-- Users are stored in data/users.json: {id, email, password_hash, tenant_id, created_at}.
+- Users live in the `users` table (backend/db.py); a legacy data/users.json is
+  imported automatically on first access (backend/repo.py).
 - Passwords are hashed with pbkdf2_sha256 (passlib, pure-python).
 - Login issues a JWT (HS256) whose `sub` is the tenant_id.
 - `require_tenant` is the dependency every data endpoint depends on: it validates the
@@ -9,7 +10,6 @@ Authentication & tenant resolution for the multi-tenant API.
 
 Set env JWT_SECRET in production; a dev fallback is used otherwise.
 """
-import json
 import os
 import re
 import uuid
@@ -21,7 +21,7 @@ from fastapi import APIRouter, Depends, Header, HTTPException
 from passlib.context import CryptContext
 from pydantic import BaseModel
 
-from backend import tenancy
+from backend import repo, tenancy
 
 router = APIRouter()
 
@@ -30,25 +30,6 @@ _JWT_SECRET = os.environ.get("JWT_SECRET", "dev-insecure-secret-change-me")
 _JWT_ALG = "HS256"
 _TOKEN_TTL = timedelta(days=7)
 _EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
-
-
-# ── User store ────────────────────────────────────────────────────
-def _load_users() -> list:
-    if not os.path.exists(tenancy.USERS_PATH):
-        return []
-    with open(tenancy.USERS_PATH, encoding="utf-8") as f:
-        return json.load(f)
-
-
-def _save_users(users: list):
-    os.makedirs(os.path.dirname(tenancy.USERS_PATH), exist_ok=True)
-    with open(tenancy.USERS_PATH, "w", encoding="utf-8") as f:
-        json.dump(users, f, indent=2, ensure_ascii=False)
-
-
-def _find_user(email: str) -> Optional[dict]:
-    email = email.strip().lower()
-    return next((u for u in _load_users() if u["email"] == email), None)
 
 
 def _make_token(tenant_id: str, email: str) -> str:
@@ -75,20 +56,16 @@ def register(req: Credentials):
         raise HTTPException(status_code=422, detail="Please enter a valid email address")
     if len(req.password) < 6:
         raise HTTPException(status_code=422, detail="Password must be at least 6 characters")
-    if _find_user(email):
+    if repo.user_find(email):
         raise HTTPException(status_code=409, detail="An account with this email already exists")
 
-    users = _load_users()
     tenant_id = uuid.uuid4().hex
-    user = {
-        "id": (max((u["id"] for u in users), default=0) + 1),
-        "email": email,
-        "password_hash": _pwd.hash(req.password),
-        "tenant_id": tenant_id,
-        "created_at": datetime.now(timezone.utc).isoformat(),
-    }
-    users.append(user)
-    _save_users(users)
+    repo.user_create(
+        email=email,
+        password_hash=_pwd.hash(req.password),
+        tenant_id=tenant_id,
+        created_at=datetime.now(timezone.utc).isoformat(),
+    )
     tenancy.provision_tenant(tenant_id)
 
     return {"token": _make_token(tenant_id, email), "email": email}
@@ -97,10 +74,10 @@ def register(req: Credentials):
 @router.post("/auth/login")
 def login(req: Credentials):
     """Verify credentials and return a token."""
-    user = _find_user(req.email)
+    user = repo.user_find(req.email)
     if not user or not _pwd.verify(req.password, user["password_hash"]):
         raise HTTPException(status_code=401, detail="Invalid email or password")
-    # Heal any tenant whose folder went missing.
+    # Heal any tenant that was never provisioned (or predates the database).
     if not tenancy.tenant_exists(user["tenant_id"]):
         tenancy.provision_tenant(user["tenant_id"])
     return {"token": _make_token(user["tenant_id"], user["email"]), "email": user["email"]}
@@ -130,5 +107,5 @@ async def require_tenant(authorization: Optional[str] = Header(None)) -> str:
 
 @router.get("/auth/me")
 def me(tenant_id: str = Depends(require_tenant)):
-    user = next((u for u in _load_users() if u["tenant_id"] == tenant_id), None)
+    user = repo.user_find_by_tenant(tenant_id)
     return {"tenant_id": tenant_id, "email": user["email"] if user else None}

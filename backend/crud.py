@@ -12,12 +12,12 @@ Endpoints
   GET    /kols/{id}/history          Metric history snapshots for a KOL
   POST   /kols/{id}/simulate-update  Simulate a TikTok API refresh (random drift)
 
-All writes persist to data/sample_kols.json immediately.
-KOL metric history persists to data/kol_history.json.
+All writes go to the tenant-scoped `kols` / `kol_snapshots` tables
+(backend/repo.py) as row-level operations, so concurrent merchants never
+contend on each other's data.
 """
 import csv
 import io
-import json
 import os
 import random
 import re
@@ -27,45 +27,22 @@ from typing import List, Optional
 from fastapi import APIRouter, HTTPException, UploadFile, File, Form, Depends
 from pydantic import BaseModel, field_validator
 
-from backend import tenancy
+from backend import repo, tenancy
 from backend.auth import require_tenant
 
 router = APIRouter()
 
-# Data file locations are resolved per-tenant at call time (see backend/tenancy.py),
-# so every endpoint reads/writes only the current merchant's isolated folder.
 
 # ── KOL history helpers ───────────────────────────────────────
 _SNAPSHOT_FIELDS = ("engagement_rate", "fit_score", "followers", "commission_rate", "avg_views", "avg_likes")
 
 
-def _load_history() -> List[dict]:
-    path = tenancy.history_path()
-    if not os.path.exists(path):
-        return []
-    with open(path, encoding="utf-8") as f:
-        return json.load(f)
-
-
-def _save_history(data: List[dict]):
-    with open(tenancy.history_path(), "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2, ensure_ascii=False)
-
-
 def _record_snapshot(kol_record: dict):
     """Append a timestamped snapshot of the KOL's current metrics to history."""
-    history = _load_history()
-    entry = next((h for h in history if h["kol_id"] == kol_record["id"]), None)
-    if entry is None:
-        entry = {"kol_id": kol_record["id"], "snapshots": []}
-        history.append(entry)
-
-    snapshot = {"recorded_at": datetime.utcnow().isoformat()}
-    for f in _SNAPSHOT_FIELDS:
-        if f in kol_record and kol_record[f] is not None:
-            snapshot[f] = kol_record[f]
-    entry["snapshots"].append(snapshot)
-    _save_history(history)
+    metrics = {f: kol_record[f] for f in _SNAPSHOT_FIELDS
+               if f in kol_record and kol_record[f] is not None}
+    repo.history_append(tenancy.current_tenant(), kol_record["id"],
+                        datetime.utcnow().isoformat(), metrics)
 
 VALID_COUNTRIES = ["MY", "ID", "TH", "PH", "SG", "VN"]
 VALID_CATEGORIES = ["beauty", "fashion", "home", "fmcg"]
@@ -156,28 +133,6 @@ class KOLUpdate(BaseModel):
     gender_ratio: Optional[float] = None
     age_group: Optional[str] = None
     tiktok_url: Optional[str] = None
-
-
-# ════════════════════════════════════════════════════════════════
-#  Helpers
-# ════════════════════════════════════════════════════════════════
-def _load() -> List[dict]:
-    path = tenancy.data_path()
-    if not os.path.exists(path):
-        return []
-    with open(path, encoding="utf-8") as f:
-        return json.load(f)
-
-
-def _save(data: List[dict]):
-    with open(tenancy.data_path(), "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2, ensure_ascii=False)
-
-
-def _next_id(data: List[dict]) -> int:
-    if not data:
-        return 1
-    return max(d["id"] for d in data) + 1
 
 
 # ════════════════════════════════════════════════════════════════
@@ -304,11 +259,11 @@ def _canonicalize_rows(headers, rows):
 
 
 def _ingest_rows(rows, default_country=None, default_category=None):
-    """Validate + insert canonicalised rows. Returns (added, estimated_cost, errors, total)."""
-    data = _load()
+    """Validate canonicalised rows and bulk-insert the valid ones.
+    Returns (added, estimated_cost, errors, total)."""
     dc = (default_country or "").strip().upper() or None
     dcat = (default_category or "").strip().lower() or None
-    added, estimated, errors = 0, 0, []
+    records, estimated, errors = [], 0, []
 
     for i, row in enumerate(rows, start=2):
         try:
@@ -352,7 +307,6 @@ def _ingest_rows(rows, default_country=None, default_category=None):
             gender = _parse_rate(row.get("gender_ratio"))
 
             record = {
-                "id":              _next_id(data),
                 "name":            name,
                 "country":         country,
                 "category":        category,
@@ -368,13 +322,13 @@ def _ingest_rows(rows, default_country=None, default_category=None):
                 "tiktok_url":      str(row.get("tiktok_url") or "").strip() or None,
                 "cost_estimated":  cost_estimated,
             }
-            data.append(_auto_fill(record))
-            added += 1
+            records.append(_auto_fill(record))
         except (ValueError, KeyError, TypeError) as e:
             errors.append(f"Row {i}: {e}")
 
-    _save(data)
-    return added, estimated, errors, len(data)
+    tenant = tenancy.current_tenant()
+    added = repo.kols_add_many(tenant, records) if records else 0
+    return added, estimated, errors, repo.kols_count(tenant)
 
 
 def _auto_fill(d: dict) -> dict:
@@ -396,23 +350,17 @@ def _auto_fill(d: dict) -> dict:
 @router.post("/kols/add")
 def add_kol(kol: KOLCreate, _t: str = Depends(require_tenant)):
     """Add a single KOL to the database."""
-    data = _load()
-    new_id = _next_id(data)
-
-    record = {"id": new_id, **kol.model_dump()}
-    record = _auto_fill(record)
-    data.append(record)
-    _save(data)
-
-    return {"message": f"KOL '{kol.name}' added with id {new_id}", "id": new_id, "kol": record}
+    record = _auto_fill(kol.model_dump())
+    saved = repo.kols_add(tenancy.current_tenant(), record)
+    return {"message": f"KOL '{kol.name}' added with id {saved['id']}", "id": saved["id"], "kol": saved}
 
 
 @router.put("/kols/{kol_id}")
 def update_kol(kol_id: int, updates: KOLUpdate, _t: str = Depends(require_tenant)):
     """Update an existing KOL. Snapshots current metrics before applying changes."""
-    data = _load()
-    idx = next((i for i, d in enumerate(data) if d["id"] == kol_id), None)
-    if idx is None:
+    tenant = tenancy.current_tenant()
+    current = repo.kols_get(tenant, kol_id)
+    if current is None:
         raise HTTPException(status_code=404, detail=f"KOL with id {kol_id} not found")
 
     changes = updates.model_dump(exclude_none=True)
@@ -428,24 +376,20 @@ def update_kol(kol_id: int, updates: KOLUpdate, _t: str = Depends(require_tenant
         changes["cost_estimated"] = False
 
     # Auto-snapshot BEFORE applying changes (track history)
-    _record_snapshot(data[idx])
+    _record_snapshot(current)
 
-    data[idx].update(changes)
-    _save(data)
-
-    return {"message": f"KOL {kol_id} updated", "kol": data[idx]}
+    updated = repo.kols_update(tenant, kol_id, changes)
+    return {"message": f"KOL {kol_id} updated", "kol": updated}
 
 
 @router.get("/kols/{kol_id}/history")
 def get_kol_history(kol_id: int, _t: str = Depends(require_tenant)):
     """Return all metric snapshots for a KOL, newest first."""
-    data = _load()
-    if not any(d["id"] == kol_id for d in data):
+    tenant = tenancy.current_tenant()
+    if not repo.kols_exists(tenant, kol_id):
         raise HTTPException(status_code=404, detail=f"KOL with id {kol_id} not found")
 
-    history = _load_history()
-    entry = next((h for h in history if h["kol_id"] == kol_id), None)
-    snapshots = list(reversed(entry["snapshots"])) if entry else []
+    snapshots = list(reversed(repo.history_for(tenant, kol_id)))
     return {"kol_id": kol_id, "snapshots": snapshots, "count": len(snapshots)}
 
 
@@ -456,12 +400,11 @@ def simulate_kol_update(kol_id: int, _t: str = Depends(require_tenant)):
     engagement_rate, fit_score, followers, and record a new snapshot.
     Useful for demos and testing trend visualisation without a real API.
     """
-    data = _load()
-    idx = next((i for i, d in enumerate(data) if d["id"] == kol_id), None)
-    if idx is None:
+    tenant = tenancy.current_tenant()
+    kol = repo.kols_get(tenant, kol_id)
+    if kol is None:
         raise HTTPException(status_code=404, detail=f"KOL with id {kol_id} not found")
 
-    kol = data[idx]
     rng = random.Random()   # fresh RNG each call → different values
 
     def drift(val: float, lo: float, hi: float, min_v: float, max_v: float) -> float:
@@ -469,28 +412,29 @@ def simulate_kol_update(kol_id: int, _t: str = Depends(require_tenant)):
         factor = 1 + rng.uniform(lo, hi)
         return round(max(min_v, min(max_v, val * factor)), 4)
 
-    old_eng = kol.get("engagement_rate", 0.08)
-    old_fit = kol.get("fit_score", 0.75)
-    old_fol = kol.get("followers", 100000)
+    old_eng = kol.get("engagement_rate") or 0.08
+    old_fit = kol.get("fit_score") or 0.75
+    old_fol = kol.get("followers") or 100000
 
     # Snapshot BEFORE applying drift (consistent with update_kol behavior)
-    _record_snapshot(dict(kol))
+    _record_snapshot(kol)
 
-    kol["engagement_rate"] = drift(old_eng, -0.08, +0.12, 0.01, 0.50)
-    kol["fit_score"]        = drift(old_fit, -0.05, +0.08, 0.10, 1.00)
-    kol["followers"]        = int(drift(old_fol, -0.02, +0.06, 1000, 50_000_000))
-    kol["avg_views"]        = int(kol["followers"] * rng.uniform(0.20, 0.40))
-    kol["avg_likes"]        = int(kol["avg_views"] * kol["engagement_rate"])
-
-    _save(data)
+    changes = {
+        "engagement_rate": drift(old_eng, -0.08, +0.12, 0.01, 0.50),
+        "fit_score":       drift(old_fit, -0.05, +0.08, 0.10, 1.00),
+        "followers":       int(drift(old_fol, -0.02, +0.06, 1000, 50_000_000)),
+    }
+    changes["avg_views"] = int(changes["followers"] * rng.uniform(0.20, 0.40))
+    changes["avg_likes"] = int(changes["avg_views"] * changes["engagement_rate"])
+    repo.kols_update(tenant, kol_id, changes)
 
     return {
         "message": "Simulated metric refresh applied",
         "kol_id": kol_id,
         "changes": {
-            "engagement_rate": {"before": old_eng, "after": kol["engagement_rate"]},
-            "fit_score":        {"before": old_fit, "after": kol["fit_score"]},
-            "followers":        {"before": old_fol, "after": kol["followers"]},
+            "engagement_rate": {"before": old_eng, "after": changes["engagement_rate"]},
+            "fit_score":        {"before": old_fit, "after": changes["fit_score"]},
+            "followers":        {"before": old_fol, "after": changes["followers"]},
         },
     }
 
@@ -498,13 +442,10 @@ def simulate_kol_update(kol_id: int, _t: str = Depends(require_tenant)):
 @router.delete("/kols/{kol_id}")
 def delete_kol(kol_id: int, _t: str = Depends(require_tenant)):
     """Delete a KOL from the database."""
-    data = _load()
-    before = len(data)
-    data = [d for d in data if d["id"] != kol_id]
-    if len(data) == before:
+    remaining = repo.kols_delete(tenancy.current_tenant(), kol_id)
+    if remaining is None:
         raise HTTPException(status_code=404, detail=f"KOL with id {kol_id} not found")
-    _save(data)
-    return {"message": f"KOL {kol_id} deleted", "remaining": len(data)}
+    return {"message": f"KOL {kol_id} deleted", "remaining": remaining}
 
 
 @router.post("/kols/import-csv")
@@ -598,7 +539,8 @@ async def backfill_costs(file: UploadFile = File(...), _t: str = Depends(require
         raise HTTPException(status_code=422, detail="No data rows found in the file.")
 
     rows = _canonicalize_rows(headers, raw_rows)
-    data = _load()
+    tenant = tenancy.current_tenant()
+    data = repo.kols_all(tenant)
     by_id = {d["id"]: d for d in data}
     by_url, by_name = {}, {}
     for d in data:
@@ -607,7 +549,7 @@ async def backfill_costs(file: UploadFile = File(...), _t: str = Depends(require
             by_url.setdefault(url, d)
         by_name.setdefault((d.get("name") or "").strip().lower(), d)
 
-    updated, no_price, unmatched = 0, 0, []
+    changes_by_id, no_price, unmatched = {}, 0, []
     for i, row in enumerate(rows, start=2):
         cost = _parse_number(row.get("cost"))
         if cost is None or cost <= 0:
@@ -626,11 +568,9 @@ async def backfill_costs(file: UploadFile = File(...), _t: str = Depends(require
             unmatched.append(str(row.get("name") or row.get("tiktok_url") or f"row {i}"))
             continue
 
-        target["cost"] = round(float(cost), 2)
-        target["cost_estimated"] = False
-        updated += 1
+        changes_by_id[target["id"]] = {"cost": round(float(cost), 2), "cost_estimated": False}
 
-    _save(data)
+    updated = repo.kols_update_many(tenant, changes_by_id) if changes_by_id else 0
     msg = f"Updated {updated} creator prices"
     if unmatched:
         msg += f" · {len(unmatched)} rows didn't match any creator"
@@ -697,7 +637,7 @@ def export_csv(_t: str = Depends(require_tenant)):
     """Export all KOLs as a downloadable CSV file."""
     from fastapi.responses import StreamingResponse
 
-    data = _load()
+    data = repo.kols_all(tenancy.current_tenant())
     output = io.StringIO()
     if data:
         all_keys = []
@@ -723,8 +663,8 @@ def export_csv(_t: str = Depends(require_tenant)):
 @router.post("/kols/reset")
 def reset_database(_t: str = Depends(require_tenant)):
     """
-    Restore the library to this tenant's seed baseline (seed_kols.json) —
-    the initialization creator library every merchant starts from.
+    Restore the library to this tenant's seed baseline — the initialization
+    creator library every merchant starts from.
 
     A merchant can freely add / edit / delete / import while experimenting,
     then reset to snap back to the curated seed. If no seed baseline exists,
@@ -733,14 +673,10 @@ def reset_database(_t: str = Depends(require_tenant)):
     Also clears metric history so reset state is clean (snapshots that
     referenced edited/removed creators do not linger).
     """
-    seed_p = tenancy.seed_path()
-    if os.path.exists(seed_p):
-        with open(seed_p, encoding="utf-8") as f:
-            seed = json.load(f)
-        _save(seed)
-        _save_history([])
+    tenant = tenancy.current_tenant()
+    seed = repo.tenant_seed(tenant)
+    repo.kols_replace(tenant, seed)
+    repo.history_clear(tenant)
+    if seed:
         return {"message": "Library restored to seed baseline", "total": len(seed)}
-
-    _save([])
-    _save_history([])
     return {"message": "Database cleared successfully", "total": 0}
