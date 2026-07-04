@@ -5,7 +5,7 @@
 [![CI](https://github.com/Hedy12130102/tiktok-kol-optimizer/actions/workflows/ci.yml/badge.svg)](https://github.com/Hedy12130102/tiktok-kol-optimizer/actions/workflows/ci.yml)
 ![Python](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.137-009688?logo=fastapi&logoColor=white)
-![Tests](https://img.shields.io/badge/tests-128%20passing-brightgreen)
+![Tests](https://img.shields.io/badge/tests-135%20passing-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 For Southeast-Asia TikTok Shop merchants and agencies who must allocate a marketing budget across hundreds of creators — and **prove the ROI afterwards**. The system filters the creator pool by market and category, compares **six optimization algorithms** to maximize predicted GMV, explains *why* each creator was chosen, and feeds predicted-vs-actual GMV back into the model so every campaign **automatically** sharpens the next. Each merchant works in their own isolated, login-gated tenant.
@@ -54,7 +54,7 @@ Structured search beats naïve hill-climbing by **49–201%**, and the advantage
 | **Data & analytics** | NumPy; CSV/Excel import (openpyxl) + export; calibrated SEA market model with actual-vs-predicted feedback |
 | **Deployment** | Docker + docker-compose (multi-worker uvicorn + PostgreSQL); env-driven config — see [`docs/saas-architecture.md`](docs/saas-architecture.md) |
 | **Experiments** | Matplotlib figure pipeline; seeded, fully reproducible benchmarks |
-| **Quality** | 128 pytest tests (isolated from production data); GitHub Actions CI on every push |
+| **Quality** | 135 pytest tests (isolated from production data); GitHub Actions CI on every push |
 
 ---
 
@@ -87,6 +87,7 @@ The platform is organised into three product modules backed by two intelligence 
 | 👥 **Creator Management** | Build, import, and curate your own KOL database | CRUD · CSV/Excel import · price backfill · metric-trend sparklines |
 | 📈 **Campaign Attribution** | Closes the loop by comparing predicted vs actual GMV | Accuracy % · **self-calibrating predictions** |
 | 🔐 **Merchant Accounts** | Email/password login; each merchant's data is fully isolated | JWT auth · per-tenant library & campaigns |
+| 💳 **Plans & Billing** | Free / Pro / Team subscription tiers with server-enforced quotas | usage meters · in-app upgrades · landing-page pricing |
 | 🧠 **Explainable AI** | Plain-English justification for every pick | 3+ data-driven reasons per creator |
 | ⭐ **CreatorScore & Tiers** | Composite quality score + tier classification | Leaderboards · badges · ranking |
 

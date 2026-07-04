@@ -41,4 +41,11 @@ shutil.copyfile(_DATA, os.path.join(_TMP, "seed_kols.json"))
 os.environ["KOL_DATA_DIR"] = _TMP
 os.environ["DEFAULT_TENANT"] = _TEST_TENANT
 
+# The suite runs far more optimizations against the fallback "test" tenant than
+# a free tier's monthly quota allows — put it on the unlimited Team plan.
+# (The env vars above must be set before this import.)
+from backend import repo  # noqa: E402
+
+repo.plan_set(_TEST_TENANT, "team")
+
 atexit.register(lambda: shutil.rmtree(_TMP, ignore_errors=True))

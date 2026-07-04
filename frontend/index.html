@@ -406,6 +406,7 @@
                     <a href="#features">Capabilities</a>
                     <a href="#how">How it works</a>
                     <a href="#metrics">Results</a>
+                    <a href="#pricing">Pricing</a>
                     <button class="lp-btn lp-btn-ghost" style="padding:9px 18px;font-size:14px" onclick="enterApp()">Launch Console</button>
                 </div>
             </nav>
@@ -527,6 +528,51 @@
                         <div class="num">3</div>
                         <h3>Compare, Save, Review</h3>
                         <p>Compare the three plans, save as a campaign, then log real GMV afterward to continuously calibrate your model.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Pricing -->
+            <section class="lp-section" id="pricing">
+                <div class="lp-eyebrow lp-reveal">PRICING</div>
+                <h2 class="lp-h2 lp-reveal">Start free, scale when it pays off</h2>
+                <p class="lp-section-sub lp-reveal">Every plan runs all six algorithms with explainable picks. Upgrade for a bigger library, unlimited runs and team seats.</p>
+                <div class="lp-reveal" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;margin-top:36px;text-align:left">
+                    <div class="lp-glass" style="border-radius:18px;padding:28px;display:flex;flex-direction:column;gap:14px">
+                        <p style="font-size:12px;letter-spacing:.12em;color:#87867d;font-weight:700">FREE</p>
+                        <p style="font-size:34px;font-weight:800;line-height:1">$0<span style="font-size:13px;color:#87867d;font-weight:500"> / month</span></p>
+                        <ul style="font-size:13px;color:#b5b3a9;display:flex;flex-direction:column;gap:8px;list-style:none;padding:0;flex:1">
+                            <li>✓ 500-creator library</li>
+                            <li>✓ 10 optimization runs / month</li>
+                            <li>✓ All 6 algorithms + explainability</li>
+                            <li>✓ CSV / Excel import &amp; export</li>
+                        </ul>
+                        <button class="lp-btn lp-btn-ghost" style="width:100%;justify-content:center" onclick="enterApp()">Start free</button>
+                    </div>
+                    <div class="lp-glass" style="border-radius:18px;padding:28px;display:flex;flex-direction:column;gap:14px;border:1px solid rgba(255,0,80,.45);position:relative">
+                        <span style="position:absolute;top:-11px;left:24px;background:linear-gradient(90deg,#FF0050,#A855F7);color:#fff;font-size:10px;font-weight:800;letter-spacing:.1em;padding:4px 10px;border-radius:999px">MOST POPULAR</span>
+                        <p style="font-size:12px;letter-spacing:.12em;color:#FF4D79;font-weight:700">PRO</p>
+                        <p style="font-size:34px;font-weight:800;line-height:1">$49<span style="font-size:13px;color:#87867d;font-weight:500"> / month</span></p>
+                        <ul style="font-size:13px;color:#b5b3a9;display:flex;flex-direction:column;gap:8px;list-style:none;padding:0;flex:1">
+                            <li>✓ 5,000-creator library</li>
+                            <li>✓ Unlimited optimization runs</li>
+                            <li>✓ Self-calibrating GMV predictions</li>
+                            <li>✓ Campaign attribution &amp; accuracy</li>
+                            <li>✓ 3 team seats</li>
+                        </ul>
+                        <button class="lp-btn lp-btn-primary" style="width:100%;justify-content:center" onclick="enterApp()">Upgrade in console</button>
+                    </div>
+                    <div class="lp-glass" style="border-radius:18px;padding:28px;display:flex;flex-direction:column;gap:14px">
+                        <p style="font-size:12px;letter-spacing:.12em;color:#A855F7;font-weight:700">TEAM</p>
+                        <p style="font-size:34px;font-weight:800;line-height:1">$199<span style="font-size:13px;color:#87867d;font-weight:500"> / month</span></p>
+                        <ul style="font-size:13px;color:#b5b3a9;display:flex;flex-direction:column;gap:8px;list-style:none;padding:0;flex:1">
+                            <li>✓ Unlimited creator library</li>
+                            <li>✓ Unlimited optimization runs</li>
+                            <li>✓ 10 seats &amp; multi-store support</li>
+                            <li>✓ API access</li>
+                            <li>✓ Priority support</li>
+                        </ul>
+                        <button class="lp-btn lp-btn-ghost" style="width:100%;justify-content:center" onclick="enterApp()">Upgrade in console</button>
                     </div>
                 </div>
             </section>
@@ -657,12 +703,18 @@
                         class="font-title-md text-title-md">Creators</span></div>
                 <div class="nav-item" data-page="campaigns"><span class="material-symbols-outlined">analytics</span><span
                         class="font-title-md text-title-md">Campaigns</span></div>
+                <div class="nav-item" data-page="billing"><span
+                        class="material-symbols-outlined">workspace_premium</span><span
+                        class="font-title-md text-title-md">Plan &amp; Billing</span></div>
             </div>
         </nav>
         <div class="mt-auto pt-md border-t border-outline-variant/30">
             <div class="flex items-center gap-2 px-xs py-2">
                 <span class="material-symbols-outlined text-[18px] text-on-surface-variant">account_circle</span>
                 <span id="account-email" class="text-[12px] text-on-surface-variant truncate flex-1" title="">—</span>
+                <span id="plan-badge" class="hidden text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider cursor-pointer flex-shrink-0"
+                    style="background:rgba(0,200,83,0.12);color:#00C853;border:1px solid rgba(0,200,83,0.3)"
+                    title="View plan & usage" onclick="showPage('billing')">Free</span>
                 <button onclick="logout()" title="Log out" class="text-outline hover:text-error transition-colors">
                     <span class="material-symbols-outlined text-[18px]">logout</span>
                 </button>
@@ -1207,6 +1259,37 @@
             </div>
         </div>
 
+        <!-- ════ PAGE: PLAN & BILLING ════ -->
+        <div id="page-billing" class="hidden p-margin-desktop space-y-xl">
+            <!-- Current plan + usage meters -->
+            <div class="glass-card rounded-xl p-lg space-y-lg">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Current Plan</p>
+                        <div class="flex items-baseline gap-md mt-1">
+                            <h3 id="billing-plan-name" class="font-headline-lg text-headline-lg text-on-surface">—</h3>
+                            <span id="billing-plan-price" class="text-sm text-on-surface-variant font-data-mono"></span>
+                        </div>
+                    </div>
+                    <span class="material-symbols-outlined text-[32px] text-secondary">workspace_premium</span>
+                </div>
+                <div id="billing-usage" class="grid grid-cols-2 gap-lg"></div>
+                <p class="text-[10px] text-on-surface-variant/60">Optimization quota resets at the start of each calendar month (UTC). Limits are enforced server-side.</p>
+            </div>
+
+            <!-- Plan catalog -->
+            <div class="space-y-sm">
+                <p class="text-on-surface-variant font-label-sm text-label-sm uppercase tracking-wider">Compare Plans</p>
+                <div id="billing-plans" class="grid grid-cols-3 gap-lg items-stretch"></div>
+            </div>
+
+            <!-- Payments note -->
+            <div class="glass-card rounded-xl p-md flex items-start gap-3" style="background:rgba(255,180,0,0.06);border:1px solid rgba(255,180,0,0.2)">
+                <span class="material-symbols-outlined text-[20px] flex-shrink-0" style="color:#ffb400">credit_card</span>
+                <p class="text-[12px] text-outline">Plan changes apply instantly in this preview build — card payments (Stripe) arrive with the commercial launch. Need invoicing, more seats, or annual billing? <a class="underline hover:text-on-surface" href="mailto:sales@tiko.app">Contact sales</a>.</p>
+            </div>
+        </div>
+
     </main>
 
     <!-- ═══════════ API CONNECT MODAL ═══════════ -->
@@ -1544,6 +1627,7 @@
         function enterApp() {
             if (!AUTH_TOKEN) { showAuth(); return; }
             setAccountEmail();
+            refreshBilling();
             const lp = document.getElementById('landing-page');
             if (!lp) return;
             lp.classList.remove('lp-show');
@@ -1594,6 +1678,12 @@
                 }
                 return _fetch(url, opts).then(r => {
                     if (r.status === 401 && typeof u === 'string' && !u.includes('/auth/')) handleAuthExpired();
+                    // 402 = plan quota hit — surface the reason and route to the upgrade page.
+                    if (r.status === 402 && typeof u === 'string' && !u.includes('/billing/')) {
+                        r.clone().json()
+                            .then(d => { toast(d.detail || 'Plan limit reached — upgrade to continue', 'err'); showPage('billing'); })
+                            .catch(() => { toast('Plan limit reached — upgrade to continue', 'err'); showPage('billing'); });
+                    }
                     return r;
                 });
             };
@@ -1669,7 +1759,7 @@
             if (!arr.length) return '—';
             return arr.map(cc => (flag[cc] || '') + ' ' + cc).join(' ');
         };
-        const PAGE_TITLES = { dashboard: 'Optimizer Dashboard', creators: 'Creator Management', campaigns: 'Campaign Attribution' };
+        const PAGE_TITLES = { dashboard: 'Optimizer Dashboard', creators: 'Creator Management', campaigns: 'Campaign Attribution', billing: 'Plan & Billing' };
         let currentView = 'business';
         let selectedPlanName = 'Balanced';
         let allPlansData = null;
@@ -1761,9 +1851,101 @@
             }
         });
 
+        // ══════════ PLAN & BILLING ══════════
+        let BILLING = null;
+        const PLAN_ORDER = ['free', 'pro', 'team'];
+        const PLAN_ACCENT = { free: '#8a8a83', pro: '#FF4D79', team: '#A855F7' };
+
+        // Fetch plan + usage and keep the sidebar badge in sync. Silent on failure.
+        async function refreshBilling() {
+            if (!AUTH_TOKEN) return null;
+            try {
+                const r = await fetch(`${API}/billing/info`);
+                if (!r.ok) return null;
+                BILLING = await r.json();
+                const badge = document.getElementById('plan-badge');
+                if (badge) { badge.textContent = BILLING.plan_name; badge.classList.remove('hidden'); }
+                return BILLING;
+            } catch (_) { return null; }
+        }
+
+        function usageMeter(icon, label, used, limit) {
+            const unlimited = limit == null;
+            const pct = unlimited ? 0 : Math.min(100, Math.round(used / limit * 100));
+            const color = unlimited ? '#00C853' : pct >= 100 ? '#FF0050' : pct >= 80 ? '#ffb400' : '#00C853';
+            const right = unlimited
+                ? `<span class="text-[11px] font-bold" style="color:#00C853">Unlimited</span>`
+                : `<span class="text-[11px] font-data-mono text-on-surface">${used.toLocaleString('en-US')} / ${limit.toLocaleString('en-US')}</span>`;
+            return `<div class="space-y-xs">
+                <div class="flex justify-between items-center">
+                    <span class="flex items-center gap-xs text-[11px] text-on-surface-variant uppercase tracking-wider">
+                        <span class="material-symbols-outlined text-[15px]">${icon}</span>${label}</span>
+                    ${right}
+                </div>
+                <div class="h-1.5 w-full bg-surface-container-highest rounded-full overflow-hidden">
+                    <div class="h-full rounded-full" style="width:${unlimited ? 100 : pct}%;background:${color};opacity:${unlimited ? 0.25 : 1};transition:width .4s"></div>
+                </div>
+            </div>`;
+        }
+
+        function planCard(id, info) {
+            const p = info.plans[id];
+            const current = id === info.plan;
+            const popular = id === 'pro';
+            const upgrade = PLAN_ORDER.indexOf(id) > PLAN_ORDER.indexOf(info.plan);
+            const features = p.features.map(f =>
+                `<li class="flex items-start gap-xs text-[12px] text-on-surface-variant">
+                    <span class="material-symbols-outlined text-[15px] flex-shrink-0" style="color:#00C853">check</span>${f}</li>`).join('');
+            const btn = current
+                ? `<button class="w-full py-sm rounded-lg text-sm font-bold border cursor-default" style="border-color:#353530;color:#8a8a83" disabled>Current plan</button>`
+                : popular
+                    ? `<button class="w-full py-sm rounded-lg text-sm font-bold primary-gradient text-white hover:scale-[0.98] transition-all" onclick="changePlan('${id}')">${upgrade ? 'Upgrade' : 'Switch'} to ${p.name}</button>`
+                    : `<button class="w-full py-sm rounded-lg text-sm font-bold border hover:bg-surface-container-high transition-colors" style="border-color:#353530;color:#e5e2da" onclick="changePlan('${id}')">${upgrade ? 'Upgrade' : 'Downgrade'} to ${p.name}</button>`;
+            return `<div class="glass-card rounded-xl p-lg flex flex-col space-y-md relative ${current ? '' : 'hover:border-outline'}"
+                style="${popular ? 'border:1px solid rgba(255,0,80,0.45)' : ''}${current ? ';box-shadow:0 0 0 1px rgba(0,200,83,0.35)' : ''}">
+                ${popular ? `<span class="absolute -top-2.5 left-5 text-[9px] font-extrabold tracking-widest px-2.5 py-0.5 rounded-full text-white" style="background:linear-gradient(90deg,#FF0050,#A855F7)">MOST POPULAR</span>` : ''}
+                <div class="flex items-center justify-between">
+                    <p class="text-[11px] font-bold tracking-widest uppercase" style="color:${PLAN_ACCENT[id]}">${p.name}</p>
+                    ${current ? `<span class="text-[9px] font-bold px-2 py-0.5 rounded-full uppercase" style="background:rgba(0,200,83,0.12);color:#00C853">Active</span>` : ''}
+                </div>
+                <p class="font-headline-lg text-headline-lg text-on-surface leading-none">$${p.price_usd}<span class="text-[12px] text-on-surface-variant font-normal"> / month</span></p>
+                <ul class="space-y-xs flex-1">${features}</ul>
+                ${btn}
+            </div>`;
+        }
+
+        async function loadBilling() {
+            const info = await refreshBilling();
+            if (!info) return;
+            document.getElementById('billing-plan-name').textContent = info.plan_name;
+            const price = (info.plans[info.plan] || {}).price_usd || 0;
+            document.getElementById('billing-plan-price').textContent = price > 0 ? `$${price} / month` : 'free forever';
+            document.getElementById('billing-usage').innerHTML =
+                usageMeter('group', 'Creator library', info.usage.creators, info.limits.max_creators) +
+                usageMeter('bolt', `Optimizations · ${info.usage.month}`, info.usage.optimize_runs, info.limits.monthly_optimizations);
+            document.getElementById('billing-plans').innerHTML = PLAN_ORDER.map(id => planCard(id, info)).join('');
+        }
+
+        async function changePlan(id) {
+            const p = BILLING && BILLING.plans[id];
+            if (!p) return;
+            const label = p.price_usd > 0 ? `$${p.price_usd}/month` : 'free';
+            if (!confirm(`Switch to the ${p.name} plan (${label})?`)) return;
+            try {
+                const r = await fetch(`${API}/billing/checkout`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ plan: id })
+                });
+                const d = await r.json();
+                if (!r.ok) { toast(d.detail || 'Could not switch plan', 'err'); return; }
+                toast(d.message || 'Plan updated');
+                loadBilling();
+            } catch (_) { toast('Could not reach the server', 'err'); }
+        }
+
         // ══════════ NAVIGATION ══════════
         function showPage(name) {
-            ['dashboard', 'creators', 'campaigns'].forEach(p => document.getElementById('page-' + p).classList.toggle('hidden', p !== name));
+            ['dashboard', 'creators', 'campaigns', 'billing'].forEach(p => document.getElementById('page-' + p).classList.toggle('hidden', p !== name));
             document.getElementById('page-title').textContent = PAGE_TITLES[name] || 'Dashboard';
             document.getElementById('view-toggle').classList.toggle('hidden', name !== 'dashboard' || document.getElementById('results-section').classList.contains('hidden'));
             document.querySelectorAll('.nav-item').forEach(el => el.classList.toggle('active', el.dataset.page === name));
@@ -1771,6 +1953,7 @@
             document.querySelector('main').scrollTop = 0;
             if (name === 'creators') loadTable();
             if (name === 'campaigns') loadCampaigns();
+            if (name === 'billing') loadBilling();
         }
         document.querySelectorAll('.nav-item').forEach(el => el.addEventListener('click', () => showPage(el.dataset.page)));
 
@@ -1982,6 +2165,7 @@
                 renderDashboard(data, payload);
                 // Sync header metrics to selected plan (overrides raw SA result)
                 if (allPlansData) selectPlan(selectedPlanName);
+                refreshBilling();   // keep the plan badge / metered usage fresh
             } catch (e) { showError(e.message.includes('fetch') ? '⚠️ Backend unavailable — run: uvicorn backend.main:app --reload' : '⚠️ ' + e.message); }
             finally { btn.innerHTML = '<span class="material-symbols-outlined text-[20px]">bolt</span> Run Optimization'; btn.disabled = false; }
         });

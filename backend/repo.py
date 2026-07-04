@@ -27,6 +27,8 @@ from backend.db import (
     KolSnapshot,
     SessionLocal,
     Tenant,
+    TenantPlan,
+    UsageCounter,
     User,
     engine,
 )
@@ -448,6 +450,51 @@ def campaigns_delete(tenant_id: str, campaign_id: int) -> bool:
         res = s.execute(delete(Campaign).where(Campaign.tenant_id == tenant_id,
                                                Campaign.campaign_id == campaign_id))
         return res.rowcount > 0
+
+
+# ════════════════════════════════════════════════════════════════
+#  Subscription plan & metered usage
+# ════════════════════════════════════════════════════════════════
+def plan_get(tenant_id: str) -> str:
+    """Tenant's subscription tier; no row means the free tier."""
+    with SessionLocal() as s:
+        row = s.get(TenantPlan, tenant_id)
+        return row.plan if row else "free"
+
+
+def plan_set(tenant_id: str, plan: str, updated_at: str = ""):
+    _ensure_migrated(tenant_id)
+    with _write_lock, _session() as s:
+        row = s.get(TenantPlan, tenant_id)
+        if row is None:
+            s.add(TenantPlan(tenant_id=tenant_id, plan=plan, updated_at=updated_at))
+        else:
+            row.plan = plan
+            row.updated_at = updated_at
+
+
+def optimize_runs(tenant_id: str, month: str) -> int:
+    with SessionLocal() as s:
+        row = s.get(UsageCounter, (tenant_id, month))
+        return row.optimize_runs if row else 0
+
+
+def optimize_consume(tenant_id: str, month: str) -> int:
+    """Count one optimization run against this month's quota; returns the new
+    total. Retries once if two first-runs of the month race on the insert."""
+    _ensure_migrated(tenant_id)
+    for attempt in (0, 1):
+        try:
+            with _write_lock, _session() as s:
+                row = s.get(UsageCounter, (tenant_id, month))
+                if row is None:
+                    s.add(UsageCounter(tenant_id=tenant_id, month=month, optimize_runs=1))
+                    return 1
+                row.optimize_runs += 1
+                return row.optimize_runs
+        except IntegrityError:
+            if attempt:
+                raise
 
 
 # ════════════════════════════════════════════════════════════════

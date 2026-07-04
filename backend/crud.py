@@ -27,7 +27,7 @@ from typing import List, Optional
 from fastapi import APIRouter, HTTPException, UploadFile, File, Form, Depends
 from pydantic import BaseModel, field_validator
 
-from backend import repo, tenancy
+from backend import billing, repo, tenancy
 from backend.auth import require_tenant
 
 router = APIRouter()
@@ -327,6 +327,8 @@ def _ingest_rows(rows, default_country=None, default_category=None):
             errors.append(f"Row {i}: {e}")
 
     tenant = tenancy.current_tenant()
+    if records:
+        billing.check_creator_capacity(tenant, adding=len(records))
     added = repo.kols_add_many(tenant, records) if records else 0
     return added, estimated, errors, repo.kols_count(tenant)
 
@@ -350,6 +352,7 @@ def _auto_fill(d: dict) -> dict:
 @router.post("/kols/add")
 def add_kol(kol: KOLCreate, _t: str = Depends(require_tenant)):
     """Add a single KOL to the database."""
+    billing.check_creator_capacity(tenancy.current_tenant(), adding=1)
     record = _auto_fill(kol.model_dump())
     saved = repo.kols_add(tenancy.current_tenant(), record)
     return {"message": f"KOL '{kol.name}' added with id {saved['id']}", "id": saved["id"], "kol": saved}

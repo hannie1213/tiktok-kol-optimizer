@@ -39,6 +39,7 @@ from engine.scoring.creator_score import compute_creator_score
 from engine.scoring.explainer import generate_reasons, get_tier
 from backend import calibration, repo, tenancy
 from backend.auth import router as auth_router, require_tenant
+from backend.billing import router as billing_router, check_and_consume_optimize
 from backend.crud import router as crud_router
 from backend.campaigns import router as campaigns_router
 
@@ -59,6 +60,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 app.include_router(auth_router)
+app.include_router(billing_router)
 app.include_router(crud_router)
 app.include_router(campaigns_router)
 
@@ -645,6 +647,11 @@ def optimize(req: OptimizeRequest, _t: str = Depends(require_tenant)):
             roi=0.0,
             results={},
         )
+
+    # Meter the run against the tenant's plan (402 → frontend shows upgrade).
+    # Only /optimize is metered: the UI fires /optimize-plans alongside it, and
+    # double-charging one user action would be wrong.
+    check_and_consume_optimize(_t)
 
     scores = compute_creator_score(filtered)
     filtered, scores = shortlist_candidates(filtered, scores)

@@ -179,6 +179,25 @@ class Calibration(Base):
     doc: Mapped[dict] = mapped_column(JSON, default=dict)
 
 
+class TenantPlan(Base):
+    """Which subscription tier a tenant is on. No row → free tier. The plan
+    catalog itself (limits, prices) lives in backend/billing.py."""
+    __tablename__ = "tenant_plans"
+
+    tenant_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    plan: Mapped[str] = mapped_column(String(16), default="free")
+    updated_at: Mapped[str] = mapped_column(String(40), default="")
+
+
+class UsageCounter(Base):
+    """Per-tenant, per-calendar-month metered usage (quota enforcement)."""
+    __tablename__ = "usage_counters"
+
+    tenant_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    month: Mapped[str] = mapped_column(String(7), primary_key=True)   # "YYYY-MM"
+    optimize_runs: Mapped[int] = mapped_column(Integer, default=0)
+
+
 def init_db():
     Base.metadata.create_all(engine)
 
