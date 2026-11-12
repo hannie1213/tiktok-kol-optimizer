@@ -14,15 +14,20 @@ Run:  uvicorn backend.main:app --reload
 Docs: http://localhost:8000/docs
 """
 
+import logging
 import math
 import os
+import re
 import sys
+import time
+import uuid
 import contextvars
 from typing import Dict, List, Optional
-from fastapi import FastAPI, HTTPException, Query, Depends
+from fastapi import FastAPI, HTTPException, Query, Depends, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 # ── Make project root importable ──────────────────────────────────
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -37,11 +42,24 @@ from engine.optimization.tabu_search import tabu_search
 from engine.optimization.greedy_ranking import greedy_ranking
 from engine.scoring.creator_score import compute_creator_score
 from engine.scoring.explainer import generate_reasons, get_tier
-from backend import calibration, repo, tenancy
+from backend import calibration, ratelimit, repo, settings, tenancy
+
+# Refuse to boot an unsafe production configuration (see backend/settings.py).
+settings.validate()
+
+logging.basicConfig(
+    level=os.environ.get("LOG_LEVEL", "INFO").upper(),
+    format="%(asctime)s %(levelname)s %(name)s %(message)s",
+)
+log = logging.getLogger("kol.api")
+
 from backend.auth import router as auth_router, require_tenant
 from backend.billing import router as billing_router, check_and_consume_optimize
 from backend.crud import router as crud_router
 from backend.campaigns import router as campaigns_router
+from backend.admin import router as admin_router, record_interest
+from backend.agent import router as agent_router
+from backend.guide import router as guide_router
 
 app = FastAPI(
     title="TikTok Shop KOL Matrix Optimizer API",
@@ -49,24 +67,100 @@ app = FastAPI(
     version="2.0",
 )
 
-# Production: set CORS_ORIGINS to a comma-separated list of your frontend
-# origins (e.g. "https://app.example.com"). The default "*" is dev-only.
-_CORS_ORIGINS = [o.strip() for o in os.environ.get("CORS_ORIGINS", "*").split(",") if o.strip()]
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=_CORS_ORIGINS,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# The bundled frontend is served from this same origin, so production needs no
+# CORS at all; set CORS_ORIGINS only if a frontend on another origin calls the
+# API. Auth is a Bearer header (no cookies), so credentials are never allowed.
+if settings.CORS_ORIGINS:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=settings.CORS_ORIGINS,
+        allow_credentials=False,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 app.include_router(auth_router)
 app.include_router(billing_router)
 app.include_router(crud_router)
 app.include_router(campaigns_router)
+app.include_router(admin_router)
+app.include_router(agent_router)
+app.include_router(guide_router)
+
+# UI language of the calling client (X-Lang header, set by the frontend).
+# Server-generated text — e.g. the "why this creator" reasons — follows it.
+_LANG_VAR = contextvars.ContextVar("ui_lang", default="en")
+
+
+@app.middleware("http")
+async def _capture_ui_lang(request, call_next):
+    lang = (request.headers.get("x-lang") or "en").lower()
+    _LANG_VAR.set("zh" if lang.startswith("zh") else "en")
+    return await call_next(request)
+
+
+# The frontend is inline-script heavy, so the CSP allows inline code; it still
+# pins where scripts/styles/fonts may load from and blocks framing and
+# cross-origin form posts.
+_CSP = (
+    "default-src 'self'; "
+    "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; "
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://api.fontshare.com; "
+    "font-src 'self' data: https://fonts.gstatic.com https://cdn.fontshare.com; "
+    "img-src 'self' data: blob: https:; "
+    "connect-src 'self'; "
+    "frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
+)
+_API_DOC_PATHS = ("/docs", "/redoc", "/openapi.json")
+
+
+@app.middleware("http")
+async def _harden(request: Request, call_next):
+    """Request-size cap, request id, access log, and security headers."""
+    rid = uuid.uuid4().hex[:12]
+    declared = request.headers.get("content-length")
+    if declared and declared.isdigit() and int(declared) > settings.MAX_UPLOAD_BYTES:
+        return JSONResponse(status_code=413, content={
+            "detail": f"Request too large (limit {settings.MAX_UPLOAD_BYTES // (1024 * 1024)} MB)"})
+
+    started = time.perf_counter()
+    try:
+        response = await call_next(request)
+    except Exception:
+        # Anything a route didn't handle: log the traceback, never leak it.
+        log.exception("unhandled error rid=%s %s %s", rid, request.method, request.url.path)
+        return JSONResponse(status_code=500, headers={"X-Request-ID": rid}, content={
+            "detail": "Something went wrong on our side. Please try again.", "request_id": rid})
+
+    ms = (time.perf_counter() - started) * 1000
+    if response.status_code >= 500 or ms > 5000:
+        log.warning("rid=%s %s %s -> %s in %.0f ms", rid, request.method,
+                    request.url.path, response.status_code, ms)
+
+    h = response.headers
+    h["X-Request-ID"] = rid
+    h.setdefault("X-Content-Type-Options", "nosniff")
+    h.setdefault("X-Frame-Options", "DENY")
+    h.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
+    h.setdefault("Permissions-Policy", "camera=(), microphone=(), geolocation=()")
+    if not request.url.path.startswith(_API_DOC_PATHS):     # Swagger UI needs its own CDN
+        h.setdefault("Content-Security-Policy", _CSP)
+    if settings.IS_PRODUCTION:
+        h.setdefault("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
+    return response
+
+
+async def _throttle_compute(request: Request, tenant_id: str = Depends(require_tenant)) -> str:
+    """Per-tenant ceiling on the CPU-bound solver routes (each call occupies a
+    worker for its whole duration). Monthly plan quotas are separate."""
+    ratelimit.enforce("compute", tenant_id, limit=30, window=60,
+                      detail="You're running optimizations very quickly — give it a few seconds.")
+    return tenant_id
 
 # ── Enum constants ────────────────────────────────────────────────
 VALID_COUNTRIES = ["MY", "ID", "TH", "PH", "SG", "VN"]
-VALID_CATEGORIES = ["beauty", "fashion", "home", "fmcg"]
+VALID_CATEGORIES = ["beauty", "fashion", "accessories", "muslim_fashion", "home", "kitchen",
+                    "appliances", "electronics", "mother_baby", "fmcg", "health",
+                    "sports_outdoor", "pet", "toys", "automotive"]
 VALID_TIERS = ["Mega", "Macro", "Micro", "Nano"]
 
 # The active KOL library is resolved per-tenant at call time (backend/tenancy.py),
@@ -76,18 +170,23 @@ VALID_TIERS = ["Mega", "Macro", "Micro", "Nano"]
 # ════════════════════════════════════════════════════════════════
 #  Pydantic models
 # ════════════════════════════════════════════════════════════════
+# Upper bound on any budget input: keeps solver runtime and the numbers sane.
+MAX_BUDGET = 10_000_000
+
+
 class OptimizeRequest(BaseModel):
-    budget: float
-    countries: List[str] = []
+    budget: float = Field(..., le=MAX_BUDGET, allow_inf_nan=False)
+    countries: List[str] = Field(default=[], max_length=12)
     category: str = "beauty"
-    seed: int = 42
+    content_type: str = "all"   # all | live (livestream sellers) | video (short-video creators)
+    seed: int = Field(42, ge=0, le=2**31 - 1)
 
 
 class SimulateScaleRequest(BaseModel):
     """Inputs for the synthetic Creator-Pool-Size simulator."""
-    budget: float
-    seed: int = 42
-    sizes: List[int] = []                 # pool sizes to sweep; empty = default sweep
+    budget: float = Field(..., le=MAX_BUDGET, allow_inf_nan=False)
+    seed: int = Field(42, ge=0, le=2**31 - 1)
+    sizes: List[int] = Field(default=[], max_length=16)   # pool sizes to sweep; empty = default sweep
     target_gmv: Optional[float] = None     # optional GMV goal → server returns needed_n
 
 
@@ -109,6 +208,8 @@ class KOLResult(BaseModel):
     gender_ratio: float = 0.5
     source: str = "fastmoss"          # "fastmoss" (real import) | "synthetic" (demo fill)
     cost_estimated: bool = False      # True when cost was inferred, not a real quote
+    content_type: str = "both"        # "live" (livestream seller) | "video" (short-video) | "both"
+    rating: Optional[int] = None      # merchant's own collaboration rating (1–5), if rated
 
 
 class KOLDetail(KOLResult):
@@ -227,9 +328,27 @@ def _refresh_meta(raw_list: List[dict]):
         d["id"]: {
             "source": d.get("source", "fastmoss"),
             "cost_estimated": bool(d.get("cost_estimated", False)),
+            "content_type": d.get("content_type") or "both",
+            "rating": d.get("rating"),
         }
         for d in raw_list
     })
+
+
+# Merchant collaboration ratings nudge future selections: a merchant's own
+# experience is first-hand brand-fit evidence, so it scales fit_score (which
+# flows into predicted GMV and every solver's objective). Unrated → unchanged.
+_RATING_FIT = {5: 1.15, 4: 1.08, 3: 1.0, 2: 0.85, 1: 0.65}
+
+
+def _apply_rating_fit(d: dict) -> dict:
+    try:
+        factor = _RATING_FIT.get(int(d.get("rating") or 0))
+    except (TypeError, ValueError):
+        factor = None
+    if factor and factor != 1.0 and d.get("fit_score") is not None:
+        d["fit_score"] = round(min(1.0, max(0.05, d["fit_score"] * factor)), 4)
+    return d
 
 
 def _kol_meta() -> dict:
@@ -237,18 +356,22 @@ def _kol_meta() -> dict:
 
 
 def load_kols(countries: Optional[List[str]] = None,
-              category: Optional[str] = None) -> List[KOL]:
+              category: Optional[str] = None,
+              content_type: Optional[str] = None) -> List[KOL]:
     """Current tenant's creators, with any country/category filter pushed down
     to an indexed SQL query instead of loading the whole library."""
-    raw = repo.kols_all(tenancy.current_tenant(), countries=countries, category=category)
+    raw = repo.kols_all(tenancy.current_tenant(), countries=countries, category=category,
+                        content_type=content_type)
     _refresh_meta(raw)
-    return [_dict_to_kol(d) for d in raw]
+    return [_dict_to_kol(_apply_rating_fit(d)) for d in raw]
 
 
 def load_raw_kols() -> List[dict]:
     raw = repo.kols_all(tenancy.current_tenant())
     _refresh_meta(raw)
-    return raw
+    # Same rating→fit adjustment as load_kols, so the /kol/{id} detail view
+    # shows the exact numbers the optimizer works with.
+    return [_apply_rating_fit(d) for d in raw]
 
 
 _KOL_FIELDS = {"id", "name", "country", "category",
@@ -261,7 +384,26 @@ def _dict_to_kol(d: dict) -> KOL:
     return KOL(**{k: v for k, v in d.items() if k in _KOL_FIELDS})
 
 
+def _rating_reason(rating: Optional[int]) -> Optional[str]:
+    """Localised 'you've worked with them before' line for the reasons list."""
+    if not rating:
+        return None
+    zh = _LANG_VAR.get() == "zh"
+    if rating >= 4:
+        return (f"你对 TA 的历史合作评分为 {rating}★ —— 已优先复用" if zh
+                else f"You rated past collaborations {rating}★ — prioritised for re-booking")
+    if rating <= 2:
+        return (f"历史合作评分 {rating}★ —— 本次已降低优先级" if zh
+                else f"Past collaboration rated {rating}★ — deprioritised this run")
+    return (f"历史合作评分 {rating}★" if zh else f"Past collaboration rated {rating}★")
+
+
 def to_kol_result(k: KOL, score: float, all_kols: List[KOL]) -> KOLResult:
+    meta = _kol_meta().get(k.id, {})
+    reasons = generate_reasons(k, all_kols, lang=_LANG_VAR.get())
+    rr = _rating_reason(meta.get("rating"))
+    if rr:
+        reasons.insert(0, rr)
     return KOLResult(
         id=k.id,
         name=k.name,
@@ -280,9 +422,11 @@ def to_kol_result(k: KOL, score: float, all_kols: List[KOL]) -> KOLResult:
         age_group=k.age_group,
         gender_ratio=k.gender_ratio,
         creator_score=score,
-        reasons=generate_reasons(k, all_kols),
-        source=_kol_meta().get(k.id, {}).get("source", "fastmoss"),
-        cost_estimated=_kol_meta().get(k.id, {}).get("cost_estimated", False),
+        reasons=reasons,
+        source=meta.get("source", "fastmoss"),
+        cost_estimated=meta.get("cost_estimated", False),
+        content_type=meta.get("content_type", "both"),
+        rating=meta.get("rating"),
     )
 
 
@@ -542,7 +686,17 @@ def run_plan_optimizers(
 # ════════════════════════════════════════════════════════════════
 @app.get("/health")
 def health():
-    return {"status": "ok"}
+    """Liveness + database reachability (used by the container healthcheck
+    and load balancers). 503 when the database can't be queried."""
+    from sqlalchemy import text
+    from backend.db import engine
+    try:
+        with engine.connect() as conn:
+            conn.execute(text("SELECT 1"))
+    except Exception:
+        log.exception("health check: database unreachable")
+        return JSONResponse(status_code=503, content={"status": "degraded", "database": "down"})
+    return {"status": "ok", "database": "ok"}
 
 
 @app.get("/calibration")
@@ -559,12 +713,16 @@ def get_calibration(_t: str = Depends(require_tenant)):
 # Phase 3 (planned): Third-party analytics (AsiaKOL, Cube Asia, Nox)
 
 class ApiConnectionRequest(BaseModel):
-    integration_type: str
-    credentials: Dict[str, str]
+    integration_type: str = Field(..., max_length=64)
+    # Accepted for forward compatibility but never read, logged or stored
+    # while the integrations are not live.
+    credentials: Dict[str, str] = {}
 
 class ApiInterestRequest(BaseModel):
-    email: str
-    integration_type: str
+    email: str = Field(..., max_length=254)
+    integration_type: str = Field(..., max_length=64)
+
+_INTEREST_EMAIL_RE = re.compile(r"^[A-Za-z0-9._%+\-]+@[A-Za-z0-9\-]+(\.[A-Za-z0-9\-]+)+$")
 
 @app.get("/api/connections")
 def list_connections():
@@ -583,15 +741,17 @@ def list_connections():
     }
 
 @app.post("/api/connections/interest")
-def register_interest(req: ApiInterestRequest):
+def register_interest(req: ApiInterestRequest, request: Request):
     """Register merchant interest in a coming-soon integration."""
-    import re as _re
-    if not _re.match(r"[^@]+@[^@]+\.[^@]+", req.email):
+    ratelimit.enforce("interest", ratelimit.client_ip(request), limit=10, window=3600)
+    if not _INTEREST_EMAIL_RE.match(req.email.strip()):
         raise HTTPException(status_code=422, detail="Invalid email address")
     valid_types = {"tiktok_creator", "tiktok_shop", "third_party"}
     if req.integration_type not in valid_types:
         raise HTTPException(status_code=422, detail=f"Unknown integration type: {req.integration_type}")
-    return {"status": "registered", "email": req.email, "integration_type": req.integration_type}
+    email = req.email.strip().lower()
+    record_interest(email, req.integration_type)   # persist for the operator console
+    return {"status": "registered", "email": email, "integration_type": req.integration_type}
 
 @app.post("/api/connections/connect")
 def connect_integration(req: ApiConnectionRequest):
@@ -621,7 +781,7 @@ def shortlist_candidates(kols: List[KOL], scores: List[float], cap: int = CANDID
 
 
 @app.post("/optimize", response_model=OptimizeResponse)
-def optimize(req: OptimizeRequest, _t: str = Depends(require_tenant)):
+def optimize(req: OptimizeRequest, _t: str = Depends(_throttle_compute)):
     """Run all six algorithms and return the best KOL matrix."""
     if req.budget <= 0:
         raise HTTPException(status_code=422, detail="budget must be a positive number")
@@ -629,10 +789,14 @@ def optimize(req: OptimizeRequest, _t: str = Depends(require_tenant)):
     if invalid_countries:
         raise HTTPException(status_code=422, detail=f"invalid countries: {invalid_countries}")
     if req.category not in VALID_CATEGORIES:
-        raise HTTPException(status_code=422, detail="category must be one of: beauty, fashion, home, fmcg")
+        raise HTTPException(status_code=422, detail=f"category must be one of: {', '.join(VALID_CATEGORIES)}")
+
+    if req.content_type not in ("all", "live", "video"):
+        raise HTTPException(status_code=422, detail="content_type must be one of: all, live, video")
 
     active_countries = set(req.countries) if req.countries else set(VALID_COUNTRIES)
-    filtered = load_kols(countries=list(active_countries), category=req.category)
+    filtered = load_kols(countries=list(active_countries), category=req.category,
+                         content_type=None if req.content_type == "all" else req.content_type)
 
     if not filtered:
         return OptimizeResponse(
@@ -697,7 +861,7 @@ def optimize(req: OptimizeRequest, _t: str = Depends(require_tenant)):
 
 
 @app.post("/optimize-plans", response_model=OptimizePlansResponse)
-def optimize_plans(req: OptimizeRequest, _t: str = Depends(require_tenant)):
+def optimize_plans(req: OptimizeRequest, _t: str = Depends(_throttle_compute)):
     """Return 3 plans with genuinely different selection objectives.
 
     Aggressive  — 120% budget, winner = algorithm with highest total GMV.
@@ -719,10 +883,14 @@ def optimize_plans(req: OptimizeRequest, _t: str = Depends(require_tenant)):
     if invalid_countries:
         raise HTTPException(status_code=422, detail=f"invalid countries: {invalid_countries}")
     if req.category not in VALID_CATEGORIES:
-        raise HTTPException(status_code=422, detail="category must be one of: beauty, fashion, home, fmcg")
+        raise HTTPException(status_code=422, detail=f"category must be one of: {', '.join(VALID_CATEGORIES)}")
+
+    if req.content_type not in ("all", "live", "video"):
+        raise HTTPException(status_code=422, detail="content_type must be one of: all, live, video")
 
     active_countries = set(req.countries) if req.countries else set(VALID_COUNTRIES)
-    filtered = load_kols(countries=list(active_countries), category=req.category)
+    filtered = load_kols(countries=list(active_countries), category=req.category,
+                         content_type=None if req.content_type == "all" else req.content_type)
 
     if not filtered:
         return OptimizePlansResponse(
@@ -772,7 +940,8 @@ def optimize_plans(req: OptimizeRequest, _t: str = Depends(require_tenant)):
         plans=[
             PlanResult(
                 plan_name="Aggressive",
-                description="Maximize GMV with up to 120% budget. Best for growth campaigns.",
+                description=("以最多 120% 预算冲刺最高 GMV，适合增长期投放。" if _LANG_VAR.get() == "zh"
+                             else "Maximize GMV with up to 120% budget. Best for growth campaigns."),
                 budget_limit=aggressive_budget,
                 selected_kols=agg_result.selected_kols,
                 total_cost=agg_result.total_cost,
@@ -783,7 +952,8 @@ def optimize_plans(req: OptimizeRequest, _t: str = Depends(require_tenant)):
             ),
             PlanResult(
                 plan_name="Balanced",
-                description="Optimal GMV–ROI trade-off within budget. Recommended default.",
+                description=("预算内 GMV 与 ROI 的最优平衡，推荐默认方案。" if _LANG_VAR.get() == "zh"
+                             else "Optimal GMV–ROI trade-off within budget. Recommended default."),
                 budget_limit=req.budget,
                 selected_kols=bal_result.selected_kols,
                 total_cost=bal_result.total_cost,
@@ -794,7 +964,8 @@ def optimize_plans(req: OptimizeRequest, _t: str = Depends(require_tenant)):
             ),
             PlanResult(
                 plan_name="Safe",
-                description="80% budget cap with deterministic Greedy Ranking for a conservative, efficient portfolio.",
+                description=("预算上限 80%，保守稳健、效率优先的阵容。" if _LANG_VAR.get() == "zh"
+                             else "80% budget cap for a conservative, efficient portfolio."),
                 budget_limit=safe_budget,
                 selected_kols=safe_result.selected_kols,
                 total_cost=safe_result.total_cost,
@@ -807,11 +978,114 @@ def optimize_plans(req: OptimizeRequest, _t: str = Depends(require_tenant)):
     )
 
 
+# ════════════════════════════════════════════════════════════════
+#  Budget advisor — "how should I split this budget?"
+# ════════════════════════════════════════════════════════════════
+class BudgetAdvisorRequest(BaseModel):
+    budget: float = Field(..., le=MAX_BUDGET, allow_inf_nan=False)
+    countries: List[str] = Field(default=[], max_length=12)
+    category: str = "beauty"
+    content_type: str = "all"
+
+
+def _dict_tier(d: dict) -> str:
+    f = d.get("followers") or 0
+    return "Mega" if f >= 1_000_000 else "Macro" if f >= 100_000 else "Micro" if f >= 10_000 else "Nano"
+
+
+def compute_budget_plan(tenant_id: str, budget: float, countries: List[str],
+                        category: str, content_type: str = "all") -> dict:
+    """Rule-based allocation template grounded in the merchant's own library.
+
+    Splits the budget into up to three roles — anchor (credibility & reach),
+    core (conversion workhorses) and test (cheap experiments / ad material) —
+    where each role maps to the highest creator tier the budget can actually
+    afford *in this merchant's library* (median real quotes, not theory).
+    """
+    import statistics
+
+    raw = repo.kols_all(tenant_id, countries=countries or None, category=category,
+                        content_type=None if content_type in ("all", "", None) else content_type)
+    tiers: Dict[str, dict] = {}
+    for t in VALID_TIERS:
+        rows = [d for d in raw if _dict_tier(d) == t]
+        costs = [d["cost"] for d in rows if (d.get("cost") or 0) > 0]
+        tiers[t] = {
+            "available": len(rows),
+            "median_cost": round(statistics.median(costs), 2) if costs else None,
+        }
+
+    # Tiers we can actually book, ordered Mega → Nano.
+    usable = [t for t in VALID_TIERS if tiers[t]["available"] > 0 and tiers[t]["median_cost"]]
+    flags: List[str] = []
+    if not usable:
+        return {"budget": budget, "category": category, "countries": countries,
+                "content_type": content_type, "total_available": len(raw),
+                "buckets": [], "rated_picks": [], "flags": ["empty_library"]}
+
+    # Anchor = highest tier whose median quote fits in ~half the budget.
+    anchor = next((t for t in usable if tiers[t]["median_cost"] <= budget * 0.5), None)
+    if anchor is None:
+        # Budget can't carry any tier as an anchor — go all-in on the cheapest tier.
+        cheapest = min(usable, key=lambda t: tiers[t]["median_cost"])
+        buckets_def = [(cheapest, "core", 1.0)]
+        flags.append("budget_stretch")
+    else:
+        below = usable[usable.index(anchor) + 1:]
+        if len(below) >= 2:
+            buckets_def = [(anchor, "anchor", 0.45), (below[0], "core", 0.35), (below[1], "test", 0.20)]
+        elif len(below) == 1:
+            buckets_def = [(anchor, "anchor", 0.60), (below[0], "core", 0.40)]
+        else:
+            buckets_def = [(anchor, "core", 1.0)]
+
+    buckets = []
+    for t, role, pct in buckets_def:
+        amount = round(budget * pct, 2)
+        median = tiers[t]["median_cost"]
+        suggested = max(1, int(amount // median)) if median and median <= amount else (1 if median else 0)
+        suggested = min(suggested, tiers[t]["available"])
+        if suggested >= tiers[t]["available"]:
+            flags.append(f"thin:{t}")
+        buckets.append({
+            "tier": t, "role": role, "pct": round(pct * 100),
+            "amount": amount, "median_cost": median,
+            "suggested_count": suggested, "available": tiers[t]["available"],
+        })
+
+    # Creators this merchant already rated highly — suggest re-booking first.
+    rated = sorted([d for d in raw if (d.get("rating") or 0) >= 4],
+                   key=lambda d: (-(d.get("rating") or 0), -(d.get("followers") or 0)))
+    rated_picks = [{"id": d["id"], "name": d.get("name"), "tier": _dict_tier(d),
+                    "rating": d.get("rating"), "cost": d.get("cost")} for d in rated[:5]]
+
+    return {"budget": budget, "category": category, "countries": countries,
+            "content_type": content_type, "total_available": len(raw),
+            "buckets": buckets, "rated_picks": rated_picks, "flags": flags}
+
+
+@app.post("/budget-advisor")
+def budget_advisor(req: BudgetAdvisorRequest, _t: str = Depends(require_tenant)):
+    """Explain how to split a budget across creator tiers before optimizing."""
+    if req.budget <= 0:
+        raise HTTPException(status_code=422, detail="budget must be a positive number")
+    invalid_countries = [c for c in req.countries if c not in VALID_COUNTRIES]
+    if invalid_countries:
+        raise HTTPException(status_code=422, detail=f"invalid countries: {invalid_countries}")
+    if req.category not in VALID_CATEGORIES:
+        raise HTTPException(status_code=422, detail=f"category must be one of: {', '.join(VALID_CATEGORIES)}")
+    if req.content_type not in ("all", "live", "video"):
+        raise HTTPException(status_code=422, detail="content_type must be one of: all, live, video")
+    return compute_budget_plan(tenancy.current_tenant(), req.budget, req.countries,
+                               req.category, req.content_type)
+
+
 @app.get("/kols", response_model=KOLListResponse)
 def get_kols(
     country: Optional[str] = Query(None),
     category: Optional[str] = Query(None),
     tier: Optional[str] = Query(None),
+    content_type: Optional[str] = Query(None),
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
     _t: str = Depends(require_tenant),
@@ -820,11 +1094,14 @@ def get_kols(
     if country is not None and country not in VALID_COUNTRIES:
         raise HTTPException(status_code=422, detail="country must be one of: MY, ID, TH, PH, SG, VN")
     if category is not None and category not in VALID_CATEGORIES:
-        raise HTTPException(status_code=422, detail="category must be one of: beauty, fashion, home, fmcg")
+        raise HTTPException(status_code=422, detail=f"category must be one of: {', '.join(VALID_CATEGORIES)}")
     if tier is not None and tier not in VALID_TIERS:
         raise HTTPException(status_code=422, detail="tier must be one of: Mega, Macro, Micro, Nano")
+    if content_type is not None and content_type not in ("live", "video"):
+        raise HTTPException(status_code=422, detail="content_type must be one of: live, video")
 
-    all_kols = load_kols(countries=[country] if country else None, category=category)
+    all_kols = load_kols(countries=[country] if country else None, category=category,
+                         content_type=content_type)
 
     filtered = [k for k in all_kols if tier is None or get_tier(k) == tier]
 
@@ -881,7 +1158,7 @@ def top_kols(
     if country is not None and country not in VALID_COUNTRIES:
         raise HTTPException(status_code=422, detail="country must be one of: MY, ID, TH, PH, SG, VN")
     if category is not None and category not in VALID_CATEGORIES:
-        raise HTTPException(status_code=422, detail="category must be one of: beauty, fashion, home, fmcg")
+        raise HTTPException(status_code=422, detail=f"category must be one of: {', '.join(VALID_CATEGORIES)}")
 
     filtered = load_kols(countries=[country] if country else None, category=category)
 
@@ -899,7 +1176,7 @@ _DEFAULT_SCALE_SIZES = [25, 50, 100, 200, 300, 500]
 
 
 @app.post("/simulate-scale", response_model=SimulateScaleResponse)
-def simulate_scale(req: SimulateScaleRequest):
+def simulate_scale(req: SimulateScaleRequest, _t: str = Depends(_throttle_compute)):
     """
     Creator-Pool-Size simulator — answers "how big a creator library do I need
     to reach my target GMV?".

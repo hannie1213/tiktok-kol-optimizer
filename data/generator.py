@@ -31,6 +31,28 @@ _AOV = {
     "fmcg":    {"MY": 22,  "ID": 18,  "TH": 20,  "PH": 16,  "SG": 32,  "VN": 11},
 }
 
+# Extended categories, mirrored from engine/models.py: a Malaysia-anchored AOV
+# scaled per market, plus a category-level CTR/CVR.
+_MARKET_AOV_FACTOR = {"MY": 1.0, "TH": 0.9, "ID": 0.83, "PH": 0.76, "SG": 1.45, "VN": 0.66}
+_EXT_CATEGORIES = {
+    # category:        (ctr,   cvr,   aov_my)
+    "accessories":     (0.034, 0.072, 35),
+    "muslim_fashion":  (0.033, 0.074, 45),
+    "kitchen":         (0.029, 0.063, 30),
+    "appliances":      (0.031, 0.058, 85),
+    "electronics":     (0.030, 0.055, 120),
+    "mother_baby":     (0.038, 0.092, 30),
+    "health":          (0.032, 0.070, 55),
+    "sports_outdoor":  (0.030, 0.062, 50),
+    "pet":             (0.039, 0.078, 32),
+    "toys":            (0.035, 0.072, 28),
+    "automotive":      (0.028, 0.050, 45),
+}
+for _cat, (_ctr, _cvr, _aov_my) in _EXT_CATEGORIES.items():
+    _CTR[_cat] = {c: _ctr for c in _MARKET_AOV_FACTOR}
+    _CVR[_cat] = {c: _cvr for c in _MARKET_AOV_FACTOR}
+    _AOV[_cat] = {c: round(_aov_my * f) for c, f in _MARKET_AOV_FACTOR.items()}
+
 _PURCHASING_POWER = {
     "MY": 1.0,
     "TH": 0.9,
@@ -69,15 +91,28 @@ def _approx_expected_gmv(country: str, category: str, followers: int,
 
 
 _COUNTRIES  = ["MY", "ID", "TH", "PH", "SG", "VN"]
-_CATEGORIES = ["beauty", "fashion", "home", "fmcg"]
+_CATEGORIES = ["beauty", "fashion", "accessories", "muslim_fashion", "home", "kitchen",
+               "appliances", "electronics", "mother_baby", "fmcg", "health",
+               "sports_outdoor", "pet", "toys", "automotive"]
 
 # Handle-like name fragments per category, for synthetic creators that need to
 # read as plausible TikTok accounts rather than "KOL_123".
 _NAME_PARTS = {
-    "beauty":  ["glowlab", "skinsense", "beautybox", "makeupdaily", "luxederma", "radiant", "glossy"],
-    "fashion": ["styledby", "wardrobe", "trendthreads", "ootd", "fitcheck", "couture", "streetfit"],
-    "home":    ["homestyle", "cozyliving", "nestit", "decorhub", "kitchenly", "casamood", "tidyhome"],
-    "fmcg":    ["dailypick", "snackbox", "freshmart", "pantrygo", "tastybites", "grocerly", "sip.daily"],
+    "beauty":         ["glowlab", "skinsense", "beautybox", "makeupdaily", "luxederma", "radiant", "glossy"],
+    "fashion":        ["styledby", "wardrobe", "trendthreads", "ootd", "fitcheck", "couture", "streetfit"],
+    "accessories":    ["bagcharm", "solemate", "shineon", "trinketry", "carryall", "glintco", "strapped"],
+    "muslim_fashion": ["modestmuse", "hijabstyle", "tudungco", "abayaline", "zahrawear", "modestly", "sofia.modest"],
+    "home":           ["homestyle", "cozyliving", "nestit", "decorhub", "casamood", "tidyhome", "loftlane"],
+    "kitchen":        ["cookjoy", "simmerly", "whisked", "panup", "sizzleco", "chefmate", "potnpan"],
+    "appliances":     ["homevolt", "applihub", "plugandgo", "breezyhome", "smartplug", "quickzap", "whirrly"],
+    "electronics":    ["technest", "gadgetgo", "voltify", "pixelpick", "unboxlab", "gizmody", "chipset"],
+    "mother_baby":    ["mamacare", "bubshub", "littleones", "mombasics", "cradleco", "tinytots", "nappybag"],
+    "fmcg":           ["dailypick", "snackbox", "freshmart", "pantrygo", "tastybites", "grocerly", "sip.daily"],
+    "health":         ["vitaboost", "wellnest", "healthyme", "supplely", "dailydose", "nutrico", "fitwell"],
+    "sports_outdoor": ["trailfit", "activelane", "sweatclub", "peakform", "outdoorly", "gymgear", "runkit"],
+    "pet":            ["pawsome", "furbaby", "petjoy", "whiskerly", "barkmart", "meowbox", "tailwag"],
+    "toys":           ["playpick", "toyverse", "funsize", "blockparty", "hobbyden", "kidplay", "brickfun"],
+    "automotive":     ["motorly", "ridegear", "autohub", "gearhead", "motokit", "drivetime", "wheelsup"],
 }
 
 

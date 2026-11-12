@@ -4,13 +4,22 @@ real Excel/CSV exports (e.g. FastMoss).
 
 This REPLACES sample_kols.json with exactly the rows in the files you pass —
 it does not append to whatever is already there. The result becomes the
-initialization library every merchant starts with (and, if you wire reset to
-restore the seed, what /kols/reset returns to).
+template library every new merchant tenant is provisioned from
+(tenancy.TEMPLATE_SEED = data/seed_kols.json), and what /kols/reset returns to.
 
 It runs the same validation + header-alias + number/rate-parsing + cost-estimate
 pipeline as the live import endpoint, so messy headers ("Follower Count",
 "Engagement Rate (%)", "Region"), formatted numbers ("250K", "$1,200", "8%"),
 and country/category names are all normalised.
+
+Category refinement: FastMoss exports carry a `selling_categories` column
+(e.g. "Electronics, Home & Living, Fashion") that is finer-grained than the
+coarse `category` column. Each creator is re-classified to the first entry of
+`selling_categories` that maps to a known category, so creators land in the
+full taxonomy (electronics, mother_baby, health, ...) instead of being
+collapsed into the four legacy verticals. Rows without a usable
+`selling_categories` keep their `category` column. Pass --no-refine to trust
+the `category` column as-is.
 
 Usage (from project root, using the project's python):
     .conda\\python.exe data\\build_seed.py data\\fastmoss\\*.xlsx
@@ -23,7 +32,9 @@ Per-file country/category are taken from (in order): an explicit column in the
 file → the filename (e.g. "Beauty_MY.xlsx") → the --country/--category flags.
 """
 import argparse
+import collections
 import glob
+import json
 import os
 import sys
 
@@ -54,11 +65,22 @@ def _read_rows(path):
     raise SystemExit(f"Unsupported file (need .csv or .xlsx): {path}")
 
 
+def _refine_category(row):
+    """Primary category from the FastMoss `selling_categories` column, or None."""
+    for token in str(row.get("selling_categories") or "").split(","):
+        cat = crud._CATEGORY_SYNONYMS.get(crud._norm_header(token))
+        if cat in crud.VALID_CATEGORIES:
+            return cat
+    return None
+
+
 def main():
     ap = argparse.ArgumentParser(description="Build sample_kols.json from real exports.")
     ap.add_argument("files", nargs="+", help="One or more .xlsx/.csv files (globs allowed).")
     ap.add_argument("--country", default=None, help="Fallback country code for files lacking one.")
     ap.add_argument("--category", default=None, help="Fallback category for files lacking one.")
+    ap.add_argument("--no-refine", action="store_true",
+                    help="Do not re-classify from selling_categories; trust the category column.")
     args = ap.parse_args()
 
     paths = []
@@ -70,33 +92,50 @@ def main():
     if not paths:
         raise SystemExit("No input files found.")
 
-    # Start from an empty library so the seed contains ONLY these rows.
-    crud._save([])
-
-    grand_added, grand_estimated, grand_errors = 0, 0, []
+    library, grand_estimated, grand_errors = [], 0, []
     for path in paths:
         headers, raw_rows = _read_rows(path)
         rows = crud._canonicalize_rows(headers, raw_rows)
+
+        refined = 0
+        if not args.no_refine:
+            for row in rows:
+                cat = _refine_category(row)
+                if cat:
+                    old = crud._CATEGORY_SYNONYMS.get(crud._norm_header(str(row.get("category") or "")))
+                    refined += old != cat
+                    row["category"] = cat
+
         country, category = _infer_defaults_from_name(path, args.country, args.category)
-        added, estimated, errors, total = crud._ingest_rows(rows, country, category)
-        grand_added += added
+        records, estimated, errors = crud._rows_to_records(rows, country, category)
+        for rec in records:
+            rec["source"] = "fastmoss"
+        library.extend(records)
         grand_estimated += estimated
         grand_errors.extend(f"{os.path.basename(path)}: {e}" for e in errors)
-        print(f"  + {os.path.basename(path):<28} added={added:<4} "
+        print(f"  + {os.path.basename(path):<28} added={len(records):<4} reclassified={refined:<4} "
               f"cost-estimated={estimated:<4} errors={len(errors)} "
               f"(defaults country={country or '—'} category={category or '—'})")
 
-    # Snapshot the freshly built library as the restore baseline that
-    # /kols/reset returns to.
-    import shutil
-    shutil.copyfile(crud.DATA_PATH, crud.SEED_PATH)
+    library = [{"id": i, **rec} for i, rec in enumerate(library, start=1)]
+
+    # Write the live library and snapshot it as the restore baseline / template
+    # seed that new tenants and /kols/reset start from.
+    for path in (crud.DATA_PATH, crud.SEED_PATH):
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(library, f, indent=2, ensure_ascii=False)
 
     print(f"\nSeed written to {crud.DATA_PATH}")
     print(f"Restore baseline written to {crud.SEED_PATH}")
-    print(f"  total creators: {grand_added}")
+    print(f"  total creators: {len(library)}")
     if grand_estimated:
         print(f"  cost estimated from followers for {grand_estimated} rows "
               f"(no price in source — replace with negotiated quotes later)")
+
+    print("  category distribution:")
+    for cat, n in collections.Counter(k["category"] for k in library).most_common():
+        print(f"    {cat:<16} {n}")
+
     if grand_errors:
         print(f"  {len(grand_errors)} rows skipped:")
         for e in grand_errors[:30]:

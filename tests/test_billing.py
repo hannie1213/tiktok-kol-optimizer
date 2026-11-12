@@ -13,6 +13,7 @@ import pytest
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+from fastapi import HTTPException
 from fastapi.testclient import TestClient
 from backend.main import app
 from backend import billing, repo
@@ -42,6 +43,9 @@ def test_new_tenant_starts_on_free_plan():
     assert set(d["plans"].keys()) == {"free", "pro", "team"}
     assert d["limits"]["monthly_optimizations"] == billing.PLANS["free"]["monthly_optimizations"]
     assert d["usage"]["optimize_runs"] == 0
+    # AI Copilot chats are the second metered axis, exposed the same way.
+    assert d["limits"]["monthly_agent_messages"] == billing.PLANS["free"]["monthly_agent_messages"]
+    assert d["usage"]["agent_messages"] == 0
     # Optimization runs are the metered axis; the library is not capped.
     assert d["limits"]["max_creators"] is None
     assert d["usage"]["creators"] > 0
@@ -85,6 +89,31 @@ def test_optimize_plans_not_metered():
     r = client.post("/optimize-plans", json=payload, headers=headers)
     assert r.status_code == 200
     assert client.get("/billing/info", headers=headers).json()["usage"]["optimize_runs"] == 0
+
+
+# ── AI Copilot quota ──────────────────────────────────────────────
+
+def test_agent_metered_and_blocked_at_quota():
+    """The copilot enforcement helper meters each chat turn and 402s at the
+    plan's cap; upgrading lifts it. (Tested directly so no LLM key is needed.)"""
+    headers, tenant_id = _register()
+    limit = billing.PLANS["free"]["monthly_agent_messages"]
+
+    # Spend the whole month's copilot allowance.
+    for _ in range(limit):
+        billing.check_and_consume_agent(tenant_id)
+    assert client.get("/billing/info", headers=headers).json()["usage"]["agent_messages"] == limit
+
+    # The next turn is refused with 402.
+    with pytest.raises(HTTPException) as exc:
+        billing.check_and_consume_agent(tenant_id)
+    assert exc.value.status_code == 402
+    assert "copilot" in exc.value.detail.lower()
+
+    # Upgrading to Team (unlimited) lets the copilot run again.
+    r = client.post("/billing/checkout", json={"plan": "team"}, headers=headers)
+    assert r.status_code == 200
+    billing.check_and_consume_agent(tenant_id)   # no raise
 
 
 # ── Creator library cap ───────────────────────────────────────────

@@ -1,0 +1,32 @@
+# Keep the build context small and secrets out of it. The Dockerfile copies an
+# explicit allow-list, so this is defence in depth + faster builds.
+.git
+.github
+.claude
+.conda
+.venv
+venv
+env
+node_modules
+.env
+.env.*
+!.env.example
+__pycache__
+*.pyc
+.pytest_cache
+.ruff_cache
+_docx_render
+docs
+experiments
+tests
+tools
+data/fastmoss
+data/tenants
+data/users.json
+data/api_interests.json
+data/*.db
+data/*.db-wal
+data/*.db-shm
+cookies.txt
+allchunks.js
+shell.html

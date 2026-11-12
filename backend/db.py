@@ -9,7 +9,10 @@ by the request's tenant.
 Configuration (env vars)
 ------------------------
   DATABASE_URL      Full SQLAlchemy URL. Unset → SQLite file at
-                    {KOL_DATA_DIR|data}/kol_saas.db (zero-config dev default).
+                    {SQLITE_DIR|KOL_DATA_DIR|data}/kol_saas.db (zero-config
+                    dev default). SQLITE_DIR lets a container keep the
+                    database on a writable volume while the seed data stays
+                    read-only in the image.
                     Production example:
                       postgresql+psycopg://user:pass@host:5432/kol_saas
   DB_POOL_SIZE      Connection-pool size per worker process (default 10).
@@ -43,17 +46,21 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, sessionmaker
 from backend import tenancy
 
 
+_SQLITE_DIR = os.environ.get("SQLITE_DIR") or tenancy.DATA_DIR
+
+
 def _database_url() -> str:
     url = os.environ.get("DATABASE_URL")
     if url:
         return url
-    return "sqlite:///" + os.path.join(tenancy.DATA_DIR, "kol_saas.db").replace("\\", "/")
+    return "sqlite:///" + os.path.join(_SQLITE_DIR, "kol_saas.db").replace("\\", "/")
 
 
 def _make_engine():
     url = _database_url()
     if url.startswith("sqlite"):
-        os.makedirs(tenancy.DATA_DIR, exist_ok=True)
+        if not os.environ.get("DATABASE_URL"):
+            os.makedirs(_SQLITE_DIR, exist_ok=True)
         eng = create_engine(
             url,
             # FastAPI sync endpoints run in a threadpool → connections hop threads.
@@ -196,10 +203,46 @@ class UsageCounter(Base):
     tenant_id: Mapped[str] = mapped_column(String(64), primary_key=True)
     month: Mapped[str] = mapped_column(String(7), primary_key=True)   # "YYYY-MM"
     optimize_runs: Mapped[int] = mapped_column(Integer, default=0)
+    # AI Copilot chat turns — the second metered axis (see backend/billing.py).
+    agent_messages: Mapped[int] = mapped_column(Integer, default=0)
+
+
+class ApiInterest(Base):
+    """Early-access interest registration for a coming-soon integration.
+    Not tenant data — it is a lead list for the operator console."""
+    __tablename__ = "api_interests"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    email: Mapped[str] = mapped_column(String(255))
+    integration_type: Mapped[str] = mapped_column(String(32))
+    registered_at: Mapped[str] = mapped_column(String(40), default="")
+
+
+# Columns added after the first release. create_all() never ALTERs an existing
+# table, so bring older SQLite/Postgres databases up to date in place. Each entry
+# is (table, column, DDL type + default); the ADD COLUMN is skipped when the
+# column already exists so this is safe to run on every boot.
+_ADDED_COLUMNS = [
+    ("usage_counters", "agent_messages", "INTEGER NOT NULL DEFAULT 0"),
+]
+
+
+def _migrate_added_columns():
+    from sqlalchemy import inspect, text
+    inspector = inspect(engine)
+    existing_tables = set(inspector.get_table_names())
+    with engine.begin() as conn:
+        for table, column, ddl in _ADDED_COLUMNS:
+            if table not in existing_tables:
+                continue
+            cols = {c["name"] for c in inspector.get_columns(table)}
+            if column not in cols:
+                conn.execute(text(f"ALTER TABLE {table} ADD COLUMN {column} {ddl}"))
 
 
 def init_db():
     Base.metadata.create_all(engine)
+    _migrate_added_columns()
 
 
 init_db()

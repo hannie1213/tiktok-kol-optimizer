@@ -25,3 +25,14 @@ data/kol_saas.db
 data/kol_saas.db-wal
 data/kol_saas.db-shm
 
+# Early-access lead list from before interests moved into the database.
+data/api_interests.json
+
+# Local tooling / scratch — never part of the product.
+.claude/
+.conda/
+.ruff_cache/
+_docx_render/
+cookies.txt
+allchunks.js
+shell.html

@@ -22,6 +22,32 @@ _AOV = {
     "fmcg":    {"MY": 22,  "ID": 18,  "TH": 20,  "PH": 16,  "SG": 32,  "VN": 11},
 }
 
+# ── Extended categories (EchoTik-style breadth) ──────────────────────
+# The four tables above stay authoritative and unchanged. Additional
+# verticals are generated from a Malaysia-anchored average order value
+# scaled by a per-market factor, plus a category-level CTR/CVR. These are
+# planning estimates grounded in SEA market research; the campaign
+# calibration layer corrects them against each merchant's real results.
+_MARKET_AOV_FACTOR = {"MY": 1.0, "TH": 0.9, "ID": 0.83, "PH": 0.76, "SG": 1.45, "VN": 0.66}
+_EXT_CATEGORIES = {
+    # category:        (ctr,   cvr,   aov_my)
+    "accessories":     (0.034, 0.072, 35),   # 时尚配件 / 箱包 / 鞋靴
+    "muslim_fashion":  (0.033, 0.074, 45),   # 穆斯林时尚 (MY/ID festival demand)
+    "kitchen":         (0.029, 0.063, 30),   # 厨房用品
+    "appliances":      (0.031, 0.058, 85),   # 家电 / 小家电
+    "electronics":     (0.030, 0.055, 120),  # 手机数码 / 电脑办公 / 3C
+    "mother_baby":     (0.038, 0.092, 30),   # 母婴用品 ("得母婴者得东南亚")
+    "health":          (0.032, 0.070, 55),   # 保健 / 健康
+    "sports_outdoor":  (0.030, 0.062, 50),   # 运动与户外
+    "pet":             (0.039, 0.078, 32),   # 宠物用品
+    "toys":            (0.035, 0.072, 28),   # 玩具和爱好
+    "automotive":      (0.028, 0.050, 45),   # 汽车与运输 (VN motorbike / TH car)
+}
+for _cat, (_ctr, _cvr, _aov_my) in _EXT_CATEGORIES.items():
+    _CTR[_cat] = {c: _ctr for c in _MARKET_AOV_FACTOR}
+    _CVR[_cat] = {c: _cvr for c in _MARKET_AOV_FACTOR}
+    _AOV[_cat] = {c: round(_aov_my * f) for c, f in _MARKET_AOV_FACTOR.items()}
+
 _PURCHASING_POWER = {
     "MY": 1.0,   
     "TH": 0.9,   

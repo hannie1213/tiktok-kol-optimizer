@@ -46,5 +46,5 @@ echo Press Ctrl+C to stop.
 echo ============================================
 echo.
 
-%PYTHON% -m uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000
+%PYTHON% -m uvicorn backend.main:app --env-file .env --reload --host 0.0.0.0 --port 8000
 pause

@@ -40,6 +40,11 @@ shutil.copyfile(_DATA, os.path.join(_TMP, "seed_kols.json"))
 # Must be set BEFORE backend.tenancy / backend.main are imported by test modules.
 os.environ["KOL_DATA_DIR"] = _TMP
 os.environ["DEFAULT_TENANT"] = _TEST_TENANT
+os.environ.pop("APP_ENV", None)                # never run the suite in production mode
+# The suite registers/logs in far faster than any real client and switches
+# plans without paying; tests/test_hardening.py re-enables both guards.
+os.environ["RATE_LIMIT_ENABLED"] = "0"
+os.environ["BILLING_SELF_SERVE"] = "1"
 
 # The suite runs far more optimizations against the fallback "test" tenant than
 # a free tier's monthly quota allows — put it on the unlimited Team plan.

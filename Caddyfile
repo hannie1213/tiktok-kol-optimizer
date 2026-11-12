@@ -1,0 +1,13 @@
+# HTTPS front door for `docker compose --profile https up`.
+# Caddy obtains and renews the certificate for {$DOMAIN} automatically — the
+# domain's DNS A/AAAA record must already point at this server, and ports
+# 80 + 443 must be reachable.
+{$DOMAIN} {
+	encode zstd gzip
+
+	# The operator console is reachable only with the ADMIN_KEY, but there is
+	# no reason to let crawlers index it.
+	header /admin.html X-Robots-Tag "noindex, nofollow"
+
+	reverse_proxy app:8000
+}

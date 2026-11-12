@@ -330,7 +330,7 @@ start_server.bat
 uvicorn backend.main:app --reload
 ```
 
-For production, set a `JWT_SECRET` env var (a dev fallback is used otherwise).
+For production, follow [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md): `docker compose --profile https up -d` runs the app with `APP_ENV=production`, which refuses to boot on an unsafe config (missing `JWT_SECRET`, wildcard CORS, auth bypass, self-serve paid plans).
 
 ### 4. Open the app
 

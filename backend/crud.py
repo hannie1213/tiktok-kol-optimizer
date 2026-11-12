@@ -27,10 +27,24 @@ from typing import List, Optional
 from fastapi import APIRouter, HTTPException, UploadFile, File, Form, Depends
 from pydantic import BaseModel, field_validator
 
-from backend import billing, repo, tenancy
+from backend import billing, repo, settings, tenancy
 from backend.auth import require_tenant
 
 router = APIRouter()
+
+
+async def _read_upload(file: UploadFile) -> bytes:
+    """Read an uploaded file, refusing anything over the configured size cap
+    (the middleware only sees the declared Content-Length)."""
+    content = await file.read(settings.MAX_UPLOAD_BYTES + 1)
+    if len(content) > settings.MAX_UPLOAD_BYTES:
+        raise HTTPException(
+            status_code=413,
+            detail=f"File too large (limit {settings.MAX_UPLOAD_BYTES // (1024 * 1024)} MB)")
+    return content
+
+DATA_PATH = os.path.join(tenancy.DATA_DIR, "sample_kols.json")
+SEED_PATH = os.path.join(tenancy.DATA_DIR, "seed_kols.json")
 
 
 # ── KOL history helpers ───────────────────────────────────────
@@ -45,14 +59,20 @@ def _record_snapshot(kol_record: dict):
                         datetime.utcnow().isoformat(), metrics)
 
 VALID_COUNTRIES = ["MY", "ID", "TH", "PH", "SG", "VN"]
-VALID_CATEGORIES = ["beauty", "fashion", "home", "fmcg"]
+VALID_CATEGORIES = ["beauty", "fashion", "accessories", "muslim_fashion", "home", "kitchen",
+                    "appliances", "electronics", "mother_baby", "fmcg", "health",
+                    "sports_outdoor", "pet", "toys", "automotive"]
 
 CSV_TEMPLATE_HEADER = [
     "name", "country", "category", "followers",
     "engagement_rate", "fit_score", "commission_rate", "cost",
     "avg_views", "avg_likes", "gender_ratio", "age_group",
-    "tiktok_url",
+    "tiktok_url", "content_type",
 ]
+
+# How the creator sells: live (livestream host), video (short-video creator),
+# or both. Optional everywhere — unmarked creators default to "both".
+VALID_CONTENT_TYPES = ("live", "video", "both")
 
 
 # ════════════════════════════════════════════════════════════════
@@ -73,12 +93,21 @@ class KOLCreate(BaseModel):
     gender_ratio: Optional[float] = None
     age_group: Optional[str] = None
     tiktok_url: Optional[str] = None
+    content_type: str = "both"
 
     @field_validator("country")
     @classmethod
     def validate_country(cls, v):
         if v not in VALID_COUNTRIES:
             raise ValueError(f"country must be one of: {', '.join(VALID_COUNTRIES)}")
+        return v
+
+    @field_validator("content_type")
+    @classmethod
+    def validate_content_type(cls, v):
+        v = (v or "both").lower()
+        if v not in VALID_CONTENT_TYPES:
+            raise ValueError(f"content_type must be one of: {', '.join(VALID_CONTENT_TYPES)}")
         return v
 
     @field_validator("category")
@@ -133,6 +162,7 @@ class KOLUpdate(BaseModel):
     gender_ratio: Optional[float] = None
     age_group: Optional[str] = None
     tiktok_url: Optional[str] = None
+    content_type: Optional[str] = None
 
 
 # ════════════════════════════════════════════════════════════════
@@ -158,6 +188,7 @@ _FIELD_ALIASES = {
     "gender_ratio":    {"gender_ratio", "female_ratio", "female", "female_percent", "female_pct", "pct_female", "audience_female"},
     "age_group":       {"age_group", "age", "age_range", "main_age", "age_bracket"},
     "tiktok_url":      {"tiktok_url", "url", "link", "profile", "profile_url", "tiktok", "tiktok_link", "homepage"},
+    "content_type":    {"content_type", "content_format", "format", "channel", "sell_channel", "promotion_type", "promo_type", "creator_type", "sales_channel", "live_or_video"},
 }
 _ALIAS_TO_FIELD = {alias: field for field, aliases in _FIELD_ALIASES.items() for alias in aliases}
 
@@ -171,10 +202,33 @@ _COUNTRY_NAME_TO_CODE = {
 }
 _CATEGORY_SYNONYMS = {
     "beauty": "beauty", "cosmetics": "beauty", "makeup": "beauty", "skincare": "beauty",
-    "personal_care": "beauty", "beauty_personal_care": "beauty",
-    "fashion": "fashion", "apparel": "fashion", "clothing": "fashion", "lifestyle": "fashion", "accessories": "fashion",
-    "home": "home", "home_living": "home", "home_garden": "home", "household": "home", "furniture": "home", "home_kitchen": "home",
-    "fmcg": "fmcg", "food": "fmcg", "grocery": "fmcg", "beverage": "fmcg", "snacks": "fmcg", "food_beverage": "fmcg",
+    "personal_care": "beauty", "beauty_personal_care": "beauty", "beauty_care": "beauty",
+    "fashion": "fashion", "apparel": "fashion", "clothing": "fashion", "lifestyle": "fashion",
+    "womenswear": "fashion", "menswear": "fashion", "womens_clothing": "fashion", "mens_clothing": "fashion",
+    "underwear": "fashion", "lingerie": "fashion",
+    "accessories": "accessories", "fashion_accessories": "accessories", "bags": "accessories", "luggage": "accessories",
+    "bags_luggage": "accessories", "shoes": "accessories", "footwear": "accessories", "jewelry": "accessories", "jewellery": "accessories", "watches": "accessories",
+    "muslim_fashion": "muslim_fashion", "muslim": "muslim_fashion", "modest_fashion": "muslim_fashion", "muslim_wear": "muslim_fashion", "islamic_fashion": "muslim_fashion",
+    "home": "home", "home_living": "home", "home_garden": "home", "household": "home", "furniture": "home", "home_supplies": "home", "daily_use": "home",
+    "kitchen": "kitchen", "kitchenware": "kitchen", "home_kitchen": "kitchen", "kitchen_supplies": "kitchen", "cookware": "kitchen", "tableware": "kitchen",
+    "appliances": "appliances", "home_appliances": "appliances", "small_appliances": "appliances", "household_appliances": "appliances", "appliance": "appliances",
+    "electronics": "electronics", "consumer_electronics": "electronics", "phones": "electronics", "phones_electronics": "electronics",
+    "mobile": "electronics", "digital": "electronics", "3c": "electronics", "computers": "electronics", "computer_office": "electronics", "gadgets": "electronics", "tech": "electronics",
+    "mother_baby": "mother_baby", "mom_baby": "mother_baby", "baby": "mother_baby", "maternity": "mother_baby", "baby_kids": "mother_baby", "maternal_child": "mother_baby", "kids": "mother_baby",
+    "fmcg": "fmcg", "food": "fmcg", "grocery": "fmcg", "beverage": "fmcg", "snacks": "fmcg", "food_beverage": "fmcg", "food_drink": "fmcg", "food_and_beverages": "fmcg",
+    "health": "health", "healthcare": "health", "supplements": "health", "wellness": "health", "nutrition": "health", "health_supplements": "health",
+    "personal_care_health": "health", "health_personal_care": "health",
+    "sports_outdoor": "sports_outdoor", "sports": "sports_outdoor", "outdoor": "sports_outdoor", "sports_outdoors": "sports_outdoor", "fitness": "sports_outdoor", "camping": "sports_outdoor",
+    "pet": "pet", "pets": "pet", "pet_supplies": "pet", "pet_care": "pet", "pet_products": "pet",
+    "toys": "toys", "toys_hobbies": "toys", "hobbies": "toys", "toy": "toys", "games": "toys", "toys_and_hobbies": "toys",
+    "automotive": "automotive", "auto": "automotive", "car": "automotive", "motorcycle": "automotive", "vehicle": "automotive", "car_accessories": "automotive", "auto_parts": "automotive", "motor": "automotive",
+}
+_CONTENT_TYPE_SYNONYMS = {
+    "live": "live", "livestream": "live", "live_stream": "live", "live_streaming": "live",
+    "livestreaming": "live", "live_commerce": "live", "host": "live", "anchor": "live",
+    "video": "video", "short_video": "video", "shorts": "video", "shortvideo": "video",
+    "clip": "video", "clips": "video", "post": "video", "posts": "video",
+    "both": "both", "all": "both", "mixed": "both", "hybrid": "both", "live_video": "both",
 }
 
 
@@ -258,9 +312,9 @@ def _canonicalize_rows(headers, rows):
     return out
 
 
-def _ingest_rows(rows, default_country=None, default_category=None):
-    """Validate canonicalised rows and bulk-insert the valid ones.
-    Returns (added, estimated_cost, errors, total)."""
+def _rows_to_records(rows, default_country=None, default_category=None):
+    """Validate canonicalised rows into KOL records without persisting them.
+    Returns (records, estimated_cost, errors)."""
     dc = (default_country or "").strip().upper() or None
     dcat = (default_category or "").strip().lower() or None
     records, estimated, errors = [], 0, []
@@ -320,12 +374,21 @@ def _ingest_rows(rows, default_country=None, default_category=None):
                 "gender_ratio":    round(gender, 2) if gender is not None else None,
                 "age_group":       str(row.get("age_group") or "").strip() or None,
                 "tiktok_url":      str(row.get("tiktok_url") or "").strip() or None,
+                "content_type":    _CONTENT_TYPE_SYNONYMS.get(
+                                       _norm_header(str(row.get("content_type") or "")), "both"),
                 "cost_estimated":  cost_estimated,
             }
             records.append(_auto_fill(record))
         except (ValueError, KeyError, TypeError) as e:
             errors.append(f"Row {i}: {e}")
 
+    return records, estimated, errors
+
+
+def _ingest_rows(rows, default_country=None, default_category=None):
+    """Validate canonicalised rows and bulk-insert the valid ones.
+    Returns (added, estimated_cost, errors, total)."""
+    records, estimated, errors = _rows_to_records(rows, default_country, default_category)
     tenant = tenancy.current_tenant()
     if records:
         billing.check_creator_capacity(tenant, adding=len(records))
@@ -373,6 +436,10 @@ def update_kol(kol_id: int, updates: KOLUpdate, _t: str = Depends(require_tenant
         changes["category"] = changes["category"].lower()
         if changes["category"] not in VALID_CATEGORIES:
             raise HTTPException(status_code=422, detail=f"category must be one of: {', '.join(VALID_CATEGORIES)}")
+    if "content_type" in changes:
+        changes["content_type"] = changes["content_type"].lower()
+        if changes["content_type"] not in VALID_CONTENT_TYPES:
+            raise HTTPException(status_code=422, detail=f"content_type must be one of: {', '.join(VALID_CONTENT_TYPES)}")
 
     # A manually entered cost is a real quote → clear the "estimated" flag.
     if "cost" in changes and changes["cost"] and changes["cost"] > 0:
@@ -451,6 +518,81 @@ def delete_kol(kol_id: int, _t: str = Depends(require_tenant)):
     return {"message": f"KOL {kol_id} deleted", "remaining": remaining}
 
 
+# ── Merchant collaboration ratings ────────────────────────────────
+class RatingIn(BaseModel):
+    """A merchant's own verdict on how a past collaboration went (1–5 stars)."""
+    score: int
+    note: Optional[str] = None
+
+    @field_validator("score")
+    @classmethod
+    def validate_score(cls, v):
+        if not (1 <= v <= 5):
+            raise ValueError("score must be between 1 and 5")
+        return v
+
+
+@router.post("/kols/{kol_id}/rate")
+def rate_kol(kol_id: int, body: RatingIn, _t: str = Depends(require_tenant)):
+    """Record the merchant's collaboration rating for a creator.
+
+    The latest score is stored on the creator (Kol.extra) and kept as a log.
+    Rated creators are boosted/deprioritised in future optimizations
+    (see the rating→fit adjustment in backend/main.py).
+    """
+    tenant = tenancy.current_tenant()
+    kol = repo.kols_get(tenant, kol_id)
+    if kol is None:
+        raise HTTPException(status_code=404, detail=f"KOL with id {kol_id} not found")
+    log = list(kol.get("rating_log") or [])
+    log.append({
+        "score": body.score,
+        "note": (body.note or "").strip() or None,
+        "at": datetime.utcnow().isoformat(),
+    })
+    repo.kols_update(tenant, kol_id, {
+        "rating": body.score,
+        "rating_log": log[-20:],          # keep the last 20 entries
+    })
+    return {"message": f"Rated '{kol.get('name')}' {body.score}★", "kol_id": kol_id, "rating": body.score}
+
+
+@router.get("/kols/{kol_id}/collabs")
+def kol_collabs(kol_id: int, _t: str = Depends(require_tenant)):
+    """Collaboration history for one creator: every saved campaign that
+    included them (with predicted vs actual results) plus the merchant's
+    rating log — the creator's track record with THIS merchant."""
+    tenant = tenancy.current_tenant()
+    kol = repo.kols_get(tenant, kol_id)
+    if kol is None:
+        raise HTTPException(status_code=404, detail=f"KOL with id {kol_id} not found")
+
+    collabs = []
+    for c in repo.campaigns_all(tenant):
+        sel = next((s for s in (c.get("selected_kols") or []) if s.get("id") == kol_id), None)
+        if sel is None:
+            continue
+        collabs.append({
+            "campaign_id": c.get("id"),
+            "name": c.get("name"),
+            "created_at": c.get("created_at"),
+            "status": c.get("status"),
+            "budget": c.get("budget"),
+            "kol_cost": sel.get("cost"),
+            "kol_predicted_gmv": sel.get("predicted_gmv"),
+            "campaign_actual_gmv": c.get("actual_total_gmv"),
+            "campaign_accuracy_pct": c.get("accuracy_pct"),
+        })
+    collabs.sort(key=lambda x: x.get("created_at") or "", reverse=True)
+    return {
+        "kol_id": kol_id,
+        "rating": kol.get("rating"),
+        "rating_log": list(reversed(kol.get("rating_log") or [])),
+        "collab_count": len(collabs),
+        "collabs": collabs[:20],
+    }
+
+
 @router.post("/kols/import-csv")
 @router.post("/kols/import")
 async def import_file(
@@ -475,7 +617,7 @@ async def import_file(
     """
     filename = (file.filename or "").strip()
     lower = filename.lower()
-    content = await file.read()
+    content = await _read_upload(file)
 
     if lower.endswith(".csv"):
         headers, raw_rows = _read_csv_rows(content)
@@ -527,7 +669,7 @@ async def backfill_costs(file: UploadFile = File(...), _t: str = Depends(require
     the "est." badge. Rows with no price or no match are reported back.
     """
     filename = (file.filename or "").lower()
-    content = await file.read()
+    content = await _read_upload(file)
     if filename.endswith(".csv"):
         headers, raw_rows = _read_csv_rows(content)
     elif filename.endswith(".xlsx"):
@@ -598,7 +740,7 @@ def download_template():
         "Lisa Beauty", "MY", "beauty", 250000,
         0.08, 0.85, 0.15, 1200,
         75000, 6000, 0.78, "18-24",
-        "https://tiktok.com/@lisa_beauty",
+        "https://tiktok.com/@lisa_beauty", "both",
     ])
     output.seek(0)
 
@@ -623,7 +765,7 @@ def download_template_excel():
         "Lisa Beauty", "MY", "beauty", 250000,
         0.08, 0.85, 0.15, 1200,
         75000, 6000, 0.78, "18-24",
-        "https://tiktok.com/@lisa_beauty",
+        "https://tiktok.com/@lisa_beauty", "both",
     ])
     buf = io.BytesIO()
     wb.save(buf)

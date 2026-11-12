@@ -21,6 +21,7 @@ from sqlalchemy.exc import IntegrityError
 
 from backend import tenancy
 from backend.db import (
+    ApiInterest,
     Calibration,
     Campaign,
     Kol,
@@ -239,11 +240,79 @@ def user_create(email: str, password_hash: str, tenant_id: str, created_at: str)
         return _user_to_dict(u)
 
 
+def users_all() -> List[dict]:
+    """Every account, newest first (operator console)."""
+    with _session() as s:
+        _ensure_users_imported(s)
+        rows = s.query(User).order_by(User.id.desc()).all()
+        return [_user_to_dict(u) for u in rows]
+
+
+def user_delete(email: str) -> Optional[str]:
+    """Delete a user account; returns their tenant_id (None if not found)."""
+    with _write_lock, _session() as s:
+        _ensure_users_imported(s)
+        u = s.scalar(select(User).where(User.email == email.strip().lower()))
+        if not u:
+            return None
+        tenant_id = u.tenant_id
+        s.delete(u)
+        return tenant_id
+
+
+def tenant_wipe(tenant_id: str) -> None:
+    """Remove every row belonging to a tenant (operator account deletion)."""
+    with _write_lock, _session() as s:
+        for model in (Kol, KolSnapshot, Campaign, TenantPlan, UsageCounter):
+            s.query(model).filter(model.tenant_id == tenant_id).delete(synchronize_session=False)
+        s.query(Calibration).filter(Calibration.tenant_id == tenant_id).delete(synchronize_session=False)
+        s.query(Tenant).filter(Tenant.id == tenant_id).delete(synchronize_session=False)
+    _migrated.discard(tenant_id)
+
+
+def user_set_password(tenant_id: str, password_hash: str) -> bool:
+    with _write_lock, _session() as s:
+        u = s.scalar(select(User).where(User.tenant_id == tenant_id))
+        if not u:
+            return False
+        u.password_hash = password_hash
+        return True
+
+
+def users_demo_before(suffix: str, cutoff_iso: str, limit: int = 200) -> List[dict]:
+    """Throwaway demo accounts created before `cutoff_iso` (expiry sweep)."""
+    with _session() as s:
+        rows = s.scalars(
+            select(User)
+            .where(User.email.like("%" + suffix), User.created_at < cutoff_iso)
+            .limit(limit)
+        ).all()
+        return [_user_to_dict(u) for u in rows]
+
+
+# ════════════════════════════════════════════════════════════════
+#  Early-access interest registrations (operator lead list)
+# ════════════════════════════════════════════════════════════════
+def interest_add(email: str, integration_type: str, registered_at: str):
+    with _write_lock, _session() as s:
+        s.add(ApiInterest(email=email, integration_type=integration_type,
+                          registered_at=registered_at))
+
+
+def interests_all(limit: int = 1000) -> List[dict]:
+    """Newest first."""
+    with SessionLocal() as s:
+        rows = s.scalars(select(ApiInterest).order_by(ApiInterest.id.desc()).limit(limit)).all()
+        return [{"email": r.email, "integration_type": r.integration_type,
+                 "registered_at": r.registered_at} for r in rows]
+
+
 # ════════════════════════════════════════════════════════════════
 #  Creators (KOLs)
 # ════════════════════════════════════════════════════════════════
 def kols_all(tenant_id: str, countries: Optional[List[str]] = None,
-             category: Optional[str] = None) -> List[dict]:
+             category: Optional[str] = None,
+             content_type: Optional[str] = None) -> List[dict]:
     _ensure_migrated(tenant_id)
     with _session() as s:
         q = select(Kol).where(Kol.tenant_id == tenant_id)
@@ -252,7 +321,12 @@ def kols_all(tenant_id: str, countries: Optional[List[str]] = None,
         if category:
             q = q.where(Kol.category == category)
         rows = s.scalars(q.order_by(Kol.kol_id)).all()
-        return [_row_to_dict(r) for r in rows]
+        out = [_row_to_dict(r) for r in rows]
+        # content_type lives in Kol.extra (no schema migration): filter in Python.
+        # A creator marked "both" (or unmarked) can run live or video campaigns.
+        if content_type in ("live", "video"):
+            out = [d for d in out if (d.get("content_type") or "both") in (content_type, "both")]
+        return out
 
 
 def kols_get(tenant_id: str, kol_id: int) -> Optional[dict]:
@@ -495,6 +569,73 @@ def optimize_consume(tenant_id: str, month: str) -> int:
         except IntegrityError:
             if attempt:
                 raise
+
+
+def agent_messages(tenant_id: str, month: str) -> int:
+    with SessionLocal() as s:
+        row = s.get(UsageCounter, (tenant_id, month))
+        return row.agent_messages if row else 0
+
+
+def agent_refund(tenant_id: str, month: str):
+    """Give back one AI Copilot chat turn (the LLM call failed, so the
+    merchant got nothing for it)."""
+    with _write_lock, _session() as s:
+        row = s.get(UsageCounter, (tenant_id, month))
+        if row is not None and row.agent_messages > 0:
+            row.agent_messages -= 1
+
+
+def agent_consume(tenant_id: str, month: str) -> int:
+    """Count one AI Copilot chat turn against this month's quota; returns the new
+    total. Mirrors optimize_consume — shares the per-month usage row."""
+    _ensure_migrated(tenant_id)
+    for attempt in (0, 1):
+        try:
+            with _write_lock, _session() as s:
+                row = s.get(UsageCounter, (tenant_id, month))
+                if row is None:
+                    s.add(UsageCounter(tenant_id=tenant_id, month=month, agent_messages=1))
+                    return 1
+                row.agent_messages += 1
+                return row.agent_messages
+        except IntegrityError:
+            if attempt:
+                raise
+
+
+# ════════════════════════════════════════════════════════════════
+#  Operator console aggregates
+# ════════════════════════════════════════════════════════════════
+def admin_stats(month: str) -> dict:
+    """Per-tenant stats for the operator console in one session (four grouped
+    queries) instead of five queries per user. Returns
+    {tenant_id: {plan, optimize_runs, agent_messages, creators, campaigns}};
+    tenants absent from a table simply keep the zero/free defaults. Reads only
+    what is in the database — it does not trigger legacy JSON migration."""
+    stats: dict = {}
+
+    def entry(tid: str) -> dict:
+        return stats.setdefault(tid, {"plan": "free", "optimize_runs": 0,
+                                      "agent_messages": 0, "creators": 0,
+                                      "campaigns": 0})
+
+    with SessionLocal() as s:
+        for tid, plan in s.execute(select(TenantPlan.tenant_id, TenantPlan.plan)):
+            entry(tid)["plan"] = plan
+        for tid, runs, chats in s.execute(
+                select(UsageCounter.tenant_id, UsageCounter.optimize_runs,
+                       UsageCounter.agent_messages)
+                .where(UsageCounter.month == month)):
+            entry(tid)["optimize_runs"] = runs
+            entry(tid)["agent_messages"] = chats
+        for tid, n in s.execute(
+                select(Kol.tenant_id, func.count()).group_by(Kol.tenant_id)):
+            entry(tid)["creators"] = n
+        for tid, n in s.execute(
+                select(Campaign.tenant_id, func.count()).group_by(Campaign.tenant_id)):
+            entry(tid)["campaigns"] = n
+    return stats
 
 
 # ════════════════════════════════════════════════════════════════

@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>tiko · 运营后台</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23000000'/><text x='50%25' y='53%25' dominant-baseline='central' text-anchor='middle' font-family='Inter,sans-serif' font-weight='800' font-size='36' fill='%23ffffff'>tiko</text><circle cx='79' cy='21' r='13' fill='%2300F2EA' stroke='%23000000' stroke-width='4'/></svg>" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --bg: #0d1613; --panel: rgba(255,255,255,.045); --panel-b: rgba(255,255,255,.09);
+            --ink: #ece9e2; --mut: #8a897f; --cy: #00F2EA; --green: #00C853; --red: #ff5c72; --amber: #f5b301;
+            --mono: 'JetBrains Mono', monospace;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background:
+                radial-gradient(900px 600px at 8% -10%, rgba(0,242,234,.08), transparent 60%),
+                radial-gradient(800px 600px at 100% 110%, rgba(14,138,110,.10), transparent 60%),
+                var(--bg);
+            color: var(--ink); font-family: 'Inter', sans-serif; min-height: 100vh;
+        }
+        .wrap { max-width: 1240px; margin: 0 auto; padding: 28px 32px 80px; }
+
+        header.top { display: flex; align-items: center; justify-content: space-between; padding-bottom: 22px; border-bottom: 1px solid var(--panel-b); margin-bottom: 26px; }
+        .brand { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 20px; letter-spacing: -.03em; }
+        .brand sup { color: var(--cy); font-size: .55em; }
+        .brand small { display: block; font-family: var(--mono); font-size: 10px; letter-spacing: .2em; color: var(--mut); margin-top: 4px; font-weight: 400; }
+        .top-actions { display: flex; gap: 10px; align-items: center; }
+
+        .card { background: var(--panel); border: 1px solid var(--panel-b); border-radius: 16px; backdrop-filter: blur(14px); }
+        .btn { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; padding: 8px 16px; border-radius: 10px; border: 1px solid var(--panel-b); background: transparent; color: var(--ink); cursor: pointer; transition: all .18s ease; }
+        .btn:hover { border-color: var(--cy); color: var(--cy); }
+        .btn.primary { background: var(--cy); border-color: var(--cy); color: #052e2c; }
+        .btn.primary:hover { filter: brightness(1.1); color: #052e2c; }
+        .btn.danger { color: var(--red); }
+        .btn.danger:hover { border-color: var(--red); background: rgba(255,92,114,.08); }
+        .btn:disabled { opacity: .45; cursor: not-allowed; }
+        input, select { background: rgba(0,0,0,.35); border: 1px solid var(--panel-b); border-radius: 10px; color: var(--ink); font-size: 13px; padding: 8px 12px; outline: none; font-family: 'Inter', sans-serif; }
+        input:focus, select:focus { border-color: var(--cy); }
+
+        /* Login gate */
+        #gate { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: var(--bg); z-index: 100; }
+        #gate .card { width: 360px; padding: 30px; }
+        #gate h1 { font-family: 'Space Grotesk', sans-serif; font-size: 22px; letter-spacing: -.02em; margin-bottom: 6px; }
+        #gate p { font-size: 12.5px; color: var(--mut); margin-bottom: 18px; line-height: 1.6; }
+        #gate input { width: 100%; margin-bottom: 12px; }
+        #gate .err { color: var(--red); font-size: 12px; margin-top: 10px; display: none; }
+
+        /* KPI */
+        .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(155px, 1fr)); gap: 14px; margin-bottom: 26px; }
+        .kpi { padding: 18px 20px; }
+        .kpi .l { font-family: var(--mono); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--mut); }
+        .kpi .v { font-family: 'Space Grotesk', sans-serif; font-size: 34px; font-weight: 600; letter-spacing: -.03em; margin-top: 6px; }
+        .kpi.hl .v { color: var(--cy); }
+
+        /* Toolbar */
+        .toolbar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }
+        .toolbar input[type="search"] { width: 260px; }
+        .toolbar label { font-size: 12.5px; color: var(--mut); display: flex; align-items: center; gap: 6px; cursor: pointer; }
+        .toolbar .spacer { flex: 1; }
+
+        /* Table */
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        thead th { font-family: var(--mono); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--mut); text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--panel-b); white-space: nowrap; }
+        thead th.sortable { cursor: pointer; user-select: none; }
+        thead th.sortable:hover { color: var(--ink); }
+        thead th .arr { color: var(--cy); margin-left: 3px; }
+        tbody td { padding: 11px 14px; border-bottom: 1px solid rgba(255,255,255,.05); vertical-align: middle; }
+        tbody tr:hover { background: rgba(0,242,234,.035); }
+        .num { font-family: var(--mono); }
+        .email { font-weight: 600; }
+        .email small { display: block; font-family: var(--mono); font-weight: 400; font-size: 10px; color: var(--mut); margin-top: 2px; cursor: pointer; }
+        .email small:hover { color: var(--cy); }
+        .chip { display: inline-block; font-family: var(--mono); font-size: 10.5px; font-weight: 700; padding: 3px 10px; border-radius: 99px; letter-spacing: .04em; }
+        .chip.free { background: rgba(138,137,127,.15); color: #b5b3a9; }
+        .chip.pro  { background: rgba(255,0,80,.14); color: #ff6b93; }
+        .chip.team { background: rgba(168,85,247,.16); color: #c4b5fd; }
+        .chip.demo { background: rgba(0,242,234,.1); color: var(--cy); }
+        .row-actions { display: flex; gap: 8px; align-items: center; justify-content: flex-end; }
+        .row-actions select { padding: 5px 8px; font-size: 12px; }
+        .row-actions .btn { padding: 5px 10px; font-size: 12px; }
+        .empty { text-align: center; padding: 40px; color: var(--mut); font-size: 13px; }
+
+        h2.sec { font-family: 'Space Grotesk', sans-serif; font-size: 17px; letter-spacing: -.01em; margin: 34px 0 12px; display: flex; align-items: center; gap: 10px; }
+        h2.sec .n { font-family: var(--mono); font-size: 11px; color: var(--cy); letter-spacing: .16em; }
+
+        /* Toast */
+        #toast { position: fixed; top: 20px; right: 20px; z-index: 999; padding: 12px 20px; border-radius: 10px; font-size: 13.5px; font-weight: 600; display: none; box-shadow: 0 16px 40px -16px rgba(0,0,0,.6); }
+        #toast.ok { background: #0e3d22; color: #7ef3b0; border: 1px solid rgba(0,200,83,.4); }
+        #toast.err { background: #46121c; color: #ffb3bf; border: 1px solid rgba(255,92,114,.4); }
+
+        @media (max-width: 960px) {
+            .kpis { grid-template-columns: repeat(2, 1fr); }
+            .wrap { padding: 20px 16px 60px; }
+            .hide-sm { display: none; }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- ── Admin key gate ── -->
+    <div id="gate">
+        <div class="card">
+            <h1>tiko<sup>®</sup> 运营后台</h1>
+            <p>输入管理密钥（服务端环境变量 <code style="font-family:var(--mono);color:var(--cy)">ADMIN_KEY</code> 或 <code style="font-family:var(--mono);color:var(--cy)">BILLING_ADMIN_KEY</code>）。密钥只保存在本浏览器的 sessionStorage。</p>
+            <input id="key-input" type="password" placeholder="Admin Key" onkeydown="if(event.key==='Enter')login()" autofocus />
+            <button class="btn primary" style="width:100%" onclick="login()">进入后台</button>
+            <p class="err" id="gate-err">密钥错误或服务端未配置管理密钥。</p>
+        </div>
+    </div>
+
+    <div class="wrap" id="app" style="display:none">
+        <header class="top">
+            <div class="brand">tiko<sup>®</sup><small>OPERATOR CONSOLE · 用户管理</small></div>
+            <div class="top-actions">
+                <button class="btn" id="btn-refresh" onclick="loadAll()">↻ 刷新</button>
+                <button class="btn danger" onclick="cleanupDemos()">清理 Demo 账号</button>
+                <button class="btn" onclick="logout()">退出</button>
+            </div>
+        </header>
+
+        <!-- ── KPI ── -->
+        <div class="kpis" id="kpis">
+            <div class="card kpi"><div class="l">总账号</div><div class="v" id="k-total">—</div></div>
+            <div class="card kpi"><div class="l">真实用户</div><div class="v" id="k-real">—</div></div>
+            <div class="card kpi hl"><div class="l">付费用户</div><div class="v" id="k-paid">—</div></div>
+            <div class="card kpi hl"><div class="l">MRR</div><div class="v" id="k-mrr">—</div></div>
+            <div class="card kpi"><div class="l">Demo 账号</div><div class="v" id="k-demo">—</div></div>
+            <div class="card kpi"><div class="l">本月优化次数 <span id="k-month" style="text-transform:none"></span></div><div class="v" id="k-runs">—</div></div>
+            <div class="card kpi"><div class="l">本月 AI 助手对话</div><div class="v" id="k-chats">—</div></div>
+        </div>
+
+        <!-- ── Users ── -->
+        <h2 class="sec"><span class="n">01 / USERS</span>用户列表</h2>
+        <div class="toolbar">
+            <input id="search" type="search" placeholder="搜索邮箱…" oninput="renderUsers()" />
+            <label><input id="hide-demo" type="checkbox" checked onchange="renderUsers()" /> 隐藏 Demo 账号</label>
+            <label><input id="only-paid" type="checkbox" onchange="renderUsers()" /> 只看付费</label>
+            <div class="spacer"></div>
+            <span id="user-count" style="font-family:var(--mono);font-size:11px;color:var(--mut)"></span>
+        </div>
+        <div class="card" style="overflow-x:auto">
+            <table>
+                <thead>
+                    <tr id="users-head">
+                        <th class="sortable" data-key="email">账号</th>
+                        <th class="sortable" data-key="plan">套餐</th>
+                        <th class="sortable" data-key="optimize_runs" style="text-align:right">本月优化</th>
+                        <th class="sortable" data-key="agent_messages" style="text-align:right">本月对话</th>
+                        <th class="sortable" data-key="creators" style="text-align:right">达人库</th>
+                        <th class="sortable" data-key="campaigns" style="text-align:right">投放数</th>
+                        <th class="sortable hide-sm" data-key="created_at">注册时间</th>
+                        <th style="text-align:right">操作</th>
+                    </tr>
+                </thead>
+                <tbody id="users-body"><tr><td colspan="8" class="empty">加载中…</td></tr></tbody>
+            </table>
+        </div>
+
+        <!-- ── Interests ── -->
+        <h2 class="sec"><span class="n">02 / LEADS</span>API 意向登记</h2>
+        <div class="card" style="overflow-x:auto">
+            <table>
+                <thead>
+                    <tr><th>邮箱</th><th>意向集成</th><th>登记时间</th></tr>
+                </thead>
+                <tbody id="interests-body"><tr><td colspan="3" class="empty">加载中…</td></tr></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="toast"></div>
+
+    <script>
+        // Same-origin when served by the backend's static mount; explicit
+        // localhost only when the file is opened directly from disk.
+        const API = location.protocol === 'file:' ? 'http://localhost:8000' : '';
+        let KEY = sessionStorage.getItem('tiko_admin_key') || '';
+        let USERS = [];   // full list from the server
+        let VIEW = [];    // currently rendered (filtered + sorted) rows
+        let SORT = { key: null, dir: 1 };
+        const PLAN_NAMES = { free: 'Free', pro: 'Pro', team: 'Team' };
+        const PLAN_RANK = { free: 0, pro: 1, team: 2 };
+        const INTEGRATIONS = {
+            tiktok_creator: 'Creator Marketplace',
+            tiktok_shop: 'TikTok Shop API',
+            third_party: '第三方分析平台'
+        };
+
+        function toast(msg, type = 'ok') {
+            const t = document.getElementById('toast');
+            t.textContent = msg; t.className = type; t.style.display = 'block';
+            clearTimeout(t._h); t._h = setTimeout(() => { t.style.display = 'none'; }, 3200);
+        }
+
+        async function req(path, opts = {}) {
+            opts.headers = Object.assign({}, opts.headers, {
+                'X-Admin-Key': KEY,
+                'Content-Type': 'application/json'
+            });
+            const r = await fetch(API + path, opts);
+            if (r.status === 403) throw new Error('AUTH');
+            if (!r.ok) { const e = await r.json().catch(() => ({})); throw new Error(e.detail || ('HTTP ' + r.status)); }
+            return r.json();
+        }
+
+        // ── Gate ──
+        async function login() {
+            KEY = document.getElementById('key-input').value.trim();
+            if (!KEY) return;
+            try {
+                await req('/admin/overview');
+                sessionStorage.setItem('tiko_admin_key', KEY);
+                document.getElementById('gate').style.display = 'none';
+                document.getElementById('app').style.display = '';
+                loadAll();
+            } catch (e) {
+                const err = document.getElementById('gate-err');
+                err.textContent = e.message === 'AUTH'
+                    ? '密钥错误或服务端未配置管理密钥。'
+                    : '无法连接服务器，请确认后端已启动。';
+                err.style.display = 'block';
+            }
+        }
+        function logout() {
+            sessionStorage.removeItem('tiko_admin_key'); KEY = '';
+            document.getElementById('app').style.display = 'none';
+            document.getElementById('gate').style.display = 'flex';
+            document.getElementById('key-input').value = '';
+        }
+
+        // ── Data ──
+        async function loadAll() {
+            const btn = document.getElementById('btn-refresh');
+            btn.disabled = true; btn.textContent = '↻ 加载中…';
+            try {
+                const [ov, us, ins] = await Promise.all([
+                    req('/admin/overview'), req('/admin/users'), req('/admin/interests')
+                ]);
+                document.getElementById('k-total').textContent = ov.total_users;
+                document.getElementById('k-real').textContent = ov.real_users;
+                document.getElementById('k-paid').textContent = ov.paid_users;
+                document.getElementById('k-mrr').textContent = '$' + (ov.mrr_usd ?? 0);
+                document.getElementById('k-demo').textContent = ov.demo_users;
+                document.getElementById('k-runs').textContent = ov.optimize_runs_month;
+                document.getElementById('k-chats').textContent = ov.agent_messages_month ?? 0;
+                document.getElementById('k-month').textContent = '(' + ov.month + ')';
+                USERS = us.users;
+                renderUsers();
+                renderInterests(ins.interests);
+            } catch (e) {
+                if (e.message === 'AUTH') { logout(); return; }
+                toast('加载失败：' + e.message, 'err');
+            } finally {
+                btn.disabled = false; btn.textContent = '↻ 刷新';
+            }
+        }
+
+        function fmtDate(iso) {
+            if (!iso) return '—';
+            try { return new Date(iso).toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }); }
+            catch (_) { return iso; }
+        }
+        function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+
+        // ── Sorting ──
+        const HEAD_THS = document.querySelectorAll('#users-head th.sortable');
+        HEAD_THS.forEach(th => {
+            th.dataset.label = th.textContent;
+            th.addEventListener('click', () => sortBy(th.dataset.key));
+        });
+        function sortBy(key) {
+            if (SORT.key === key) SORT.dir = -SORT.dir;
+            else SORT = { key, dir: (key === 'email' || key === 'created_at') ? 1 : -1 };
+            renderUsers();
+        }
+        function sortRows(rows) {
+            if (!SORT.key) return rows;
+            const { key, dir } = SORT;
+            return rows.slice().sort((a, b) => {
+                let va = a[key], vb = b[key];
+                if (key === 'plan') { va = PLAN_RANK[va] ?? 0; vb = PLAN_RANK[vb] ?? 0; }
+                if (typeof va === 'string' || typeof vb === 'string')
+                    return dir * String(va ?? '').localeCompare(String(vb ?? ''));
+                return dir * ((va ?? 0) - (vb ?? 0));
+            });
+        }
+
+        function renderUsers() {
+            const q = document.getElementById('search').value.trim().toLowerCase();
+            const hideDemo = document.getElementById('hide-demo').checked;
+            const onlyPaid = document.getElementById('only-paid').checked;
+            VIEW = sortRows(USERS.filter(u =>
+                (!q || u.email.toLowerCase().includes(q)) &&
+                (!hideDemo || !u.demo) &&
+                (!onlyPaid || u.plan !== 'free')
+            ));
+            HEAD_THS.forEach(th => {
+                const arr = th.dataset.key === SORT.key ? (SORT.dir > 0 ? '▲' : '▼') : '';
+                th.innerHTML = esc(th.dataset.label) + (arr ? `<span class="arr">${arr}</span>` : '');
+            });
+            document.getElementById('user-count').textContent = VIEW.length + ' / ' + USERS.length;
+            const tbody = document.getElementById('users-body');
+            if (!VIEW.length) { tbody.innerHTML = '<tr><td colspan="8" class="empty">没有匹配的用户</td></tr>'; return; }
+            tbody.innerHTML = VIEW.map((u, i) => {
+                const chip = u.demo
+                    ? '<span class="chip demo">DEMO</span>'
+                    : `<span class="chip ${u.plan}">${PLAN_NAMES[u.plan] || u.plan}</span>`;
+                const sel = `<select id="plan-row-${i}">` +
+                    ['free', 'pro', 'team'].map(p => `<option value="${p}" ${p === u.plan ? 'selected' : ''}>${PLAN_NAMES[p]}</option>`).join('') +
+                    '</select>';
+                return `<tr>
+                    <td class="email">${esc(u.email)}<small title="点击复制租户 ID" onclick="copyTid(${i})">${esc(u.tenant_id).slice(0, 12)}…</small></td>
+                    <td>${chip}</td>
+                    <td class="num" style="text-align:right">${u.optimize_runs}</td>
+                    <td class="num" style="text-align:right">${u.agent_messages ?? 0}</td>
+                    <td class="num" style="text-align:right">${u.creators}</td>
+                    <td class="num" style="text-align:right">${u.campaigns}</td>
+                    <td class="hide-sm num" style="font-size:11.5px;color:var(--mut)">${fmtDate(u.created_at)}</td>
+                    <td>
+                        <div class="row-actions">
+                            ${sel}
+                            <button class="btn" onclick="applyPlan(${i})">应用</button>
+                            ${u.demo ? '' : `<button class="btn" title="生成一次性临时密码（用户忘记密码时使用）" onclick="resetPw(${i})">重置密码</button>`}
+                            <button class="btn danger" onclick="removeUser(${i})">删除</button>
+                        </div>
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        // Forgot-password support: verify the merchant's identity out of band first.
+        async function resetPw(i) {
+            const u = VIEW[i];
+            if (!confirm(`为 ${u.email} 生成临时密码？\n该用户的所有登录会话将立即失效。请先确认对方身份。`)) return;
+            try {
+                const d = await req('/admin/reset-password', { method: 'POST', body: JSON.stringify({ email: u.email }) });
+                prompt(`临时密码（仅显示这一次，请复制后发给 ${d.email}，并提醒对方登录后立即修改）：`, d.temporary_password);
+            } catch (e) {
+                if (e.message === 'AUTH') { toast('管理密钥无效或已失效', 'err'); return; }
+                toast('重置失败：' + e.message, 'err');
+            }
+        }
+
+        function copyTid(i) {
+            const tid = VIEW[i].tenant_id;
+            (navigator.clipboard
+                ? navigator.clipboard.writeText(tid).then(() => toast('已复制租户 ID'))
+                : Promise.reject()
+            ).catch(() => toast('复制失败，请手动复制：' + tid, 'err'));
+        }
+
+        function renderInterests(list) {
+            const tbody = document.getElementById('interests-body');
+            if (!list || !list.length) { tbody.innerHTML = '<tr><td colspan="3" class="empty">暂无登记 —— 用户在「即将上线」集成里留下邮箱后会出现在这里</td></tr>'; return; }
+            tbody.innerHTML = list.map(i => `<tr>
+                <td class="email">${esc(i.email)}</td>
+                <td>${INTEGRATIONS[i.integration_type] || esc(i.integration_type)}</td>
+                <td class="num" style="font-size:11.5px;color:var(--mut)">${fmtDate(i.registered_at)}</td>
+            </tr>`).join('');
+        }
+
+        // ── Actions ──
+        async function applyPlan(i) {
+            const u = VIEW[i];
+            const plan = document.getElementById('plan-row-' + i).value;
+            if (plan === u.plan) { toast(`${u.email} 已在 ${PLAN_NAMES[plan] || plan} 套餐`); return; }
+            try {
+                const d = await req('/admin/plan', { method: 'POST', body: JSON.stringify({ email: u.email, plan }) });
+                toast(`${u.email} → ${d.plan_name}`);
+                loadAll();
+            } catch (e) { toast('变更失败：' + e.message, 'err'); }
+        }
+        async function removeUser(i) {
+            const u = VIEW[i];
+            if (!confirm(`删除账号 ${u.email}？\n其达人库、投放记录、套餐与用量数据将一并清除，不可恢复。`)) return;
+            try {
+                await req('/admin/delete-user', { method: 'POST', body: JSON.stringify({ email: u.email }) });
+                toast(`已删除 ${u.email}`);
+                loadAll();
+            } catch (e) { toast('删除失败：' + e.message, 'err'); }
+        }
+        async function cleanupDemos() {
+            const n = USERS.filter(u => u.demo).length;
+            if (!n) { toast('当前没有 Demo 账号'); return; }
+            if (!confirm(`清理全部 ${n} 个 Demo 账号（@demo.tiko）及其数据？`)) return;
+            try {
+                const d = await req('/admin/cleanup-demos', { method: 'POST' });
+                toast(`已清理 ${d.removed} 个 Demo 账号`);
+                loadAll();
+            } catch (e) { toast('清理失败：' + e.message, 'err'); }
+        }
+
+        // Auto-login if a key is already stored for this browser session.
+        if (KEY) { document.getElementById('key-input').value = KEY; login(); }
+    </script>
+</body>
+
+</html>
