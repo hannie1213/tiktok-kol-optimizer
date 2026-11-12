@@ -26,6 +26,7 @@ from backend.db import (
     Campaign,
     Kol,
     KolSnapshot,
+    PaymentOrder,
     SessionLocal,
     Tenant,
     TenantPlan,
@@ -213,7 +214,8 @@ def _ensure_users_imported(s):
 
 def _user_to_dict(u: User) -> dict:
     return {"id": u.id, "email": u.email, "password_hash": u.password_hash,
-            "tenant_id": u.tenant_id, "created_at": u.created_at}
+            "tenant_id": u.tenant_id, "created_at": u.created_at,
+            "email_verified": bool(u.email_verified), "lang": u.lang or "en"}
 
 
 def user_find(email: str) -> Optional[dict]:
@@ -230,11 +232,13 @@ def user_find_by_tenant(tenant_id: str) -> Optional[dict]:
         return _user_to_dict(u) if u else None
 
 
-def user_create(email: str, password_hash: str, tenant_id: str, created_at: str) -> dict:
+def user_create(email: str, password_hash: str, tenant_id: str, created_at: str,
+                lang: str = "en") -> dict:
     with _write_lock, _session() as s:
         _ensure_users_imported(s)
         u = User(email=email, password_hash=password_hash,
-                 tenant_id=tenant_id, created_at=created_at)
+                 tenant_id=tenant_id, created_at=created_at,
+                 email_verified=False, lang=lang)
         s.add(u)
         s.flush()
         return _user_to_dict(u)
@@ -263,11 +267,23 @@ def user_delete(email: str) -> Optional[str]:
 def tenant_wipe(tenant_id: str) -> None:
     """Remove every row belonging to a tenant (operator account deletion)."""
     with _write_lock, _session() as s:
-        for model in (Kol, KolSnapshot, Campaign, TenantPlan, UsageCounter):
+        for model in (Kol, KolSnapshot, Campaign, TenantPlan, UsageCounter, PaymentOrder):
             s.query(model).filter(model.tenant_id == tenant_id).delete(synchronize_session=False)
         s.query(Calibration).filter(Calibration.tenant_id == tenant_id).delete(synchronize_session=False)
         s.query(Tenant).filter(Tenant.id == tenant_id).delete(synchronize_session=False)
     _migrated.discard(tenant_id)
+
+
+def user_update(tenant_id: str, **fields) -> bool:
+    """Set simple account attributes (email_verified, lang)."""
+    with _write_lock, _session() as s:
+        u = s.scalar(select(User).where(User.tenant_id == tenant_id))
+        if not u:
+            return False
+        for k, v in fields.items():
+            if k in ("email_verified", "lang"):
+                setattr(u, k, v)
+        return True
 
 
 def user_set_password(tenant_id: str, password_hash: str) -> bool:
@@ -529,22 +545,131 @@ def campaigns_delete(tenant_id: str, campaign_id: int) -> bool:
 # ════════════════════════════════════════════════════════════════
 #  Subscription plan & metered usage
 # ════════════════════════════════════════════════════════════════
+def _now_iso() -> str:
+    from datetime import datetime, timezone
+    return datetime.now(timezone.utc).isoformat()
+
+
+def _plan_active(row) -> bool:
+    """A paid period that has run out counts as Free. Timestamps are all
+    written by _now_iso-style UTC isoformat, so string order is time order."""
+    return not row.expires_at or row.expires_at > _now_iso()
+
+
 def plan_get(tenant_id: str) -> str:
-    """Tenant's subscription tier; no row means the free tier."""
+    """Tenant's subscription tier; no row — or a lapsed paid period — means
+    the free tier."""
     with SessionLocal() as s:
         row = s.get(TenantPlan, tenant_id)
-        return row.plan if row else "free"
+        return row.plan if row and _plan_active(row) else "free"
 
 
-def plan_set(tenant_id: str, plan: str, updated_at: str = ""):
+def plan_info(tenant_id: str) -> dict:
+    """{plan, expires_at} with the same lapse rule as plan_get."""
+    with SessionLocal() as s:
+        row = s.get(TenantPlan, tenant_id)
+        if not row or not _plan_active(row):
+            return {"plan": "free", "expires_at": None}
+        return {"plan": row.plan, "expires_at": row.expires_at}
+
+
+def plan_set(tenant_id: str, plan: str, updated_at: str = "", expires_at: Optional[str] = None):
+    """Set the plan. expires_at=None means it never lapses (operator grant)."""
     _ensure_migrated(tenant_id)
     with _write_lock, _session() as s:
         row = s.get(TenantPlan, tenant_id)
         if row is None:
-            s.add(TenantPlan(tenant_id=tenant_id, plan=plan, updated_at=updated_at))
+            s.add(TenantPlan(tenant_id=tenant_id, plan=plan, updated_at=updated_at,
+                             expires_at=expires_at))
         else:
             row.plan = plan
             row.updated_at = updated_at
+            row.expires_at = expires_at
+
+
+# ════════════════════════════════════════════════════════════════
+#  QR-payment orders
+# ════════════════════════════════════════════════════════════════
+_ORDER_FIELDS = ("order_no", "tenant_id", "email", "plan", "months", "amount", "currency",
+                 "status", "reference", "note", "created_at", "submitted_at", "decided_at")
+ORDER_OPEN = ("pending", "submitted")
+
+
+def _order_to_dict(o: PaymentOrder) -> dict:
+    return {f: getattr(o, f) for f in _ORDER_FIELDS}
+
+
+def order_create(**fields) -> dict:
+    with _write_lock, _session() as s:
+        o = PaymentOrder(**fields)
+        s.add(o)
+        s.flush()
+        return _order_to_dict(o)
+
+
+def order_get(order_no: str) -> Optional[dict]:
+    with SessionLocal() as s:
+        o = s.scalar(select(PaymentOrder).where(PaymentOrder.order_no == order_no))
+        return _order_to_dict(o) if o else None
+
+
+def order_update(order_no: str, expect_status: Optional[tuple] = None, **changes) -> Optional[dict]:
+    """Apply changes; with expect_status, only if the order is still in one
+    of those states (so two operators can't both confirm it). Returns the
+    updated order, or None when it is missing / in another state."""
+    with _write_lock, _session() as s:
+        o = s.scalar(select(PaymentOrder).where(PaymentOrder.order_no == order_no))
+        if o is None or (expect_status and o.status not in expect_status):
+            return None
+        for k, v in changes.items():
+            if k in _ORDER_FIELDS:
+                setattr(o, k, v)
+        s.flush()
+        return _order_to_dict(o)
+
+
+def orders_for_tenant(tenant_id: str, limit: int = 20) -> List[dict]:
+    with SessionLocal() as s:
+        rows = s.scalars(select(PaymentOrder).where(PaymentOrder.tenant_id == tenant_id)
+                         .order_by(PaymentOrder.id.desc()).limit(limit)).all()
+        return [_order_to_dict(o) for o in rows]
+
+
+def orders_all(statuses: Optional[tuple] = None, limit: int = 200) -> List[dict]:
+    with SessionLocal() as s:
+        q = select(PaymentOrder)
+        if statuses:
+            q = q.where(PaymentOrder.status.in_(statuses))
+        rows = s.scalars(q.order_by(PaymentOrder.id.desc()).limit(limit)).all()
+        return [_order_to_dict(o) for o in rows]
+
+
+def order_open_amounts(currency: str) -> set:
+    """Amounts of every order still awaiting payment/confirmation — a new
+    order must not reuse one, so each can be matched in the wallet history."""
+    with SessionLocal() as s:
+        rows = s.scalars(select(PaymentOrder.amount).where(
+            PaymentOrder.status.in_(ORDER_OPEN), PaymentOrder.currency == currency)).all()
+        return {round(a, 2) for a in rows}
+
+
+def order_reference_used(reference: str, exclude_order_no: str) -> bool:
+    """True when another live or paid order already claims this transaction."""
+    with SessionLocal() as s:
+        return s.scalar(select(func.count()).select_from(PaymentOrder).where(
+            func.lower(PaymentOrder.reference) == reference.lower(),
+            PaymentOrder.order_no != exclude_order_no,
+            PaymentOrder.status.in_(("submitted", "paid")))) > 0
+
+
+def orders_expire_pending(cutoff_iso: str) -> int:
+    """Mark never-submitted orders created before the cutoff as expired."""
+    with _write_lock, _session() as s:
+        rows = s.scalars(select(PaymentOrder).where(
+            PaymentOrder.status == "pending", PaymentOrder.created_at < cutoff_iso)).all()
+        for o in rows:
+            o.status = "expired"
+        return len(rows)
 
 
 def optimize_runs(tenant_id: str, month: str) -> int:
@@ -621,8 +746,12 @@ def admin_stats(month: str) -> dict:
                                       "campaigns": 0})
 
     with SessionLocal() as s:
-        for tid, plan in s.execute(select(TenantPlan.tenant_id, TenantPlan.plan)):
-            entry(tid)["plan"] = plan
+        now = _now_iso()
+        for tid, plan, exp in s.execute(
+                select(TenantPlan.tenant_id, TenantPlan.plan, TenantPlan.expires_at)):
+            lapsed = bool(exp) and exp <= now
+            entry(tid)["plan"] = "free" if lapsed else plan
+            entry(tid)["plan_expires_at"] = None if lapsed else exp
         for tid, runs, chats in s.execute(
                 select(UsageCounter.tenant_id, UsageCounter.optimize_runs,
                        UsageCounter.agent_messages)

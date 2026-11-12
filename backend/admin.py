@@ -25,10 +25,10 @@ import secrets
 from datetime import datetime, timezone
 from typing import Optional
 
-from fastapi import APIRouter, Depends, Header, HTTPException, Request
+from fastapi import APIRouter, BackgroundTasks, Depends, Header, HTTPException, Request
 from pydantic import BaseModel
 
-from backend import ratelimit, repo, settings, tenancy
+from backend import mailer, ratelimit, repo, settings, tenancy
 from backend.auth import DEMO_SUFFIX as _DEMO_SUFFIX, _pwd
 from backend.billing import PLANS
 
@@ -85,6 +85,7 @@ def _user_rows(month: str) -> list:
             "tenant_id": u["tenant_id"],
             "created_at": u["created_at"],
             "plan": st.get("plan", "free"),
+            "plan_expires_at": st.get("plan_expires_at"),
             "optimize_runs": st.get("optimize_runs", 0),
             "agent_messages": st.get("agent_messages", 0),
             "creators": st.get("creators", 0),
@@ -121,13 +122,17 @@ def users():
 
 
 @router.post("/admin/plan")
-def set_plan(req: PlanChange):
+def set_plan(req: PlanChange, background: BackgroundTasks):
     if req.plan not in PLANS:
         raise HTTPException(status_code=422, detail=f"Unknown plan: {req.plan}")
     user = repo.user_find(req.email.strip().lower())
     if not user:
         raise HTTPException(status_code=404, detail="No account with that email")
+    changed = repo.plan_get(user["tenant_id"]) != req.plan
     repo.plan_set(user["tenant_id"], req.plan, datetime.now(timezone.utc).isoformat())
+    if changed and not user["email"].endswith(_DEMO_SUFFIX):
+        background.add_task(mailer.send_plan_changed, user["email"], PLANS[req.plan]["name"],
+                            mailer.base_url(), user.get("lang", "en"))
     return {"status": "ok", "email": user["email"], "plan": req.plan,
             "plan_name": PLANS[req.plan]["name"]}
 

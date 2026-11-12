@@ -47,6 +47,18 @@ RATE_LIMIT_ENABLED = _flag("RATE_LIMIT_ENABLED", True)
 MAX_UPLOAD_BYTES = int(float(os.environ.get("MAX_UPLOAD_MB", "10")) * 1024 * 1024)
 
 
+# ── QR payment (see backend/payments.py) ──────────────────────────
+# Path of the receiving QR image inside frontend/. The feature is on when the
+# file exists; delete the file (or point this at nothing) to switch it off.
+PAY_QR_IMAGE = (os.environ.get("PAY_QR_IMAGE") or "pay/duitnow-qr.png").strip().lstrip("/")
+PAY_PAYEE_NAME = (os.environ.get("PAY_PAYEE_NAME") or "").strip()
+PAY_CURRENCY = (os.environ.get("PAY_CURRENCY") or "MYR").strip().upper()
+# How many units of PAY_CURRENCY one USD of list price costs.
+PAY_FX_RATE = float(os.environ.get("PAY_FX_RATE") or 4.4)
+# Where "a merchant says they paid" notices go (needs SMTP).
+OPERATOR_EMAIL = (os.environ.get("OPERATOR_EMAIL") or "").strip()
+
+
 def admin_key_ok(candidate) -> bool:
     """Constant-time operator-key check; always False when no key is configured."""
     if not ADMIN_KEY or not candidate:
@@ -67,6 +79,8 @@ def production_problems() -> list:
         problems.append('CORS_ORIGINS contains "*" (list your real origins, or leave it unset)')
     if BILLING_SELF_SERVE:
         problems.append("BILLING_SELF_SERVE is on (anyone could take a paid plan for free)")
+    if os.environ.get("SMTP_HOST") and not os.environ.get("APP_BASE_URL"):
+        problems.append("SMTP_HOST is set without APP_BASE_URL (links in emails need your public origin)")
     if ADMIN_KEY and len(ADMIN_KEY) < 16:
         problems.append("ADMIN_KEY is too short (use at least 16 random characters)")
     return problems

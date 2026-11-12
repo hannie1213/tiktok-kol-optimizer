@@ -42,7 +42,7 @@ from engine.optimization.tabu_search import tabu_search
 from engine.optimization.greedy_ranking import greedy_ranking
 from engine.scoring.creator_score import compute_creator_score
 from engine.scoring.explainer import generate_reasons, get_tier
-from backend import calibration, ratelimit, repo, settings, tenancy
+from backend import calibration, mailer, ratelimit, repo, settings, tenancy
 
 # Refuse to boot an unsafe production configuration (see backend/settings.py).
 settings.validate()
@@ -60,6 +60,7 @@ from backend.campaigns import router as campaigns_router
 from backend.admin import router as admin_router, record_interest
 from backend.agent import router as agent_router
 from backend.guide import router as guide_router
+from backend.payments import router as payments_router
 
 app = FastAPI(
     title="TikTok Shop KOL Matrix Optimizer API",
@@ -85,6 +86,7 @@ app.include_router(campaigns_router)
 app.include_router(admin_router)
 app.include_router(agent_router)
 app.include_router(guide_router)
+app.include_router(payments_router)
 
 # UI language of the calling client (X-Lang header, set by the frontend).
 # Server-generated text — e.g. the "why this creator" reasons — follows it.
@@ -697,6 +699,13 @@ def health():
         log.exception("health check: database unreachable")
         return JSONResponse(status_code=503, content={"status": "degraded", "database": "down"})
     return {"status": "ok", "database": "ok"}
+
+
+@app.get("/app-config")
+def app_config():
+    """Public feature switches the frontend needs before anyone signs in."""
+    return {"email_enabled": mailer.enabled(),
+            "billing_self_serve": settings.BILLING_SELF_SERVE}
 
 
 @app.get("/calibration")

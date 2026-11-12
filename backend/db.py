@@ -113,6 +113,10 @@ class User(Base):
     password_hash: Mapped[str] = mapped_column(String(255))
     tenant_id: Mapped[str] = mapped_column(String(64), index=True)
     created_at: Mapped[str] = mapped_column(String(40), default="")
+    # Set once the owner clicks the link we emailed (or resets a password by email).
+    email_verified: Mapped[bool] = mapped_column(Boolean, default=False)
+    # UI language last seen for this user — the language emails are written in.
+    lang: Mapped[str] = mapped_column(String(8), default="en")
 
 
 class Kol(Base):
@@ -194,6 +198,9 @@ class TenantPlan(Base):
     tenant_id: Mapped[str] = mapped_column(String(64), primary_key=True)
     plan: Mapped[str] = mapped_column(String(16), default="free")
     updated_at: Mapped[str] = mapped_column(String(40), default="")
+    # UTC ISO timestamp the paid period ends; NULL = no expiry (operator
+    # grant). Past it, the tenant is treated as Free (see repo.plan_get).
+    expires_at: Mapped[str] = mapped_column(String(40), nullable=True)
 
 
 class UsageCounter(Base):
@@ -205,6 +212,29 @@ class UsageCounter(Base):
     optimize_runs: Mapped[int] = mapped_column(Integer, default=0)
     # AI Copilot chat turns — the second metered axis (see backend/billing.py).
     agent_messages: Mapped[int] = mapped_column(Integer, default=0)
+
+
+class PaymentOrder(Base):
+    """One QR-payment order: a merchant asks for a plan, pays the exact
+    amount by scanning the operator's QR code, submits the transaction
+    reference, and the operator confirms it against their wallet history."""
+    __tablename__ = "payment_orders"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    order_no: Mapped[str] = mapped_column(String(16), unique=True, index=True)
+    tenant_id: Mapped[str] = mapped_column(String(64), index=True)
+    email: Mapped[str] = mapped_column(String(255))
+    plan: Mapped[str] = mapped_column(String(16))
+    months: Mapped[int] = mapped_column(Integer, default=1)
+    amount: Mapped[float] = mapped_column(Float)
+    currency: Mapped[str] = mapped_column(String(8), default="MYR")
+    # pending → submitted → paid | rejected ; pending → expired | cancelled
+    status: Mapped[str] = mapped_column(String(16), default="pending", index=True)
+    reference: Mapped[str] = mapped_column(String(64), nullable=True)
+    note: Mapped[str] = mapped_column(String(255), nullable=True)
+    created_at: Mapped[str] = mapped_column(String(40), default="")
+    submitted_at: Mapped[str] = mapped_column(String(40), nullable=True)
+    decided_at: Mapped[str] = mapped_column(String(40), nullable=True)
 
 
 class ApiInterest(Base):
@@ -224,6 +254,9 @@ class ApiInterest(Base):
 # column already exists so this is safe to run on every boot.
 _ADDED_COLUMNS = [
     ("usage_counters", "agent_messages", "INTEGER NOT NULL DEFAULT 0"),
+    ("users", "email_verified", "BOOLEAN NOT NULL DEFAULT FALSE"),
+    ("users", "lang", "VARCHAR(8) NOT NULL DEFAULT 'en'"),
+    ("tenant_plans", "expires_at", "VARCHAR(40)"),
 ]
 
 

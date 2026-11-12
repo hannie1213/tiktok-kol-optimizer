@@ -20,6 +20,13 @@ Endpoints
   GET  /auth/me                Who am I
   POST /auth/change-password   Change password (returns a fresh token)
   POST /auth/delete-account    Permanently delete the account and its data
+  POST /auth/verify-email         Confirm the address from the emailed link
+  POST /auth/resend-verification  Send the verification link again
+  POST /auth/forgot-password      Email a password-reset link
+  POST /auth/reset-password       Set a new password from the emailed link
+
+Email flows need SMTP (backend/mailer.py). Without it, registration still
+works and password recovery falls back to the operator console.
 
 JWT_SECRET must be set in production (see backend/settings.py).
 """
@@ -31,11 +38,11 @@ from datetime import datetime, timedelta, timezone
 from typing import Optional
 
 import jwt
-from fastapi import APIRouter, Depends, Header, HTTPException, Request
+from fastapi import APIRouter, BackgroundTasks, Depends, Header, HTTPException, Request
 from passlib.context import CryptContext
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
-from backend import ratelimit, repo, settings, tenancy
+from backend import mailer, ratelimit, repo, settings, tenancy
 
 router = APIRouter()
 log = logging.getLogger("kol.auth")
@@ -75,6 +82,55 @@ def _make_token(tenant_id: str, email: str, password_hash: str,
     return jwt.encode(payload, settings.JWT_SECRET, algorithm=_JWT_ALG)
 
 
+_VERIFY_TTL = timedelta(hours=48)
+_RESET_TTL = timedelta(minutes=30)
+
+
+def _lang(request: Request) -> str:
+    return "zh" if (request.headers.get("x-lang") or "").lower().startswith("zh") else "en"
+
+
+def _action_token(purpose: str, user: dict, ttl: timedelta) -> str:
+    """Signed, expiring token for an emailed link. `purpose` keeps it from
+    being used as a login token (those have none) or for the other flow.
+    A reset token also carries the password fingerprint, which makes it
+    single-use: it stops matching the moment the password changes."""
+    payload = {
+        "sub": user["tenant_id"],
+        "purpose": purpose,
+        "email": user["email"],
+        "exp": datetime.now(timezone.utc) + ttl,
+    }
+    if purpose == "reset":
+        payload["pv"] = _pw_fingerprint(user["password_hash"])
+    return jwt.encode(payload, settings.JWT_SECRET, algorithm=_JWT_ALG)
+
+
+def _read_action_token(token: str, purpose: str) -> dict:
+    """Return the user the link was issued for, or raise 400."""
+    invalid = HTTPException(status_code=400,
+                            detail="This link is invalid or has expired — please request a new one.")
+    try:
+        payload = jwt.decode(token, settings.JWT_SECRET, algorithms=[_JWT_ALG])
+    except jwt.PyJWTError:
+        raise invalid
+    if payload.get("purpose") != purpose:
+        raise invalid
+    user = repo.user_find_by_tenant(payload.get("sub") or "")
+    if not user or user["email"] != payload.get("email"):
+        raise invalid
+    if purpose == "reset" and payload.get("pv") != _pw_fingerprint(user["password_hash"]):
+        raise invalid
+    return user
+
+
+def _send_verification(user: dict, request: Request, background: BackgroundTasks, lang: str):
+    # The token sits in the URL fragment, which browsers never send to a
+    # server — so it can't leak through access logs or Referer headers.
+    link = f"{mailer.base_url(request)}/#verify={_action_token('verify', user, _VERIFY_TTL)}"
+    background.add_task(mailer.send_verification, user["email"], link, lang)
+
+
 def _check_password_rules(password: str):
     if len(password) < _PASSWORD_MIN:
         raise HTTPException(status_code=422,
@@ -112,9 +168,22 @@ class AccountDeletion(BaseModel):
     password: str
 
 
+class TokenOnly(BaseModel):
+    token: str = Field(..., max_length=2000)
+
+
+class EmailOnly(BaseModel):
+    email: str = Field(..., max_length=254)
+
+
+class PasswordReset(BaseModel):
+    token: str = Field(..., max_length=2000)
+    new_password: str
+
+
 # ── Endpoints ─────────────────────────────────────────────────────
 @router.post("/auth/register")
-def register(req: Credentials, request: Request):
+def register(req: Credentials, request: Request, background: BackgroundTasks):
     """Create a merchant account + an isolated data tenant, and return a token."""
     ratelimit.enforce("register", ratelimit.client_ip(request), limit=10, window=3600,
                       detail="Too many sign-ups from this network — please try again later.")
@@ -127,16 +196,23 @@ def register(req: Credentials, request: Request):
 
     tenant_id = uuid.uuid4().hex
     password_hash = _pwd.hash(req.password)
-    repo.user_create(
+    lang = _lang(request)
+    user = repo.user_create(
         email=email,
         password_hash=password_hash,
         tenant_id=tenant_id,
         created_at=datetime.now(timezone.utc).isoformat(),
+        lang=lang,
     )
     tenancy.provision_tenant(tenant_id)
     log.info("registered account tenant=%s", tenant_id)
 
-    return {"token": _make_token(tenant_id, email, password_hash), "email": email}
+    verification_sent = mailer.enabled()
+    if verification_sent:
+        _send_verification(user, request, background, lang)
+
+    return {"token": _make_token(tenant_id, email, password_hash), "email": email,
+            "email_verified": False, "verification_sent": verification_sent}
 
 
 @router.post("/auth/demo")
@@ -184,6 +260,9 @@ def login(req: Credentials, request: Request):
     # Heal any tenant that was never provisioned (or predates the database).
     if not tenancy.tenant_exists(user["tenant_id"]):
         tenancy.provision_tenant(user["tenant_id"])
+    lang = _lang(request)
+    if user.get("lang") != lang:                 # emails follow the language they use
+        repo.user_update(user["tenant_id"], lang=lang)
     return {"token": _make_token(user["tenant_id"], user["email"], user["password_hash"]),
             "email": user["email"]}
 
@@ -224,7 +303,9 @@ def me(tenant_id: str = Depends(require_tenant)):
     user = repo.user_find_by_tenant(tenant_id)
     email = user["email"] if user else None
     return {"tenant_id": tenant_id, "email": email,
-            "demo": bool(email and email.endswith(DEMO_SUFFIX))}
+            "demo": bool(email and email.endswith(DEMO_SUFFIX)),
+            "email_verified": bool(user and user.get("email_verified")),
+            "email_enabled": mailer.enabled()}
 
 
 def _account_or_403(tenant_id: str) -> dict:
@@ -237,7 +318,8 @@ def _account_or_403(tenant_id: str) -> dict:
 
 
 @router.post("/auth/change-password")
-def change_password(req: PasswordChange, tenant_id: str = Depends(require_tenant)):
+def change_password(req: PasswordChange, request: Request, background: BackgroundTasks,
+                    tenant_id: str = Depends(require_tenant)):
     """Change the password. Every other session is signed out; the response
     carries a fresh token so this one stays signed in."""
     user = _account_or_403(tenant_id)
@@ -251,6 +333,7 @@ def change_password(req: PasswordChange, tenant_id: str = Depends(require_tenant
     new_hash = _pwd.hash(req.new_password)
     repo.user_set_password(tenant_id, new_hash)
     log.info("password changed tenant=%s", tenant_id)
+    background.add_task(mailer.send_password_changed, user["email"], _lang(request))
     return {"status": "ok", "token": _make_token(tenant_id, user["email"], new_hash),
             "email": user["email"]}
 
@@ -267,3 +350,68 @@ def delete_account(req: AccountDeletion, tenant_id: str = Depends(require_tenant
     repo.tenant_wipe(tenant_id)
     log.info("account deleted tenant=%s", tenant_id)
     return {"status": "deleted"}
+
+
+# ── Email verification ────────────────────────────────────────────
+@router.post("/auth/verify-email")
+def verify_email(req: TokenOnly):
+    """Confirm ownership of the address from the emailed link."""
+    user = _read_action_token(req.token, "verify")
+    if not user["email_verified"]:
+        repo.user_update(user["tenant_id"], email_verified=True)
+        log.info("email verified tenant=%s", user["tenant_id"])
+    return {"status": "ok", "email": user["email"], "email_verified": True}
+
+
+@router.post("/auth/resend-verification")
+def resend_verification(request: Request, background: BackgroundTasks,
+                        tenant_id: str = Depends(require_tenant)):
+    user = _account_or_403(tenant_id)
+    if not mailer.enabled():
+        raise HTTPException(status_code=503, detail="Email is not set up on this server yet.")
+    if user["email_verified"]:
+        return {"status": "already_verified"}
+    ratelimit.enforce("verify-mail", tenant_id, limit=3, window=3600,
+                      detail="We just sent you a link — check your inbox (and spam) before asking again.")
+    _send_verification(user, request, background, _lang(request))
+    return {"status": "sent"}
+
+
+# ── Password recovery by email ────────────────────────────────────
+@router.post("/auth/forgot-password")
+def forgot_password(req: EmailOnly, request: Request, background: BackgroundTasks):
+    """Email a reset link. The answer is identical whether or not the account
+    exists, so this can't be used to discover who has an account."""
+    if not mailer.enabled():
+        raise HTTPException(status_code=503,
+                            detail="Email is not set up on this server — contact us to reset your password.")
+    email = req.email.strip().lower()
+    slow = "Too many reset requests — please wait a while and try again."
+    ratelimit.enforce("forgot-ip", ratelimit.client_ip(request), limit=10, window=900, detail=slow)
+    # Per-address cap: silently skip rather than 429, so the limit itself
+    # doesn't reveal that the address has an account.
+    allowed = ratelimit.hit("forgot-email", email, limit=3, window=3600)
+
+    user = repo.user_find(email) if _EMAIL_RE.match(email) else None
+    if user and allowed and not user["email"].endswith(DEMO_SUFFIX):
+        link = f"{mailer.base_url(request)}/#reset={_action_token('reset', user, _RESET_TTL)}"
+        background.add_task(mailer.send_password_reset, user["email"], link, _lang(request))
+    return {"status": "ok"}
+
+
+@router.post("/auth/reset-password")
+def reset_password(req: PasswordReset, request: Request, background: BackgroundTasks):
+    """Set a new password from the emailed link and sign in. The link works
+    once; every existing session is signed out."""
+    ratelimit.enforce("reset-ip", ratelimit.client_ip(request), limit=20, window=900)
+    user = _read_action_token(req.token, "reset")
+    _check_password_rules(req.new_password)
+
+    new_hash = _pwd.hash(req.new_password)
+    repo.user_set_password(user["tenant_id"], new_hash)
+    # Opening the emailed link proves they own the address.
+    repo.user_update(user["tenant_id"], email_verified=True)
+    log.info("password reset by email tenant=%s", user["tenant_id"])
+    background.add_task(mailer.send_password_changed, user["email"], _lang(request))
+    return {"status": "ok", "email": user["email"],
+            "token": _make_token(user["tenant_id"], user["email"], new_hash)}

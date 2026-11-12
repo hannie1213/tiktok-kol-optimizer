@@ -133,6 +133,17 @@
             <div class="card kpi"><div class="l">本月 AI 助手对话</div><div class="v" id="k-chats">—</div></div>
         </div>
 
+        <!-- ── Payments awaiting confirmation ── -->
+        <h2 class="sec"><span class="n">00 / PAYMENTS</span>待确认付款 <span id="orders-count" style="color:var(--cy)"></span></h2>
+        <div class="card" style="overflow-x:auto">
+            <table>
+                <thead>
+                    <tr><th>订单号</th><th>账号</th><th>套餐</th><th style="text-align:right">应付金额</th><th>交易参考号</th><th>提交时间</th><th></th></tr>
+                </thead>
+                <tbody id="orders-body"><tr><td colspan="7" class="empty">加载中…</td></tr></tbody>
+            </table>
+        </div>
+
         <!-- ── Users ── -->
         <h2 class="sec"><span class="n">01 / USERS</span>用户列表</h2>
         <div class="toolbar">
@@ -237,9 +248,10 @@
             const btn = document.getElementById('btn-refresh');
             btn.disabled = true; btn.textContent = '↻ 加载中…';
             try {
-                const [ov, us, ins] = await Promise.all([
-                    req('/admin/overview'), req('/admin/users'), req('/admin/interests')
+                const [ov, us, ins, ord] = await Promise.all([
+                    req('/admin/overview'), req('/admin/users'), req('/admin/interests'), req('/admin/orders')
                 ]);
+                renderOrders(ord.orders);
                 document.getElementById('k-total').textContent = ov.total_users;
                 document.getElementById('k-real').textContent = ov.real_users;
                 document.getElementById('k-paid').textContent = ov.paid_users;
@@ -351,6 +363,52 @@
                 ? navigator.clipboard.writeText(tid).then(() => toast('已复制租户 ID'))
                 : Promise.reject()
             ).catch(() => toast('复制失败，请手动复制：' + tid, 'err'));
+        }
+
+        // ── QR payments: check the wallet history, then confirm or reject ──
+        let ORDERS = [];
+        function renderOrders(list) {
+            ORDERS = list || [];
+            document.getElementById('orders-count').textContent = ORDERS.length ? `(${ORDERS.length})` : '';
+            const tbody = document.getElementById('orders-body');
+            if (!ORDERS.length) { tbody.innerHTML = '<tr><td colspan="7" class="empty">没有待确认的付款</td></tr>'; return; }
+            tbody.innerHTML = ORDERS.map((o, i) => `<tr>
+                <td class="num">${esc(o.order_no)}</td>
+                <td class="email">${esc(o.email)}</td>
+                <td>${esc(o.plan)} × ${o.months} 个月</td>
+                <td class="num" style="text-align:right;font-weight:700;color:var(--cy)">${esc(o.currency)} ${Number(o.amount).toFixed(2)}</td>
+                <td class="num">${esc(o.reference || '—')}</td>
+                <td class="num" style="font-size:11.5px;color:var(--mut)">${fmtDate(o.submitted_at)}</td>
+                <td><div class="row-actions">
+                    <button class="btn" onclick="confirmOrder(${i})">确认到账</button>
+                    <button class="btn danger" onclick="rejectOrder(${i})">驳回</button>
+                </div></td>
+            </tr>`).join('');
+        }
+        async function confirmOrder(i) {
+            const o = ORDERS[i];
+            if (!confirm(`确认已在钱包收款记录中看到 ${o.currency} ${Number(o.amount).toFixed(2)}？\n确认后将为 ${o.email} 开通 ${o.plan} × ${o.months} 个月。`)) return;
+            try {
+                const d = await req(`/admin/orders/${o.order_no}/confirm`, { method: 'POST' });
+                toast(`已开通 ${o.email} · ${o.plan}` + (d.expires_at ? ` · 至 ${d.expires_at.slice(0, 10)}` : ''));
+                loadAll();
+            } catch (e) {
+                if (e.message === 'AUTH') { logout(); return; }
+                toast('确认失败：' + e.message, 'err');
+            }
+        }
+        async function rejectOrder(i) {
+            const o = ORDERS[i];
+            const note = prompt(`驳回 ${o.order_no}（${o.email}）。可填写原因，用户会看到：`, '未在收款记录中找到这笔金额');
+            if (note === null) return;
+            try {
+                await req(`/admin/orders/${o.order_no}/reject`, { method: 'POST', body: JSON.stringify({ note }) });
+                toast('已驳回，用户可修改后重新提交');
+                loadAll();
+            } catch (e) {
+                if (e.message === 'AUTH') { logout(); return; }
+                toast('驳回失败：' + e.message, 'err');
+            }
         }
 
         function renderInterests(list) {

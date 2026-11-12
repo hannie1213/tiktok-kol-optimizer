@@ -31,10 +31,10 @@ Endpoints
 from datetime import datetime, timezone
 from typing import Optional
 
-from fastapi import APIRouter, Depends, Header, HTTPException, Request
+from fastapi import APIRouter, BackgroundTasks, Depends, Header, HTTPException, Request
 from pydantic import BaseModel
 
-from backend import ratelimit, repo, settings
+from backend import mailer, ratelimit, repo, settings
 from backend.auth import require_tenant
 
 router = APIRouter()
@@ -150,11 +150,14 @@ class CheckoutRequest(BaseModel):
 @router.get("/billing/info")
 def billing_info(tenant_id: str = Depends(require_tenant)):
     """Current plan + this month's usage against its limits, and the catalog."""
-    plan_id = repo.plan_get(tenant_id)
+    current = repo.plan_info(tenant_id)
+    plan_id = current["plan"]
     limits = PLANS.get(plan_id, PLANS["free"])
     return {
         "plan": plan_id,
         "plan_name": limits["name"],
+        # End of the paid period (UTC ISO); null = free plan or no expiry.
+        "expires_at": current["expires_at"],
         "limits": {
             "max_creators": limits["max_creators"],
             "monthly_optimizations": limits["monthly_optimizations"],
@@ -221,7 +224,7 @@ class GrantRequest(BaseModel):
 
 
 @router.post("/billing/grant")
-def grant_plan(req: GrantRequest, request: Request, x_admin_key: Optional[str] = Header(None)):
+def grant_plan(req: GrantRequest, request: Request, background: BackgroundTasks, x_admin_key: Optional[str] = Header(None)):
     """Manual-payment fulfillment (offline WhatsApp / WeChat payments).
 
     Once payment is confirmed, the operator activates the merchant's plan:
@@ -244,6 +247,8 @@ def grant_plan(req: GrantRequest, request: Request, x_admin_key: Optional[str] =
     if not user:
         raise HTTPException(status_code=404, detail="No account with that email")
     repo.plan_set(user["tenant_id"], req.plan, datetime.now(timezone.utc).isoformat())
+    background.add_task(mailer.send_plan_changed, user["email"], PLANS[req.plan]["name"],
+                        mailer.base_url(), user.get("lang", "en"))
     return {
         "status": "ok",
         "email": user["email"],

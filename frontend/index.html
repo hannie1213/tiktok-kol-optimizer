@@ -634,11 +634,11 @@
                 <p id="auth-error" style="display:none;font-size:12px;color:#ef4444;margin:-4px 0 0"></p>
                 <button id="auth-submit" onclick="authSubmit()" class="btn btn-primary" style="width:100%;justify-content:center;padding:11px">Sign in</button>
             </div>
-            <p style="font-size:12.5px;color:#7B8794;text-align:center;margin-top:16px">
+            <p id="auth-switch-row" style="font-size:12.5px;color:#7B8794;text-align:center;margin-top:16px">
                 <span id="auth-switch-text">No account yet?</span>
                 <button onclick="authToggleMode()" id="auth-switch-btn" style="color:#0FB5AE;font-weight:700;background:none;border:none;cursor:pointer">Create one</button>
             </p>
-            <p style="font-size:12px;text-align:center;margin-top:8px">
+            <p id="auth-forgot-row" style="font-size:12px;text-align:center;margin-top:8px">
                 <button onclick="forgotPassword()" style="color:#7B8794;background:none;border:none;cursor:pointer;text-decoration:underline" data-i18n="auth.forgot">Forgot your password?</button>
             </p>
             <p style="font-size:11px;color:#9AA5B1;text-align:center;margin-top:12px;line-height:1.6" data-i18n-html="auth.legal">By continuing you agree to our <a href="./legal.html#terms" target="_blank" rel="noopener" style="color:#0FB5AE">Terms</a> and <a href="./legal.html#privacy" target="_blank" rel="noopener" style="color:#0FB5AE">Privacy Policy</a>.</p>
@@ -1647,6 +1647,8 @@
                 <p class="text-[10px] text-on-surface-variant/60" data-i18n="b.quotaNote">Optimization quota resets at the start of each calendar month (UTC). Limits are enforced server-side.</p>
             </div>
 
+            <div id="pay-status" class="glass-card rounded-xl p-md items-center gap-3 text-[12.5px]" style="display:none"></div>
+
             <!-- Plan catalog -->
             <div class="space-y-sm">
                 <p class="text-on-surface-variant font-label-sm text-label-sm uppercase tracking-wider" data-i18n="b.compare">Compare Plans</p>
@@ -1662,6 +1664,7 @@
             <!-- Account: password + account deletion -->
             <div class="space-y-sm" id="account-section">
                 <p class="text-on-surface-variant font-label-sm text-label-sm uppercase tracking-wider" data-i18n="acct.title">Account</p>
+                <div id="acct-verify" class="glass-card rounded-xl p-md items-center gap-3 text-[12.5px]" style="display:none"></div>
                 <div class="grid grid-cols-2 gap-lg items-start">
                     <div class="glass-card rounded-xl p-lg space-y-sm">
                         <p class="text-[14px] font-bold" data-i18n="acct.pwTitle">Change password</p>
@@ -2081,7 +2084,7 @@
     </div>
 
     <div id="pay-modal" class="modal-overlay hidden" onclick="if(event.target===this)closePayModal()">
-        <div class="glass-card rounded-xl p-6 w-[460px]">
+        <div class="glass-card rounded-xl p-6 w-[460px]" style="max-width:460px;max-height:92vh;overflow-y:auto">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-xl font-bold text-on-surface flex items-center gap-2">
                     <span class="material-symbols-outlined text-primary">workspace_premium</span>
@@ -2090,6 +2093,8 @@
                 <button onclick="closePayModal()" class="text-outline hover:text-white"><span class="material-symbols-outlined">close</span></button>
             </div>
             <p class="text-[15px] font-bold text-primary mb-2" id="pay-plan-name">—</p>
+            <div id="pay-qr" style="display:none"></div>
+            <div id="pay-manual">
             <p class="text-[12.5px] text-on-surface-variant leading-relaxed mb-4" data-i18n="pay.intro">Payments are handled personally while we're in early access — message us on WhatsApp or WeChat, pay, and we activate your plan (usually within minutes).</p>
             <div class="glass-card rounded-xl p-md mb-4 space-y-xs">
                 <p class="text-[10px] text-on-surface-variant uppercase tracking-wider" data-i18n="pay.account">Your account ID (include it with your payment)</p>
@@ -2111,6 +2116,7 @@
                 </div>
             </div>
             <p class="text-[11px] text-on-surface-variant/70" data-i18n="pay.note">After we confirm your payment, the plan is activated on this account — refresh the Billing page to see it.</p>
+            </div>
         </div>
     </div>
 
@@ -2427,6 +2433,19 @@
         function renderAuthMode() {
             const d = I18N[LANG];
             const reg = authMode === 'register';
+            const reset = authMode === 'reset';
+            // Reset mode: only a new-password field; no email, no mode switch.
+            document.getElementById('auth-email').style.display = reset ? 'none' : '';
+            document.getElementById('auth-switch-row').style.display = reset ? 'none' : '';
+            document.getElementById('auth-forgot-row').style.display = authMode === 'login' ? '' : 'none';
+            document.getElementById('auth-password').placeholder = reset ? d['auth.phNewPass'] : d['auth.phPass'];
+            if (reset) {
+                document.getElementById('auth-title').textContent = d['auth.resetTitle'];
+                document.getElementById('auth-submit').textContent = d['auth.resetBtn'];
+                document.getElementById('auth-password').setAttribute('autocomplete', 'new-password');
+                const er = document.getElementById('auth-error'); er.style.display = 'none'; er.style.color = '#ef4444';
+                return;
+            }
             document.getElementById('auth-title').textContent = reg ? d['auth.create'] : d['auth.signin'];
             document.getElementById('auth-submit').textContent = reg ? d['auth.createBtn'] : d['auth.signin'];
             document.getElementById('auth-switch-text').textContent = reg ? d['auth.have'] : d['auth.no'];
@@ -2436,6 +2455,7 @@
         }
         function authToggleMode() { authMode = authMode === 'login' ? 'register' : 'login'; renderAuthMode(); }
         async function authSubmit() {
+            if (authMode === 'reset') return resetSubmit();
             const email = document.getElementById('auth-email').value.trim();
             const password = document.getElementById('auth-password').value;
             const errEl = document.getElementById('auth-error'); errEl.style.color = '#ef4444';
@@ -2456,7 +2476,7 @@
                 enterApp();
                 if (typeof loadDashboard === 'function') loadDashboard();
                 else if (typeof loadTable === 'function') loadTable();
-                toast(authMode === 'register' ? 'Account created' : 'Signed in');
+                toast(authMode === 'register' ? (d.verification_sent ? T('auth.verifySent') : 'Account created') : 'Signed in');
             } catch (e) { errEl.textContent = I18N[LANG]['auth.errNet']; errEl.style.display = 'block'; }
             finally { btn.disabled = false; }
         }
@@ -2631,7 +2651,7 @@
         };
         // ── Console dynamic-content dictionary ──
         Object.assign(I18N.en, {
-            'toast.demo': 'Welcome to the live demo — running your first optimization…', 'toast.demoFail': 'Demo unavailable — is the backend running?', 'toast.dlFail': 'Download failed', 't.copied': 'Copied', 'auth.forgot': 'Forgot your password?', 'auth.forgotHelp': 'Message us on <a href="{wa}" target="_blank" rel="noopener" style="color:#0FB5AE">WhatsApp</a> or WeChat (<b>{wc}</b>) from the contact you signed up with — we verify it is you and send a temporary password.', 'auth.legal': 'By continuing you agree to our <a href="./legal.html#terms" target="_blank" rel="noopener" style="color:#0FB5AE">Terms</a> and <a href="./legal.html#privacy" target="_blank" rel="noopener" style="color:#0FB5AE">Privacy Policy</a>.', 'footer.terms': 'Terms', 'footer.privacy': 'Privacy', 'acct.title': 'Account', 'acct.pwTitle': 'Change password', 'acct.pwNote': 'Changing it signs out every other device.', 'acct.phCurrent': 'Current password', 'acct.phNew': 'New password (min 8 chars)', 'acct.pwBtn': 'Update password', 'acct.delTitle': 'Delete account', 'acct.delNote': 'Permanently removes your account, creator library, campaigns and usage history. This cannot be undone.', 'acct.phConfirm': 'Confirm with your password', 'acct.delBtn': 'Delete my account', 'acct.fill': 'Please fill in the password fields.', 'acct.fail': 'Could not complete the request.', 'acct.pwOk': 'Password updated', 'acct.delConfirm': 'Delete your account and ALL of its data permanently? This cannot be undone.', 'acct.delOk': 'Your account has been deleted',
+            'toast.demo': 'Welcome to the live demo — running your first optimization…', 'toast.demoFail': 'Demo unavailable — is the backend running?', 'toast.dlFail': 'Download failed', 't.copied': 'Copied', 'b.until': 'active until {d}', 'qr.term': '{m} mo', 'qr.payExactly': 'Pay exactly', 'qr.copyAmount': 'Copy amount', 'qr.payee': 'Payee:', 'qr.order': 'Order:', 'qr.s1': 'Scan the QR with any DuitNow-enabled banking app or e-wallet (Touch \'n Go, GrabPay, Boost, MAE …).', 'qr.s2': 'Pay exactly <b>{a}</b> — the amount identifies your order, so please do not round it.', 'qr.s3': 'Paste the transaction reference from your receipt below and submit.', 'qr.phRef': 'Transaction reference / receipt no.', 'qr.paid': 'I have paid — submit', 'qr.needRef': 'Enter the transaction reference from your receipt.', 'qr.submitted': 'Submitted — we will activate your plan once the payment is confirmed', 'qr.waitTitle': 'Payment submitted — awaiting confirmation', 'qr.waitBody': 'Order {n} · {a} · reference {r}. We check it against our account and activate your plan, usually within a few hours. You will get an email when it is done.', 'qr.rejected': 'We could not find this payment', 'qr.help': 'Problem with a payment?', 'qr.banner.pending': 'You have an unfinished payment for {p} ({a}).', 'qr.banner.submitted': 'Payment {n} ({a}) is awaiting confirmation.', 'qr.banner.rejected': 'We could not confirm payment {n} ({a}) — please check and resubmit.', 'qr.continue': 'Continue', 'qr.view': 'View', 'auth.phNewPass': 'New password (min 8 chars)', 'auth.resetTitle': 'Choose a new password', 'auth.resetBtn': 'Save and sign in', 'auth.forgotNeedEmail': 'Type your account email above first, then click again.', 'auth.forgotSent': 'If an account exists for <b>{e}</b>, a reset link is on its way. It is valid for 30 minutes — check your spam folder too.', 'auth.verifySent': 'Account created — we emailed you a link to verify your address', 'auth.verified': 'Email verified — thank you', 'acct.verified': '{e} is verified.', 'acct.unverified': '{e} is not verified yet — password resets and payment notices are sent to this address.', 'acct.resend': 'Resend link', 'auth.forgot': 'Forgot your password?', 'auth.forgotHelp': 'Message us on <a href="{wa}" target="_blank" rel="noopener" style="color:#0FB5AE">WhatsApp</a> or WeChat (<b>{wc}</b>) from the contact you signed up with — we verify it is you and send a temporary password.', 'auth.legal': 'By continuing you agree to our <a href="./legal.html#terms" target="_blank" rel="noopener" style="color:#0FB5AE">Terms</a> and <a href="./legal.html#privacy" target="_blank" rel="noopener" style="color:#0FB5AE">Privacy Policy</a>.', 'footer.terms': 'Terms', 'footer.privacy': 'Privacy', 'acct.title': 'Account', 'acct.pwTitle': 'Change password', 'acct.pwNote': 'Changing it signs out every other device.', 'acct.phCurrent': 'Current password', 'acct.phNew': 'New password (min 8 chars)', 'acct.pwBtn': 'Update password', 'acct.delTitle': 'Delete account', 'acct.delNote': 'Permanently removes your account, creator library, campaigns and usage history. This cannot be undone.', 'acct.phConfirm': 'Confirm with your password', 'acct.delBtn': 'Delete my account', 'acct.fill': 'Please fill in the password fields.', 'acct.fail': 'Could not complete the request.', 'acct.pwOk': 'Password updated', 'acct.delConfirm': 'Delete your account and ALL of its data permanently? This cannot be undone.', 'acct.delOk': 'Your account has been deleted',
             't.backend': 'Backend unavailable', 't.failed': 'Failed', 't.loadFail': 'Failed to load', 't.netFail': 'Could not reach the server',
             't.planFail': 'Could not switch plan', 't.planOk': 'Plan updated', 'b.confirmFree': 'Switch to the Free plan?',
             't.runFirst': 'Run an optimization first', 't.campName': 'Enter a campaign name', 't.campSaved': 'Campaign saved! View it in the Campaigns tab.',
@@ -2650,7 +2670,7 @@
             'b.currentBtn': 'Current plan', 'b.upgradeTo': 'Upgrade to {n}', 'b.switchTo': 'Switch to {n}', 'b.downgradeTo': 'Downgrade to {n}',
             'b.mostPop': 'MOST POPULAR', 'b.active': 'Active', 'b.freeForever': 'free forever', 'b.optims': 'Optimizations', 'b.copilot': 'AI Copilot chats', 'b.library': 'Creator library', 'b.unlimited': 'Unlimited',
             'b.current': 'Current Plan', 'b.quotaNote': 'Optimization quota resets at the start of each calendar month (UTC). Limits are enforced server-side.', 'b.compare': 'Compare Plans',
-            'b.payNote': 'Paid plans are activated personally during early access: click an upgrade button, message us on <b>WhatsApp / WeChat</b> with your account ID, and we switch your plan right after payment — usually within minutes. Card payments (Stripe) arrive with the commercial launch.',
+            'b.payNote': 'Upgrade by scanning our QR code: pick a plan, pay the exact amount shown, and submit your transaction reference. We confirm it against our account and activate your plan — usually within a few hours — and email you when it is done.',
             'd.recTeam': 'Your Recommended KOL Team', 'd.aiOpt': 'AI Optimized', 'd.budgetUsed': 'Budget Used', 'd.predGmv': 'Predicted GMV', 'd.gmvFull': 'Gross Merchandise Value',
             'd.roi': 'Return on Investment', 'd.gmvCost': 'GMV / Cost', 'd.algoCompare': 'AI cross-check — 6 strategies verified your lineup', 'd.fullAnalysis': 'Full analysis',
             'd.stratPlans': 'Strategy Plans', 'd.clickPlan': 'Click a plan to view its creators', 'd.creatorsSel': 'creators selected', 'd.sortedByGmv': 'Sorted by GMV contribution',
@@ -2734,7 +2754,7 @@
             'sim.target': 'Target', 'sim.targetMark': '← target'
         });
         Object.assign(I18N.zh, {
-            'toast.demo': '欢迎体验在线演示——正在为你运行第一次优化…', 'toast.demoFail': '演示暂不可用——请确认后端已启动', 'toast.dlFail': '下载失败', 't.copied': '已复制', 'auth.forgot': '忘记密码？', 'auth.forgotHelp': '请用注册时的联系方式通过 <a href="{wa}" target="_blank" rel="noopener" style="color:#0FB5AE">WhatsApp</a> 或微信（<b>{wc}</b>）联系我们，核实身份后我们会发给你一个临时密码。', 'auth.legal': '继续即表示你同意我们的<a href="./legal.html#terms" target="_blank" rel="noopener" style="color:#0FB5AE">服务条款</a>和<a href="./legal.html#privacy" target="_blank" rel="noopener" style="color:#0FB5AE">隐私政策</a>。', 'footer.terms': '服务条款', 'footer.privacy': '隐私政策', 'acct.title': '账号', 'acct.pwTitle': '修改密码', 'acct.pwNote': '修改后其他设备会自动退出登录。', 'acct.phCurrent': '当前密码', 'acct.phNew': '新密码（至少 8 位）', 'acct.pwBtn': '更新密码', 'acct.delTitle': '注销账号', 'acct.delNote': '将永久删除你的账号、达人库、投放活动和用量记录，且无法恢复。', 'acct.phConfirm': '输入密码以确认', 'acct.delBtn': '注销我的账号', 'acct.fill': '请填写密码。', 'acct.fail': '操作未能完成。', 'acct.pwOk': '密码已更新', 'acct.delConfirm': '确定要永久注销账号并删除全部数据吗？此操作无法撤销。', 'acct.delOk': '账号已注销',
+            'toast.demo': '欢迎体验在线演示——正在为你运行第一次优化…', 'toast.demoFail': '演示暂不可用——请确认后端已启动', 'toast.dlFail': '下载失败', 't.copied': '已复制', 'b.until': '有效期至 {d}', 'qr.term': '{m} 个月', 'qr.payExactly': '请支付', 'qr.copyAmount': '复制金额', 'qr.payee': '收款人：', 'qr.order': '订单号：', 'qr.s1': '用任意支持 DuitNow 的银行 App 或电子钱包（Touch \'n Go、GrabPay、Boost、MAE 等）扫码。', 'qr.s2': '请准确支付 <b>{a}</b>——我们靠金额识别你的订单，请勿四舍五入。', 'qr.s3': '把付款凭证上的交易参考号填到下方并提交。', 'qr.phRef': '交易参考号 / 凭证编号', 'qr.paid': '我已付款，提交', 'qr.needRef': '请填写付款凭证上的交易参考号。', 'qr.submitted': '已提交——确认到账后我们会为你开通套餐', 'qr.waitTitle': '付款已提交，等待确认', 'qr.waitBody': '订单 {n} · {a} · 参考号 {r}。我们核对到账后会为你开通套餐，通常在几小时内完成，届时会邮件通知你。', 'qr.rejected': '我们没有找到这笔付款', 'qr.help': '付款遇到问题？', 'qr.banner.pending': '你有一笔未完成的 {p} 付款（{a}）。', 'qr.banner.submitted': '付款 {n}（{a}）正在等待确认。', 'qr.banner.rejected': '付款 {n}（{a}）未能确认——请核对后重新提交。', 'qr.continue': '继续', 'qr.view': '查看', 'auth.phNewPass': '新密码（至少 8 位）', 'auth.resetTitle': '设置新密码', 'auth.resetBtn': '保存并登录', 'auth.forgotNeedEmail': '请先在上方填写账号邮箱，再点一次。', 'auth.forgotSent': '如果 <b>{e}</b> 已注册，重置链接已发往该邮箱，30 分钟内有效——也请检查垃圾邮件。', 'auth.verifySent': '账号已创建——验证链接已发送到你的邮箱', 'auth.verified': '邮箱验证成功', 'acct.verified': '{e} 已验证。', 'acct.unverified': '{e} 尚未验证——找回密码和付款通知都会发到这个邮箱。', 'acct.resend': '重新发送', 'auth.forgot': '忘记密码？', 'auth.forgotHelp': '请用注册时的联系方式通过 <a href="{wa}" target="_blank" rel="noopener" style="color:#0FB5AE">WhatsApp</a> 或微信（<b>{wc}</b>）联系我们，核实身份后我们会发给你一个临时密码。', 'auth.legal': '继续即表示你同意我们的<a href="./legal.html#terms" target="_blank" rel="noopener" style="color:#0FB5AE">服务条款</a>和<a href="./legal.html#privacy" target="_blank" rel="noopener" style="color:#0FB5AE">隐私政策</a>。', 'footer.terms': '服务条款', 'footer.privacy': '隐私政策', 'acct.title': '账号', 'acct.pwTitle': '修改密码', 'acct.pwNote': '修改后其他设备会自动退出登录。', 'acct.phCurrent': '当前密码', 'acct.phNew': '新密码（至少 8 位）', 'acct.pwBtn': '更新密码', 'acct.delTitle': '注销账号', 'acct.delNote': '将永久删除你的账号、达人库、投放活动和用量记录，且无法恢复。', 'acct.phConfirm': '输入密码以确认', 'acct.delBtn': '注销我的账号', 'acct.fill': '请填写密码。', 'acct.fail': '操作未能完成。', 'acct.pwOk': '密码已更新', 'acct.delConfirm': '确定要永久注销账号并删除全部数据吗？此操作无法撤销。', 'acct.delOk': '账号已注销',
             't.backend': '后端不可用', 't.failed': '操作失败', 't.loadFail': '加载失败', 't.netFail': '无法连接服务器',
             't.planFail': '切换套餐失败', 't.planOk': '套餐已更新', 'b.confirmFree': '确定切换到免费版？',
             't.runFirst': '请先运行一次优化', 't.campName': '请输入投放名称', 't.campSaved': '投放已保存！可在「投放记录」中查看。',
@@ -2753,7 +2773,7 @@
             'b.currentBtn': '当前套餐', 'b.upgradeTo': '升级到{n}', 'b.switchTo': '切换到{n}', 'b.downgradeTo': '降级到{n}',
             'b.mostPop': '最受欢迎', 'b.active': '使用中', 'b.freeForever': '永久免费', 'b.optims': '优化次数', 'b.copilot': 'AI 助手对话', 'b.library': '达人库', 'b.unlimited': '不限量',
             'b.current': '当前套餐', 'b.quotaNote': '优化次数配额在每个自然月（UTC）月初重置，限额由服务端强制执行。', 'b.compare': '套餐对比',
-            'b.payNote': '内测期间付费套餐由人工开通：点击升级按钮，通过 <b>WhatsApp / 微信</b> 联系我们并附上账号识别码，付款后我们立即为你切换套餐（通常几分钟内）。信用卡支付（Stripe）将随正式版上线。',
+            'b.payNote': '扫码即可升级：选择套餐，按页面显示的金额准确付款，再提交交易参考号。我们核对到账后为你开通（通常几小时内），并邮件通知你。',
             'd.recTeam': '为你推荐的 KOL 阵容', 'd.aiOpt': 'AI 已优化', 'd.budgetUsed': '已用预算', 'd.predGmv': '预测 GMV', 'd.gmvFull': '商品交易总额',
             'd.roi': '投资回报率', 'd.gmvCost': 'GMV / 成本', 'd.algoCompare': 'AI 交叉验证 — 6 套策略共同确认了你的阵容', 'd.fullAnalysis': '完整分析',
             'd.stratPlans': '策略方案', 'd.clickPlan': '点击方案查看其达人阵容', 'd.creatorsSel': '位达人入选', 'd.sortedByGmv': '按 GMV 贡献排序',
@@ -3109,11 +3129,14 @@
         }
 
         async function loadBilling() {
+            loadAccountStatus();
             const info = await refreshBilling();
             if (!info) return;
             document.getElementById('billing-plan-name').textContent = T('plan.' + info.plan);
             const price = (info.plans[info.plan] || {}).price_usd || 0;
-            document.getElementById('billing-plan-price').textContent = price > 0 ? `$${price}${T('per.month')}` : T('b.freeForever');
+            document.getElementById('billing-plan-price').textContent = (price > 0 ? `$${price}${T('per.month')}` : T('b.freeForever'))
+                + (info.expires_at ? ' · ' + T('b.until', { d: info.expires_at.slice(0, 10) }) : '');
+            loadPayStatus();
             // Optimization runs are the metered product value — show them first.
             document.getElementById('billing-usage').innerHTML =
                 usageMeter('bolt', `${T('b.optims')} · ${info.usage.month}`, info.usage.optimize_runs, info.limits.monthly_optimizations) +
@@ -3134,6 +3157,121 @@
             const msg = encodeURIComponent(`Hi tiko! I'd like to upgrade to the ${name} plan ($${price}/mo). Account: ${AUTH_EMAIL || ''}`);
             document.getElementById('pay-wa-link').href = `https://wa.me/${PAY_CONTACT.whatsapp}?text=${msg}`;
             document.getElementById('pay-modal').classList.remove('hidden');
+            initQrPay(id);
+        }
+
+        // ── Scan-to-pay (static QR + transaction reference; see backend/payments.py) ──
+        let PAY_CFG = null, PAY_ORDER = null, PAY_PLAN = null;
+        async function loadPayConfig() {
+            if (PAY_CFG) return PAY_CFG;
+            try { const r = await fetch(`${API}/billing/pay-config`); if (r.ok) PAY_CFG = await r.json(); } catch (_) {}
+            return PAY_CFG;
+        }
+        function payMoney(o) { return `${esc(o.currency)} ${Number(o.amount).toFixed(2)}`; }
+        async function myOrders() {
+            try { const r = await fetch(`${API}/billing/orders`); if (r.ok) return (await r.json()).orders || []; } catch (_) {}
+            return [];
+        }
+        async function initQrPay(planId) {
+            const qr = document.getElementById('pay-qr'), manual = document.getElementById('pay-manual');
+            qr.style.display = 'none'; manual.style.display = '';
+            const cfg = await loadPayConfig();
+            if (!cfg || !cfg.enabled) return;                       // chat-based fallback stays visible
+            manual.style.display = 'none'; qr.style.display = '';
+            qr.innerHTML = `<p class="text-[12px] text-on-surface-variant">${T('k.loading')}</p>`;
+            PAY_PLAN = planId;
+            // Resume an unfinished payment for this plan instead of opening a second one.
+            const live = (await myOrders()).find(o => o.plan === planId && ['pending', 'submitted', 'rejected'].includes(o.status));
+            if (live) { PAY_ORDER = live; renderQrPay(); return; }
+            await payNewOrder(1);
+        }
+        async function payNewOrder(months) {
+            const qr = document.getElementById('pay-qr');
+            try {
+                const r = await fetch(`${API}/billing/orders`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ plan: PAY_PLAN, months })
+                });
+                const d = await r.json();
+                if (!r.ok) { qr.innerHTML = `<p class="text-[12.5px]" style="color:#ef4444">${esc(d.detail || T('acct.fail'))}</p>`; return; }
+                PAY_ORDER = d; renderQrPay();
+            } catch (_) { qr.innerHTML = `<p class="text-[12.5px]" style="color:#ef4444">${T('t.netFail')}</p>`; }
+        }
+        async function payChangeTerm(months) {
+            if (!PAY_ORDER || PAY_ORDER.months === months) return;
+            if (PAY_ORDER.status === 'submitted') return;
+            // Withdraw the unpaid order first so amounts don't pile up.
+            try { await fetch(`${API}/billing/orders/${PAY_ORDER.order_no}/cancel`, { method: 'POST' }); } catch (_) {}
+            await payNewOrder(months);
+        }
+        function renderQrPay() {
+            const o = PAY_ORDER, cfg = PAY_CFG, qr = document.getElementById('pay-qr');
+            const wa = `https://wa.me/${PAY_CONTACT.whatsapp}?text=${encodeURIComponent('Hi tiko! About my payment ' + o.order_no + ' — account: ' + (AUTH_EMAIL || ''))}`;
+            const help = `<p class="text-[11px] text-on-surface-variant/70 mt-3">${T('qr.help')} <a href="${wa}" target="_blank" rel="noopener" style="color:#0FB5AE">WhatsApp</a></p>`;
+            if (o.status === 'submitted') {
+                qr.innerHTML = `
+                    <div class="glass-card rounded-xl p-md text-center space-y-xs">
+                        <span class="material-symbols-outlined text-[34px]" style="color:#00C853">hourglass_top</span>
+                        <p class="text-[14px] font-bold text-on-surface">${T('qr.waitTitle')}</p>
+                        <p class="text-[12.5px] text-on-surface-variant leading-relaxed">${T('qr.waitBody', { a: payMoney(o), r: esc(o.reference || ''), n: esc(o.order_no) })}</p>
+                    </div>${help}`;
+                return;
+            }
+            const terms = cfg.terms.map(m => `<button onclick="payChangeTerm(${m})" class="btn ${m === o.months ? 'btn-primary' : 'btn-outline'} text-[12px] py-1 px-3">${T('qr.term', { m })}</button>`).join('');
+            const rejected = o.status === 'rejected'
+                ? `<div class="rounded-lg p-2 mb-3 text-[12px]" style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.35);color:#fca5a5">${T('qr.rejected')}${o.note ? ' — ' + esc(o.note) : ''}</div>` : '';
+            qr.innerHTML = `
+                ${rejected}
+                <div class="flex items-center gap-2 mb-3">${terms}</div>
+                <div class="flex gap-4 items-start mb-3">
+                    <img src="${esc(cfg.qr_image)}" alt="Payment QR" style="width:168px;border-radius:10px;background:#fff;flex-shrink:0" />
+                    <div class="space-y-xs" style="min-width:0">
+                        <p class="text-[10px] text-on-surface-variant uppercase tracking-wider">${T('qr.payExactly')}</p>
+                        <p class="font-data-mono font-bold" style="font-size:24px;color:#00F2EA;line-height:1.1">${payMoney(o)}</p>
+                        <button onclick="copyText('${Number(o.amount).toFixed(2)}')" class="btn btn-outline text-[11px] py-1 px-2">${T('qr.copyAmount')}</button>
+                        ${cfg.payee ? `<p class="text-[11.5px] text-on-surface-variant pt-1">${T('qr.payee')} <b class="text-on-surface">${esc(cfg.payee)}</b></p>` : ''}
+                        <p class="text-[11.5px] text-on-surface-variant">${T('qr.order')} <b class="font-data-mono text-on-surface">${esc(o.order_no)}</b></p>
+                    </div>
+                </div>
+                <ol class="text-[12px] text-on-surface-variant leading-relaxed mb-3" style="padding-left:18px;list-style:decimal">
+                    <li>${T('qr.s1')}</li><li>${T('qr.s2', { a: payMoney(o) })}</li><li>${T('qr.s3')}</li>
+                </ol>
+                <input id="pay-ref" class="form-input" style="width:100%" maxlength="64" placeholder="${T('qr.phRef')}" value="" />
+                <button id="pay-submit-btn" onclick="paySubmit()" class="btn btn-primary w-full mt-2" style="justify-content:center">${T('qr.paid')}</button>
+                ${help}`;
+        }
+        async function paySubmit() {
+            const ref = document.getElementById('pay-ref').value.trim();
+            if (ref.length < 4) { toast(T('qr.needRef'), 'err'); return; }
+            const btn = document.getElementById('pay-submit-btn'); btn.disabled = true;
+            try {
+                const r = await fetch(`${API}/billing/orders/${PAY_ORDER.order_no}/submit`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ reference: ref })
+                });
+                const d = await r.json();
+                if (!r.ok) { toast(d.detail || T('acct.fail'), 'err'); btn.disabled = false; return; }
+                PAY_ORDER = d; renderQrPay(); loadPayStatus();
+                toast(T('qr.submitted'));
+            } catch (_) { toast(T('t.netFail'), 'err'); btn.disabled = false; }
+        }
+        // Banner on the billing page for a payment that is unfinished or under review.
+        async function loadPayStatus() {
+            const box = document.getElementById('pay-status');
+            if (!box || !AUTH_TOKEN) return;
+            const o = (await myOrders()).find(x => ['pending', 'submitted', 'rejected'].includes(x.status));
+            if (!o) { box.style.display = 'none'; return; }
+            const icon = { pending: 'qr_code_2', submitted: 'hourglass_top', rejected: 'error' }[o.status];
+            const color = { pending: '#00F2EA', submitted: '#f59e0b', rejected: '#ef4444' }[o.status];
+            const vars = { n: esc(o.order_no), a: payMoney(o), p: esc(o.plan_name) };
+            box.style.display = 'flex';
+            box.innerHTML = `<span class="material-symbols-outlined text-[18px]" style="color:${color}">${icon}</span>
+                <span style="flex:1">${T('qr.banner.' + o.status, vars)}</span>
+                <button class="btn" onclick="resumePay('${esc(o.plan)}')">${T(o.status === 'submitted' ? 'qr.view' : 'qr.continue')}</button>`;
+        }
+        function resumePay(planId) {
+            const p = BILLING && BILLING.plans[planId];
+            if (p) openPayModal(planId, p.name, p.price_usd);
         }
         // ── Account: password change, deletion, forgot-password help ──
         async function changePassword() {
@@ -3171,8 +3309,101 @@
             } catch (_) { toast(T('t.netFail'), 'err'); }
             finally { btn.disabled = false; }
         }
-        function forgotPassword() {
+        // Feature switches from the server (is email configured?).
+        function esc(v) { return String(v == null ? '' : v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+        let APP_CONFIG = { email_enabled: false };
+        let RESET_TOKEN = null;
+        fetch(`${API}/app-config`).then(r => r.ok ? r.json() : null).then(c => { if (c) APP_CONFIG = c; }).catch(() => {});
+
+        function authNote(html, ok) {
+            const e = document.getElementById('auth-error');
+            e.innerHTML = html; e.style.color = ok ? '#0FB5AE' : '#ef4444'; e.style.display = 'block';
+        }
+        async function resetSubmit() {
+            const pw = document.getElementById('auth-password');
+            if (!pw.value) { authNote(T('acct.fill')); return; }
+            const btn = document.getElementById('auth-submit'); btn.disabled = true;
+            try {
+                const r = await fetch(`${API}/auth/reset-password`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token: RESET_TOKEN, new_password: pw.value })
+                });
+                const d = await r.json();
+                if (!r.ok) { authNote(esc(d.detail || T('acct.fail'))); return; }
+                RESET_TOKEN = null; pw.value = '';
+                AUTH_TOKEN = d.token; AUTH_EMAIL = d.email;
+                localStorage.setItem('kol_token', AUTH_TOKEN); localStorage.setItem('kol_email', AUTH_EMAIL);
+                setAccountEmail(); hideAuth(); authMode = 'login'; renderAuthMode();
+                enterApp();
+                if (typeof loadDashboard === 'function') loadDashboard();
+                toast(T('acct.pwOk'));
+            } catch (_) { authNote(T('t.netFail')); }
+            finally { btn.disabled = false; }
+        }
+        // Links in our emails carry their token in the URL fragment (#verify=… / #reset=…),
+        // which the browser never sends to any server.
+        async function handleEmailLink() {
+            const m = location.hash.match(/^#(verify|reset)=([\w\-.]+)$/);
+            if (!m) return;
+            history.replaceState(null, '', location.pathname + location.search);
+            if (m[1] === 'reset') {
+                RESET_TOKEN = m[2];
+                document.getElementById('auth-overlay').style.display = 'flex';
+                authMode = 'reset'; renderAuthMode();
+                return;
+            }
+            try {
+                const r = await fetch(`${API}/auth/verify-email`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token: m[2] })
+                });
+                const d = await r.json();
+                toast(r.ok ? T('auth.verified') : (d.detail || T('acct.fail')), r.ok ? undefined : 'err');
+                if (r.ok && typeof loadAccountStatus === 'function') loadAccountStatus();
+            } catch (_) { toast(T('t.netFail'), 'err'); }
+        }
+        window.addEventListener('load', handleEmailLink);
+        window.addEventListener('hashchange', handleEmailLink);
+
+        // Verified-email status line in the Account section.
+        async function loadAccountStatus() {
+            const box = document.getElementById('acct-verify');
+            if (!box || !AUTH_TOKEN) return;
+            try {
+                const r = await fetch(`${API}/auth/me`);
+                if (!r.ok) return;
+                const me = await r.json();
+                if (me.demo || !me.email_enabled) { box.style.display = 'none'; return; }
+                box.style.display = 'flex';
+                box.innerHTML = me.email_verified
+                    ? `<span class="material-symbols-outlined text-[18px]" style="color:#00C853">verified</span><span>${T('acct.verified', { e: esc(me.email) })}</span>`
+                    : `<span class="material-symbols-outlined text-[18px]" style="color:#f59e0b">mark_email_unread</span><span style="flex:1">${T('acct.unverified', { e: esc(me.email) })}</span><button class="btn" onclick="resendVerification(this)">${T('acct.resend')}</button>`;
+            } catch (_) { /* status line is optional */ }
+        }
+        async function resendVerification(btn) {
+            btn.disabled = true;
+            try {
+                const r = await fetch(`${API}/auth/resend-verification`, { method: 'POST' });
+                const d = await r.json();
+                if (!r.ok) { toast(d.detail || T('acct.fail'), 'err'); btn.disabled = false; return; }
+                toast(T('auth.verifySent'));
+            } catch (_) { toast(T('t.netFail'), 'err'); btn.disabled = false; }
+        }
+
+        async function forgotPassword() {
             const email = document.getElementById('auth-email').value.trim();
+            if (APP_CONFIG.email_enabled) {
+                if (!email) { authNote(T('auth.forgotNeedEmail')); return; }
+                try {
+                    const r = await fetch(`${API}/auth/forgot-password`, {
+                        method: 'POST', headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email })
+                    });
+                    if (r.status === 429) { const d = await r.json(); authNote(esc(d.detail)); return; }
+                    if (r.ok) { authNote(T('auth.forgotSent', { e: esc(email) }), true); return; }
+                } catch (_) { authNote(T('t.netFail')); return; }
+            }
+            // No email on this server (or it failed): operator-assisted recovery.
             const msg = encodeURIComponent(`Hi tiko! I forgot my password. Account: ${email}`);
             const e = document.getElementById('auth-error');
             e.innerHTML = T('auth.forgotHelp', { wa: `https://wa.me/${PAY_CONTACT.whatsapp}?text=${msg}`, wc: PAY_CONTACT.wechat });
