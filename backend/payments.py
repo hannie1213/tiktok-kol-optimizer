@@ -42,20 +42,18 @@ import secrets
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, Request
 from pydantic import BaseModel, Field
 
 from backend import mailer, ratelimit, repo, settings
 from backend.admin import _require_admin
-from backend.auth import DEMO_SUFFIX, require_tenant
-from backend.billing import PLANS
+from backend.auth import DEMO_SUFFIX, require_owner, require_tenant
+from backend.billing import PLANS, TERMS, term_end
 
 router = APIRouter()
 log = logging.getLogger("kol.pay")
 
 _FRONTEND_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "frontend")
-TERMS = (1, 3, 12)                       # months a merchant can buy at once
-_DAYS_PER_MONTH = 30
 _PENDING_TTL = timedelta(hours=24)       # unpaid orders lapse after this
 _MAX_OPEN_ORDERS = 3
 _ORDER_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"     # no 0/O, 1/I
@@ -135,7 +133,7 @@ def pay_config(_t: str = Depends(require_tenant)):
 
 
 @router.post("/billing/orders")
-def create_order(req: OrderRequest, tenant_id: str = Depends(require_tenant)):
+def create_order(req: OrderRequest, tenant_id: str = Depends(require_owner)):
     """Start a payment. Asking again for the same plan and term returns the
     order already open, so reopening the dialog doesn't change the amount."""
     if not enabled():
@@ -175,7 +173,7 @@ def my_orders(tenant_id: str = Depends(require_tenant)):
 
 @router.post("/billing/orders/{order_no}/submit")
 def submit_order(order_no: str, req: SubmitRequest, background: BackgroundTasks,
-                 tenant_id: str = Depends(require_tenant)):
+                 tenant_id: str = Depends(require_owner)):
     """The merchant has paid: record the transaction reference and queue the
     order for the operator. A rejected order can be corrected and resubmitted."""
     order = _own_order(order_no, tenant_id)
@@ -201,7 +199,7 @@ def submit_order(order_no: str, req: SubmitRequest, background: BackgroundTasks,
 
 
 @router.post("/billing/orders/{order_no}/cancel")
-def cancel_order(order_no: str, tenant_id: str = Depends(require_tenant)):
+def cancel_order(order_no: str, tenant_id: str = Depends(require_owner)):
     order = _own_order(order_no, tenant_id)
     updated = repo.order_update(order["order_no"], expect_status=("pending", "rejected"),
                                 status="cancelled", decided_at=_now().isoformat())
@@ -216,18 +214,6 @@ class RejectRequest(BaseModel):
     note: str = Field("", max_length=255)
 
 
-def _term_end(tenant_id: str, plan: str, months: int) -> Optional[str]:
-    """End of the term this payment buys. Renewing the plan already active
-    extends from its current end; a permanent operator grant stays permanent."""
-    current = repo.plan_info(tenant_id)
-    start = _now()
-    if current["plan"] == plan:
-        if current["expires_at"] is None:
-            return None
-        start = max(start, datetime.fromisoformat(current["expires_at"]))
-    return (start + timedelta(days=_DAYS_PER_MONTH * months)).isoformat()
-
-
 @router.get("/admin/orders", dependencies=[Depends(_require_admin)])
 def admin_orders(status: str = Query("submitted")):
     """Orders for the console. status=submitted (default) is the to-do list;
@@ -238,7 +224,7 @@ def admin_orders(status: str = Query("submitted")):
 
 
 @router.post("/admin/orders/{order_no}/confirm", dependencies=[Depends(_require_admin)])
-def admin_confirm(order_no: str, background: BackgroundTasks):
+def admin_confirm(order_no: str, request: Request, background: BackgroundTasks):
     """Payment received: activate the plan for the paid term."""
     order = repo.order_get(order_no.strip().upper())
     if not order:
@@ -254,8 +240,12 @@ def admin_confirm(order_no: str, background: BackgroundTasks):
         repo.order_update(order["order_no"], status="rejected", note="account no longer exists")
         raise HTTPException(status_code=404, detail="The account for this order no longer exists")
 
-    expires_at = _term_end(order["tenant_id"], order["plan"], order["months"])
+    expires_at = term_end(order["tenant_id"], order["plan"], order["months"])
     repo.plan_set(order["tenant_id"], order["plan"], _now().isoformat(), expires_at=expires_at)
+    repo.audit_add("order.confirm", user["email"],
+                   f"{order['order_no']} {order['currency']} {order['amount']:.2f} "
+                   f"{order['plan']}x{order['months']}mo ref={order.get('reference') or '-'}",
+                   ratelimit.client_ip(request))
     log.info("order paid %s plan=%s until=%s", order["order_no"], order["plan"], expires_at)
     background.add_task(mailer.send_plan_changed, user["email"], PLANS[order["plan"]]["name"],
                         mailer.base_url(), user.get("lang", "en"),
@@ -264,7 +254,7 @@ def admin_confirm(order_no: str, background: BackgroundTasks):
 
 
 @router.post("/admin/orders/{order_no}/reject", dependencies=[Depends(_require_admin)])
-def admin_reject(order_no: str, req: RejectRequest, background: BackgroundTasks):
+def admin_reject(order_no: str, req: RejectRequest, request: Request, background: BackgroundTasks):
     """Payment not found: hand the order back with a note. The merchant can
     correct the reference and resubmit."""
     order = repo.order_get(order_no.strip().upper())
@@ -275,6 +265,9 @@ def admin_reject(order_no: str, req: RejectRequest, background: BackgroundTasks)
                                 status="rejected", note=note, decided_at=_now().isoformat())
     if updated is None:
         raise HTTPException(status_code=409, detail=f"Order is {order['status']}, not awaiting confirmation.")
+    repo.audit_add("order.reject", order["email"],
+                   f"{order['order_no']} {order['currency']} {order['amount']:.2f} note={note or '-'}",
+                   ratelimit.client_ip(request))
     user = repo.user_find_by_tenant(order["tenant_id"])
     if user:
         background.add_task(mailer.send_order_rejected, user["email"], updated,

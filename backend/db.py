@@ -117,6 +117,21 @@ class User(Base):
     email_verified: Mapped[bool] = mapped_column(Boolean, default=False)
     # UI language last seen for this user — the language emails are written in.
     lang: Mapped[str] = mapped_column(String(8), default="en")
+    # "owner" created the workspace (and pays for it); a "member" was invited
+    # into it and shares its tenant_id.
+    role: Mapped[str] = mapped_column(String(16), default="owner")
+
+
+class TeamInvite(Base):
+    """An owner's invitation for someone to join their workspace."""
+    __tablename__ = "team_invites"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    tenant_id: Mapped[str] = mapped_column(String(64), index=True)
+    email: Mapped[str] = mapped_column(String(255))
+    invited_by: Mapped[str] = mapped_column(String(255), default="")
+    created_at: Mapped[str] = mapped_column(String(40), default="")
+    status: Mapped[str] = mapped_column(String(16), default="pending")   # pending | accepted | revoked
 
 
 class Kol(Base):
@@ -201,6 +216,9 @@ class TenantPlan(Base):
     # UTC ISO timestamp the paid period ends; NULL = no expiry (operator
     # grant). Past it, the tenant is treated as Free (see repo.plan_get).
     expires_at: Mapped[str] = mapped_column(String(40), nullable=True)
+    # Which renewal notice was last sent for this term ("<expires_at>|<stage>"),
+    # so the scheduler never sends the same one twice.
+    reminded: Mapped[str] = mapped_column(String(64), nullable=True)
 
 
 class UsageCounter(Base):
@@ -237,6 +255,34 @@ class PaymentOrder(Base):
     decided_at: Mapped[str] = mapped_column(String(40), nullable=True)
 
 
+class AdminAudit(Base):
+    """Append-only trail of operator actions (who got which plan, which
+    payment was confirmed, which account was deleted) — the record to check
+    when a merchant disputes something."""
+    __tablename__ = "admin_audit"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    at: Mapped[str] = mapped_column(String(40), index=True)
+    action: Mapped[str] = mapped_column(String(32))
+    target: Mapped[str] = mapped_column(String(255), default="")
+    detail: Mapped[str] = mapped_column(String(500), default="")
+    ip: Mapped[str] = mapped_column(String(64), default="")
+
+
+class TenantDoc(Base):
+    """Small per-workspace documents that don't warrant a table each: message
+    and contract templates, generated contracts, the outreach message log and
+    the workspace activity trail. `kind` says which; the payload is `doc`."""
+    __tablename__ = "tenant_docs"
+    __table_args__ = (Index("ix_tenant_docs_kind", "tenant_id", "kind", "id"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    tenant_id: Mapped[str] = mapped_column(String(64), index=True)
+    kind: Mapped[str] = mapped_column(String(24))
+    created_at: Mapped[str] = mapped_column(String(40), default="")
+    doc: Mapped[dict] = mapped_column(JSON, default=dict)
+
+
 class ApiInterest(Base):
     """Early-access interest registration for a coming-soon integration.
     Not tenant data — it is a lead list for the operator console."""
@@ -257,6 +303,8 @@ _ADDED_COLUMNS = [
     ("users", "email_verified", "BOOLEAN NOT NULL DEFAULT FALSE"),
     ("users", "lang", "VARCHAR(8) NOT NULL DEFAULT 'en'"),
     ("tenant_plans", "expires_at", "VARCHAR(40)"),
+    ("tenant_plans", "reminded", "VARCHAR(64)"),
+    ("users", "role", "VARCHAR(16) NOT NULL DEFAULT 'owner'"),
 ]
 
 

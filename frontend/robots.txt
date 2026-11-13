@@ -1,0 +1,14 @@
+# The landing page and legal pages are public; everything else is the app's API
+# or the operator console and has nothing for a crawler.
+User-agent: *
+Allow: /$
+Allow: /legal.html
+Allow: /dist/
+Disallow: /admin.html
+Disallow: /admin/
+Disallow: /auth/
+Disallow: /billing/
+Disallow: /pay/
+Disallow: /docs
+Disallow: /redoc
+Disallow: /openapi.json

@@ -28,14 +28,14 @@ Endpoints
   POST /billing/checkout   Downgrade to Free (paid plans -> 402, see above)
   POST /billing/grant      Operator: activate a plan after offline payment
 """
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 
 from fastapi import APIRouter, BackgroundTasks, Depends, Header, HTTPException, Request
 from pydantic import BaseModel
 
 from backend import mailer, ratelimit, repo, settings
-from backend.auth import require_tenant
+from backend.auth import require_owner, require_tenant
 
 router = APIRouter()
 
@@ -94,8 +94,25 @@ PLANS = {
 }
 
 
+TERMS = (1, 3, 12)          # months a paid term can be bought / granted for
+DAYS_PER_MONTH = 30
+
+
 def _month() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m")
+
+
+def term_end(tenant_id: str, plan: str, months: int) -> Optional[str]:
+    """End (UTC ISO) of a `months`-long term of `plan` starting now. Renewing
+    the plan already active extends from its current end; a permanent grant
+    of that same plan stays permanent (returns None)."""
+    current = repo.plan_info(tenant_id)
+    start = datetime.now(timezone.utc)
+    if current["plan"] == plan:
+        if current["expires_at"] is None:
+            return None
+        start = max(start, datetime.fromisoformat(current["expires_at"]))
+    return (start + timedelta(days=DAYS_PER_MONTH * months)).isoformat()
 
 
 def plan_limits(tenant_id: str) -> dict:
@@ -177,7 +194,7 @@ def billing_info(tenant_id: str = Depends(require_tenant)):
 
 
 @router.post("/billing/checkout")
-def checkout(req: CheckoutRequest, tenant_id: str = Depends(require_tenant)):
+def checkout(req: CheckoutRequest, tenant_id: str = Depends(require_owner)):
     """Switch the tenant's plan — only moves that need no payment.
 
     A paid plan answers 402: it is activated by the operator after payment
@@ -247,6 +264,8 @@ def grant_plan(req: GrantRequest, request: Request, background: BackgroundTasks,
     if not user:
         raise HTTPException(status_code=404, detail="No account with that email")
     repo.plan_set(user["tenant_id"], req.plan, datetime.now(timezone.utc).isoformat())
+    repo.audit_add("plan.grant", user["email"], f"plan={req.plan} (api, no expiry)",
+                   ratelimit.client_ip(request))
     background.add_task(mailer.send_plan_changed, user["email"], PLANS[req.plan]["name"],
                         mailer.base_url(), user.get("lang", "en"))
     return {

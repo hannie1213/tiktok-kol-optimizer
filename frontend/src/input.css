@@ -4,7 +4,7 @@
 
 @layer base {
   body {
-    background: #0e0f0a;
+    background: #08080A;
   }
 
   ::-webkit-scrollbar {
@@ -16,7 +16,7 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    background: #353530;
+    background: #26262B;
     border-radius: 10px;
   }
 
@@ -27,8 +27,8 @@
 
 @layer components {
   .glass-card {
-    background: #161711;
-    border: 1px solid #353530;
+    background: #0E0E11;
+    border: 1px solid #26262B;
     backdrop-filter: blur(24px);
   }
 
@@ -74,11 +74,11 @@
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.15s;
-    color: #a7a7a0;
+    color: #9A9AA2;
   }
 
   .nav-item:hover {
-    background: #20201b;
+    background: #141417;
   }
 
   .nav-item.active {
@@ -145,8 +145,8 @@
 
   .form-input {
     width: 100%;
-    background: #20201b;
-    border: 1px solid #353530;
+    background: #141417;
+    border: 1px solid #26262B;
     border-radius: 8px;
     padding: 8px 12px;
     color: #e5e2da;
@@ -156,13 +156,13 @@
 
   .form-input:focus {
     border-color: #00F2EA;
-    background: #20201b;
+    background: #141417;
   }
 
   .form-label {
     font-size: 12px;
     font-weight: 600;
-    color: #a7a7a0;
+    color: #9A9AA2;
     letter-spacing: 0.05em;
     text-transform: uppercase;
     margin-bottom: 4px;
@@ -198,19 +198,19 @@
 
   .btn-outline {
     background: transparent;
-    border: 1px solid #353530;
+    border: 1px solid #26262B;
     color: #e5e2da;
   }
 
   .btn-outline:hover {
-    background: #20201b;
+    background: #141417;
   }
 
   .view-toggle {
     display: flex;
     border-radius: 8px;
     overflow: hidden;
-    border: 1px solid #353530;
+    border: 1px solid #26262B;
   }
 
   .view-toggle button {
@@ -218,7 +218,7 @@
     font-size: 12px;
     font-weight: 600;
     background: transparent;
-    color: #a7a7a0;
+    color: #9A9AA2;
     cursor: pointer;
     transition: all 0.15s;
     border: none;
@@ -231,7 +231,7 @@
 
   .contrib-bar {
     height: 6px;
-    background: #353530;
+    background: #26262B;
     border-radius: 99px;
     overflow: hidden;
     margin-top: 4px;
@@ -266,8 +266,8 @@
     font-size: 12px;
     font-weight: 600;
     background: transparent;
-    border: 1px solid #353530;
-    color: #a7a7a0;
+    border: 1px solid #26262B;
+    color: #9A9AA2;
     cursor: pointer;
     transition: all 0.15s;
   }
@@ -329,7 +329,7 @@
   /* Demo bar */
   .demo-bar {
     height: 8px;
-    background: #353530;
+    background: #26262B;
     border-radius: 99px;
     overflow: hidden;
   }

@@ -17,7 +17,7 @@ from typing import List, Optional
 from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
 
-from backend import calibration, repo, tenancy
+from backend import activity, calibration, repo, tenancy
 from backend.auth import require_tenant
 
 router = APIRouter()
@@ -83,7 +83,9 @@ def save_campaign(req: CampaignCreate, _t: str = Depends(require_tenant)):
         "completed_at":     None,
         "status":           "active",   # active | completed
     }
-    return repo.campaigns_add(tenancy.current_tenant(), campaign)
+    saved = repo.campaigns_add(tenancy.current_tenant(), campaign)
+    activity.record(tenancy.current_tenant(), "campaign.save", req.name, f"{len(req.selected_kols)} creators")
+    return saved
 
 
 @router.get("/campaigns")
@@ -124,6 +126,7 @@ def record_actual(campaign_id: int, req: ActualResultsUpdate, _t: str = Depends(
     c["completed_at"] = datetime.utcnow().isoformat()
 
     repo.campaigns_put(tenant, campaign_id, c)
+    activity.record(tenant, "campaign.results", c.get("name", ""), f"actual GMV {req.actual_total_gmv:,.0f}")
 
     # Close the loop: fold this outcome into the tenant's GMV calibration so
     # future predictions self-correct — at the campaign level (segment) and,

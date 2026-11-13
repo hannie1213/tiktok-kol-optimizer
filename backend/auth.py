@@ -30,6 +30,7 @@ works and password recovery falls back to the operator console.
 
 JWT_SECRET must be set in production (see backend/settings.py).
 """
+import contextvars
 import hashlib
 import logging
 import re
@@ -63,6 +64,30 @@ _PASSWORD_MAX = 128        # bounds the cost of hashing attacker-supplied input
 # Verified against when the email is unknown, so a miss costs the same time as
 # a wrong password and can't be used to enumerate accounts.
 _DUMMY_HASH = _pwd.hash(uuid.uuid4().hex)
+
+
+# Email of the account behind the current request. A workspace can hold several
+# accounts (owner + invited members), so the tenant id alone no longer says who
+# is signed in.
+_current_email: contextvars.ContextVar = contextvars.ContextVar("current_email", default=None)
+
+
+def current_user() -> Optional[dict]:
+    """The signed-in account (None for the DEFAULT_TENANT dev fallback)."""
+    email = _current_email.get()
+    return repo.user_find(email) if email else None
+
+
+def seats_exceeded(tenant_id: str) -> bool:
+    """True when the workspace holds more accounts than its plan has seats —
+    i.e. a paid term lapsed while members were still on board."""
+    from backend.billing import PLANS          # deferred: billing imports this module
+    seats = PLANS.get(repo.plan_get(tenant_id), PLANS["free"])["seats"]
+    return len(repo.users_for_tenant(tenant_id)) > seats
+
+
+_SEATS_DETAIL = ("This workspace's plan no longer covers its team seats — "
+                 "ask the workspace owner to renew the plan.")
 
 
 def _pw_fingerprint(password_hash: str) -> str:
@@ -116,8 +141,8 @@ def _read_action_token(token: str, purpose: str) -> dict:
         raise invalid
     if payload.get("purpose") != purpose:
         raise invalid
-    user = repo.user_find_by_tenant(payload.get("sub") or "")
-    if not user or user["email"] != payload.get("email"):
+    user = repo.user_find(payload.get("email") or "")
+    if not user or user["tenant_id"] != payload.get("sub"):
         raise invalid
     if purpose == "reset" and payload.get("pv") != _pw_fingerprint(user["password_hash"]):
         raise invalid
@@ -260,9 +285,11 @@ def login(req: Credentials, request: Request):
     # Heal any tenant that was never provisioned (or predates the database).
     if not tenancy.tenant_exists(user["tenant_id"]):
         tenancy.provision_tenant(user["tenant_id"])
+    if user["role"] == "member" and seats_exceeded(user["tenant_id"]):
+        raise HTTPException(status_code=403, detail=_SEATS_DETAIL)
     lang = _lang(request)
     if user.get("lang") != lang:                 # emails follow the language they use
-        repo.user_update(user["tenant_id"], lang=lang)
+        repo.user_update(user["email"], lang=lang)
     return {"token": _make_token(user["tenant_id"], user["email"], user["password_hash"]),
             "email": user["email"]}
 
@@ -273,6 +300,7 @@ async def require_tenant(authorization: Optional[str] = Header(None)) -> str:
     # (settings.validate() refuses to boot production with it).
     if tenancy.DEFAULT_TENANT and not authorization:
         tenancy.set_current_tenant(tenancy.DEFAULT_TENANT)
+        _current_email.set(None)
         return tenancy.DEFAULT_TENANT
 
     if not authorization or not authorization.lower().startswith("bearer "):
@@ -290,19 +318,37 @@ async def require_tenant(authorization: Optional[str] = Header(None)) -> str:
     # The account must still exist and the password must be the one the token
     # was issued under — so deleting an account or changing its password
     # signs every old session out immediately.
-    user = repo.user_find_by_tenant(tenant_id)
-    if not user or payload.get("pv") != _pw_fingerprint(user["password_hash"]):
+    # A removed member's account is gone, so their token dies here too.
+    user = repo.user_find(payload.get("email") or "")
+    if (not user or user["tenant_id"] != tenant_id
+            or payload.get("pv") != _pw_fingerprint(user["password_hash"])):
         raise HTTPException(status_code=401, detail="Invalid or expired token")
+    if user["role"] == "member" and seats_exceeded(tenant_id):
+        raise HTTPException(status_code=403, detail=_SEATS_DETAIL)
 
     tenancy.set_current_tenant(tenant_id)
+    _current_email.set(user["email"])
+    return tenant_id
+
+
+def require_owner(tenant_id: str = Depends(require_tenant)) -> str:
+    """For billing and team management: invited members may use the workspace
+    but not spend its money or change who is in it."""
+    user = current_user()
+    if user and user["role"] == "member":
+        raise HTTPException(status_code=403,
+                            detail="Only the workspace owner can do this.")
     return tenant_id
 
 
 @router.get("/auth/me")
 def me(tenant_id: str = Depends(require_tenant)):
-    user = repo.user_find_by_tenant(tenant_id)
+    user = current_user()
     email = user["email"] if user else None
+    role = user["role"] if user else "owner"
+    owner = repo.user_find_by_tenant(tenant_id) if role == "member" else None
     return {"tenant_id": tenant_id, "email": email,
+            "role": role, "workspace_owner": owner["email"] if owner else email,
             "demo": bool(email and email.endswith(DEMO_SUFFIX)),
             "email_verified": bool(user and user.get("email_verified")),
             "email_enabled": mailer.enabled()}
@@ -310,7 +356,7 @@ def me(tenant_id: str = Depends(require_tenant)):
 
 def _account_or_403(tenant_id: str) -> dict:
     """The signed-in user's row; demo/fallback sessions have no manageable account."""
-    user = repo.user_find_by_tenant(tenant_id)
+    user = current_user()
     if not user or user["email"].endswith(DEMO_SUFFIX):
         raise HTTPException(status_code=403,
                             detail="Demo sessions have no account to manage — create a free account first.")
@@ -331,7 +377,7 @@ def change_password(req: PasswordChange, request: Request, background: Backgroun
         raise HTTPException(status_code=422, detail="New password must be different from the current one")
 
     new_hash = _pwd.hash(req.new_password)
-    repo.user_set_password(tenant_id, new_hash)
+    repo.user_set_password(user["email"], new_hash)
     log.info("password changed tenant=%s", tenant_id)
     background.add_task(mailer.send_password_changed, user["email"], _lang(request))
     return {"status": "ok", "token": _make_token(tenant_id, user["email"], new_hash),
@@ -340,15 +386,17 @@ def change_password(req: PasswordChange, request: Request, background: Backgroun
 
 @router.post("/auth/delete-account")
 def delete_account(req: AccountDeletion, tenant_id: str = Depends(require_tenant)):
-    """Permanently delete the account and everything in its workspace
-    (creator library, campaigns, calibration, usage). Not reversible."""
+    """Permanently delete the account. For the owner that is the whole
+    workspace — creator library, campaigns, calibration, usage and every
+    member's access. A member only removes themself. Not reversible."""
     user = _account_or_403(tenant_id)
     ratelimit.enforce("pw-change", tenant_id, limit=10, window=900)
     if not _pwd.verify(req.password[:_PASSWORD_MAX + 1], user["password_hash"]):
         raise HTTPException(status_code=403, detail="Password is incorrect")
     repo.user_delete(user["email"])
-    repo.tenant_wipe(tenant_id)
-    log.info("account deleted tenant=%s", tenant_id)
+    if user["role"] != "member":
+        repo.tenant_wipe(tenant_id)
+    log.info("account deleted tenant=%s role=%s", tenant_id, user["role"])
     return {"status": "deleted"}
 
 
@@ -358,7 +406,7 @@ def verify_email(req: TokenOnly):
     """Confirm ownership of the address from the emailed link."""
     user = _read_action_token(req.token, "verify")
     if not user["email_verified"]:
-        repo.user_update(user["tenant_id"], email_verified=True)
+        repo.user_update(user["email"], email_verified=True)
         log.info("email verified tenant=%s", user["tenant_id"])
     return {"status": "ok", "email": user["email"], "email_verified": True}
 
@@ -408,9 +456,9 @@ def reset_password(req: PasswordReset, request: Request, background: BackgroundT
     _check_password_rules(req.new_password)
 
     new_hash = _pwd.hash(req.new_password)
-    repo.user_set_password(user["tenant_id"], new_hash)
+    repo.user_set_password(user["email"], new_hash)
     # Opening the emailed link proves they own the address.
-    repo.user_update(user["tenant_id"], email_verified=True)
+    repo.user_update(user["email"], email_verified=True)
     log.info("password reset by email tenant=%s", user["tenant_id"])
     background.add_task(mailer.send_password_changed, user["email"], _lang(request))
     return {"status": "ok", "email": user["email"],

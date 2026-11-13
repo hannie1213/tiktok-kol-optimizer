@@ -1,5 +1,5 @@
 """
-TikTok Shop KOL Matrix Optimizer — FastAPI backend.
+tiko KOL Matrix Optimizer — FastAPI backend.
 
 Endpoints
 ---------
@@ -14,6 +14,7 @@ Run:  uvicorn backend.main:app --reload
 Docs: http://localhost:8000/docs
 """
 
+import contextlib
 import logging
 import math
 import os
@@ -61,9 +62,20 @@ from backend.admin import router as admin_router, record_interest
 from backend.agent import router as agent_router
 from backend.guide import router as guide_router
 from backend.payments import router as payments_router
+from backend.workspace import router as workspace_router
+from backend.pipeline import router as pipeline_router
+from backend.collab import router as collab_router
+from backend import jobs
+
+@contextlib.asynccontextmanager
+async def _lifespan(_app):
+    jobs.start()            # renewal reminders + cleanup (backend/jobs.py)
+    yield
+
 
 app = FastAPI(
-    title="TikTok Shop KOL Matrix Optimizer API",
+    lifespan=_lifespan,
+    title="tiko KOL Optimizer API",
     description="Local search optimizer for selecting a KOL portfolio under a marketing budget.",
     version="2.0",
 )
@@ -87,6 +99,9 @@ app.include_router(admin_router)
 app.include_router(agent_router)
 app.include_router(guide_router)
 app.include_router(payments_router)
+app.include_router(workspace_router)
+app.include_router(pipeline_router)
+app.include_router(collab_router)
 
 # UI language of the calling client (X-Lang header, set by the frontend).
 # Server-generated text — e.g. the "why this creator" reasons — follows it.
@@ -106,8 +121,8 @@ async def _capture_ui_lang(request, call_next):
 _CSP = (
     "default-src 'self'; "
     "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; "
-    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://api.fontshare.com; "
-    "font-src 'self' data: https://fonts.gstatic.com https://cdn.fontshare.com; "
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+    "font-src 'self' data: https://fonts.gstatic.com; "
     "img-src 'self' data: blob: https:; "
     "connect-src 'self'; "
     "frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
@@ -718,7 +733,7 @@ def get_calibration(_t: str = Depends(require_tenant)):
 
 # ── API Connections (commercial expansion stubs) ──────────────────
 # Phase 1 (current): manual import only
-# Phase 2 (planned): TikTok Creator Marketplace, TikTok Shop Partner API
+# Phase 2 (planned): creator marketplace, shop partner API
 # Phase 3 (planned): Third-party analytics (AsiaKOL, Cube Asia, Nox)
 
 class ApiConnectionRequest(BaseModel):
@@ -740,9 +755,9 @@ def list_connections():
         "connections": [
             {"id": "manual", "name": "Manual Import", "status": "active",
              "description": "CSV upload and manual KOL entry"},
-            {"id": "tiktok_creator", "name": "TikTok Creator Marketplace API", "status": "coming_soon",
+            {"id": "tiktok_creator", "name": "Creator Marketplace API", "status": "coming_soon",
              "description": "Auto-sync KOL profiles and audience demographics"},
-            {"id": "tiktok_shop", "name": "TikTok Shop Partner API", "status": "coming_soon",
+            {"id": "tiktok_shop", "name": "Shop Partner API", "status": "coming_soon",
              "description": "Real GMV and commission data from affiliate campaigns"},
             {"id": "third_party", "name": "Third-Party Analytics Platforms", "status": "coming_soon",
              "description": "AsiaKOL, Cube Asia, Nox Influencer and similar"},
@@ -1100,6 +1115,8 @@ def get_kols(
     _t: str = Depends(require_tenant),
 ):
     """Return a filtered, paginated list of KOLs."""
+    # An empty filter ("?country=") means "no filter", not an invalid value.
+    country, category, tier, content_type = (v or None for v in (country, category, tier, content_type))
     if country is not None and country not in VALID_COUNTRIES:
         raise HTTPException(status_code=422, detail="country must be one of: MY, ID, TH, PH, SG, VN")
     if category is not None and category not in VALID_CATEGORIES:

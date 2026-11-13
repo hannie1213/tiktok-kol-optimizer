@@ -21,6 +21,7 @@ from sqlalchemy.exc import IntegrityError
 
 from backend import tenancy
 from backend.db import (
+    AdminAudit,
     ApiInterest,
     Calibration,
     Campaign,
@@ -33,6 +34,8 @@ from backend.db import (
     UsageCounter,
     User,
     engine,
+    TeamInvite,
+    TenantDoc,
 )
 
 # Canonical creator fields stored as real columns; anything else round-trips
@@ -215,7 +218,8 @@ def _ensure_users_imported(s):
 def _user_to_dict(u: User) -> dict:
     return {"id": u.id, "email": u.email, "password_hash": u.password_hash,
             "tenant_id": u.tenant_id, "created_at": u.created_at,
-            "email_verified": bool(u.email_verified), "lang": u.lang or "en"}
+            "email_verified": bool(u.email_verified), "lang": u.lang or "en",
+            "role": u.role or "owner"}
 
 
 def user_find(email: str) -> Optional[dict]:
@@ -226,19 +230,30 @@ def user_find(email: str) -> Optional[dict]:
 
 
 def user_find_by_tenant(tenant_id: str) -> Optional[dict]:
+    """The workspace OWNER — the account that billing mail and orders belong to."""
     with _session() as s:
         _ensure_users_imported(s)
-        u = s.scalar(select(User).where(User.tenant_id == tenant_id))
+        # "owner" sorts after "member", so descending puts the owner first.
+        u = s.scalars(select(User).where(User.tenant_id == tenant_id)
+                      .order_by(User.role.desc(), User.id)).first()
         return _user_to_dict(u) if u else None
 
 
+def users_for_tenant(tenant_id: str) -> List[dict]:
+    """Everyone in a workspace, owner first."""
+    with _session() as s:
+        rows = s.scalars(select(User).where(User.tenant_id == tenant_id)
+                         .order_by(User.role.desc(), User.id)).all()
+        return [_user_to_dict(u) for u in rows]
+
+
 def user_create(email: str, password_hash: str, tenant_id: str, created_at: str,
-                lang: str = "en") -> dict:
+                lang: str = "en", role: str = "owner", email_verified: bool = False) -> dict:
     with _write_lock, _session() as s:
         _ensure_users_imported(s)
         u = User(email=email, password_hash=password_hash,
                  tenant_id=tenant_id, created_at=created_at,
-                 email_verified=False, lang=lang)
+                 email_verified=email_verified, lang=lang, role=role)
         s.add(u)
         s.flush()
         return _user_to_dict(u)
@@ -265,19 +280,21 @@ def user_delete(email: str) -> Optional[str]:
 
 
 def tenant_wipe(tenant_id: str) -> None:
-    """Remove every row belonging to a tenant (operator account deletion)."""
+    """Remove every row belonging to a tenant — its data, and every account
+    in the workspace (owner and invited members alike)."""
     with _write_lock, _session() as s:
-        for model in (Kol, KolSnapshot, Campaign, TenantPlan, UsageCounter, PaymentOrder):
+        for model in (Kol, KolSnapshot, Campaign, TenantPlan, UsageCounter, PaymentOrder,
+                      TeamInvite, TenantDoc, User):
             s.query(model).filter(model.tenant_id == tenant_id).delete(synchronize_session=False)
         s.query(Calibration).filter(Calibration.tenant_id == tenant_id).delete(synchronize_session=False)
         s.query(Tenant).filter(Tenant.id == tenant_id).delete(synchronize_session=False)
     _migrated.discard(tenant_id)
 
 
-def user_update(tenant_id: str, **fields) -> bool:
+def user_update(email: str, **fields) -> bool:
     """Set simple account attributes (email_verified, lang)."""
     with _write_lock, _session() as s:
-        u = s.scalar(select(User).where(User.tenant_id == tenant_id))
+        u = s.scalar(select(User).where(User.email == email.strip().lower()))
         if not u:
             return False
         for k, v in fields.items():
@@ -286,12 +303,52 @@ def user_update(tenant_id: str, **fields) -> bool:
         return True
 
 
-def user_set_password(tenant_id: str, password_hash: str) -> bool:
+def user_set_password(email: str, password_hash: str) -> bool:
     with _write_lock, _session() as s:
-        u = s.scalar(select(User).where(User.tenant_id == tenant_id))
+        u = s.scalar(select(User).where(User.email == email.strip().lower()))
         if not u:
             return False
         u.password_hash = password_hash
+        return True
+
+
+# ── Team invitations ──────────────────────────────────────────────
+def _invite_to_dict(i: TeamInvite) -> dict:
+    return {"id": i.id, "tenant_id": i.tenant_id, "email": i.email,
+            "invited_by": i.invited_by, "created_at": i.created_at, "status": i.status}
+
+
+def invite_create(tenant_id: str, email: str, invited_by: str, created_at: str) -> dict:
+    with _write_lock, _session() as s:
+        i = TeamInvite(tenant_id=tenant_id, email=email, invited_by=invited_by,
+                       created_at=created_at, status="pending")
+        s.add(i)
+        s.flush()
+        return _invite_to_dict(i)
+
+
+def invite_get(invite_id: int) -> Optional[dict]:
+    with _session() as s:
+        i = s.get(TeamInvite, invite_id)
+        return _invite_to_dict(i) if i else None
+
+
+def invites_pending(tenant_id: str) -> List[dict]:
+    with _session() as s:
+        rows = s.scalars(select(TeamInvite).where(TeamInvite.tenant_id == tenant_id,
+                                                  TeamInvite.status == "pending")
+                         .order_by(TeamInvite.id)).all()
+        return [_invite_to_dict(i) for i in rows]
+
+
+def invite_close(invite_id: int, status: str) -> bool:
+    """pending → accepted | revoked. False when it was no longer pending, so
+    an invitation can be used (or withdrawn) exactly once."""
+    with _write_lock, _session() as s:
+        i = s.get(TeamInvite, invite_id)
+        if not i or i.status != "pending":
+            return False
+        i.status = status
         return True
 
 
@@ -496,6 +553,58 @@ def campaigns_all(tenant_id: str) -> List[dict]:
         return [dict(r.doc) for r in rows]
 
 
+# ── Workspace documents (templates, contracts, message log, activity) ──
+def _doc_to_dict(r: TenantDoc) -> dict:
+    return {**(r.doc or {}), "id": r.id, "created_at": r.created_at}
+
+
+def docs_list(tenant_id: str, kind: str, limit: int = 500) -> List[dict]:
+    """Newest first."""
+    with _session() as s:
+        rows = s.scalars(select(TenantDoc).where(TenantDoc.tenant_id == tenant_id, TenantDoc.kind == kind)
+                         .order_by(TenantDoc.id.desc()).limit(limit)).all()
+        return [_doc_to_dict(r) for r in rows]
+
+
+def docs_count(tenant_id: str, kind: str) -> int:
+    with _session() as s:
+        return s.scalar(select(func.count()).select_from(TenantDoc)
+                        .where(TenantDoc.tenant_id == tenant_id, TenantDoc.kind == kind)) or 0
+
+
+def doc_add(tenant_id: str, kind: str, doc: dict, created_at: str) -> dict:
+    with _write_lock, _session() as s:
+        r = TenantDoc(tenant_id=tenant_id, kind=kind, created_at=created_at, doc=doc)
+        s.add(r)
+        s.flush()
+        return _doc_to_dict(r)
+
+
+def doc_get(tenant_id: str, kind: str, doc_id: int) -> Optional[dict]:
+    with _session() as s:
+        r = s.get(TenantDoc, doc_id)
+        return _doc_to_dict(r) if r and r.tenant_id == tenant_id and r.kind == kind else None
+
+
+def doc_put(tenant_id: str, kind: str, doc_id: int, doc: dict) -> Optional[dict]:
+    with _write_lock, _session() as s:
+        r = s.get(TenantDoc, doc_id)
+        if not r or r.tenant_id != tenant_id or r.kind != kind:
+            return None
+        r.doc = {k: v for k, v in doc.items() if k not in ("id", "created_at")}
+        s.flush()
+        return _doc_to_dict(r)
+
+
+def doc_delete(tenant_id: str, kind: str, doc_id: int) -> bool:
+    with _write_lock, _session() as s:
+        r = s.get(TenantDoc, doc_id)
+        if not r or r.tenant_id != tenant_id or r.kind != kind:
+            return False
+        s.delete(r)
+        return True
+
+
 def campaigns_get(tenant_id: str, campaign_id: int) -> Optional[dict]:
     _ensure_migrated(tenant_id)
     with _session() as s:
@@ -587,6 +696,26 @@ def plan_set(tenant_id: str, plan: str, updated_at: str = "", expires_at: Option
             row.expires_at = expires_at
 
 
+def plans_with_expiry() -> List[dict]:
+    """Every paid term that has an end date (renewal-reminder scan)."""
+    with SessionLocal() as s:
+        rows = s.scalars(select(TenantPlan).where(TenantPlan.expires_at.is_not(None),
+                                                  TenantPlan.plan != "free")).all()
+        return [{"tenant_id": r.tenant_id, "plan": r.plan, "expires_at": r.expires_at,
+                 "reminded": r.reminded} for r in rows]
+
+
+def plan_claim_reminder(tenant_id: str, key: str) -> bool:
+    """Record that notice `key` is being sent. False if it already was — the
+    guard that keeps several workers from mailing the same reminder."""
+    with _write_lock, _session() as s:
+        row = s.get(TenantPlan, tenant_id)
+        if not row or row.reminded == key:
+            return False
+        row.reminded = key
+        return True
+
+
 # ════════════════════════════════════════════════════════════════
 #  QR-payment orders
 # ════════════════════════════════════════════════════════════════
@@ -660,6 +789,41 @@ def order_reference_used(reference: str, exclude_order_no: str) -> bool:
             func.lower(PaymentOrder.reference) == reference.lower(),
             PaymentOrder.order_no != exclude_order_no,
             PaymentOrder.status.in_(("submitted", "paid")))) > 0
+
+
+def orders_paid_totals(since_iso: Optional[str] = None) -> dict:
+    """{currency: {"amount": total, "count": n}} of confirmed payments,
+    optionally only those confirmed at/after since_iso."""
+    with SessionLocal() as s:
+        q = select(PaymentOrder.currency, func.sum(PaymentOrder.amount), func.count()).where(
+            PaymentOrder.status == "paid")
+        if since_iso:
+            q = q.where(PaymentOrder.decided_at >= since_iso)
+        return {cur: {"amount": round(total or 0, 2), "count": n}
+                for cur, total, n in s.execute(q.group_by(PaymentOrder.currency))}
+
+
+def orders_count(status: str) -> int:
+    with SessionLocal() as s:
+        return s.scalar(select(func.count()).select_from(PaymentOrder).where(
+            PaymentOrder.status == status))
+
+
+# ════════════════════════════════════════════════════════════════
+#  Operator audit trail
+# ════════════════════════════════════════════════════════════════
+def audit_add(action: str, target: str = "", detail: str = "", ip: str = ""):
+    with _write_lock, _session() as s:
+        s.add(AdminAudit(at=_now_iso(), action=action[:32], target=target[:255],
+                         detail=detail[:500], ip=ip[:64]))
+
+
+def audit_list(limit: int = 100) -> List[dict]:
+    """Newest first."""
+    with SessionLocal() as s:
+        rows = s.scalars(select(AdminAudit).order_by(AdminAudit.id.desc()).limit(limit)).all()
+        return [{"at": r.at, "action": r.action, "target": r.target,
+                 "detail": r.detail, "ip": r.ip} for r in rows]
 
 
 def orders_expire_pending(cutoff_iso: str) -> int:
@@ -765,6 +929,39 @@ def admin_stats(month: str) -> dict:
                 select(Campaign.tenant_id, func.count()).group_by(Campaign.tenant_id)):
             entry(tid)["campaigns"] = n
     return stats
+
+
+def admin_engagement(since_iso: str) -> dict:
+    """Per-tenant engagement for the operator console, in one session:
+    {tenant_id: {ever_optimized, last_active, active_recent, messages,
+    contracts, contacted}}. `contacted` = any creator moved past "shortlisted"."""
+    out: dict = {}
+
+    def entry(tid: str) -> dict:
+        return out.setdefault(tid, {"ever_optimized": False, "last_active": None, "active_recent": False,
+                                    "messages": 0, "contracts": 0, "contacted": False})
+
+    with SessionLocal() as s:
+        for tid, runs in s.execute(select(UsageCounter.tenant_id, func.sum(UsageCounter.optimize_runs))
+                                   .group_by(UsageCounter.tenant_id)):
+            entry(tid)["ever_optimized"] = (runs or 0) > 0
+        for tid, kind, n, latest in s.execute(
+                select(TenantDoc.tenant_id, TenantDoc.kind, func.count(), func.max(TenantDoc.created_at))
+                .where(TenantDoc.kind.in_(("activity", "message", "contract")))
+                .group_by(TenantDoc.tenant_id, TenantDoc.kind)):
+            e = entry(tid)
+            if kind == "activity":
+                e["last_active"] = latest
+                e["active_recent"] = bool(latest) and latest >= since_iso
+            elif kind == "message":
+                e["messages"] = n
+            else:
+                e["contracts"] = n
+        for tid, doc in s.execute(select(Campaign.tenant_id, Campaign.doc)):
+            if any((p.get("status") or "shortlisted") != "shortlisted"
+                   for p in ((doc or {}).get("pipeline") or {}).values()):
+                entry(tid)["contacted"] = True
+    return out
 
 
 # ════════════════════════════════════════════════════════════════

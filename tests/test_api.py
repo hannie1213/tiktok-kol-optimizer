@@ -375,3 +375,10 @@ def test_optimize_same_seed_same_result():
     r2 = client.post("/optimize", json=payload).json()
     assert r1["total_gmv"] == r2["total_gmv"]
     assert r1["best_algorithm"] == r2["best_algorithm"]
+
+
+def test_empty_filter_values_mean_no_filter():
+    """The console sends ?country= when "All countries" is selected."""
+    r = client.get("/kols?limit=5&country=&category=beauty&tier=&content_type=")
+    assert r.status_code == 200, r.text
+    assert all(k["category"] == "beauty" for k in r.json()["kols"])

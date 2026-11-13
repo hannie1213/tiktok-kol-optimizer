@@ -220,6 +220,70 @@ def send_plan_changed(to: str, plan_name: str, link: str = "", lang: str = "en",
     return send(to, subject, text, body)
 
 
+def send_plan_expiring(to: str, plan_name: str, days_left: int, expires_on: str,
+                       link: str = "", lang: str = "en") -> bool:
+    if _zh(lang):
+        when = "明天" if days_left <= 1 else f"{days_left} 天后"
+        subject = f"你的 {BRAND} {plan_name} 套餐将在{when}到期"
+        text, body = _compose(
+            f"{plan_name} 套餐即将到期",
+            [f"你的 {plan_name} 套餐有效期至 {expires_on}。",
+             "到期后账号会自动回到免费版：数据全部保留，但每月额度会降低，团队成员将无法登录。",
+             "在到期前续费，新的期限会接在当前到期日之后，不会损失剩余天数。"],
+            "如果你已经续费，请忽略这封邮件。",
+            ("去续费", link) if link else None)
+    else:
+        when = "tomorrow" if days_left <= 1 else f"in {days_left} days"
+        subject = f"Your {BRAND} {plan_name} plan ends {when}"
+        text, body = _compose(
+            f"Your {plan_name} plan is about to end",
+            [f"Your {plan_name} plan is active until {expires_on}.",
+             "After that the account returns to the Free plan: all your data stays, but the "
+             "monthly allowances drop and team members can no longer sign in.",
+             "Renew before then and the new term starts where this one ends — no days are lost."],
+            "If you have already renewed, you can ignore this email.",
+            ("Renew now", link) if link else None)
+    return send(to, subject, text, body)
+
+
+def send_plan_expired(to: str, plan_name: str, link: str = "", lang: str = "en") -> bool:
+    if _zh(lang):
+        subject = f"你的 {BRAND} {plan_name} 套餐已到期"
+        text, body = _compose(
+            f"{plan_name} 套餐已到期",
+            ["你的账号已回到免费版。创作者库、活动和校准数据都还在。",
+             "随时续费即可恢复原来的额度和团队成员的访问。"],
+            "感谢使用 tiko。", ("续费", link) if link else None)
+    else:
+        subject = f"Your {BRAND} {plan_name} plan has ended"
+        text, body = _compose(
+            f"Your {plan_name} plan has ended",
+            ["Your account is back on the Free plan. Your creator library, campaigns and "
+             "calibration are all still there.",
+             "Renew any time to restore your allowances and your team's access."],
+            "Thanks for using tiko.", ("Renew", link) if link else None)
+    return send(to, subject, text, body)
+
+
+def send_team_invite(to: str, inviter: str, link: str, lang: str = "en") -> bool:
+    if _zh(lang):
+        subject = f"{inviter} 邀请你加入 {BRAND} 工作区"
+        text, body = _compose(
+            "你收到了一个团队邀请",
+            [f"{inviter} 邀请你加入他们的 {BRAND} 工作区，一起管理创作者库和投放方案。",
+             "点击下方按钮设置密码即可加入。链接 7 天内有效。"],
+            "如果你不认识邀请人，请忽略这封邮件。", ("接受邀请", link))
+    else:
+        subject = f"{inviter} invited you to their {BRAND} workspace"
+        text, body = _compose(
+            "You've been invited to a team",
+            [f"{inviter} invited you to join their {BRAND} workspace and work on the same "
+             "creator library and campaign plans.",
+             "Choose a password with the button below to join. The link works for 7 days."],
+            "If you don't know the sender, you can ignore this email.", ("Accept invitation", link))
+    return send(to, subject, text, body)
+
+
 def send_order_to_operator(to: str, order: dict, base: str = "") -> bool:
     """Tell the operator a merchant says they have paid (operator-facing, Chinese)."""
     amount = f"{order['currency']} {order['amount']:.2f}"

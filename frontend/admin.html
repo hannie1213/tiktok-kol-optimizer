@@ -7,44 +7,73 @@
     <meta name="robots" content="noindex, nofollow" />
     <title>tiko · 运营后台</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23000000'/><text x='50%25' y='53%25' dominant-baseline='central' text-anchor='middle' font-family='Inter,sans-serif' font-weight='800' font-size='36' fill='%23ffffff'>tiko</text><circle cx='79' cy='21' r='13' fill='%2300F2EA' stroke='%23000000' stroke-width='4'/></svg>" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- One typeface system for the whole product: Manrope (Latin, digits) +
+         Noto Sans SC / 思源黑体 (Chinese). See --font-ui. -->
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400..800&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" />
+    <script>
+        (function () {
+            var p = 'dark';
+            try { p = localStorage.getItem('tiko_theme') || 'dark'; } catch (e) {}
+            var light = p === 'light' || (p === 'system' && window.matchMedia('(prefers-color-scheme: light)').matches);
+            document.documentElement.dataset.theme = light ? 'light' : 'dark';
+        })();
+    </script>
     <style>
+        :root { --font-ui: 'Manrope', 'Noto Sans SC', 'PingFang SC', 'HarmonyOS Sans SC', 'Microsoft YaHei', system-ui, -apple-system, 'Segoe UI', sans-serif; }
+        html, body, button, input, select, textarea { font-family: var(--font-ui); }
+        body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-rendering: optimizeLegibility; }
+        .num, .kpi .v, td { font-variant-numeric: tabular-nums; }
+
         :root {
-            --bg: #0d1613; --panel: rgba(255,255,255,.045); --panel-b: rgba(255,255,255,.09);
-            --ink: #ece9e2; --mut: #8a897f; --cy: #00F2EA; --green: #00C853; --red: #ff5c72; --amber: #f5b301;
-            --mono: 'JetBrains Mono', monospace;
+            --bg: #08080A; --panel: #0E0E11; --panel-b: rgba(var(--tint),.08);
+            --ink: #ece9e2; --mut: #8B8B93; --cy: #00F2EA; --green: #00C853; --red: #ff5c72; --amber: #f5b301;
+            --mono: var(--font-ui); --tint: 255,255,255; --cy-rgb: 0,242,234;
+            --btn-bg: #EDEDEF; --btn-fg: #0A0A0B; --shadow: none;
+            color-scheme: dark;
         }
+        html[data-theme="light"] {
+            --bg: #F4F5F8; --panel: #FFFFFF; --panel-b: rgba(18,20,26,.1);
+            --ink: #12141A; --mut: #5A6170; --cy: #0A8F8A; --green: #0A9548; --red: #C92A2A; --amber: #9A5B06;
+            --tint: 18,20,26; --cy-rgb: 10,143,138; --btn-bg: #12141A; --btn-fg: #FFFFFF;
+            --shadow: 0 1px 2px rgba(16,24,40,.05), 0 12px 28px -20px rgba(16,24,40,.2);
+            color-scheme: light;
+        }
+        html[data-theme="light"] body { background: var(--bg); }
+        html[data-theme="light"] input, html[data-theme="light"] select { background: #F1F3F6; }
+        .card { box-shadow: var(--shadow); }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             background:
-                radial-gradient(900px 600px at 8% -10%, rgba(0,242,234,.08), transparent 60%),
+                radial-gradient(900px 600px at 8% -10%, rgba(var(--cy-rgb),.08), transparent 60%),
                 radial-gradient(800px 600px at 100% 110%, rgba(14,138,110,.10), transparent 60%),
                 var(--bg);
-            color: var(--ink); font-family: 'Inter', sans-serif; min-height: 100vh;
+            color: var(--ink); font-family: var(--font-ui); min-height: 100vh;
         }
         .wrap { max-width: 1240px; margin: 0 auto; padding: 28px 32px 80px; }
 
         header.top { display: flex; align-items: center; justify-content: space-between; padding-bottom: 22px; border-bottom: 1px solid var(--panel-b); margin-bottom: 26px; }
-        .brand { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 20px; letter-spacing: -.03em; }
+        .brand { font-family: var(--font-ui); font-weight: 700; font-size: 20px; letter-spacing: -.03em; }
         .brand sup { color: var(--cy); font-size: .55em; }
-        .brand small { display: block; font-family: var(--mono); font-size: 10px; letter-spacing: .2em; color: var(--mut); margin-top: 4px; font-weight: 400; }
+        .brand small { display: block; font-family: var(--font-ui); font-size: 10px; letter-spacing: .2em; color: var(--mut); margin-top: 4px; font-weight: 400; }
         .top-actions { display: flex; gap: 10px; align-items: center; }
 
         .card { background: var(--panel); border: 1px solid var(--panel-b); border-radius: 16px; backdrop-filter: blur(14px); }
-        .btn { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; padding: 8px 16px; border-radius: 10px; border: 1px solid var(--panel-b); background: transparent; color: var(--ink); cursor: pointer; transition: all .18s ease; }
+        .btn { font-family: var(--font-ui); font-size: 13px; font-weight: 600; padding: 8px 16px; border-radius: 10px; border: 1px solid var(--panel-b); background: transparent; color: var(--ink); cursor: pointer; transition: all .18s ease; }
         .btn:hover { border-color: var(--cy); color: var(--cy); }
-        .btn.primary { background: var(--cy); border-color: var(--cy); color: #052e2c; }
-        .btn.primary:hover { filter: brightness(1.1); color: #052e2c; }
+        .btn.primary { background: var(--btn-bg); border-color: var(--btn-bg); color: var(--btn-fg); }
+        .btn.primary:hover { background: var(--btn-bg); border-color: var(--btn-bg); color: var(--btn-fg); box-shadow: -3px 3px 0 #25F4EE, 3px -3px 0 #FE2C55; }
         .btn.danger { color: var(--red); }
         .btn.danger:hover { border-color: var(--red); background: rgba(255,92,114,.08); }
         .btn:disabled { opacity: .45; cursor: not-allowed; }
-        input, select { background: rgba(0,0,0,.35); border: 1px solid var(--panel-b); border-radius: 10px; color: var(--ink); font-size: 13px; padding: 8px 12px; outline: none; font-family: 'Inter', sans-serif; }
+        input, select { background: rgba(0,0,0,.35); border: 1px solid var(--panel-b); border-radius: 10px; color: var(--ink); font-size: 13px; padding: 8px 12px; outline: none; font-family: var(--font-ui); }
         input:focus, select:focus { border-color: var(--cy); }
 
         /* Login gate */
         #gate { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: var(--bg); z-index: 100; }
         #gate .card { width: 360px; padding: 30px; }
-        #gate h1 { font-family: 'Space Grotesk', sans-serif; font-size: 22px; letter-spacing: -.02em; margin-bottom: 6px; }
+        #gate h1 { font-family: var(--font-ui); font-size: 22px; letter-spacing: -.02em; margin-bottom: 6px; }
         #gate p { font-size: 12.5px; color: var(--mut); margin-bottom: 18px; line-height: 1.6; }
         #gate input { width: 100%; margin-bottom: 12px; }
         #gate .err { color: var(--red); font-size: 12px; margin-top: 10px; display: none; }
@@ -52,8 +81,8 @@
         /* KPI */
         .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(155px, 1fr)); gap: 14px; margin-bottom: 26px; }
         .kpi { padding: 18px 20px; }
-        .kpi .l { font-family: var(--mono); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--mut); }
-        .kpi .v { font-family: 'Space Grotesk', sans-serif; font-size: 34px; font-weight: 600; letter-spacing: -.03em; margin-top: 6px; }
+        .kpi .l { font-family: var(--font-ui); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--mut); }
+        .kpi .v { font-family: var(--font-ui); font-size: 34px; font-weight: 600; letter-spacing: -.03em; margin-top: 6px; }
         .kpi.hl .v { color: var(--cy); }
 
         /* Toolbar */
@@ -64,28 +93,50 @@
 
         /* Table */
         table { width: 100%; border-collapse: collapse; font-size: 13px; }
-        thead th { font-family: var(--mono); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--mut); text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--panel-b); white-space: nowrap; }
+        thead th { font-family: var(--font-ui); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--mut); text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--panel-b); white-space: nowrap; }
         thead th.sortable { cursor: pointer; user-select: none; }
         thead th.sortable:hover { color: var(--ink); }
         thead th .arr { color: var(--cy); margin-left: 3px; }
-        tbody td { padding: 11px 14px; border-bottom: 1px solid rgba(255,255,255,.05); vertical-align: middle; }
-        tbody tr:hover { background: rgba(0,242,234,.035); }
-        .num { font-family: var(--mono); }
+        tbody td { padding: 11px 14px; border-bottom: 1px solid rgba(var(--tint),.05); vertical-align: middle; }
+        tbody tr:hover { background: rgba(var(--cy-rgb),.035); }
+        .num { font-family: var(--font-ui); }
         .email { font-weight: 600; }
-        .email small { display: block; font-family: var(--mono); font-weight: 400; font-size: 10px; color: var(--mut); margin-top: 2px; cursor: pointer; }
+        .email small { display: block; font-family: var(--font-ui); font-weight: 400; font-size: 10px; color: var(--mut); margin-top: 2px; cursor: pointer; }
         .email small:hover { color: var(--cy); }
-        .chip { display: inline-block; font-family: var(--mono); font-size: 10.5px; font-weight: 700; padding: 3px 10px; border-radius: 99px; letter-spacing: .04em; }
+        .chip { display: inline-block; font-family: var(--font-ui); font-size: 10.5px; font-weight: 700; padding: 3px 10px; border-radius: 99px; letter-spacing: .04em; }
         .chip.free { background: rgba(138,137,127,.15); color: #b5b3a9; }
         .chip.pro  { background: rgba(255,0,80,.14); color: #ff6b93; }
         .chip.team { background: rgba(168,85,247,.16); color: #c4b5fd; }
-        .chip.demo { background: rgba(0,242,234,.1); color: var(--cy); }
+        .chip.demo { background: rgba(var(--cy-rgb),.1); color: var(--cy); }
         .row-actions { display: flex; gap: 8px; align-items: center; justify-content: flex-end; }
         .row-actions select { padding: 5px 8px; font-size: 12px; }
         .row-actions .btn { padding: 5px 10px; font-size: 12px; }
         .empty { text-align: center; padding: 40px; color: var(--mut); font-size: 13px; }
 
-        h2.sec { font-family: 'Space Grotesk', sans-serif; font-size: 17px; letter-spacing: -.01em; margin: 34px 0 12px; display: flex; align-items: center; gap: 10px; }
-        h2.sec .n { font-family: var(--mono); font-size: 11px; color: var(--cy); letter-spacing: .16em; }
+        .chip.ok { background: rgba(0,200,83,.14); color: #7ef3b0; }
+        .chip.warn { background: rgba(245,179,1,.14); color: #ffd666; }
+        .chip.bad { background: rgba(255,92,114,.14); color: #ffb3bf; }
+        .chip.mute { background: rgba(138,137,127,.15); color: #b5b3a9; }
+        .sub { display: block; font-family: var(--font-ui); font-size: 10px; color: var(--mut); margin-top: 3px; white-space: nowrap; }
+        .sub.soon { color: var(--amber); }
+        .vmark { color: var(--green); font-size: 11px; margin-left: 5px; }
+        .umark { color: var(--amber); font-size: 10px; margin-left: 5px; font-family: var(--font-ui); font-weight: 400; }
+        .seg { display: inline-flex; border: 1px solid var(--panel-b); border-radius: 10px; overflow: hidden; }
+        .seg button { background: transparent; border: 0; color: var(--mut); font: 600 12.5px var(--font-ui); padding: 7px 14px; cursor: pointer; }
+        .seg button.on { background: rgba(var(--cy-rgb),.12); color: var(--cy); }
+        .status-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; padding: 16px; }
+        .status-item { font-size: 12.5px; line-height: 1.6; }
+        .status-item b { display: block; font-family: var(--font-ui); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--mut); font-weight: 400; margin-bottom: 4px; }
+        .status-item span.d { color: var(--mut); font-size: 11.5px; display: block; margin-top: 3px; }
+        .blockers { margin: 0 16px 16px; padding: 12px 14px; border-radius: 10px; background: rgba(245,179,1,.08); border: 1px solid rgba(245,179,1,.3); font-size: 12.5px; line-height: 1.7; color: #ffd666; }
+        .blockers ul { margin: 4px 0 0 18px; }
+        .kpi .v small { font-size: 13px; font-family: var(--font-ui); color: var(--mut); font-weight: 400; letter-spacing: 0; }
+        .kpi.alert .v { color: var(--amber); }
+        #k-rev, #k-rev-total { font-size: 22px; white-space: nowrap; line-height: 41px; }
+
+        h2.sec { font-family: var(--font-ui); font-size: 17px; letter-spacing: -.01em; margin: 34px 0 12px; display: flex; align-items: center; gap: 10px; }
+        h2.sec .n { font-family: var(--font-ui); font-size: 11px; color: var(--cy); letter-spacing: .16em; }
+        h2.sec .spacer { flex: 1; }
 
         /* Toast */
         #toast { position: fixed; top: 20px; right: 20px; z-index: 999; padding: 12px 20px; border-radius: 10px; font-size: 13.5px; font-weight: 600; display: none; box-shadow: 0 16px 40px -16px rgba(0,0,0,.6); }
@@ -97,7 +148,45 @@
             .wrap { padding: 20px 16px 60px; }
             .hide-sm { display: none; }
         }
-    </style>
+    
+        /* ── growth ── */
+        .growth { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 16px; }
+        .growth h3 { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+        .growth .hint { font-size: 11.5px; color: var(--mut); margin-bottom: 14px; }
+        .fn { display: grid; grid-template-columns: 96px 1fr 44px 52px; gap: 10px; align-items: center; font-size: 12.5px; padding: 5px 0; color: var(--mut); }
+        .fn .bar { height: 9px; border-radius: 99px; background: rgba(var(--tint),.07); overflow: hidden; }
+        .fn .bar i { display: block; height: 100%; border-radius: 99px; background: var(--cy); }
+        .fn b { text-align: right; color: var(--ink); }
+        .fn em { text-align: right; font-style: normal; font-size: 11.5px; }
+        .days { display: flex; align-items: flex-end; gap: 4px; height: 92px; }
+        .days span { flex: 1; min-height: 2px; border-radius: 3px 3px 0 0; background: rgba(var(--tint),.16); position: relative; }
+        .days span.has { background: var(--cy); }
+        .days-x { display: flex; justify-content: space-between; font-size: 10.5px; color: var(--mut); margin-top: 6px; }
+        .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+        .chips span { padding: 5px 11px; border-radius: 99px; border: 1px solid var(--panel-b); font-size: 12px; color: var(--mut); }
+        .chips b { color: var(--ink); margin-left: 4px; }
+        /* ── workspace drawer ── */
+        .lnk { color: inherit; cursor: pointer; border-bottom: 1px dashed rgba(var(--tint),.3); }
+        .lnk:hover { color: var(--cy); border-color: var(--cy); }
+        #drawer-bg { position: fixed; inset: 0; z-index: 60; background: rgba(0,0,0,.5); display: none; }
+        #drawer { position: fixed; top: 0; right: 0; bottom: 0; z-index: 61; width: min(560px, 100vw); background: var(--panel); border-left: 1px solid var(--panel-b); padding: 26px 26px 40px; overflow-y: auto; transform: translateX(100%); transition: transform .25s ease; }
+        #drawer.open { transform: none; }
+        #drawer h2 { font-size: 18px; letter-spacing: -.01em; word-break: break-all; }
+        #drawer h4 { font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--mut); font-weight: 600; margin: 24px 0 10px; }
+        .dgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .dstat { padding: 12px; border-radius: 10px; border: 1px solid var(--panel-b); }
+        .dstat b { display: block; font-size: 20px; letter-spacing: -.02em; }
+        .dstat span { font-size: 11.5px; color: var(--mut); }
+        .dl { display: grid; grid-template-columns: 110px 1fr; gap: 6px 12px; font-size: 13px; }
+        .dl dt { color: var(--mut); }
+        .drow { display: flex; justify-content: space-between; gap: 12px; padding: 7px 0; border-bottom: 1px solid rgba(var(--tint),.06); font-size: 12.5px; }
+        .drow:last-child { border-bottom: 0; }
+        .drow span { color: var(--mut); }
+        .ob { display: flex; flex-wrap: wrap; gap: 6px; }
+        .ob span { padding: 3px 9px; border-radius: 99px; font-size: 11.5px; border: 1px solid var(--panel-b); color: var(--mut); }
+        .ob span.ok { color: var(--green); border-color: var(--green); }
+        @media (max-width: 900px) { .growth { grid-template-columns: 1fr; } }
+</style>
 </head>
 
 <body>
@@ -105,7 +194,7 @@
     <div id="gate">
         <div class="card">
             <h1>tiko<sup>®</sup> 运营后台</h1>
-            <p>输入管理密钥（服务端环境变量 <code style="font-family:var(--mono);color:var(--cy)">ADMIN_KEY</code> 或 <code style="font-family:var(--mono);color:var(--cy)">BILLING_ADMIN_KEY</code>）。密钥只保存在本浏览器的 sessionStorage。</p>
+            <p>输入管理密钥（服务端环境变量 <code style="font-family: var(--font-ui);color:var(--cy)">ADMIN_KEY</code>）。密钥只保存在本浏览器的 sessionStorage。</p>
             <input id="key-input" type="password" placeholder="Admin Key" onkeydown="if(event.key==='Enter')login()" autofocus />
             <button class="btn primary" style="width:100%" onclick="login()">进入后台</button>
             <p class="err" id="gate-err">密钥错误或服务端未配置管理密钥。</p>
@@ -114,8 +203,9 @@
 
     <div class="wrap" id="app" style="display:none">
         <header class="top">
-            <div class="brand">tiko<sup>®</sup><small>OPERATOR CONSOLE · 用户管理</small></div>
+            <div class="brand">tiko<sup>®</sup><small>OPERATOR CONSOLE · <span id="last-sync">运营后台</span></small></div>
             <div class="top-actions">
+                <button class="btn" id="btn-theme" onclick="toggleTheme()" title="切换深色 / 浅色">◐ 浅色</button>
                 <button class="btn" id="btn-refresh" onclick="loadAll()">↻ 刷新</button>
                 <button class="btn danger" onclick="cleanupDemos()">清理 Demo 账号</button>
                 <button class="btn" onclick="logout()">退出</button>
@@ -124,34 +214,71 @@
 
         <!-- ── KPI ── -->
         <div class="kpis" id="kpis">
-            <div class="card kpi"><div class="l">总账号</div><div class="v" id="k-total">—</div></div>
-            <div class="card kpi"><div class="l">真实用户</div><div class="v" id="k-real">—</div></div>
+            <div class="card kpi" id="kc-pending"><div class="l">待确认付款</div><div class="v" id="k-pending">—</div></div>
+            <div class="card kpi hl"><div class="l">本月实收</div><div class="v" id="k-rev">—</div></div>
+            <div class="card kpi"><div class="l">累计实收</div><div class="v" id="k-rev-total">—</div></div>
             <div class="card kpi hl"><div class="l">付费用户</div><div class="v" id="k-paid">—</div></div>
-            <div class="card kpi hl"><div class="l">MRR</div><div class="v" id="k-mrr">—</div></div>
+            <div class="card kpi" id="kc-expiring"><div class="l">7 天内到期</div><div class="v" id="k-expiring">—</div></div>
+            <div class="card kpi"><div class="l">MRR（按标价）</div><div class="v" id="k-mrr">—</div></div>
+            <div class="card kpi"><div class="l">真实用户 <span style="text-transform:none">/ 已验证邮箱</span></div><div class="v"><span id="k-real">—</span> <small>/ <span id="k-verified">—</span></small></div></div>
             <div class="card kpi"><div class="l">Demo 账号</div><div class="v" id="k-demo">—</div></div>
             <div class="card kpi"><div class="l">本月优化次数 <span id="k-month" style="text-transform:none"></span></div><div class="v" id="k-runs">—</div></div>
             <div class="card kpi"><div class="l">本月 AI 助手对话</div><div class="v" id="k-chats">—</div></div>
         </div>
 
-        <!-- ── Payments awaiting confirmation ── -->
-        <h2 class="sec"><span class="n">00 / PAYMENTS</span>待确认付款 <span id="orders-count" style="color:var(--cy)"></span></h2>
+        <!-- ── Growth ── -->
+        <h2 class="sec"><span class="n">GROWTH</span>增长与激活 <span style="font-size:12px;color:var(--mut);font-weight:400">不含 Demo 账号</span></h2>
+        <div class="growth">
+            <div class="card" style="padding:20px 22px">
+                <h3>激活漏斗</h3>
+                <p class="hint">每个工作区（按所有者计）走到了哪一步。右侧百分比是相对注册数的转化率。</p>
+                <div id="g-funnel"></div>
+                <div class="chips" id="g-chips"></div>
+            </div>
+            <div class="card" style="padding:20px 22px">
+                <h3>近 14 天注册</h3>
+                <p class="hint" id="g-signups-hint"></p>
+                <div class="days" id="g-days"></div>
+                <div class="days-x"><span id="g-d0"></span><span id="g-d1"></span></div>
+            </div>
+        </div>
+
+        <!-- ── System status ── -->
+        <h2 class="sec"><span class="n">00 / SYSTEM</span>系统状态</h2>
+        <div class="card">
+            <div class="status-grid" id="status-grid"><div class="status-item" style="color:var(--mut)">加载中…</div></div>
+            <div class="blockers" id="blockers" style="display:none"></div>
+        </div>
+
+        <!-- ── Payments ── -->
+        <h2 class="sec"><span class="n">01 / PAYMENTS</span>付款订单
+            <span class="spacer"></span>
+            <input id="order-search" type="search" placeholder="搜索订单号 / 邮箱 / 参考号…" oninput="renderOrders()" style="width:250px;display:none" />
+            <span class="seg">
+                <button id="tab-pending" class="on" onclick="setOrderTab('pending')">待确认 <span id="orders-count"></span></button>
+                <button id="tab-history" onclick="setOrderTab('history')">全部记录</button>
+            </span>
+        </h2>
         <div class="card" style="overflow-x:auto">
             <table>
                 <thead>
-                    <tr><th>订单号</th><th>账号</th><th>套餐</th><th style="text-align:right">应付金额</th><th>交易参考号</th><th>提交时间</th><th></th></tr>
+                    <tr><th>订单号</th><th>账号</th><th>套餐</th><th style="text-align:right">应付金额</th><th>交易参考号</th><th id="orders-time-th">提交时间</th><th></th></tr>
                 </thead>
                 <tbody id="orders-body"><tr><td colspan="7" class="empty">加载中…</td></tr></tbody>
             </table>
         </div>
 
         <!-- ── Users ── -->
-        <h2 class="sec"><span class="n">01 / USERS</span>用户列表</h2>
+        <h2 class="sec"><span class="n">02 / USERS</span>用户列表</h2>
         <div class="toolbar">
             <input id="search" type="search" placeholder="搜索邮箱…" oninput="renderUsers()" />
             <label><input id="hide-demo" type="checkbox" checked onchange="renderUsers()" /> 隐藏 Demo 账号</label>
             <label><input id="only-paid" type="checkbox" onchange="renderUsers()" /> 只看付费</label>
+            <label><input id="only-expiring" type="checkbox" onchange="renderUsers()" /> 7 天内到期</label>
+            <label><input id="only-unverified" type="checkbox" onchange="renderUsers()" /> 邮箱未验证</label>
             <div class="spacer"></div>
-            <span id="user-count" style="font-family:var(--mono);font-size:11px;color:var(--mut)"></span>
+            <button class="btn" onclick="exportUsers()" style="padding:6px 12px;font-size:12px">导出 CSV</button>
+            <span id="user-count" style="font-family: var(--font-ui);font-size:11px;color:var(--mut)"></span>
         </div>
         <div class="card" style="overflow-x:auto">
             <table>
@@ -163,16 +290,28 @@
                         <th class="sortable" data-key="agent_messages" style="text-align:right">本月对话</th>
                         <th class="sortable" data-key="creators" style="text-align:right">达人库</th>
                         <th class="sortable" data-key="campaigns" style="text-align:right">投放数</th>
+                        <th class="sortable hide-sm" data-key="last_active">最近活跃</th>
                         <th class="sortable hide-sm" data-key="created_at">注册时间</th>
                         <th style="text-align:right">操作</th>
                     </tr>
                 </thead>
-                <tbody id="users-body"><tr><td colspan="8" class="empty">加载中…</td></tr></tbody>
+                <tbody id="users-body"><tr><td colspan="9" class="empty">加载中…</td></tr></tbody>
+            </table>
+        </div>
+
+        <!-- ── Audit trail ── -->
+        <h2 class="sec"><span class="n">03 / AUDIT</span>操作日志 <span style="font-size:12px;color:var(--mut);font-family: var(--font-ui);font-weight:400">最近 100 条后台操作</span></h2>
+        <div class="card" style="overflow-x:auto">
+            <table>
+                <thead>
+                    <tr><th>时间</th><th>操作</th><th>对象</th><th>详情</th><th class="hide-sm">来源 IP</th></tr>
+                </thead>
+                <tbody id="audit-body"><tr><td colspan="5" class="empty">加载中…</td></tr></tbody>
             </table>
         </div>
 
         <!-- ── Interests ── -->
-        <h2 class="sec"><span class="n">02 / LEADS</span>API 意向登记</h2>
+        <h2 class="sec"><span class="n">04 / LEADS</span>API 意向登记</h2>
         <div class="card" style="overflow-x:auto">
             <table>
                 <thead>
@@ -182,6 +321,9 @@
             </table>
         </div>
     </div>
+
+    <div id="drawer-bg" onclick="closeWs()"></div>
+    <aside id="drawer" aria-label="工作区详情"></aside>
 
     <div id="toast"></div>
 
@@ -197,7 +339,7 @@
         const PLAN_RANK = { free: 0, pro: 1, team: 2 };
         const INTEGRATIONS = {
             tiktok_creator: 'Creator Marketplace',
-            tiktok_shop: 'TikTok Shop API',
+            tiktok_shop: 'Shop API',
             third_party: '第三方分析平台'
         };
 
@@ -214,6 +356,7 @@
             });
             const r = await fetch(API + path, opts);
             if (r.status === 403) throw new Error('AUTH');
+            if (r.status === 429) throw new Error('THROTTLED');
             if (!r.ok) { const e = await r.json().catch(() => ({})); throw new Error(e.detail || ('HTTP ' + r.status)); }
             return r.json();
         }
@@ -232,7 +375,9 @@
                 const err = document.getElementById('gate-err');
                 err.textContent = e.message === 'AUTH'
                     ? '密钥错误或服务端未配置管理密钥。'
-                    : '无法连接服务器，请确认后端已启动。';
+                    : e.message === 'THROTTLED'
+                        ? '密钥错误次数过多，请 15 分钟后再试。'
+                        : '无法连接服务器，请确认后端已启动。';
                 err.style.display = 'block';
             }
         }
@@ -244,15 +389,39 @@
         }
 
         // ── Data ──
-        async function loadAll() {
+        function money(totals) {
+            const parts = Object.entries(totals || {}).map(([cur, t]) => `${cur} ${Number(t.amount).toFixed(2)}`);
+            return parts.length ? parts.join(' + ') : '0';
+        }
+        function daysLeft(iso) { return Math.ceil((new Date(iso) - Date.now()) / 86400000); }
+
+        // silent = background auto-refresh: no button spinner, no error toast,
+        // and never while the operator is in the middle of something.
+        async function loadAll(silent) {
             const btn = document.getElementById('btn-refresh');
-            btn.disabled = true; btn.textContent = '↻ 加载中…';
+            if (!silent) { btn.disabled = true; btn.textContent = '↻ 加载中…'; }
             try {
-                const [ov, us, ins, ord] = await Promise.all([
-                    req('/admin/overview'), req('/admin/users'), req('/admin/interests'), req('/admin/orders')
+                const [ov, us, ins, ord, st, au, gr] = await Promise.all([
+                    req('/admin/overview'), req('/admin/users'), req('/admin/interests'),
+                    req('/admin/orders?status=' + (ORDER_TAB === 'history' ? 'all' : 'submitted')),
+                    req('/admin/status'), req('/admin/audit'), req('/admin/growth')
                 ]);
-                renderOrders(ord.orders);
-                document.getElementById('k-total').textContent = ov.total_users;
+                ORDERS_RAW = ord.orders || [];
+                renderOrders();
+                renderStatus(st);
+                renderAudit(au.entries);
+                renderGrowth(gr);
+                const pending = ov.pending_orders ?? 0;
+                document.getElementById('orders-count').textContent = pending ? `(${pending})` : '';
+                document.getElementById('k-pending').textContent = pending;
+                document.getElementById('kc-pending').classList.toggle('alert', pending > 0);
+                document.title = (pending ? `(${pending}) ` : '') + 'tiko · 运营后台';
+                document.getElementById('k-rev').textContent = money(ov.revenue_month);
+                document.getElementById('k-rev-total').textContent = money(ov.revenue_total);
+                document.getElementById('k-expiring').textContent = ov.expiring_7d ?? 0;
+                document.getElementById('kc-expiring').classList.toggle('alert', (ov.expiring_7d ?? 0) > 0);
+                document.getElementById('k-verified').textContent = ov.verified_users ?? 0;
+                document.getElementById('last-sync').textContent = '更新于 ' + new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
                 document.getElementById('k-real').textContent = ov.real_users;
                 document.getElementById('k-paid').textContent = ov.paid_users;
                 document.getElementById('k-mrr').textContent = '$' + (ov.mrr_usd ?? 0);
@@ -265,10 +434,163 @@
                 renderInterests(ins.interests);
             } catch (e) {
                 if (e.message === 'AUTH') { logout(); return; }
-                toast('加载失败：' + e.message, 'err');
+                if (!silent) toast('加载失败：' + e.message, 'err');
             } finally {
-                btn.disabled = false; btn.textContent = '↻ 刷新';
+                if (!silent) { btn.disabled = false; btn.textContent = '↻ 刷新'; }
             }
+        }
+
+        // New payments should surface on their own: refresh every minute while
+        // the tab is visible and nobody is typing or choosing in the page.
+        setInterval(() => {
+            const el = document.activeElement;
+            const busy = el && ['INPUT', 'SELECT', 'TEXTAREA'].includes(el.tagName);
+            if (KEY && !document.hidden && !busy && document.getElementById('app').style.display !== 'none') loadAll(true);
+        }, 60000);
+
+
+        // ── Theme (shared preference with the merchant console) ──
+        function applyThemeLabel() {
+            document.getElementById('btn-theme').textContent = document.documentElement.dataset.theme === 'light' ? '◑ 深色' : '◐ 浅色';
+        }
+        function toggleTheme() {
+            const next = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
+            document.documentElement.dataset.theme = next;
+            try { localStorage.setItem('tiko_theme', next); } catch (_) {}
+            applyThemeLabel();
+        }
+        applyThemeLabel();
+
+        // ── Growth & activation ──
+        const FUNNEL_LABELS = { registered: '注册', verified: '验证邮箱', optimized: '运行过优化', campaign: '保存过投放', outreach: '联系过达人', paid: '付费' };
+        function renderGrowth(g) {
+            const top = Math.max(g.funnel[0].count, 1);
+            document.getElementById('g-funnel').innerHTML = g.funnel.map(f =>
+                `<div class="fn"><span>${FUNNEL_LABELS[f.step] || f.step}</span><span class="bar"><i style="width:${(f.count / top * 100).toFixed(1)}%"></i></span><b>${f.count}</b><em>${Math.round(f.count / top * 100)}%</em></div>`).join('');
+            const a = g.adoption;
+            document.getElementById('g-chips').innerHTML =
+                `<span>7 天内活跃工作区<b>${g.active_7d} / ${g.workspaces}</b></span><span>多人工作区<b>${g.team_workspaces}</b></span><span>成员账号<b>${g.members}</b></span>` +
+                `<span>投放总数<b>${a.campaigns}</b></span><span>消息记录<b>${a.messages}</b></span><span>合同<b>${a.contracts}</b></span><span>本月 AI 对话<b>${a.ai_chats_month}</b></span>`;
+            const max = Math.max(...g.signups.map(d => d.count), 1);
+            document.getElementById('g-days').innerHTML = g.signups.map(d =>
+                `<span class="${d.count ? 'has' : ''}" style="height:${Math.max(2, d.count / max * 100)}%" title="${d.date}：${d.count} 人"></span>`).join('');
+            document.getElementById('g-d0').textContent = g.signups[0].date.slice(5);
+            document.getElementById('g-d1').textContent = g.signups[g.signups.length - 1].date.slice(5);
+            const diff = g.signups_7d - g.signups_prev_7d;
+            document.getElementById('g-signups-hint').textContent =
+                `最近 7 天 ${g.signups_7d} 人，前 7 天 ${g.signups_prev_7d} 人` + (diff ? `（${diff > 0 ? '+' : ''}${diff}）` : '');
+        }
+
+        async function runJobs(btn) {
+            btn.disabled = true;
+            try {
+                const d = await req('/admin/jobs/run', { method: 'POST' });
+                toast('已运行：' + Object.entries(d.result).map(([k, v]) => `${k}=${v}`).join('，'));
+                loadAll(true);
+            } catch (e) { toast('运行失败：' + e.message, 'err'); btn.disabled = false; }
+        }
+
+        // ── Workspace detail drawer ──
+        const STAGE_LABELS = { shortlisted: '待邀约', invited: '已邀约', negotiating: '洽谈中', contracted: '已签约', submitted: '内容已提交', live: '已发布', paid: '已结算', declined: '已拒绝' };
+        const OB_LABELS = { creators: '达人库', optimize: '优化', campaign: '投放', outreach: '邀约', contract: '合同', results: '结果', team: '团队' };
+        const WS_ACT = { 'campaign.save': '保存投放', 'campaign.results': '录入结果', 'collab.stage': '推进阶段', 'collab.assign': '指派负责人', 'message.send': '发消息', 'contract.create': '生成合同', 'contract.status': '合同状态', 'contract.delete': '删除合同', 'team.invite': '邀请成员', 'team.remove': '移除成员' };
+        function closeWs() {
+            document.getElementById('drawer').classList.remove('open');
+            document.getElementById('drawer-bg').style.display = 'none';
+        }
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeWs(); });
+        async function openWs(i) {
+            const u = VIEW[i]; if (!u) return;
+            const box = document.getElementById('drawer');
+            box.innerHTML = '<p style="color:var(--mut)">加载中…</p>';
+            box.classList.add('open'); document.getElementById('drawer-bg').style.display = 'block';
+            let d;
+            try { d = await req('/admin/workspace?email=' + encodeURIComponent(u.email)); }
+            catch (e) { box.innerHTML = `<p style="color:var(--red)">加载失败：${esc(e.message)}</p>`; return; }
+            const lim = v => v == null ? '不限' : v;
+            const expiry = d.plan === 'free' ? '' : (d.plan_expires_at ? ` · 至 ${esc(d.plan_expires_at.slice(0, 10))}（剩 ${daysLeft(d.plan_expires_at)} 天）` : ' · 永久');
+            const stat = (n, l) => `<div class="dstat"><b>${n}</b><span>${l}</span></div>`;
+            box.innerHTML = `
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+                    <div><h2>${esc(d.email)}</h2><p style="font-size:12px;color:var(--mut);margin-top:4px">${d.role === 'member' ? '成员账号' : '工作区所有者'} · 注册于 ${fmtDate(d.created_at)} · ${d.email_verified ? '邮箱已验证' : '邮箱未验证'} · ${d.lang === 'zh' ? '中文' : 'English'}</p></div>
+                    <button class="btn" onclick="closeWs()">关闭</button>
+                </div>
+                <h4>套餐与用量</h4>
+                <dl class="dl">
+                    <dt>套餐</dt><dd><b>${esc(d.plan_name)}</b>${expiry}</dd>
+                    <dt>本月优化</dt><dd>${d.usage.optimize_runs} / ${lim(d.usage.optimize_limit)}</dd>
+                    <dt>本月 AI 对话</dt><dd>${d.usage.agent_messages} / ${lim(d.usage.agent_limit)}</dd>
+                    <dt>席位</dt><dd>${d.members.length} / ${d.seats}${d.pending_invites.length ? `（另有 ${d.pending_invites.length} 个待接受邀请）` : ''}</dd>
+                </dl>
+                <h4>使用情况</h4>
+                <div class="dgrid">${stat(d.counts.creators, '达人')}${stat(d.counts.campaigns, `投放（${d.counts.completed_campaigns} 已复盘）`)}${stat(d.counts.messages, '消息记录')}${stat(d.counts.contracts, '合同')}${stat(Object.entries(d.pipeline).filter(([k]) => k !== 'shortlisted' && k !== 'declined').reduce((a, [, v]) => a + v, 0), '推进中的合作')}${stat(d.onboarding.done + ' / ' + d.onboarding.total, '新手引导')}</div>
+                <h4>新手引导进度</h4>
+                <div class="ob">${d.onboarding.steps.map(st => `<span class="${st.done ? 'ok' : ''}">${st.done ? '✓ ' : ''}${OB_LABELS[st.id] || st.id}</span>`).join('')}</div>
+                <h4>合作阶段</h4>
+                <div class="ob">${Object.entries(d.pipeline).map(([k, v]) => `<span>${STAGE_LABELS[k] || k} ${v}</span>`).join('')}</div>
+                <h4>成员（${d.members.length}）</h4>
+                ${d.members.map(m => `<div class="drow"><div>${esc(m.email)} ${m.email_verified ? '' : '<span>· 未验证</span>'}</div><span>${m.role === 'member' ? '成员' : '所有者'} · ${fmtDate(m.joined_at)}</span></div>`).join('')}
+                ${d.pending_invites.map(e => `<div class="drow"><div>${esc(e)}</div><span>邀请待接受</span></div>`).join('')}
+                <h4>最近订单</h4>
+                ${d.orders.length ? d.orders.map(o => `<div class="drow"><div>${esc(o.order_no)} · ${esc(PLAN_NAMES[o.plan] || o.plan)} × ${o.months} 个月</div><span>${esc(o.currency)} ${Number(o.amount).toFixed(2)} · ${esc((ORDER_STATUS[o.status] || [o.status])[0])}</span></div>`).join('') : '<p style="font-size:12.5px;color:var(--mut)">没有订单。</p>'}
+                <h4>最近操作</h4>
+                ${d.activity.length ? d.activity.map(a => `<div class="drow"><div>${esc(WS_ACT[a.action] || a.action)} · ${esc(a.target)}${a.detail ? ` <span>${esc(a.detail)}</span>` : ''}</div><span style="white-space:nowrap">${fmtDate(a.created_at)}</span></div>`).join('') : '<p style="font-size:12.5px;color:var(--mut)">还没有操作记录。</p>'}
+                <p style="font-size:11.5px;color:var(--mut);margin-top:22px">这里只显示数量、账单和操作记录，不显示商家的达人、投放或消息内容。</p>`;
+        }
+
+        // ── System status ──
+        function renderStatus(st) {
+            const chip = (ok, yes, no) => `<span class="chip ${ok ? 'ok' : 'warn'}">${ok ? yes : no}</span>`;
+            const prices = Object.entries(st.payments.prices || {}).map(([p, v]) => `${PLAN_NAMES[p] || p} ${st.payments.currency} ${Number(v).toFixed(2)}/月`).join(' · ');
+            const items = [
+                ['运行环境', `<span class="chip ${st.production ? 'ok' : 'mute'}">${st.production ? '生产模式' : '开发模式'}</span>`,
+                    `数据库：${esc(st.database)}${st.database === 'sqlite' ? '（仅适合单机试用）' : ''}`],
+                ['扫码收款', chip(st.payments.enabled, '已开启', '未开启'),
+                    st.payments.enabled
+                        ? `收款人 ${esc(st.payments.payee || '未设置 PAY_PAYEE_NAME')} · 汇率 ${st.payments.fx_rate}<br>${esc(prices)}`
+                        : '缺少收款码图片 frontend/pay/duitnow-qr.png'],
+                ['邮件', chip(st.email.enabled, '已开启', '未配置'),
+                    st.email.enabled
+                        ? `发件人 ${esc(st.email.from || '')}<br>付款通知邮箱：${st.email.operator_email_set ? '已设置' : '未设置 OPERATOR_EMAIL'}`
+                        : '未配置 SMTP：无邮箱验证、无自助找回密码、无付款通知'],
+                ['AI 助手', chip(st.copilot.enabled, '已开启', '未配置'),
+                    st.copilot.enabled ? `模型 ${esc(st.copilot.model)}` : '未设置 DEEPSEEK_API_KEY'],
+                ['安全', chip(st.rate_limiting && !st.billing_self_serve, '正常', '需检查'),
+                    `限流：${st.rate_limiting ? '开' : '关'} · 付费套餐自助开通：${st.billing_self_serve ? '开（仅限演示！）' : '关'}`],
+                ['定时任务', chip(st.jobs && st.jobs.running && !st.jobs.last_error, '运行中', st.jobs && st.jobs.running ? '有错误' : '未运行'),
+                    (st.jobs && st.jobs.running
+                        ? `到期提醒（提前 7 天 / 1 天 / 到期时）、过期订单与 Demo 清理<br>上次运行：${st.jobs.last_run ? fmtDate(st.jobs.last_run) : '启动后 30 秒内首次运行'}`
+                            + (st.jobs.last_error ? ` · 最近错误：${esc(st.jobs.last_error)}` : '')
+                            + (st.email.enabled ? '' : '<br>未配置邮件，到期提醒不会发出')
+                        : '已用 JOBS_ENABLED=0 关闭：不会自动发到期提醒')
+                    + '<br><button class="btn" style="margin-top:8px;padding:4px 10px;font-size:11.5px" onclick="runJobs(this)">立即运行一次</button>'],
+            ];
+            document.getElementById('status-grid').innerHTML = items.map(([t, c, d]) =>
+                `<div class="status-item"><b>${t}</b>${c}<span class="d">${d}</span></div>`).join('');
+            const box = document.getElementById('blockers');
+            const list = st.launch_blockers || [];
+            if (!list.length) { box.style.display = 'none'; return; }
+            box.style.display = '';
+            box.innerHTML = (st.production ? '当前配置存在问题：' : '以下配置在正式上线（APP_ENV=production）前必须解决，否则服务会拒绝启动：')
+                + '<ul>' + list.map(p => `<li>${esc(p)}</li>`).join('') + '</ul>';
+        }
+
+        // ── Audit trail ──
+        const AUDIT_LABELS = {
+            'jobs.run': '手动运行定时任务',
+            'plan.set': '设置套餐', 'plan.grant': '接口开通套餐', 'order.confirm': '确认到账', 'order.reject': '驳回付款',
+            'user.delete': '删除账号', 'user.reset_password': '重置密码', 'demo.cleanup': '清理 Demo'
+        };
+        function renderAudit(list) {
+            const tbody = document.getElementById('audit-body');
+            if (!list || !list.length) { tbody.innerHTML = '<tr><td colspan="5" class="empty">还没有后台操作记录</td></tr>'; return; }
+            tbody.innerHTML = list.map(a => `<tr>
+                <td class="num" style="font-size:11.5px;color:var(--mut);white-space:nowrap">${fmtDate(a.at)}</td>
+                <td>${esc(AUDIT_LABELS[a.action] || a.action)}</td>
+                <td class="email">${esc(a.target || '—')}</td>
+                <td class="num" style="font-size:11.5px">${esc(a.detail || '')}</td>
+                <td class="hide-sm num" style="font-size:11.5px;color:var(--mut)">${esc(a.ip || '')}</td>
+            </tr>`).join('');
         }
 
         function fmtDate(iso) {
@@ -305,10 +627,14 @@
             const q = document.getElementById('search').value.trim().toLowerCase();
             const hideDemo = document.getElementById('hide-demo').checked;
             const onlyPaid = document.getElementById('only-paid').checked;
+            const onlyExpiring = document.getElementById('only-expiring').checked;
+            const onlyUnverified = document.getElementById('only-unverified').checked;
             VIEW = sortRows(USERS.filter(u =>
-                (!q || u.email.toLowerCase().includes(q)) &&
+                (!q || u.email.toLowerCase().includes(q) || u.tenant_id.includes(q)) &&
                 (!hideDemo || !u.demo) &&
-                (!onlyPaid || u.plan !== 'free')
+                (!onlyPaid || u.plan !== 'free') &&
+                (!onlyExpiring || (u.plan_expires_at && daysLeft(u.plan_expires_at) <= 7)) &&
+                (!onlyUnverified || (!u.demo && !u.email_verified))
             ));
             HEAD_THS.forEach(th => {
                 const arr = th.dataset.key === SORT.key ? (SORT.dir > 0 ? '▲' : '▼') : '';
@@ -316,21 +642,36 @@
             });
             document.getElementById('user-count').textContent = VIEW.length + ' / ' + USERS.length;
             const tbody = document.getElementById('users-body');
-            if (!VIEW.length) { tbody.innerHTML = '<tr><td colspan="8" class="empty">没有匹配的用户</td></tr>'; return; }
+            if (!VIEW.length) { tbody.innerHTML = '<tr><td colspan="9" class="empty">没有匹配的用户</td></tr>'; return; }
             tbody.innerHTML = VIEW.map((u, i) => {
                 const chip = u.demo
                     ? '<span class="chip demo">DEMO</span>'
                     : `<span class="chip ${u.plan}">${PLAN_NAMES[u.plan] || u.plan}</span>`;
                 const sel = `<select id="plan-row-${i}">` +
                     ['free', 'pro', 'team'].map(p => `<option value="${p}" ${p === u.plan ? 'selected' : ''}>${PLAN_NAMES[p]}</option>`).join('') +
-                    '</select>';
+                    '</select>' +
+                    `<select id="term-row-${i}" title="付费套餐的有效期；续同一套餐时在原到期日上顺延">
+                        <option value="">永久</option><option value="1">1 个月</option><option value="3">3 个月</option><option value="12">12 个月</option>
+                    </select>`;
+                let expiry = '';
+                if (u.plan !== 'free' && !u.demo) {
+                    if (u.plan_expires_at) {
+                        const d = daysLeft(u.plan_expires_at);
+                        expiry = `<span class="sub ${d <= 7 ? 'soon' : ''}">至 ${esc(u.plan_expires_at.slice(0, 10))} · 剩 ${d} 天</span>`;
+                    } else expiry = '<span class="sub">永久</span>';
+                }
+                const mark = u.demo ? '' : (u.email_verified
+                    ? '<span class="vmark" title="邮箱已验证">✓</span>'
+                    : '<span class="umark" title="邮箱未验证">未验证</span>');
+                const role = u.role === 'member' ? '<span class="umark" style="color:var(--mut)" title="受邀加入他人工作区的成员，套餐随所有者">成员</span>' : '';
                 return `<tr>
-                    <td class="email">${esc(u.email)}<small title="点击复制租户 ID" onclick="copyTid(${i})">${esc(u.tenant_id).slice(0, 12)}…</small></td>
-                    <td>${chip}</td>
+                    <td class="email"><span class="lnk" title="查看工作区详情" onclick="openWs(${i})">${esc(u.email)}</span>${mark}${role}${u.members > 1 && u.role !== 'member' ? `<span class="umark" style="color:var(--cy)" title="工作区成员数">${u.members} 人</span>` : ''}<small title="点击复制租户 ID" onclick="copyTid(${i})">${esc(u.tenant_id).slice(0, 12)}…</small></td>
+                    <td>${chip}${expiry}</td>
                     <td class="num" style="text-align:right">${u.optimize_runs}</td>
                     <td class="num" style="text-align:right">${u.agent_messages ?? 0}</td>
                     <td class="num" style="text-align:right">${u.creators}</td>
                     <td class="num" style="text-align:right">${u.campaigns}</td>
+                    <td class="hide-sm num" style="font-size:11.5px;color:var(--mut)">${u.last_active ? fmtDate(u.last_active) : '—'}</td>
                     <td class="hide-sm num" style="font-size:11.5px;color:var(--mut)">${fmtDate(u.created_at)}</td>
                     <td>
                         <div class="row-actions">
@@ -366,24 +707,47 @@
         }
 
         // ── QR payments: check the wallet history, then confirm or reject ──
-        let ORDERS = [];
-        function renderOrders(list) {
-            ORDERS = list || [];
-            document.getElementById('orders-count').textContent = ORDERS.length ? `(${ORDERS.length})` : '';
+        let ORDERS = [];        // rows currently rendered
+        let ORDERS_RAW = [];    // as loaded for the active tab
+        let ORDER_TAB = 'pending';
+        const ORDER_STATUS = {
+            pending: ['待付款', 'mute'], submitted: ['待确认', 'warn'], paid: ['已到账', 'ok'],
+            rejected: ['已驳回', 'bad'], expired: ['已过期', 'mute'], cancelled: ['已取消', 'mute']
+        };
+        function setOrderTab(tab) {
+            ORDER_TAB = tab;
+            document.getElementById('tab-pending').classList.toggle('on', tab === 'pending');
+            document.getElementById('tab-history').classList.toggle('on', tab === 'history');
+            document.getElementById('order-search').style.display = tab === 'history' ? '' : 'none';
+            document.getElementById('orders-time-th').textContent = tab === 'history' ? '状态 / 时间' : '提交时间';
+            loadAll();
+        }
+        function renderOrders() {
+            const q = ORDER_TAB === 'history' ? document.getElementById('order-search').value.trim().toLowerCase() : '';
+            ORDERS = ORDERS_RAW.filter(o => !q || [o.order_no, o.email, o.reference].some(v => (v || '').toLowerCase().includes(q)));
             const tbody = document.getElementById('orders-body');
-            if (!ORDERS.length) { tbody.innerHTML = '<tr><td colspan="7" class="empty">没有待确认的付款</td></tr>'; return; }
-            tbody.innerHTML = ORDERS.map((o, i) => `<tr>
-                <td class="num">${esc(o.order_no)}</td>
-                <td class="email">${esc(o.email)}</td>
-                <td>${esc(o.plan)} × ${o.months} 个月</td>
-                <td class="num" style="text-align:right;font-weight:700;color:var(--cy)">${esc(o.currency)} ${Number(o.amount).toFixed(2)}</td>
-                <td class="num">${esc(o.reference || '—')}</td>
-                <td class="num" style="font-size:11.5px;color:var(--mut)">${fmtDate(o.submitted_at)}</td>
-                <td><div class="row-actions">
-                    <button class="btn" onclick="confirmOrder(${i})">确认到账</button>
-                    <button class="btn danger" onclick="rejectOrder(${i})">驳回</button>
-                </div></td>
-            </tr>`).join('');
+            if (!ORDERS.length) {
+                tbody.innerHTML = `<tr><td colspan="7" class="empty">${ORDER_TAB === 'history' ? '没有匹配的订单' : '没有待确认的付款'}</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = ORDERS.map((o, i) => {
+                const [label, cls] = ORDER_STATUS[o.status] || [o.status, 'mute'];
+                const when = ORDER_TAB === 'history'
+                    ? `<span class="chip ${cls}">${label}</span><span class="sub">${fmtDate(o.decided_at || o.submitted_at || o.created_at)}</span>${o.note ? `<span class="sub" style="white-space:normal">${esc(o.note)}</span>` : ''}`
+                    : `<span class="num" style="font-size:11.5px;color:var(--mut)">${fmtDate(o.submitted_at)}</span>`;
+                const actions = o.status === 'submitted'
+                    ? `<button class="btn" onclick="confirmOrder(${i})">确认到账</button>
+                       <button class="btn danger" onclick="rejectOrder(${i})">驳回</button>` : '';
+                return `<tr>
+                    <td class="num">${esc(o.order_no)}</td>
+                    <td class="email">${esc(o.email)}</td>
+                    <td>${esc(PLAN_NAMES[o.plan] || o.plan)} × ${o.months} 个月</td>
+                    <td class="num" style="text-align:right;font-weight:700;color:var(--cy)">${esc(o.currency)} ${Number(o.amount).toFixed(2)}</td>
+                    <td class="num">${esc(o.reference || '—')}</td>
+                    <td>${when}</td>
+                    <td><div class="row-actions">${actions}</div></td>
+                </tr>`;
+            }).join('');
         }
         async function confirmOrder(i) {
             const o = ORDERS[i];
@@ -425,16 +789,36 @@
         async function applyPlan(i) {
             const u = VIEW[i];
             const plan = document.getElementById('plan-row-' + i).value;
-            if (plan === u.plan) { toast(`${u.email} 已在 ${PLAN_NAMES[plan] || plan} 套餐`); return; }
+            const term = document.getElementById('term-row-' + i).value;
+            const months = plan !== 'free' && term ? Number(term) : null;
+            // Same plan with no term chosen would change nothing; same plan WITH a term is a renewal.
+            if (plan === u.plan && !months) { toast(`${u.email} 已在 ${PLAN_NAMES[plan] || plan} 套餐（要续期请选择期限）`); return; }
+            const what = plan === 'free' ? '降为 Free' : `${PLAN_NAMES[plan]} · ${months ? months + ' 个月' : '永久'}`;
+            if (!confirm(`${u.email}\n${plan === u.plan ? '续期：' : '变更为：'}${what}\n\n用户会收到套餐变更邮件（如已配置邮件）。`)) return;
             try {
-                const d = await req('/admin/plan', { method: 'POST', body: JSON.stringify({ email: u.email, plan }) });
-                toast(`${u.email} → ${d.plan_name}`);
+                const d = await req('/admin/plan', { method: 'POST', body: JSON.stringify({ email: u.email, plan, months }) });
+                toast(`${u.email} → ${d.plan_name}` + (d.expires_at ? ` · 至 ${d.expires_at.slice(0, 10)}` : ''));
                 loadAll();
             } catch (e) { toast('变更失败：' + e.message, 'err'); }
         }
+        // Export exactly what is on screen (current filters + sort).
+        function exportUsers() {
+            if (!VIEW.length) { toast('没有可导出的用户', 'err'); return; }
+            const cols = ['email', 'role', 'tenant_id', 'plan', 'plan_expires_at', 'email_verified', 'optimize_runs', 'agent_messages', 'creators', 'campaigns', 'created_at', 'demo'];
+            // Quote every cell; prefix formula-looking values so a spreadsheet never executes them.
+            const cell = v => { let t = v == null ? '' : String(v); if (/^[=+\-@]/.test(t)) t = "'" + t; return '"' + t.replace(/"/g, '""') + '"'; };
+            const csv = [cols.join(',')].concat(VIEW.map(u => cols.map(c => cell(u[c])).join(','))).join('\r\n');
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' }));
+            a.download = `tiko-users-${new Date().toISOString().slice(0, 10)}.csv`;
+            a.click();
+            URL.revokeObjectURL(a.href);
+        }
         async function removeUser(i) {
             const u = VIEW[i];
-            if (!confirm(`删除账号 ${u.email}？\n其达人库、投放记录、套餐与用量数据将一并清除，不可恢复。`)) return;
+            if (!confirm(u.role === 'member'
+                ? `删除成员账号 ${u.email}？\n只移除此人的登录，所在工作区的数据不受影响。`
+                : `删除账号 ${u.email}？\n其达人库、投放记录、套餐与用量数据将一并清除，工作区内的成员账号也会一并删除，不可恢复。`)) return;
             try {
                 await req('/admin/delete-user', { method: 'POST', body: JSON.stringify({ email: u.email }) });
                 toast(`已删除 ${u.email}`);

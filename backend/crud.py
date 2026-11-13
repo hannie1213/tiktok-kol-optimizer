@@ -10,7 +10,7 @@ Endpoints
   GET    /kols/template              Download CSV template
   GET    /kols/export                Export all KOLs as CSV
   GET    /kols/{id}/history          Metric history snapshots for a KOL
-  POST   /kols/{id}/simulate-update  Simulate a TikTok API refresh (random drift)
+  POST   /kols/{id}/simulate-update  Simulate a platform API refresh (random drift)
 
 All writes go to the tenant-scoped `kols` / `kol_snapshots` tables
 (backend/repo.py) as row-level operations, so concurrent merchants never
@@ -466,7 +466,7 @@ def get_kol_history(kol_id: int, _t: str = Depends(require_tenant)):
 @router.post("/kols/{kol_id}/simulate-update")
 def simulate_kol_update(kol_id: int, _t: str = Depends(require_tenant)):
     """
-    Simulate a TikTok API metric refresh: apply realistic random drift to
+    Simulate a platform API metric refresh: apply realistic random drift to
     engagement_rate, fit_score, followers, and record a new snapshot.
     Useful for demos and testing trend visualisation without a real API.
     """
@@ -740,7 +740,7 @@ def download_template():
         "Lisa Beauty", "MY", "beauty", 250000,
         0.08, 0.85, 0.15, 1200,
         75000, 6000, 0.78, "18-24",
-        "https://tiktok.com/@lisa_beauty", "both",
+        "https://example.com/@lisa_beauty", "both",
     ])
     output.seek(0)
 
@@ -765,7 +765,7 @@ def download_template_excel():
         "Lisa Beauty", "MY", "beauty", 250000,
         0.08, 0.85, 0.15, 1200,
         75000, 6000, 0.78, "18-24",
-        "https://tiktok.com/@lisa_beauty", "both",
+        "https://example.com/@lisa_beauty", "both",
     ])
     buf = io.BytesIO()
     wb.save(buf)

@@ -44,6 +44,8 @@ else:
 
 BILLING_SELF_SERVE = _flag("BILLING_SELF_SERVE", False)
 RATE_LIMIT_ENABLED = _flag("RATE_LIMIT_ENABLED", True)
+# Hourly background jobs (renewal reminders, stale-order and demo cleanup).
+JOBS_ENABLED = _flag("JOBS_ENABLED", True)
 MAX_UPLOAD_BYTES = int(float(os.environ.get("MAX_UPLOAD_MB", "10")) * 1024 * 1024)
 
 
