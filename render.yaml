@@ -1,0 +1,58 @@
+# Render Blueprint for Lumio. In Render: New > Blueprint > pick this repo.
+# Cost: Starter web service (US$7/month) + Basic PostgreSQL 256 MB (US$6/month)
+# ≈ US$13/month, both in Singapore. Guide: docs/DEPLOY-RENDER.md
+databases:
+  - name: lumio-db
+    plan: basic-256mb
+    region: singapore
+    databaseName: lumio
+    user: lumio
+
+services:
+  - type: web
+    name: kol-optimizer
+    runtime: docker
+    plan: starter
+    region: singapore
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: PORT                   # the Docker image listens on 8000
+        value: "8000"
+      - key: WEB_CONCURRENCY        # Starter has 512 MB RAM; 2 workers fit
+        value: "2"
+      - key: FORWARDED_ALLOW_IPS    # trust Render's proxy so rate limits see real client IPs
+        value: "*"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: lumio-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ADMIN_KEY              # operator console key; copy it from the Render dashboard
+        generateValue: true
+      # Fill these in the dashboard (leave blank to skip a feature)
+      - key: APP_BASE_URL           # e.g. https://kol-optimizer.onrender.com (needed once SMTP is on)
+        sync: false
+      - key: SMTP_HOST              # e.g. smtp.resend.com
+        sync: false
+      - key: SMTP_PORT
+        value: "587"
+      - key: SMTP_USER              # Resend: the literal word "resend"
+        sync: false
+      - key: SMTP_PASSWORD          # Resend: your API key
+        sync: false
+      - key: SMTP_FROM              # e.g. Lumio <no-reply@yourdomain.com>
+        sync: false
+      - key: OPERATOR_EMAIL         # where "merchant says they paid" notices go
+        sync: false
+      - key: PAY_PAYEE_NAME         # name shown next to the payment QR
+        sync: false
+      - key: PAY_CURRENCY
+        value: MYR
+      - key: PAY_FX_RATE            # USD plan price × this = amount charged in MYR
+        value: "4.4"
+      - key: DEEPSEEK_API_KEY       # optional: turns on the AI copilot
+        sync: false

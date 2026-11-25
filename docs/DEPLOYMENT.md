@@ -1,6 +1,8 @@
 # 上线部署手册
 
 面向运营者：把 Lumio 部署到一台公网服务器并安全地对外提供服务。架构背景见
+
+> 没有自己的服务器？用 Render 一键部署更简单，见 [DEPLOY-RENDER.md](DEPLOY-RENDER.md)。
 [saas-architecture.md](saas-architecture.md)。
 
 ## 1. 准备
