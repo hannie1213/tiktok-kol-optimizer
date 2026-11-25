@@ -23,3 +23,4 @@ data/tenants/
 # SQLite database (users + all tenant data) and its WAL side files
 data/app.db
 data/app.db-*
+data/payment_qr.png

@@ -31,14 +31,12 @@ services:
         sync: false
       - key: SMTP_FROM              # e.g. KOL Optimizer <no-reply@yourdomain.com>
         sync: false
-      # Lemon Squeezy billing (see docs/DEPLOY.md, part five)
-      - key: LEMONSQUEEZY_API_KEY
+      # Manual QR payments (see docs/DEPLOY.md, part five)
+      - key: ADMIN_EMAILS           # your login email(s), comma-separated
         sync: false
-      - key: LEMONSQUEEZY_STORE_ID
+      - key: PAYMENT_PAYEE          # name shown under the QR, e.g. YUHAN (DuitNow)
         sync: false
-      - key: LEMONSQUEEZY_VARIANT_PRO
-        sync: false
-      - key: LEMONSQUEEZY_VARIANT_AGENCY
-        sync: false
-      - key: LEMONSQUEEZY_WEBHOOK_SECRET
-        sync: false
+      - key: PRICE_PRO_MYR
+        value: "99"
+      - key: PRICE_AGENCY_MYR
+        value: "399"

@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Payment Review</title>
+<style>
+    :root { --bg: #0b1114; --card: #131b1f; --line: rgba(255,255,255,.09); --text: #eef2f3; --muted: #8b989e; --accent: #0FB5AE; --danger: #ef4444; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 24px 16px 60px; }
+    header { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; }
+    h1 { font-size: 20px; margin: 0; }
+    a { color: var(--accent); }
+    .tabs { display: flex; gap: 6px; }
+    .tabs button, .btn { border: 1px solid var(--line); background: transparent; color: var(--text); border-radius: 9px; padding: 7px 12px; cursor: pointer; font: inherit; font-size: 13px; }
+    .tabs button.on { background: var(--accent); border-color: var(--accent); color: #031414; font-weight: 700; }
+    .btn.ok { background: var(--accent); border-color: var(--accent); color: #031414; font-weight: 700; }
+    .btn.no { border-color: rgba(239,68,68,.5); color: #fca5a5; }
+    .btn:disabled { opacity: .5; cursor: default; }
+    .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px; }
+    .list { display: flex; flex-direction: column; gap: 12px; }
+    .row { display: grid; grid-template-columns: 1fr 150px; gap: 16px; }
+    .row img { width: 150px; max-height: 220px; object-fit: contain; border-radius: 8px; background: #000; cursor: zoom-in; }
+    .noimg { width: 150px; height: 90px; border: 1px dashed var(--line); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 12px; }
+    .meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 6px 16px; margin: 6px 0 12px; }
+    .meta span { color: var(--muted); font-size: 12px; display: block; }
+    .amt { font-size: 22px; font-weight: 800; }
+    .pill { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 99px; border: 1px solid var(--line); text-transform: uppercase; letter-spacing: .4px; }
+    .pill.pending { color: #fbbf24; } .pill.approved { color: #34d399; } .pill.rejected { color: #fca5a5; } .pill.cancelled { color: var(--muted); }
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .actions input { flex: 1; min-width: 160px; background: transparent; border: 1px solid var(--line); border-radius: 9px; color: var(--text); padding: 7px 10px; font: inherit; font-size: 13px; }
+    .empty, .msg { color: var(--muted); text-align: center; padding: 30px 0; }
+    .qr { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; margin-bottom: 18px; }
+    .qr img { width: 90px; height: 90px; object-fit: contain; background: #fff; border-radius: 8px; padding: 4px; }
+    .zoom { position: fixed; inset: 0; background: rgba(0,0,0,.85); display: none; align-items: center; justify-content: center; padding: 16px; z-index: 10; }
+    .zoom img { max-width: 100%; max-height: 100%; }
+    @media (max-width: 640px) { .row { grid-template-columns: 1fr; } .row img, .noimg { width: 100%; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+    <header>
+        <h1>Payment review</h1>
+        <div class="tabs">
+            <button data-s="pending" class="on">Pending</button>
+            <button data-s="approved">Approved</button>
+            <button data-s="rejected">Rejected</button>
+            <button data-s="all">All</button>
+        </div>
+        <a href="/">← Back to app</a>
+    </header>
+
+    <div class="card qr">
+        <img id="qr" alt="Current payment QR" />
+        <div style="flex:1;min-width:200px">
+            <b>Payment QR shown to customers</b>
+            <div style="color:var(--muted);font-size:12px">Upload your DuitNow / Touch 'n Go / bank QR image (PNG or JPG, under 3 MB).</div>
+        </div>
+        <label class="btn">Upload new QR<input id="qr-file" type="file" accept="image/png,image/jpeg,image/webp" hidden /></label>
+    </div>
+
+    <div id="list" class="list"><div class="msg">Loading…</div></div>
+</div>
+<div class="zoom" id="zoom" onclick="this.style.display='none'"><img alt="Receipt screenshot" /></div>
+
+<script>
+const TOKEN = (() => { try { return localStorage.getItem('kol_token'); } catch (_) { return null; } })();
+const H = TOKEN ? { Authorization: 'Bearer ' + TOKEN } : {};
+let STATUS = 'pending';
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const when = iso => iso ? new Date(iso).toLocaleString('en-MY', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—';
+const PLAN = { pro: 'Pro', agency: 'Agency' };
+
+function msg(t) { document.getElementById('list').innerHTML = `<div class="msg">${t}</div>`; }
+
+async function load() {
+    if (!TOKEN) { msg('Please <a href="/">sign in</a> with an admin account first.'); return; }
+    const r = await fetch(`/admin/payments?status=${STATUS}`, { headers: H });
+    if (r.status === 401) { msg('Your session expired. Please <a href="/">sign in</a> again.'); return; }
+    if (r.status === 403) { msg('This account is not an admin. Add its email to ADMIN_EMAILS on the server.'); return; }
+    const { payments } = await r.json();
+    if (!payments.length) { msg(STATUS === 'pending' ? 'No payments waiting for review.' : 'Nothing here yet.'); return; }
+    document.getElementById('list').innerHTML = payments.map(p => `
+        <div class="card row" id="p${p.id}">
+            <div>
+                <div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center">
+                    <div><span class="amt">RM${p.amount_myr}</span> &nbsp; ${PLAN[p.plan] || esc(p.plan)} × ${p.months} month(s)</div>
+                    <span class="pill ${esc(p.status)}">${esc(p.status)}</span>
+                </div>
+                <div class="meta">
+                    <div><span>Customer</span>${esc(p.email)}</div>
+                    <div><span>Transaction ref</span><b>${esc(p.reference)}</b></div>
+                    <div><span>Submitted</span>${when(p.created_at)}</div>
+                    <div><span>Current plan</span>${esc(p.current_plan)}${p.current_expires_at ? ' until ' + when(p.current_expires_at) : ''}</div>
+                    ${p.status !== 'pending' ? `<div><span>Decided</span>${when(p.decided_at)} by ${esc(p.decided_by || '—')}</div>` : ''}
+                    ${p.reject_reason ? `<div><span>Reason</span>${esc(p.reject_reason)}</div>` : ''}
+                    ${p.plan_expires_at ? `<div><span>Active until</span>${when(p.plan_expires_at)}</div>` : ''}
+                </div>
+                ${p.status === 'pending' ? `
+                <div class="actions">
+                    <button class="btn ok" onclick="decide(${p.id}, 'approve')">Approve &amp; activate</button>
+                    <input id="reason${p.id}" placeholder="Reason if rejecting (sent to customer)" />
+                    <button class="btn no" onclick="decide(${p.id}, 'reject')">Reject</button>
+                </div>` : ''}
+            </div>
+            <div>${p.has_proof ? `<img data-proof="${p.id}" alt="Receipt screenshot" />` : '<div class="noimg">No screenshot</div>'}</div>
+        </div>`).join('');
+    document.querySelectorAll('[data-proof]').forEach(async img => {
+        const r = await fetch(`/admin/payments/${img.dataset.proof}/proof`, { headers: H });
+        if (r.ok) { img.src = URL.createObjectURL(await r.blob()); img.onclick = () => zoom(img.src); }
+    });
+}
+
+function zoom(src) { const z = document.getElementById('zoom'); z.querySelector('img').src = src; z.style.display = 'flex'; }
+
+async function decide(id, action) {
+    const body = new FormData();
+    if (action === 'reject') body.append('reason', document.getElementById('reason' + id).value);
+    document.querySelectorAll(`#p${id} button`).forEach(b => b.disabled = true);
+    const r = await fetch(`/admin/payments/${id}/${action}`, { method: 'POST', headers: H, body });
+    if (!r.ok) {
+        const d = await r.json().catch(() => ({}));
+        document.querySelectorAll(`#p${id} button`).forEach(b => b.disabled = false);
+        alertRow(id, d.detail || 'Something went wrong');
+        return;
+    }
+    load();
+}
+function alertRow(id, text) {
+    const el = document.querySelector(`#p${id} .actions`);
+    if (el) el.insertAdjacentHTML('beforeend', `<span style="color:var(--danger);font-size:12px">${esc(text)}</span>`);
+}
+
+function loadQr() { const i = document.getElementById('qr'); i.src = '/billing/qr?t=' + Date.now(); i.onerror = () => { i.removeAttribute('src'); i.alt = 'None yet'; }; }
+document.getElementById('qr-file').addEventListener('change', async e => {
+    const f = e.target.files[0]; if (!f) return;
+    const body = new FormData(); body.append('file', f);
+    const r = await fetch('/admin/payment-qr', { method: 'POST', headers: H, body });
+    if (r.ok) loadQr();
+    e.target.value = '';
+});
+
+document.querySelectorAll('.tabs button').forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll('.tabs button').forEach(x => x.classList.toggle('on', x === b));
+    STATUS = b.dataset.s; load();
+}));
+loadQr();
+load();
+</script>
+</body>
+</html>

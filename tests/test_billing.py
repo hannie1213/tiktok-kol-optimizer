@@ -1,54 +1,47 @@
-"""Plans, usage limits and the Lemon Squeezy webhook."""
-import hashlib
-import hmac
-import json
+"""Plans, usage limits and manual QR payments with admin approval (MYR)."""
 import uuid
+from datetime import datetime, timedelta, timezone
 
 import pytest
 from fastapi.testclient import TestClient
 
-from backend import billing
+from backend import billing, db, mailer
 from backend.main import app
 
 client = TestClient(app)
 
-SECRET = "whsec_test"
 OPT = {"countries": ["MY"], "category": "beauty", "budget": 3000}
+PNG = b"\x89PNG\r\n\x1a\n" + b"0" * 64
 
 
-@pytest.fixture(autouse=True)
-def ls_env(monkeypatch):
-    monkeypatch.setenv("LEMONSQUEEZY_WEBHOOK_SECRET", SECRET)
-    monkeypatch.setenv("LEMONSQUEEZY_VARIANT_PRO", "111")
-    monkeypatch.setenv("LEMONSQUEEZY_VARIANT_AGENCY", "222")
-
-
-def _account():
-    email = f"bill_{uuid.uuid4().hex[:10]}@example.com"
+def _account(email=None):
+    email = email or f"bill_{uuid.uuid4().hex[:10]}@example.com"
     r = client.post("/auth/register", json={"email": email, "password": "secret123"})
-    token = r.json()["token"]
-    tenant = client.get("/auth/me", headers={"Authorization": f"Bearer {token}"}).json()["tenant_id"]
-    return {"Authorization": f"Bearer {token}"}, tenant
+    h = {"Authorization": f"Bearer {r.json()['token']}"}
+    return h, email
 
 
-def _send(event_name, tenant, status="active", variant=111, sub_id="sub_1", secret=SECRET):
-    body = json.dumps({
-        "meta": {"event_name": event_name, "custom_data": {"tenant_id": tenant}},
-        "data": {"id": sub_id, "type": "subscriptions", "attributes": {
-            "status": status, "variant_id": variant, "renews_at": "2026-12-25T00:00:00Z",
-            "ends_at": None, "urls": {"customer_portal": "https://shop.lemonsqueezy.com/billing"},
-        }},
-    }).encode()
-    sig = hmac.new(secret.encode(), body, hashlib.sha256).hexdigest()
-    return client.post("/billing/webhook", content=body, headers={"X-Signature": sig, "Content-Type": "application/json"})
+@pytest.fixture
+def admin(monkeypatch):
+    h, email = _account()
+    monkeypatch.setenv("ADMIN_EMAILS", f"someone@else.com, {email}")
+    return h
 
 
-def test_new_account_is_free_with_limits():
+def _pay(h, plan="pro", months=1, ref="TNG123456", proof=True):
+    files = {"proof": ("r.png", PNG, "image/png")} if proof else None
+    return client.post("/billing/requests", headers=h, files=files,
+                       data={"plan": plan, "months": str(months), "reference": ref})
+
+
+# ── Limits ────────────────────────────────────────────────────────
+def test_new_account_is_free_in_myr():
     h, _ = _account()
     s = client.get("/billing/status", headers=h).json()
-    assert s["plan"] == "free"
+    assert s["plan"] == "free" and s["currency"] == "MYR"
     assert s["limits"]["optimizations_per_month"] == 10
-    assert s["usage"]["optimizations"] == 0
+    plans = client.get("/billing/plans").json()
+    assert plans["plans"]["pro"]["price_myr"] == 99 and plans["month_options"] == [1, 3, 12]
 
 
 def test_free_optimization_quota_enforced(monkeypatch):
@@ -58,7 +51,6 @@ def test_free_optimization_quota_enforced(monkeypatch):
     assert client.post("/optimize", json=OPT, headers=h).status_code == 200
     r = client.post("/optimize", json=OPT, headers=h)
     assert r.status_code == 402 and r.json()["detail"]["upgrade"] is True
-    assert client.get("/billing/status", headers=h).json()["usage"]["optimizations"] == 2
 
 
 def test_free_cannot_export_or_import():
@@ -73,60 +65,92 @@ def test_free_campaign_cap(monkeypatch):
     h, _ = _account()
     camp = {"name": "c", "countries": ["MY"], "category": "beauty", "budget": 1000,
             "best_algorithm": "Greedy Ranking", "selected_kols": [], "predicted_gmv": 0, "total_cost": 0}
-    first = client.post("/campaigns", json=camp, headers=h)
-    assert first.status_code == 200, first.text
+    assert client.post("/campaigns", json=camp, headers=h).status_code == 200
     assert client.post("/campaigns", json=camp, headers=h).status_code == 402
 
 
-def test_webhook_rejects_bad_signature():
-    _, tenant = _account()
-    assert _send("subscription_created", tenant, secret="wrong").status_code == 401
+# ── Payment submission ────────────────────────────────────────────
+def test_submit_payment_validates_input():
+    h, _ = _account()
+    assert _pay(h, plan="gold").status_code == 422
+    assert _pay(h, months=2).status_code == 422
+    assert _pay(h, ref="x").status_code == 422
+    bad = client.post("/billing/requests", headers=h, data={"plan": "pro", "months": "1", "reference": "REF12345"},
+                      files={"proof": ("r.pdf", b"%PDF", "application/pdf")})
+    assert bad.status_code == 422
 
 
-def test_subscription_lifecycle_upgrades_and_downgrades():
-    h, tenant = _account()
-    sub = f"sub_{uuid.uuid4().hex[:6]}"
-    assert _send("subscription_created", tenant, sub_id=sub).json()["plan"] == "pro"
+def test_one_pending_request_at_a_time_and_cancel():
+    h, _ = _account()
+    r = _pay(h, months=3)
+    assert r.status_code == 200 and r.json()["amount_myr"] == 297
+    assert _pay(h).status_code == 409
     s = client.get("/billing/status", headers=h).json()
-    assert s["plan"] == "pro" and s["portal_url"].startswith("https://")
-    assert client.get("/kols/export", headers=h).status_code == 200
+    assert s["pending_request"]["status"] == "pending" and s["plan"] == "free"
+    assert client.delete("/billing/requests/pending", headers=h).status_code == 200
+    assert _pay(h).status_code == 200
 
-    # Cancelled keeps access until the period ends...
-    assert _send("subscription_cancelled", tenant, status="cancelled", sub_id=sub).json()["plan"] == "pro"
-    # ...then expiry drops back to free.
-    assert _send("subscription_expired", tenant, status="expired", sub_id=sub).json()["plan"] == "free"
+
+# ── Admin review ──────────────────────────────────────────────────
+def test_non_admin_cannot_review(admin):
+    h, _ = _account()
+    assert client.get("/admin/payments", headers=h).status_code == 403
+
+
+def test_approve_activates_plan_with_expiry(admin):
+    h, email = _account()
+    req = _pay(h, months=1).json()
+    listed = client.get("/admin/payments", headers=admin).json()["payments"]
+    mine = next(p for p in listed if p["id"] == req["id"])
+    assert mine["email"] == email and mine["has_proof"] and "proof" not in mine
+    assert client.get(f"/admin/payments/{req['id']}/proof", headers=admin).content == PNG
+
+    r = client.post(f"/admin/payments/{req['id']}/approve", headers=admin)
+    assert r.status_code == 200
+    s = client.get("/billing/status", headers=h).json()
+    assert s["plan"] == "pro"
+    exp = datetime.fromisoformat(s["plan_expires_at"])
+    assert timedelta(days=29) < exp - datetime.now(timezone.utc) <= timedelta(days=30)
+    assert client.get("/kols/export", headers=h).status_code == 200
+    assert any(m["to"] == email and "active" in m["subject"] for m in mailer.outbox)
+    # can't decide twice
+    assert client.post(f"/admin/payments/{req['id']}/approve", headers=admin).status_code == 409
+
+
+def test_renewal_stacks_on_remaining_time(admin):
+    h, _ = _account()
+    first = _pay(h, months=1).json()
+    client.post(f"/admin/payments/{first['id']}/approve", headers=admin)
+    second = _pay(h, months=3, ref="TNG999999").json()
+    client.post(f"/admin/payments/{second['id']}/approve", headers=admin)
+    exp = datetime.fromisoformat(client.get("/billing/status", headers=h).json()["plan_expires_at"])
+    assert exp - datetime.now(timezone.utc) > timedelta(days=119)
+
+
+def test_reject_keeps_free_and_records_reason(admin):
+    h, _ = _account()
+    req = _pay(h).json()
+    r = client.post(f"/admin/payments/{req['id']}/reject", headers=admin, data={"reason": "Amount mismatch"})
+    assert r.status_code == 200
+    s = client.get("/billing/status", headers=h).json()
+    assert s["plan"] == "free" and s["last_decision"]["reject_reason"] == "Amount mismatch"
+
+
+def test_expired_plan_falls_back_to_free(admin):
+    h, email = _account()
+    req = _pay(h).json()
+    client.post(f"/admin/payments/{req['id']}/approve", headers=admin)
+    past = (datetime.now(timezone.utc) - timedelta(minutes=1)).isoformat()
+    with db.connect() as conn:
+        conn.execute("UPDATE users SET plan_expires_at=? WHERE email=?", (past, email))
+    assert client.get("/billing/status", headers=h).json()["plan"] == "free"
     assert client.get("/kols/export", headers=h).status_code == 402
 
 
-def test_agency_variant_maps_to_agency():
-    h, tenant = _account()
-    _send("subscription_created", tenant, variant=222, sub_id=f"sub_{uuid.uuid4().hex[:6]}")
-    assert client.get("/billing/status", headers=h).json()["plan"] == "agency"
-
-
-def test_checkout_unavailable_until_configured(monkeypatch):
-    monkeypatch.delenv("LEMONSQUEEZY_API_KEY", raising=False)
-    h, _ = _account()
-    assert client.post("/billing/checkout", json={"plan": "pro"}, headers=h).status_code == 503
-    assert client.post("/billing/checkout", json={"plan": "gold"}, headers=h).status_code == 422
-
-
-def test_checkout_calls_lemon_squeezy(monkeypatch):
-    monkeypatch.setenv("LEMONSQUEEZY_API_KEY", "key")
-    monkeypatch.setenv("LEMONSQUEEZY_STORE_ID", "9")
-    seen = {}
-
-    class Resp:
-        def raise_for_status(self): pass
-        def json(self): return {"data": {"attributes": {"url": "https://x.lemonsqueezy.com/checkout/abc"}}}
-
-    def fake_post(url, json, headers, timeout):
-        seen.update(url=url, body=json)
-        return Resp()
-
-    monkeypatch.setattr(billing.httpx, "post", fake_post)
-    h, tenant = _account()
-    r = client.post("/billing/checkout", json={"plan": "pro"}, headers=h)
-    assert r.json()["url"].startswith("https://")
-    assert seen["body"]["data"]["attributes"]["checkout_data"]["custom"]["tenant_id"] == tenant
-    assert seen["body"]["data"]["relationships"]["variant"]["data"]["id"] == "111"
+def test_admin_uploads_qr(admin, tmp_path, monkeypatch):
+    monkeypatch.setenv("PAYMENT_QR_PATH", str(tmp_path / "qr.png"))
+    assert client.get("/billing/qr").status_code == 404
+    r = client.post("/admin/payment-qr", headers=admin, files={"file": ("qr.png", PNG, "image/png")})
+    assert r.status_code == 200
+    assert client.get("/billing/qr").content == PNG
+    assert client.get("/billing/plans").json()["qr_available"] is True

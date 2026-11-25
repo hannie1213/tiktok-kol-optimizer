@@ -11,6 +11,7 @@ Tables
   tenant_docs      one JSON document per (tenant, name), e.g. the creator library
   password_resets  single-use, hashed, expiring reset tokens
   usage            per-tenant monthly counters for plan limits
+  payment_requests manual QR payments waiting for / decided by an admin
   meta             key/value flags (e.g. whether legacy JSON was imported)
 
 Location: env DATABASE_PATH, else <KOL_DATA_DIR or data/>/app.db.
@@ -55,6 +56,25 @@ CREATE TABLE IF NOT EXISTS usage (
     count      INTEGER NOT NULL DEFAULT 0,
     PRIMARY KEY (tenant_id, period, metric)
 );
+CREATE TABLE IF NOT EXISTS payment_requests (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id         INTEGER NOT NULL REFERENCES users(id),
+    plan            TEXT    NOT NULL,
+    months          INTEGER NOT NULL,
+    amount_myr      INTEGER NOT NULL,
+    code            TEXT    NOT NULL,
+    reference       TEXT    NOT NULL,
+    note            TEXT,
+    proof           BLOB,
+    proof_type      TEXT,
+    status          TEXT    NOT NULL,      -- pending | approved | rejected | cancelled
+    reject_reason   TEXT,
+    created_at      TEXT    NOT NULL,
+    decided_at      TEXT,
+    decided_by      TEXT,
+    plan_expires_at TEXT
+);
+CREATE INDEX IF NOT EXISTS payment_requests_status ON payment_requests(status);
 CREATE TABLE IF NOT EXISTS meta (
     key    TEXT PRIMARY KEY,
     value  TEXT NOT NULL
@@ -170,11 +190,7 @@ def tenant_exists(tenant_id: str) -> bool:
 
 # ── Additive column migrations (safe on existing databases) ──────
 _USER_COLUMNS = {
-    "subscription_id": "TEXT",
-    "subscription_status": "TEXT",
-    "subscription_renews_at": "TEXT",
-    "subscription_ends_at": "TEXT",
-    "customer_portal_url": "TEXT",
+    "plan_expires_at": "TEXT",
 }
 
 

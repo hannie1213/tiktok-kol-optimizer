@@ -366,7 +366,7 @@
         .up-plan h4 { font-size: 15px; font-weight: 800; margin: 0; }
         .up-plan .amt { font-size: 22px; font-weight: 800; }
         .up-plan ul { margin: 0; padding-left: 16px; flex: 1; color: #7B8794; }
-        @media (max-width: 700px) { .up-plans { grid-template-columns: 1fr; } }
+        @media (max-width: 700px) { .up-plans, .up-pay-grid { grid-template-columns: 1fr !important; } }
         @media (max-width: 900px) {
             .lp-pricing { grid-template-columns: 1fr; gap: 28px; }
             .lp-hero { grid-template-columns: 1fr; gap: 40px; padding: 40px 0 60px; }
@@ -410,37 +410,81 @@
         </div>
     </div>
 
-    <!-- ═══════════════════════ UPGRADE / BILLING DIALOG ═══════════════════════ -->
+    <!-- ═══════════════════════ UPGRADE / BILLING DIALOG (manual QR payment) ═══════════════════════ -->
     <div id="upgrade-overlay" onclick="if(event.target===this)closeUpgrade()" style="display:none;position:fixed;inset:0;z-index:2100;background:rgba(10,15,20,.72);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:16px">
         <div class="glass-card" style="width:100%;max-width:720px;border-radius:20px;padding:26px;max-height:92vh;overflow:auto">
             <div style="display:flex;justify-content:space-between;align-items:start;gap:12px">
                 <div>
-                    <p style="font-size:19px;font-weight:800;margin:0">Choose your plan</p>
+                    <p id="upgrade-title" style="font-size:19px;font-weight:800;margin:0">Choose your plan</p>
                     <p id="upgrade-reason" style="font-size:12.5px;color:#7B8794;margin:4px 0 16px">Unlock unlimited optimizations, imports and exports.</p>
                 </div>
                 <button onclick="closeUpgrade()" title="Close" style="background:none;border:none;cursor:pointer;color:#7B8794"><span class="material-symbols-outlined">close</span></button>
             </div>
-            <div class="up-plans">
-                <div class="up-plan" data-plan="free">
-                    <h4>Free</h4><div class="amt">$0</div>
-                    <ul><li>10 optimizations / month</li><li>2 campaigns</li><li>No import / export</li></ul>
-                    <button class="btn btn-outline" disabled style="justify-content:center">Included</button>
+
+            <!-- Step 1: pick plan + months -->
+            <div id="up-step-plan">
+                <div class="up-plans">
+                    <div class="up-plan" data-plan="free">
+                        <h4>Free</h4><div class="amt">RM0</div>
+                        <ul><li>10 optimizations / month</li><li>2 campaigns</li><li>No import / export</li></ul>
+                        <button class="btn btn-outline" disabled style="justify-content:center">Included</button>
+                    </div>
+                    <div class="up-plan" data-plan="pro">
+                        <h4>Pro</h4><div class="amt">RM<span data-price="pro">99</span><span style="font-size:12px;font-weight:500">/mo</span></div>
+                        <ul><li>Unlimited optimizations</li><li>Unlimited campaigns</li><li>Import + export</li></ul>
+                        <button class="btn btn-primary" onclick="choosePlan('pro')" style="justify-content:center">Choose Pro</button>
+                    </div>
+                    <div class="up-plan" data-plan="agency">
+                        <h4>Agency</h4><div class="amt">RM<span data-price="agency">399</span><span style="font-size:12px;font-weight:500">/mo</span></div>
+                        <ul><li>Everything in Pro</li><li>For multi-brand agencies</li><li>Priority support</li></ul>
+                        <button class="btn btn-outline" onclick="choosePlan('agency')" style="justify-content:center">Choose Agency</button>
+                    </div>
                 </div>
-                <div class="up-plan" data-plan="pro">
-                    <h4>Pro</h4><div class="amt">$29<span style="font-size:12px;font-weight:500">/mo</span></div>
-                    <ul><li>Unlimited optimizations</li><li>Unlimited campaigns</li><li>Import + export</li></ul>
-                    <button class="btn btn-primary" onclick="checkout('pro')" style="justify-content:center">Upgrade to Pro</button>
-                </div>
-                <div class="up-plan" data-plan="agency">
-                    <h4>Agency</h4><div class="amt">$99<span style="font-size:12px;font-weight:500">/mo</span></div>
-                    <ul><li>Everything in Pro</li><li>For multi-brand agencies</li><li>Priority support</li></ul>
-                    <button class="btn btn-outline" onclick="checkout('agency')" style="justify-content:center">Choose Agency</button>
+                <p style="font-size:11px;color:#7B8794;margin:14px 0 0;text-align:center">Pay once by QR for 1, 3 or 12 months. No card needed, no auto-renewal.</p>
+            </div>
+
+            <!-- Step 2: scan, pay, submit proof -->
+            <div id="up-step-pay" style="display:none">
+                <div style="display:grid;grid-template-columns:minmax(0,220px) 1fr;gap:20px;align-items:start" class="up-pay-grid">
+                    <div style="text-align:center">
+                        <img id="pay-qr" src="" alt="Payment QR code" style="width:100%;max-width:220px;border-radius:12px;background:#fff;padding:8px" />
+                        <p id="pay-qr-missing" style="display:none;font-size:12px;color:#ef4444">The payment QR is not set up yet. Please contact support.</p>
+                        <p id="pay-payee" style="font-size:12px;color:#7B8794;margin-top:6px"></p>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:10px;font-size:13px">
+                        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+                            <span style="font-weight:700" id="pay-plan-name">Pro</span>
+                            <select id="pay-months" class="form-input" style="width:auto;padding:6px 10px" onchange="renderAmount()">
+                                <option value="1">1 month</option><option value="3">3 months</option><option value="12">12 months</option>
+                            </select>
+                        </div>
+                        <div>Amount to pay: <span id="pay-amount" style="font-size:22px;font-weight:800">RM99</span></div>
+                        <ol style="margin:0;padding-left:18px;color:#7B8794;line-height:1.6">
+                            <li>Scan the QR with DuitNow, Touch 'n Go or your bank app.</li>
+                            <li>Pay the exact amount. Put <b id="pay-email" style="color:inherit"></b> in the transfer note.</li>
+                            <li>Enter the transaction / reference number from your receipt below.</li>
+                        </ol>
+                        <input id="pay-ref" class="form-input" placeholder="Transaction / reference no." style="width:100%" />
+                        <label style="font-size:12px;color:#7B8794">Receipt screenshot (recommended)
+                            <input id="pay-proof" type="file" accept="image/png,image/jpeg,image/webp,image/gif" style="display:block;margin-top:4px;font-size:12px" />
+                        </label>
+                        <p id="pay-error" style="display:none;font-size:12px;color:#ef4444;margin:0"></p>
+                        <div style="display:flex;gap:8px">
+                            <button class="btn btn-outline" onclick="showUpStep('plan')" style="justify-content:center">Back</button>
+                            <button id="pay-submit" class="btn btn-primary" onclick="submitPayment()" style="justify-content:center;flex:1">I've paid, submit for review</button>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <p id="upgrade-portal" style="display:none;font-size:12.5px;margin:16px 0 0;text-align:center">
-                <a id="upgrade-portal-link" href="#" target="_blank" rel="noopener" style="color:#0FB5AE;font-weight:700">Manage subscription, invoices and payment method</a>
-            </p>
-            <p style="font-size:11px;color:#7B8794;margin:14px 0 0;text-align:center">Secure checkout by Lemon Squeezy. Cancel anytime.</p>
+
+            <!-- Step 3: waiting for review -->
+            <div id="up-step-pending" style="display:none;text-align:center;padding:10px 0">
+                <span class="material-symbols-outlined" style="font-size:44px;color:#0FB5AE">hourglass_top</span>
+                <p style="font-size:16px;font-weight:800;margin:8px 0 4px">Payment under review</p>
+                <p id="pending-detail" style="font-size:13px;color:#7B8794;margin:0 0 14px"></p>
+                <p style="font-size:12px;color:#7B8794;margin:0 0 14px">Usually confirmed within a few hours. You'll get an email, and your plan switches on automatically.</p>
+                <button class="btn btn-outline" onclick="cancelPayment()" style="justify-content:center">Cancel this request</button>
+            </div>
         </div>
     </div>
 
@@ -594,11 +638,11 @@
             <section class="lp-section" id="pricing">
                 <div class="lp-eyebrow lp-reveal">PRICING</div>
                 <h2 class="lp-h2 lp-reveal">Start free. Upgrade when it pays for itself.</h2>
-                <p class="lp-section-sub lp-reveal">One better creator pick usually covers a month. Cancel anytime; prices in USD, local taxes handled at checkout.</p>
+                <p class="lp-section-sub lp-reveal">One better creator pick usually covers a month. Prices in Malaysian Ringgit; pay by DuitNow / Touch 'n Go QR, no auto-renewal.</p>
                 <div class="lp-pricing">
                     <div class="lp-price lp-glass lp-reveal">
                         <h3>Free</h3>
-                        <div class="amt">$0<small> / month</small></div>
+                        <div class="amt">RM0<small> / month</small></div>
                         <ul>
                             <li>10 optimizations per month</li>
                             <li>All 6 algorithms + 3 risk plans</li>
@@ -610,7 +654,7 @@
                     <div class="lp-price lp-glass featured lp-reveal">
                         <span class="tag">MOST POPULAR</span>
                         <h3>Pro</h3>
-                        <div class="amt">$29<small> / month</small></div>
+                        <div class="amt">RM99<small> / month</small></div>
                         <ul>
                             <li>Unlimited optimizations</li>
                             <li>Unlimited campaigns + self-calibrating predictions</li>
@@ -621,7 +665,7 @@
                     </div>
                     <div class="lp-price lp-glass lp-reveal">
                         <h3>Agency</h3>
-                        <div class="amt">$99<small> / month</small></div>
+                        <div class="amt">RM399<small> / month</small></div>
                         <ul>
                             <li>Everything in Pro</li>
                             <li>Built for agencies running many brands</li>
@@ -768,6 +812,7 @@
                     <button id="plan-action" onclick="openUpgrade()" class="text-[11.5px] font-bold" style="color:#0FB5AE;background:none;border:none;cursor:pointer">Upgrade</button>
                 </div>
                 <div id="plan-usage" class="text-[11px] text-on-surface-variant mt-1"></div>
+                <a id="admin-link" href="/admin.html" class="text-[11px] font-bold" style="display:none;color:#0FB5AE">Review payments →</a>
             </div>
             <div class="flex items-center gap-2 px-xs py-2">
                 <span class="material-symbols-outlined text-[18px] text-on-surface-variant">account_circle</span>
@@ -1835,67 +1880,122 @@
             showAuth();
         }
 
-        // ══════════ BILLING (plans, usage, Lemon Squeezy checkout) ══════════
+        // ══════════ BILLING (MYR plans, usage, manual QR payment) ══════════
         let BILLING = null;
+        let PLANS_INFO = null;
+        let UP_PLAN = 'pro';
         let PENDING_PLAN = sessionStorage.getItem('kol_pending_plan');
+        const fmtDate = iso => iso ? new Date(iso).toLocaleDateString('en-MY', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
+        async function loadPlansInfo() {
+            if (PLANS_INFO) return PLANS_INFO;
+            try {
+                const r = await fetch(`${API}/billing/plans`);
+                PLANS_INFO = await r.json();
+                ['pro', 'agency'].forEach(p => document.querySelectorAll(`[data-price="${p}"]`).forEach(el => el.textContent = PLANS_INFO.plans[p].price_myr));
+            } catch (_) {}
+            return PLANS_INFO;
+        }
         async function loadBilling() {
             if (!AUTH_TOKEN) return;
             try {
                 const r = await fetch(`${API}/billing/status`);
                 if (!r.ok) return;
                 BILLING = await r.json();
-                const card = document.getElementById('plan-card');
-                card.style.display = '';
+                document.getElementById('plan-card').style.display = '';
                 document.getElementById('plan-name').textContent = BILLING.limits.name;
                 const cap = BILLING.limits.optimizations_per_month;
-                document.getElementById('plan-usage').textContent = cap == null
-                    ? 'Unlimited optimizations'
-                    : `${BILLING.usage.optimizations} / ${cap} optimizations this month`;
-                document.getElementById('plan-action').textContent = BILLING.plan === 'free' ? 'Upgrade' : 'Manage';
+                let line = cap == null ? 'Unlimited optimizations' : `${BILLING.usage.optimizations} / ${cap} optimizations this month`;
+                if (BILLING.plan_expires_at) line += ` · until ${fmtDate(BILLING.plan_expires_at)}`;
+                if (BILLING.pending_request) line = 'Payment under review';
+                document.getElementById('plan-usage').textContent = line;
+                document.getElementById('plan-action').textContent = BILLING.pending_request ? 'View' : (BILLING.plan === 'free' ? 'Upgrade' : 'Renew');
+                document.getElementById('admin-link').style.display = BILLING.is_admin ? '' : 'none';
             } catch (_) {}
         }
-        function openUpgrade(reason) {
+        function showUpStep(step) {
+            ['plan', 'pay', 'pending'].forEach(x => document.getElementById('up-step-' + x).style.display = x === step ? '' : 'none');
+            document.getElementById('upgrade-title').textContent =
+                step === 'pay' ? 'Scan to pay' : step === 'pending' ? 'Thanks!' : 'Choose your plan';
+        }
+        async function openUpgrade(reason) {
             if (!AUTH_TOKEN) { showAuth('register'); return; }
-            document.getElementById('upgrade-reason').textContent = reason || 'Unlock unlimited optimizations, imports and exports.';
+            await loadPlansInfo();
+            await loadBilling();
+            let why = reason || 'Unlock unlimited optimizations, imports and exports.';
+            const last = BILLING && BILLING.last_decision;
+            if (!reason && last && last.status === 'rejected') why = `Your last payment (ref ${last.reference}) was not confirmed: ${last.reject_reason}`;
+            document.getElementById('upgrade-reason').textContent = why;
             const plan = BILLING ? BILLING.plan : 'free';
             document.querySelectorAll('.up-plan').forEach(el => el.classList.toggle('current', el.dataset.plan === plan));
-            const portal = BILLING && BILLING.portal_url;
-            document.getElementById('upgrade-portal').style.display = portal ? '' : 'none';
-            if (portal) document.getElementById('upgrade-portal-link').href = portal;
+            if (BILLING && BILLING.pending_request) {
+                const p = BILLING.pending_request;
+                document.getElementById('pending-detail').textContent =
+                    `${p.plan === 'agency' ? 'Agency' : 'Pro'} × ${p.months} month(s), RM${p.amount_myr}, ref ${p.reference}`;
+                showUpStep('pending');
+            } else showUpStep('plan');
             document.getElementById('upgrade-overlay').style.display = 'flex';
         }
-        // FastAPI error bodies: string detail, validation list, or {message, upgrade}.
-        function errMsg(d) {
-            const x = d && d.detail;
-            if (!x) return 'Request failed';
-            if (typeof x === 'string') return x;
-            if (x.message) return x.message;
-            return 'Please check the fields and try again.';
-        }
         function closeUpgrade() { document.getElementById('upgrade-overlay').style.display = 'none'; }
-        async function checkout(plan) {
+        function renderAmount() {
+            const m = +document.getElementById('pay-months').value;
+            const price = PLANS_INFO ? PLANS_INFO.plans[UP_PLAN].price_myr : (UP_PLAN === 'agency' ? 399 : 99);
+            document.getElementById('pay-amount').textContent = 'RM' + (price * m);
+        }
+        async function choosePlan(plan) {
             if (!AUTH_TOKEN) { sessionStorage.setItem('kol_pending_plan', plan); PENDING_PLAN = plan; showAuth('register'); return; }
-            if (BILLING && BILLING.plan === plan) { toast('You are already on this plan'); return; }
+            UP_PLAN = plan;
+            const info = await loadPlansInfo();
+            document.getElementById('pay-plan-name').textContent = plan === 'agency' ? 'Agency' : 'Pro';
+            document.getElementById('pay-email').textContent = AUTH_EMAIL || 'your account email';
+            const qrOk = info && info.qr_available;
+            document.getElementById('pay-qr').style.display = qrOk ? '' : 'none';
+            document.getElementById('pay-qr-missing').style.display = qrOk ? 'none' : '';
+            if (qrOk) document.getElementById('pay-qr').src = `${API}/billing/qr?t=${Date.now()}`;
+            document.getElementById('pay-payee').textContent = (info && info.payee) || '';
+            document.getElementById('pay-ref').value = '';
+            document.getElementById('pay-proof').value = '';
+            document.getElementById('pay-error').style.display = 'none';
+            renderAmount();
+            showUpStep('pay');
+            document.getElementById('upgrade-overlay').style.display = 'flex';
+        }
+        async function submitPayment() {
+            const err = document.getElementById('pay-error');
+            const ref = document.getElementById('pay-ref').value.trim();
+            if (ref.length < 4) { err.textContent = 'Please enter the transaction / reference number from your receipt.'; err.style.display = 'block'; return; }
+            const form = new FormData();
+            form.append('plan', UP_PLAN);
+            form.append('months', document.getElementById('pay-months').value);
+            form.append('reference', ref);
+            const f = document.getElementById('pay-proof').files[0];
+            if (f) form.append('proof', f);
+            const btn = document.getElementById('pay-submit'); btn.disabled = true;
             try {
-                const r = await fetch(`${API}/billing/checkout`, {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ plan })
-                });
+                const r = await fetch(`${API}/billing/requests`, { method: 'POST', body: form });
                 const d = await r.json();
-                if (!r.ok) { toast(errMsg(d), 'err'); return; }
-                window.location.href = d.url;
-            } catch (_) { toast('Cannot reach the server', 'err'); }
+                if (!r.ok) { err.textContent = errMsg(d); err.style.display = 'block'; return; }
+                toast('Payment submitted for review');
+                await openUpgrade();
+            } catch (_) { err.textContent = 'Cannot reach the server.'; err.style.display = 'block'; }
+            finally { btn.disabled = false; }
+        }
+        async function cancelPayment() {
+            await fetch(`${API}/billing/requests/pending`, { method: 'DELETE' });
+            await loadBilling();
+            showUpStep('plan');
         }
         // Pricing buttons on the landing page.
         function startPlan(plan) {
             if (plan === 'free') { enterApp(); return; }
-            checkout(plan);
+            if (AUTH_TOKEN) enterApp();
+            choosePlan(plan);
         }
-        // Runs after sign-in: resume a checkout chosen before the account existed.
+        // Runs after sign-in: resume the plan chosen before the account existed.
         function afterSignIn() {
             loadBilling();
             if (PENDING_PLAN) {
                 const p = PENDING_PLAN; PENDING_PLAN = null; sessionStorage.removeItem('kol_pending_plan');
-                checkout(p);
+                choosePlan(p);
             }
         }
         async function exportKols() {
@@ -1906,10 +2006,6 @@
             a.href = URL.createObjectURL(blob); a.download = 'kols_export.csv';
             document.body.appendChild(a); a.click(); a.remove();
             setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-        }
-        if (new URLSearchParams(location.search).get('upgraded')) {
-            history.replaceState(null, '', location.pathname);
-            setTimeout(() => { toast('Thanks! Your plan will update within a minute.'); loadBilling(); setTimeout(loadBilling, 8000); }, 500);
         }
         if (AUTH_TOKEN) loadBilling();
 

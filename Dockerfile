@@ -6,6 +6,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PIP_NO_CACHE_DIR=1 \
     APP_ENV=production \
     DATABASE_PATH=/var/data/app.db \
+    PAYMENT_QR_PATH=/var/data/payment_qr.png \
     PORT=8000
 
 WORKDIR /app

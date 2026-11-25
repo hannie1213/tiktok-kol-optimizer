@@ -1,6 +1,6 @@
 # 部署上线指南（Render）
 
-预计费用：约 **7.25 美元/月**（Starter 实例 7 美元 + 1 GB 持久化磁盘 0.25 美元）。域名另算，约 10 美元/年。
+预计费用：约 **7.25 美元/月**（约 RM32）（Starter 实例 7 美元 + 1 GB 持久化磁盘 0.25 美元）。域名另算，约 10 美元/年。
 
 ## 一、第一次部署（约 10 分钟）
 
@@ -45,41 +45,32 @@ Render 付费磁盘每天自动快照，保留 7 天，可在 **Disks** 页面�
 python -c "import sqlite3,datetime; s=sqlite3.connect('/var/data/app.db'); s.backup(sqlite3.connect(f'/var/data/backup-{datetime.date.today()}.db'))"
 ```
 
-## 五、开通收款（Lemon Squeezy）
+## 五、开通收款（个人收款码 + 后台审核）
 
-Lemon Squeezy 是"代收方"（Merchant of Record）：用户付款、全球增值税/销售税、发票都由它处理，然后把钱结算给你。**个人身份即可注册，不需要公司**。费用约每笔 5% + 0.5 美元。
+价格用马币，用户扫你的个人收款码（DuitNow、Touch 'n Go 或银行 App）付款，然后在网站里提交交易号和截图，你在后台确认到账后点"通过"，套餐自动开通并按购买月数计算到期日。不需要公司，也没有手续费。
 
-1. 注册 <https://lemonsqueezy.com>，创建一个 Store，按提示完成身份验证和收款账户（支持 PayPal 或银行卡）。审核通过前可以先用 **Test mode** 调试。
-2. **Products → New product**，建两个"订阅"类产品：
-   - `Pro`：29 美元/月
-   - `Agency`：99 美元/月
-3. 打开每个产品的 variant，记下 **Variant ID**（数字）。在 **Settings → Stores** 记下 **Store ID**。
-4. **Settings → API** 创建 API key。
-5. **Settings → Webhooks → +**：
-   - URL：`https://你的网址/billing/webhook`
-   - Signing secret：自己随便设一串长随机字符串
-   - 勾选所有 `subscription_*` 事件
-6. 在 Render 的 **Environment** 填：
+1. 在 Render 的 **Environment** 填：
    | 变量 | 值 |
    |---|---|
-   | `LEMONSQUEEZY_API_KEY` | 第 4 步的 key |
-   | `LEMONSQUEEZY_STORE_ID` | Store ID |
-   | `LEMONSQUEEZY_VARIANT_PRO` | Pro 的 Variant ID |
-   | `LEMONSQUEEZY_VARIANT_AGENCY` | Agency 的 Variant ID |
-   | `LEMONSQUEEZY_WEBHOOK_SECRET` | 第 5 步的 signing secret |
-7. 在网站上注册一个新账号，点 **Upgrade to Pro**，用测试卡 `4242 4242 4242 4242` 付款。回到网站后左下角应显示 **Pro plan**。确认无误后在 Lemon Squeezy 关闭 Test mode，并把上面的 key 和 ID 换成正式环境的。
-
-没配置这些变量时，网站照常运行，点升级会提示"Payments are not set up yet"。
+   | `ADMIN_EMAILS` | 你自己登录网站用的邮箱（多个用逗号分隔） |
+   | `PAYMENT_PAYEE` | 收款码下方显示的名字，例如 `YUHAN (DuitNow)` |
+   | `PRICE_PRO_MYR` / `PRICE_AGENCY_MYR` | 每月价格，默认 99 和 399 |
+2. 用这个邮箱在网站注册并登录，左下角会出现 **Review payments →**，或直接打开 `https://你的网址/admin.html`。
+3. 在后台点 **Upload new QR**，上传你的收款码图片（保存在持久化磁盘上，重新部署不会丢）。
+4. 用户付款并提交后，你会收到邮件提醒（需要先配好第三部分的邮件）。在后台核对金额、交易号和截图：
+   - 到账了：点 **Approve & activate**，用户的套餐立即开通，并收到确认邮件。同一套餐续费会接在原到期日后面。
+   - 没到账：填写原因后点 **Reject**，用户会收到邮件，可以重新提交。
+5. 到期后账号自动降回 Free，不会自动扣款。用户可以随时在网站里续费。
 
 ### 套餐规则（在 `backend/billing.py` 的 `PLANS` 里改）
 
-| | Free | Pro 29 美元 | Agency 99 美元 |
+| | Free | Pro RM99/月 | Agency RM399/月 |
 |---|---|---|---|
 | 每月优化次数 | 10 | 不限 | 不限 |
 | 跟踪的活动数 | 2 | 不限 | 不限 |
 | 导入 / 导出达人 | 不可以 | 可以 | 可以 |
 
-用户取消订阅后，可以用到当期结束，之后自动降回 Free。
+可以一次购买 1、3 或 12 个月。
 
 ## 环境变量一览
 
@@ -92,7 +83,7 @@ Lemon Squeezy 是"代收方"（Merchant of Record）：用户付款、全球增�
 | `SMTP_*` | 发信配置 |
 | `AUTH_RATE_LIMIT` | 登录/注册限流，默认 `10/60`（每 IP 每分钟 10 次） |
 | `CORS_ORIGINS` | 允许跨域的来源，同域部署时不需要设置 |
-| `LEMONSQUEEZY_*` | 收款配置，见第五部分 |
+| `ADMIN_EMAILS` / `PAYMENT_PAYEE` / `PRICE_*_MYR` / `PAYMENT_QR_PATH` | 收款与审核配置，见第五部分 |
 
 ## 本地用 Docker 运行
 

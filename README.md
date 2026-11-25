@@ -5,7 +5,7 @@
 [![CI](https://github.com/Hedy12130102/tiktok-kol-optimizer/actions/workflows/ci.yml/badge.svg)](https://github.com/Hedy12130102/tiktok-kol-optimizer/actions/workflows/ci.yml)
 ![Python](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.137-009688?logo=fastapi&logoColor=white)
-![Tests](https://img.shields.io/badge/tests-148%20passing-brightgreen)
+![Tests](https://img.shields.io/badge/tests-151%20passing-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 For Southeast-Asia TikTok Shop merchants and agencies who must allocate a marketing budget across hundreds of creators — and **prove the ROI afterwards**. The system filters the creator pool by market and category, compares **six optimization algorithms** to maximize predicted GMV, explains *why* each creator was chosen, and feeds predicted-vs-actual GMV back into the model so every campaign **automatically** sharpens the next. Each merchant works in their own isolated, login-gated tenant.
@@ -54,7 +54,7 @@ Structured search beats naïve hill-climbing by **49–201%**, and the advantage
 | **Frontend** | Single-page app (vanilla JS + Tailwind CSS), served directly by FastAPI — no separate web server |
 | **Data & analytics** | NumPy; JSON persistence; CSV/Excel import (openpyxl) + export; calibrated SEA market model with actual-vs-predicted feedback |
 | **Experiments** | Matplotlib figure pipeline; seeded, fully reproducible benchmarks |
-| **Quality** | 148 pytest tests (isolated from production data); GitHub Actions CI on every push |
+| **Quality** | 151 pytest tests (isolated from production data); GitHub Actions CI on every push |
 
 ---
 
@@ -238,7 +238,7 @@ tiktok-kol-optimizer/
 │   ├── config.py            # Env config + production safety checks
 │   ├── ratelimit.py         # Per-IP rate limit for auth endpoints
 │   ├── mailer.py            # SMTP email (logs instead when not configured)
-│   ├── billing.py           # Plans, usage limits, Lemon Squeezy checkout + webhook
+│   ├── billing.py           # MYR plans, usage limits, QR payment requests + admin approval
 │   ├── calibration.py       # Self-calibration: actual→predicted feedback (global/segment/creator)
 │   ├── crud.py              # KOL CRUD: /kols/add, PUT, DELETE, /import, /backfill-costs, /reset
 │   │                        # also: GET /kols/{id}/history, POST /kols/{id}/simulate-update
