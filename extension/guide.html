@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lumio Creator Capture</title>
+<style>
+    :root { --ink:#0E1424; --sub:#5B6478; --line:#E3E7EF; --soft:#F3F5F9; --navy:#1B2B5C; --navy2:#2C4590; --red:#B42318; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font: 15px/1.65 system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; color: var(--ink); background: #F2F4F9; }
+    header { position: relative; overflow: hidden; padding: 48px 24px 40px; color: #fff; text-align: center;
+             background: radial-gradient(90% 140% at 80% -10%, #3B5BB5 0%, #1B2B5C 45%, #070A14 100%); }
+    header::after { content: ""; position: absolute; inset: 0; pointer-events: none;
+             background-image: radial-gradient(1px 1px at 12% 30%, #fff 50%, transparent 51%), radial-gradient(1px 1px at 30% 70%, #DCE3F5 50%, transparent 51%),
+             radial-gradient(1.5px 1.5px at 58% 22%, #fff 50%, transparent 51%), radial-gradient(1px 1px at 74% 64%, #C9D2EA 50%, transparent 51%),
+             radial-gradient(1.5px 1.5px at 90% 34%, #fff 50%, transparent 51%), radial-gradient(1px 1px at 45% 48%, #fff 50%, transparent 51%); }
+    header img { width: 56px; height: 56px; border-radius: 14px; }
+    header h1 { margin: 12px 0 4px; font-size: 26px; letter-spacing: .01em; }
+    header p { margin: 0 auto; max-width: 560px; color: #C9D2EA; }
+    main { max-width: 760px; margin: -20px auto 40px; padding: 0 16px; position: relative; }
+    section { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 22px 24px; margin-bottom: 16px; box-shadow: 0 1px 2px rgba(14,20,36,.04); }
+    h2 { margin: 0 0 12px; font-size: 18px; }
+    ol { margin: 0; padding: 0; list-style: none; counter-reset: s; }
+    ol li { position: relative; padding: 0 0 14px 40px; counter-increment: s; }
+    ol li::before { content: counter(s); position: absolute; left: 0; top: 1px; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center;
+                    font: 700 13px system-ui; color: #fff; background: linear-gradient(135deg, var(--navy2), var(--navy)); }
+    ol li b { display: block; }
+    p, li span { color: var(--sub); }
+    code { padding: 1px 6px; border-radius: 6px; background: var(--soft); color: var(--ink); font-size: 13px; }
+    .legend { display: grid; gap: 8px; }
+    .legend div { display: flex; align-items: center; gap: 10px; color: var(--sub); }
+    .badge { width: 22px; height: 22px; border-radius: 6px; display: grid; place-items: center; color: #fff; font: 700 12px system-ui; }
+    details { border-top: 1px solid var(--line); padding: 10px 0; }
+    details:first-of-type { border-top: 0; }
+    summary { cursor: pointer; font-weight: 600; }
+    details p { margin: 6px 0 0; }
+    .lang { position: absolute; top: 14px; right: 16px; z-index: 1; }
+    .lang button { border: 1px solid rgba(255,255,255,.3); background: transparent; color: #fff; border-radius: 8px; padding: 4px 10px; cursor: pointer; font: 600 12px system-ui; }
+    [data-l] { display: none; } html[lang=en] [data-l=en], html[lang=zh] [data-l=zh] { display: revert; }
+</style>
+</head>
+<body>
+<header>
+    <div class="lang"><button id="switch">中文 / EN</button></div>
+    <img src="icons/icon128.png" alt="">
+    <h1>Lumio Creator Capture</h1>
+    <p data-l="en">Adds the TikTok creators you browse to your Lumio creator pool, so your team can find and shortlist them.</p>
+    <p data-l="zh">把你浏览过的 TikTok 达人自动加入 Lumio 达人池，方便团队查找和筛选。</p>
+</header>
+<main>
+    <section>
+        <h2><span data-l="en">Connect in 30 seconds</span><span data-l="zh">30 秒完成连接</span></h2>
+        <ol>
+            <li><b data-l="en">Pin the extension</b><b data-l="zh">固定扩展</b>
+                <span data-l="en">Click the puzzle icon in the browser toolbar and pin Lumio.</span>
+                <span data-l="zh">点浏览器工具栏上的拼图图标，把 Lumio 固定到工具栏。</span></li>
+            <li><b data-l="en">Create a connection code</b><b data-l="zh">生成连接码</b>
+                <span data-l="en">Sign in to your Lumio site, open <b>Explore</b>, click <b>Browser extension</b>, then <b>Create connection code</b>. It is copied for you.</span>
+                <span data-l="zh">登录 Lumio 网站，打开「发现达人」，点「浏览器扩展」，再点「生成连接码」，连接码会自动复制。</span></li>
+            <li><b data-l="en">Paste it</b><b data-l="zh">粘贴连接码</b>
+                <span data-l="en">Click the Lumio icon and paste. It connects on its own and shows your email.</span>
+                <span data-l="zh">点 Lumio 图标，把连接码粘贴进去，会自动连接并显示你的邮箱。</span></li>
+        </ol>
+    </section>
+    <section>
+        <h2><span data-l="en">Everyday use</span><span data-l="zh">日常使用</span></h2>
+        <p data-l="en"><b>Automatic:</b> open any creator profile (<code>tiktok.com/@name</code>). The public handle, follower and like counts are sent to Lumio and a note appears in the corner. The same creator is not re-sent within 6 hours.</p>
+        <p data-l="zh"><b>自动采集：</b>打开任意达人主页（<code>tiktok.com/@账号</code>），公开的账号、粉丝数和获赞数会发送到 Lumio，页面右下角会弹出提示。同一位达人 6 小时内不会重复发送。</p>
+        <p data-l="en"><b>Manual:</b> on a profile, click the Lumio icon and press <b>Capture this page</b>.</p>
+        <p data-l="zh"><b>手动采集：</b>在达人主页点 Lumio 图标，再点「采集当前页面」。</p>
+        <p data-l="en"><b>Find them:</b> captured creators appear on <b>Explore</b> in Lumio for your whole team. Add the ones you like to your Creators library.</p>
+        <p data-l="zh"><b>在哪里看：</b>采集到的达人会出现在 Lumio 的「发现达人」，整个团队都能看到。看中的可以加入「达人库」。</p>
+        <div class="legend">
+            <div><span class="badge" style="background:#1B2B5C">✓</span><span data-l="en">Sent to the pool</span><span data-l="zh">已发送到达人池</span></div>
+            <div><span class="badge" style="background:#B42318">!</span><span data-l="en">Code expired or capture failed. Open the pop-up.</span><span data-l="zh">连接码失效或采集失败，点开弹窗处理</span></div>
+        </div>
+    </section>
+    <section>
+        <h2><span data-l="en">FAQ</span><span data-l="zh">常见问题</span></h2>
+        <details><summary><span data-l="en">Nothing is captured</span><span data-l="zh">打开主页后没有采集</span></summary>
+            <p data-l="en">Make sure the address is a profile (<code>tiktok.com/@name</code>), not a video or the For You feed. Refresh TikTok tabs that were open before installing. Check that the pop-up says Connected and automatic capture is on.</p>
+            <p data-l="zh">确认网址是达人主页（<code>tiktok.com/@账号</code>），视频页和推荐页不会采集。安装前就打开的 TikTok 页面需要刷新一次。再看弹窗里是否显示「已连接」、自动采集是否打开。</p></details>
+        <details><summary><span data-l="en">The icon shows a red “!”</span><span data-l="zh">图标上出现红色「!」</span></summary>
+            <p data-l="en">The code expired (for example after a password change). Click Reconnect in the pop-up and paste a new code. Captures made meanwhile are kept and sent afterwards.</p>
+            <p data-l="zh">连接码失效了（比如修改过密码）。在弹窗里点「重新连接」，粘贴新的连接码即可。这期间采集的达人会保留，之后自动补发。</p></details>
+        <details><summary><span data-l="en">Does it read my account?</span><span data-l="zh">会读取我的账号吗？</span></summary>
+            <p data-l="en">No. It only reads public numbers on creator profiles and only talks to your Lumio site.</p>
+            <p data-l="zh">不会。只读取达人主页上公开的数字，并且只和你的 Lumio 网站通信。</p></details>
+        <details><summary><span data-l="en">How do I update?</span><span data-l="zh">怎么更新？</span></summary>
+            <p data-l="en">Download the extension again from Lumio, replace this folder with the new one, then click reload on the Lumio card in <code>chrome://extensions</code>.</p>
+            <p data-l="zh">在 Lumio 网站重新下载，用新文件夹替换旧的，再到 <code>chrome://extensions</code> 里点 Lumio 卡片上的刷新按钮。</p></details>
+    </section>
+</main>
+<script src="guide.js"></script>
+</body>
+</html>

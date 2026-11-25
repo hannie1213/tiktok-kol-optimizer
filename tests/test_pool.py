@@ -170,6 +170,7 @@ def test_extension_zip_contains_a_loadable_extension():
 def test_extension_zip_includes_icons_and_ping_reports_account():
     names = zipfile.ZipFile(io.BytesIO(client.get("/extension/download").content)).namelist()
     assert "lumio-capture/icons/icon128.png" in names
+    assert "lumio-capture/guide.html" in names and "lumio-capture/README.txt" in names
     h, _tenant = _account()
     email = client.get("/auth/me", headers=h).json()["email"]
     d = client.get("/extension/ping", headers=_ext(h)).json()

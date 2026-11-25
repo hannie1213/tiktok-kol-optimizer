@@ -97,7 +97,11 @@ async function flushQueue() {
     return { sent };
 }
 
-chrome.runtime.onInstalled.addListener(() => chrome.alarms.create('lumio-retry', { periodInMinutes: RETRY_MINUTES }));
+chrome.runtime.onInstalled.addListener(details => {
+    chrome.alarms.create('lumio-retry', { periodInMinutes: RETRY_MINUTES });
+    // First install: open the how-to guide that ships with the extension.
+    if (details && details.reason === 'install') chrome.tabs.create({ url: chrome.runtime.getURL('guide.html') });
+});
 chrome.runtime.onStartup.addListener(() => chrome.alarms.create('lumio-retry', { periodInMinutes: RETRY_MINUTES }));
 chrome.alarms.onAlarm.addListener(a => { if (a.name === 'lumio-retry') flushQueue(); });
 
