@@ -327,6 +327,39 @@
             </table>
         </div>
 
+        <!-- ── Industry news ── -->
+        <h2 class="sec"><span class="n">NEWS</span>行业资讯
+            <span style="font-size:12px;color:var(--mut);font-weight:400">显示在商家控制台「行业资讯」页，RSS 每小时自动抓取</span>
+            <span class="spacer"></span>
+            <button class="btn" onclick="refreshNews(this)">↻ 立即抓取</button>
+        </h2>
+        <div class="card" style="padding:18px 20px">
+            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+                <input id="nl-url" type="url" placeholder="粘贴文章链接（支持公众号文章 mp.weixin.qq.com）" style="flex:1;min-width:260px" onkeydown="if(event.key==='Enter')addNewsLink(this.nextElementSibling)" />
+                <button class="btn primary" onclick="addNewsLink(this)">发布到资讯</button>
+            </div>
+            <p style="font-size:11.5px;color:var(--mut);margin:8px 0 0">自动读取标题、摘要和封面。公众号没有开放接口，所以用粘贴链接的方式发布。</p>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:16px">
+                <input id="ns-name" placeholder="来源名称，如 KrASIA" style="width:180px" />
+                <input id="ns-url" type="url" placeholder="RSS / Atom 地址" style="flex:1;min-width:240px" />
+                <select id="ns-lang" style="width:90px"><option value="en">英文</option><option value="zh">中文</option></select>
+                <button class="btn" onclick="addNewsSource(this)">添加 RSS 源</button>
+            </div>
+            <div id="ns-suggest" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px"></div>
+        </div>
+        <div class="card" style="overflow-x:auto;margin-top:12px">
+            <table>
+                <thead><tr><th>RSS 源</th><th>语言</th><th style="text-align:right">文章</th><th>最近抓取</th><th>状态</th><th></th></tr></thead>
+                <tbody id="ns-body"><tr><td colspan="6" class="empty">加载中…</td></tr></tbody>
+            </table>
+        </div>
+        <div class="card" style="overflow-x:auto;margin-top:12px">
+            <table>
+                <thead><tr><th>最近文章</th><th>来源</th><th>发布时间</th><th></th></tr></thead>
+                <tbody id="ni-body"><tr><td colspan="4" class="empty">加载中…</td></tr></tbody>
+            </table>
+        </div>
+
         <!-- ── Audit trail ── -->
         <h2 class="sec"><span class="n">03 / AUDIT</span>操作日志 <span style="font-size:12px;color:var(--mut);font-family: var(--font-ui);font-weight:400">最近 100 条后台操作</span></h2>
         <div class="card" style="overflow-x:auto">
@@ -439,7 +472,7 @@
                 renderStatus(st);
                 renderAudit(au.entries);
                 renderGrowth(gr);
-                loadPool(); loadAnnouncement();
+                loadPool(); loadAnnouncement(); loadNewsAdmin();
                 const pending = ov.pending_orders ?? 0;
                 document.getElementById('orders-count').textContent = pending ? `(${pending})` : '';
                 document.getElementById('k-pending').textContent = pending;
@@ -626,6 +659,74 @@
             if (!confirm(`从达人池删除 @${r.handle}？\n已经把 TA 加入自己达人库的商家不受影响。`)) return;
             try { await req('/admin/pool/' + r.id, { method: 'DELETE' }); toast(`已删除 @${r.handle}`); loadPool(); }
             catch (e) { toast('删除失败：' + e.message, 'err'); }
+        }
+
+        // ── Industry news: sources, pasted links, pin / hide ──
+        let NEWS_ITEMS = [];
+        async function loadNewsAdmin() {
+            try {
+                const [src, it] = await Promise.all([req('/admin/news/sources'), req('/admin/news/items?limit=40')]);
+                document.getElementById('ns-suggest').innerHTML = (src.suggested || []).length
+                    ? '<span style="font-size:11.5px;color:var(--mut);align-self:center">推荐：</span>' + src.suggested.map(x =>
+                        `<button class="btn" style="padding:4px 10px;font-size:12px" onclick='addNewsSource(this, ${esc(JSON.stringify(x))})'>+ ${esc(x.name)}</button>`).join('') : '';
+                document.getElementById('ns-body').innerHTML = src.sources.length ? src.sources.map(x => `<tr>
+                    <td class="email">${esc(x.name)}<small><a href="${esc(x.url)}" target="_blank" rel="noopener noreferrer" style="color:inherit">${esc(x.url)}</a></small></td>
+                    <td>${x.lang === 'zh' ? '中文' : '英文'}</td>
+                    <td class="num" style="text-align:right">${x.item_count}</td>
+                    <td class="num" style="font-size:11.5px;color:var(--mut)">${x.last_fetched ? fmtDate(x.last_fetched) : '—'}</td>
+                    <td>${x.last_error ? `<span class="chip warn" title="${esc(x.last_error)}">抓取失败</span>` : x.enabled ? '<span class="chip ok">正常</span>' : '<span class="chip mute">已暂停</span>'}</td>
+                    <td><div class="row-actions"><button class="btn" onclick="toggleNewsSource(${x.id}, ${!x.enabled})">${x.enabled ? '暂停' : '启用'}</button><button class="btn danger" onclick="deleteNewsSource(${x.id}, ${esc(JSON.stringify(x.name))})">删除</button></div></td></tr>`).join('')
+                    : '<tr><td colspan="6" class="empty">还没有 RSS 源。点上面的推荐一键添加，或填入任意 RSS 地址。</td></tr>';
+                NEWS_ITEMS = it.items;
+                document.getElementById('ni-body').innerHTML = it.items.length ? it.items.map((x, i) => `<tr style="${x.hidden ? 'opacity:.45' : ''}">
+                    <td class="email" style="max-width:420px">${x.pinned ? '📌 ' : ''}<a href="${esc(x.url)}" target="_blank" rel="noopener noreferrer" style="color:inherit">${esc(x.title)}</a></td>
+                    <td>${esc(x.source || '—')}</td>
+                    <td class="num" style="font-size:11.5px;color:var(--mut)">${fmtDate(x.published_at)}</td>
+                    <td><div class="row-actions"><button class="btn" onclick="patchNews(${i}, {pinned: ${!x.pinned}})">${x.pinned ? '取消置顶' : '置顶'}</button><button class="btn ${x.hidden ? '' : 'danger'}" onclick="patchNews(${i}, {hidden: ${!x.hidden}})">${x.hidden ? '恢复' : '隐藏'}</button></div></td></tr>`).join('')
+                    : '<tr><td colspan="4" class="empty">还没有文章。</td></tr>';
+            } catch (_) { /* shown on next refresh */ }
+        }
+        async function addNewsLink(btn) {
+            const url = document.getElementById('nl-url').value.trim(); if (!url) return;
+            btn.disabled = true; btn.textContent = '读取中…';
+            try {
+                const d = await req('/admin/news/link', { method: 'POST', body: JSON.stringify({ url, lang: /weixin\.qq\.com/.test(url) ? 'zh' : 'en' }) });
+                toast(d.created ? `已发布：${d.item.title}` : '这篇文章已经在资讯里了');
+                document.getElementById('nl-url').value = ''; loadNewsAdmin();
+            } catch (e) { toast('发布失败：' + e.message, 'err'); }
+            finally { btn.disabled = false; btn.textContent = '发布到资讯'; }
+        }
+        async function addNewsSource(btn, preset) {
+            const body = preset || { name: document.getElementById('ns-name').value.trim(), url: document.getElementById('ns-url').value.trim(), lang: document.getElementById('ns-lang').value };
+            if (!body.name || !body.url) { toast('请填写来源名称和 RSS 地址', 'err'); return; }
+            btn.disabled = true;
+            try {
+                const d = await req('/admin/news/sources', { method: 'POST', body: JSON.stringify(body) });
+                toast(d.error ? `已添加，但抓取失败：${d.error}` : `已添加 ${body.name}，抓到 ${d.new} 篇文章`, d.error ? 'err' : 'ok');
+                if (!preset) { document.getElementById('ns-name').value = ''; document.getElementById('ns-url').value = ''; }
+                loadNewsAdmin();
+            } catch (e) { toast('添加失败：' + e.message, 'err'); }
+            finally { btn.disabled = false; }
+        }
+        async function toggleNewsSource(id, enabled) {
+            try { await req('/admin/news/sources/' + id, { method: 'PATCH', body: JSON.stringify({ enabled }) }); loadNewsAdmin(); }
+            catch (e) { toast('操作失败：' + e.message, 'err'); }
+        }
+        async function deleteNewsSource(id, name) {
+            if (!confirm(`删除资讯源「${name}」？它抓到的文章也会一起删除（置顶的保留）。`)) return;
+            try { await req('/admin/news/sources/' + id, { method: 'DELETE' }); toast('已删除'); loadNewsAdmin(); }
+            catch (e) { toast('删除失败：' + e.message, 'err'); }
+        }
+        async function patchNews(i, body) {
+            const x = NEWS_ITEMS[i]; if (!x) return;
+            try { await req('/admin/news/items/' + x.id, { method: 'POST', body: JSON.stringify(body) }); loadNewsAdmin(); }
+            catch (e) { toast('操作失败：' + e.message, 'err'); }
+        }
+        async function refreshNews(btn) {
+            btn.disabled = true; btn.textContent = '↻ 抓取中…';
+            try { const d = await req('/admin/news/refresh', { method: 'POST' }); toast(`抓取完成，新增 ${d.new} 篇`); loadNewsAdmin(); }
+            catch (e) { toast('抓取失败：' + e.message, 'err'); }
+            finally { btn.disabled = false; btn.textContent = '↻ 立即抓取'; }
         }
 
         // ── System status ──

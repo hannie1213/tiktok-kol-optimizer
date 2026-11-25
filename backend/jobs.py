@@ -85,11 +85,12 @@ def send_renewal_reminders(now: Optional[datetime] = None) -> int:
 
 def run_once(now: Optional[datetime] = None) -> dict:
     """Run every job once. Each is isolated: one failing never blocks the rest."""
-    from backend import auth, payments
+    from backend import auth, news, payments
     result = {}
     for name, job in (("reminders", lambda: send_renewal_reminders(now)),
                       ("orders_expired", payments._expire_stale),
-                      ("demos_swept", auth._sweep_expired_demos)):
+                      ("demos_swept", auth._sweep_expired_demos),
+                      ("news_fetched", news.refresh_all)):
         try:
             result[name] = job()
         except Exception as e:                        # noqa: BLE001 — keep the loop alive
