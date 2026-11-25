@@ -5,7 +5,7 @@
 [![CI](https://github.com/Hedy12130102/tiktok-kol-optimizer/actions/workflows/ci.yml/badge.svg)](https://github.com/Hedy12130102/tiktok-kol-optimizer/actions/workflows/ci.yml)
 ![Python](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.137-009688?logo=fastapi&logoColor=white)
-![Tests](https://img.shields.io/badge/tests-128%20passing-brightgreen)
+![Tests](https://img.shields.io/badge/tests-139%20passing-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 For Southeast-Asia TikTok Shop merchants and agencies who must allocate a marketing budget across hundreds of creators — and **prove the ROI afterwards**. The system filters the creator pool by market and category, compares **six optimization algorithms** to maximize predicted GMV, explains *why* each creator was chosen, and feeds predicted-vs-actual GMV back into the model so every campaign **automatically** sharpens the next. Each merchant works in their own isolated, login-gated tenant.
@@ -52,7 +52,7 @@ Structured search beats naïve hill-climbing by **49–201%**, and the advantage
 | **Frontend** | Single-page app (vanilla JS + Tailwind CSS), served directly by FastAPI — no separate web server |
 | **Data & analytics** | NumPy; JSON persistence; CSV/Excel import (openpyxl) + export; calibrated SEA market model with actual-vs-predicted feedback |
 | **Experiments** | Matplotlib figure pipeline; seeded, fully reproducible benchmarks |
-| **Quality** | 128 pytest tests (isolated from production data); GitHub Actions CI on every push |
+| **Quality** | 139 pytest tests (isolated from production data); GitHub Actions CI on every push |
 
 ---
 
@@ -122,7 +122,9 @@ A `GET /calibration` endpoint and a Campaigns-page banner show the current adjus
 
 ### 🔐 Merchant Accounts & Data Isolation
 
-Each merchant registers with email + password (hashed with `pbkdf2_sha256`) and works in a **fully isolated tenant**: their own creator library, campaigns, history, and calibration live under `data/tenants/{id}/`, seeded from the curated baseline on signup. Every data endpoint requires a **JWT** bearer token (`/auth/register`, `/auth/login`); the single-page app gates the console behind a login screen and attaches the token to every request.
+Each merchant registers with email + password (hashed with `pbkdf2_sha256`) and works in a **fully isolated tenant**: their own creator library, campaigns, history, and calibration are stored per tenant in a SQLite database (`data/app.db`, or `DATABASE_PATH`), seeded from the curated baseline on signup. Older `data/users.json` / `data/tenants/{id}/` files are imported automatically on first start. Every data endpoint requires a **JWT** bearer token (`/auth/register`, `/auth/login`); the single-page app gates the console behind a login screen and attaches the token to every request. Accounts can reset a forgotten password by email (`/auth/forgot-password`, `/auth/reset-password`) or change it when signed in (`/auth/change-password`); either revokes older sessions. Auth endpoints are rate limited per IP.
+
+**Production settings** (environment variables): `APP_ENV=production`, `JWT_SECRET` (random, 32+ chars; the server refuses to start without it), `PUBLIC_BASE_URL` (used in reset emails), `SMTP_HOST` / `SMTP_PORT` / `SMTP_USER` / `SMTP_PASSWORD` / `SMTP_FROM` for email, optional `DATABASE_PATH`, `CORS_ORIGINS` and `AUTH_RATE_LIMIT` (default `10/60`).
 
 ### 🧠 Explainable AI
 
@@ -229,7 +231,11 @@ tiktok-kol-optimizer/
 │   ├── main.py              # FastAPI: /optimize, /kols, /kol/{id}, /top-kols, /simulate-scale,
 │   │                        #          /calibration, /api/connections (integration stubs)
 │   ├── auth.py              # JWT auth: /auth/register, /auth/login, /auth/me; require_tenant dep
-│   ├── tenancy.py           # Per-tenant data paths + provisioning (data/tenants/{id}/)
+│   ├── tenancy.py           # Per-tenant document names + provisioning
+│   ├── db.py                # SQLite store (users, tenant docs, reset tokens) + legacy JSON import
+│   ├── config.py            # Env config + production safety checks
+│   ├── ratelimit.py         # Per-IP rate limit for auth endpoints
+│   ├── mailer.py            # SMTP email (logs instead when not configured)
 │   ├── calibration.py       # Self-calibration: actual→predicted feedback (global/segment/creator)
 │   ├── crud.py              # KOL CRUD: /kols/add, PUT, DELETE, /import, /backfill-costs, /reset
 │   │                        # also: GET /kols/{id}/history, POST /kols/{id}/simulate-update

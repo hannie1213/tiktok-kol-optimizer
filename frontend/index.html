@@ -375,9 +375,13 @@
             <p id="auth-sub" style="font-size:12.5px;color:#7B8794;margin-bottom:18px">Each merchant gets a private, isolated creator library.</p>
             <div style="display:flex;flex-direction:column;gap:12px">
                 <input id="auth-email" type="email" placeholder="you@company.com" autocomplete="username" class="form-input" style="width:100%" />
-                <input id="auth-password" type="password" placeholder="Password (min 6 chars)" autocomplete="current-password" class="form-input" style="width:100%" onkeydown="if(event.key==='Enter')authSubmit()" />
+                <input id="auth-password" type="password" placeholder="Password" autocomplete="current-password" class="form-input" style="width:100%" onkeydown="if(event.key==='Enter')authSubmit()" />
+                <input id="auth-password2" type="password" placeholder="New password" autocomplete="new-password" class="form-input" style="width:100%;display:none" onkeydown="if(event.key==='Enter')authSubmit()" />
+                <p id="auth-hint" style="display:none;font-size:11.5px;color:#7B8794;margin:-4px 0 0">At least 8 characters, with both letters and numbers.</p>
                 <p id="auth-error" style="display:none;font-size:12px;color:#ef4444;margin:-4px 0 0"></p>
+                <p id="auth-info" style="display:none;font-size:12px;color:#0FB5AE;margin:-4px 0 0"></p>
                 <button id="auth-submit" onclick="authSubmit()" class="btn btn-primary" style="width:100%;justify-content:center;padding:11px">Sign in</button>
+                <button id="auth-forgot-btn" onclick="setAuthMode('forgot')" style="font-size:12px;color:#7B8794;background:none;border:none;cursor:pointer;align-self:center">Forgot password?</button>
             </div>
             <p style="font-size:12.5px;color:#7B8794;text-align:center;margin-top:16px">
                 <span id="auth-switch-text">No account yet?</span>
@@ -663,6 +667,9 @@
             <div class="flex items-center gap-2 px-xs py-2">
                 <span class="material-symbols-outlined text-[18px] text-on-surface-variant">account_circle</span>
                 <span id="account-email" class="text-[12px] text-on-surface-variant truncate flex-1" title="">—</span>
+                <button onclick="showChangePassword()" title="Change password" class="text-outline hover:text-primary transition-colors">
+                    <span class="material-symbols-outlined text-[18px]">key</span>
+                </button>
                 <button onclick="logout()" title="Log out" class="text-outline hover:text-error transition-colors">
                     <span class="material-symbols-outlined text-[18px]">logout</span>
                 </button>
@@ -1576,12 +1583,14 @@
             document.querySelectorAll('.lp-reveal').forEach(el => io.observe(el));
         })();
 
-        const API = 'http://localhost:8000';
+        // Same origin as the page when served by FastAPI (local or deployed); fallback for file:// previews.
+        const API = location.protocol.startsWith('http') ? location.origin : 'http://localhost:8000';
 
         // ══════════ AUTH (multi-tenant) ══════════
         let AUTH_TOKEN = localStorage.getItem('kol_token') || null;
         let AUTH_EMAIL = localStorage.getItem('kol_email') || null;
-        let authMode = 'login';   // 'login' | 'register'
+        let authMode = 'login';   // 'login' | 'register' | 'forgot' | 'reset' | 'change'
+        let RESET_TOKEN = new URLSearchParams(location.search).get('reset_token');
 
         // Inject the bearer token into every API call; auto-logout on a 401 (except auth calls).
         (function () {
@@ -1599,44 +1608,104 @@
             };
         })();
 
-        function showAuth() {
-            authMode = 'login'; renderAuthMode();
+        function showAuth(mode) {
+            setAuthMode(mode || (RESET_TOKEN ? 'reset' : 'login'));
             document.getElementById('auth-overlay').style.display = 'flex';
         }
         function hideAuth() { document.getElementById('auth-overlay').style.display = 'none'; }
+        function showChangePassword() { showAuth('change'); }
+        function setAuthMode(m) { authMode = m; renderAuthMode(); }
+
+        const AUTH_MODES = {
+            login:    { title: 'Sign in', sub: 'Each merchant gets a private, isolated creator library.', submit: 'Sign in',
+                        email: true, pw: 'Password', pw2: null, switchText: 'No account yet?', switchBtn: 'Create one', forgot: true },
+            register: { title: 'Create your account', sub: 'Free to start. Your library is private to your account.', submit: 'Create account',
+                        email: true, pw: 'Password', pw2: null, hint: true, switchText: 'Already have an account?', switchBtn: 'Sign in' },
+            forgot:   { title: 'Reset your password', sub: "Enter your account email and we'll send you a reset link.", submit: 'Send reset link',
+                        email: true, pw: null, pw2: null, switchText: 'Remembered it?', switchBtn: 'Sign in' },
+            reset:    { title: 'Choose a new password', sub: 'This link works once and expires after 1 hour.', submit: 'Update password',
+                        email: false, pw: 'New password', pw2: 'Repeat new password', hint: true, switchText: 'Back to', switchBtn: 'Sign in' },
+            change:   { title: 'Change password', sub: 'You will stay signed in on this device.', submit: 'Update password',
+                        email: false, pw: 'Current password', pw2: 'New password', hint: true, switchText: '', switchBtn: 'Cancel' },
+        };
         function renderAuthMode() {
-            const reg = authMode === 'register';
-            document.getElementById('auth-title').textContent = reg ? 'Create your account' : 'Sign in';
-            document.getElementById('auth-submit').textContent = reg ? 'Create account' : 'Sign in';
-            document.getElementById('auth-switch-text').textContent = reg ? 'Already have an account?' : 'No account yet?';
-            document.getElementById('auth-switch-btn').textContent = reg ? 'Sign in' : 'Create one';
-            document.getElementById('auth-password').setAttribute('autocomplete', reg ? 'new-password' : 'current-password');
-            const e = document.getElementById('auth-error'); e.style.display = 'none';
+            const m = AUTH_MODES[authMode];
+            const show = (id, on) => { document.getElementById(id).style.display = on ? '' : 'none'; };
+            document.getElementById('auth-title').textContent = m.title;
+            document.getElementById('auth-sub').textContent = m.sub;
+            document.getElementById('auth-submit').textContent = m.submit;
+            document.getElementById('auth-switch-text').textContent = m.switchText;
+            document.getElementById('auth-switch-btn').textContent = m.switchBtn;
+            show('auth-email', m.email);
+            show('auth-password', !!m.pw);
+            show('auth-password2', !!m.pw2);
+            show('auth-hint', !!m.hint);
+            show('auth-forgot-btn', !!m.forgot);
+            if (m.pw) document.getElementById('auth-password').placeholder = m.pw;
+            if (m.pw2) document.getElementById('auth-password2').placeholder = m.pw2;
+            document.getElementById('auth-password').setAttribute('autocomplete',
+                authMode === 'login' || authMode === 'change' ? 'current-password' : 'new-password');
+            document.getElementById('auth-password').value = '';
+            document.getElementById('auth-password2').value = '';
+            show('auth-error', false); show('auth-info', false);
         }
-        function authToggleMode() { authMode = authMode === 'login' ? 'register' : 'login'; renderAuthMode(); }
+        function authToggleMode() {
+            if (authMode === 'change') { hideAuth(); return; }
+            if (authMode === 'reset') { RESET_TOKEN = null; history.replaceState(null, '', location.pathname); }
+            setAuthMode(authMode === 'login' ? 'register' : 'login');
+        }
+        function authSay(id, msg) {
+            const el = document.getElementById(id); el.textContent = msg; el.style.display = 'block';
+            document.getElementById(id === 'auth-error' ? 'auth-info' : 'auth-error').style.display = 'none';
+        }
+        async function authPost(path, body) {
+            const r = await fetch(`${API}/auth/${path}`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+            });
+            let d = {}; try { d = await r.json(); } catch (_) {}
+            if (!r.ok) {
+                const msg = Array.isArray(d.detail) ? 'Please check the fields and try again.' : (d.detail || 'Something went wrong.');
+                throw Object.assign(new Error(msg), { shown: true });
+            }
+            return d;
+        }
+        function signedIn(d, msg) {
+            AUTH_TOKEN = d.token; AUTH_EMAIL = d.email;
+            localStorage.setItem('kol_token', AUTH_TOKEN); localStorage.setItem('kol_email', AUTH_EMAIL);
+            setAccountEmail();
+            hideAuth();
+            document.getElementById('auth-password').value = '';
+            document.getElementById('auth-password2').value = '';
+            toast(msg);
+        }
         async function authSubmit() {
             const email = document.getElementById('auth-email').value.trim();
-            const password = document.getElementById('auth-password').value;
-            const errEl = document.getElementById('auth-error');
-            if (!email || !password) { errEl.textContent = 'Enter your email and password.'; errEl.style.display = 'block'; return; }
+            const pw = document.getElementById('auth-password').value;
+            const pw2 = document.getElementById('auth-password2').value;
+            const m = AUTH_MODES[authMode];
+            if ((m.email && !email) || (m.pw && !pw) || (m.pw2 && !pw2)) { authSay('auth-error', 'Please fill in every field.'); return; }
             const btn = document.getElementById('auth-submit'); btn.disabled = true;
             try {
-                const r = await fetch(`${API}/auth/${authMode}`, {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password })
-                });
-                const d = await r.json();
-                if (!r.ok) { errEl.textContent = d.detail || 'Something went wrong.'; errEl.style.display = 'block'; return; }
-                AUTH_TOKEN = d.token; AUTH_EMAIL = d.email;
-                localStorage.setItem('kol_token', AUTH_TOKEN); localStorage.setItem('kol_email', AUTH_EMAIL);
-                setAccountEmail();
-                hideAuth();
-                document.getElementById('auth-password').value = '';
-                enterApp();
-                if (typeof loadDashboard === 'function') loadDashboard();
-                else if (typeof loadTable === 'function') loadTable();
-                toast(authMode === 'register' ? 'Account created' : 'Signed in');
-            } catch (e) { errEl.textContent = 'Cannot reach the server.'; errEl.style.display = 'block'; }
+                if (authMode === 'login' || authMode === 'register') {
+                    const d = await authPost(authMode, { email, password: pw });
+                    signedIn(d, authMode === 'register' ? 'Account created' : 'Signed in');
+                    enterApp();
+                    if (typeof loadDashboard === 'function') loadDashboard();
+                    else if (typeof loadTable === 'function') loadTable();
+                } else if (authMode === 'forgot') {
+                    const d = await authPost('forgot-password', { email });
+                    authSay('auth-info', d.message);
+                } else if (authMode === 'reset') {
+                    if (pw !== pw2) { authSay('auth-error', 'The two passwords do not match.'); return; }
+                    await authPost('reset-password', { token: RESET_TOKEN, password: pw });
+                    RESET_TOKEN = null; history.replaceState(null, '', location.pathname);
+                    setAuthMode('login');
+                    authSay('auth-info', 'Password updated. Please sign in with your new password.');
+                } else if (authMode === 'change') {
+                    const d = await authPost('change-password', { current_password: pw, new_password: pw2 });
+                    signedIn(d, 'Password updated');
+                }
+            } catch (e) { authSay('auth-error', e.shown ? e.message : 'Cannot reach the server.'); }
             finally { btn.disabled = false; }
         }
         function setAccountEmail() {
@@ -1656,6 +1725,9 @@
             toast('Session expired — please sign in again', 'err');
             showAuth();
         }
+
+        // Opened from a password-reset email: go straight to the "choose a new password" form.
+        if (RESET_TOKEN) showAuth('reset');
 
         const TIER_BADGE = { Mega: 'tier-mega', Macro: 'tier-macro', Micro: 'tier-micro', Nano: 'tier-nano' };
         const TIER_EMOJI = { Mega: '🟣', Macro: '🔵', Micro: '🟢', Nano: '🟡' };

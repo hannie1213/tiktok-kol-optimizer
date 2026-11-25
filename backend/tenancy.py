@@ -1,4 +1,5 @@
 import contextvars
+import json
 import os
 
 # Root data directory (overridable for tests).
@@ -30,49 +31,34 @@ def current_tenant() -> str:
     return tid
 
 
-# ── Per-tenant path resolvers ─────────────────────────────────────
+# ── Per-tenant document names (stored in SQLite, see backend/db.py) ──
+LIBRARY = "sample_kols"       # the merchant's working creator library
+SEED = "seed_kols"            # reset baseline for the library
+HISTORY = "kol_history"       # metric snapshots
+CAMPAIGNS = "campaigns"
+CALIBRATION = "calibration"
+
+
 def tenant_dir(tenant_id: str = None) -> str:
+    """Legacy on-disk folder (only read once, by the JSON importer)."""
     return os.path.join(TENANTS_DIR, tenant_id or current_tenant())
-
-
-def data_path() -> str:
-    return os.path.join(tenant_dir(), "sample_kols.json")
-
-
-def seed_path() -> str:
-    return os.path.join(tenant_dir(), "seed_kols.json")
-
-
-def history_path() -> str:
-    return os.path.join(tenant_dir(), "kol_history.json")
-
-
-def campaigns_path() -> str:
-    return os.path.join(tenant_dir(), "campaigns.json")
 
 
 # ── Provisioning ──────────────────────────────────────────────────
 def provision_tenant(tenant_id: str):
-    """Create a fresh data folder for a new tenant, seeded from the template."""
-    d = tenant_dir(tenant_id)
-    os.makedirs(d, exist_ok=True)
+    """Seed a new tenant's documents from the template library."""
+    from backend import db
 
-    seed = "[]"
+    seed = []
     if os.path.exists(TEMPLATE_SEED):
         with open(TEMPLATE_SEED, encoding="utf-8") as f:
-            seed = f.read()
+            seed = json.load(f)
 
-    for name, content in (
-        ("sample_kols.json", seed),
-        ("seed_kols.json", seed),
-        ("kol_history.json", "[]"),
-        ("campaigns.json", "[]"),
-    ):
-        p = os.path.join(d, name)
-        if not os.path.exists(p):
-            with open(p, "w", encoding="utf-8") as f:
-                f.write(content)
+    for name, content in ((LIBRARY, seed), (SEED, seed), (HISTORY, []), (CAMPAIGNS, [])):
+        if not db.doc_exists(name, tenant_id=tenant_id):
+            db.write_doc(name, content, tenant_id=tenant_id)
 
 
 def tenant_exists(tenant_id: str) -> bool:
-    return os.path.isdir(tenant_dir(tenant_id))
+    from backend import db
+    return db.tenant_exists(tenant_id)

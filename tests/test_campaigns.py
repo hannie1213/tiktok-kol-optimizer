@@ -21,12 +21,13 @@ client = TestClient(app)
 # ────────────────────────────────────────────────────────────
 
 @pytest.fixture(autouse=True)
-def isolated_campaigns_file(tmp_path, monkeypatch):
-    """Each test gets its own empty campaigns.json so tests don't interfere."""
-    tmp_file = tmp_path / "campaigns.json"
-    tmp_file.write_text("[]")
-    monkeypatch.setattr(tenancy_module, "campaigns_path", lambda: str(tmp_file))
-    yield str(tmp_file)
+def isolated_campaigns():
+    """Each test starts with an empty campaign list so tests don't interfere."""
+    from backend import db
+    tid = tenancy_module.DEFAULT_TENANT
+    db.write_doc(tenancy_module.CAMPAIGNS, [], tenant_id=tid)
+    db.write_doc(tenancy_module.CALIBRATION, {"global": {"factor": 1.0, "n": 0}, "segments": {}, "creators": {}}, tenant_id=tid)
+    yield
 
 
 SAMPLE_CAMPAIGN = {

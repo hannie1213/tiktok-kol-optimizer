@@ -14,7 +14,6 @@ Run:  uvicorn backend.main:app --reload
 Docs: http://localhost:8000/docs
 """
 
-import json
 import math
 import os
 import sys
@@ -38,11 +37,14 @@ from engine.optimization.tabu_search import tabu_search
 from engine.optimization.greedy_ranking import greedy_ranking
 from engine.scoring.creator_score import compute_creator_score
 from engine.scoring.explainer import generate_reasons, get_tier
-from backend import tenancy
+from backend import config, db, tenancy
 from backend import calibration
 from backend.auth import router as auth_router, require_tenant
 from backend.crud import router as crud_router
 from backend.campaigns import router as campaigns_router
+
+config.validate()
+db.init()
 
 app = FastAPI(
     title="TikTok Shop KOL Matrix Optimizer API",
@@ -52,8 +54,8 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
+    allow_origins=config.CORS_ORIGINS,
+    allow_credentials=config.CORS_ORIGINS != ["*"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -235,17 +237,17 @@ def _kol_meta() -> dict:
 
 def load_kols() -> List[KOL]:
     try:
-        with open(tenancy.data_path(), encoding="utf-8") as f:
-            raw = json.load(f)
+        raw = db.read_doc(tenancy.LIBRARY)
+        if raw is None:
+            raise FileNotFoundError("creator library not found for this account")
         _refresh_meta(raw)
         return [_dict_to_kol(d) for d in raw]
-    except (FileNotFoundError, json.JSONDecodeError) as e:
-        raise HTTPException(status_code=500, detail=f"Data file error: {e}")
+    except FileNotFoundError as e:
+        raise HTTPException(status_code=500, detail=f"Data error: {e}")
 
 
 def load_raw_kols() -> List[dict]:
-    with open(tenancy.data_path(), encoding="utf-8") as f:
-        raw = json.load(f)
+    raw = db.read_doc(tenancy.LIBRARY, [])
     _refresh_meta(raw)
     return raw
 
@@ -541,6 +543,8 @@ def run_plan_optimizers(
 # ════════════════════════════════════════════════════════════════
 @app.get("/health")
 def health():
+    with db.connect() as conn:
+        conn.execute("SELECT 1").fetchone()
     return {"status": "ok"}
 
 
