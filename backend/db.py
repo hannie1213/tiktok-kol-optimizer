@@ -10,6 +10,8 @@ Tables
   users            accounts (email, password hash, tenant id, plan)
   tenant_docs      one JSON document per (tenant, name), e.g. the creator library
   password_resets  single-use, hashed, expiring reset tokens
+  usage            per-tenant monthly counters for plan limits
+  payment_requests manual QR payments waiting for / decided by an admin
   meta             key/value flags (e.g. whether legacy JSON was imported)
 
 Location: env DATABASE_PATH, else <KOL_DATA_DIR or data/>/app.db.
@@ -47,6 +49,32 @@ CREATE TABLE IF NOT EXISTS password_resets (
     expires_at  TEXT NOT NULL,
     used        INTEGER NOT NULL DEFAULT 0
 );
+CREATE TABLE IF NOT EXISTS usage (
+    tenant_id  TEXT    NOT NULL,
+    period     TEXT    NOT NULL,          -- YYYY-MM
+    metric     TEXT    NOT NULL,
+    count      INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY (tenant_id, period, metric)
+);
+CREATE TABLE IF NOT EXISTS payment_requests (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id         INTEGER NOT NULL REFERENCES users(id),
+    plan            TEXT    NOT NULL,
+    months          INTEGER NOT NULL,
+    amount_myr      INTEGER NOT NULL,
+    code            TEXT    NOT NULL,
+    reference       TEXT    NOT NULL,
+    note            TEXT,
+    proof           BLOB,
+    proof_type      TEXT,
+    status          TEXT    NOT NULL,      -- pending | approved | rejected | cancelled
+    reject_reason   TEXT,
+    created_at      TEXT    NOT NULL,
+    decided_at      TEXT,
+    decided_by      TEXT,
+    plan_expires_at TEXT
+);
+CREATE INDEX IF NOT EXISTS payment_requests_status ON payment_requests(status);
 CREATE TABLE IF NOT EXISTS meta (
     key    TEXT PRIMARY KEY,
     value  TEXT NOT NULL
@@ -88,6 +116,7 @@ def init():
         conn = _connect()
         try:
             conn.executescript(_SCHEMA)
+            _migrate(conn)
             _import_legacy_json(conn)
         finally:
             conn.close()
@@ -157,6 +186,19 @@ def tenant_exists(tenant_id: str) -> bool:
         return conn.execute(
             "SELECT 1 FROM tenant_docs WHERE tenant_id=? LIMIT 1", (tenant_id,)
         ).fetchone() is not None
+
+
+# ── Additive column migrations (safe on existing databases) ──────
+_USER_COLUMNS = {
+    "plan_expires_at": "TEXT",
+}
+
+
+def _migrate(conn: sqlite3.Connection):
+    have = {r["name"] for r in conn.execute("PRAGMA table_info(users)")}
+    for col, typ in _USER_COLUMNS.items():
+        if col not in have:
+            conn.execute(f"ALTER TABLE users ADD COLUMN {col} {typ}")
 
 
 # ── Legacy import ─────────────────────────────────────────────────

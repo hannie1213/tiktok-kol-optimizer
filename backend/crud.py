@@ -26,7 +26,7 @@ from typing import List, Optional
 from fastapi import APIRouter, HTTPException, UploadFile, File, Form, Depends
 from pydantic import BaseModel, field_validator
 
-from backend import db, tenancy
+from backend import billing, db, tenancy
 from backend.auth import require_tenant
 
 router = APIRouter()
@@ -502,7 +502,7 @@ async def import_file(
     file: UploadFile = File(...),
     default_country: Optional[str] = Form(None),
     default_category: Optional[str] = Form(None),
-    _t: str = Depends(require_tenant),
+    _t: str = Depends(billing.require_import_export),
 ):
     """
     Bulk import creators from a CSV or Excel (.xlsx) file.
@@ -562,7 +562,7 @@ async def import_file(
 
 
 @router.post("/kols/backfill-costs")
-async def backfill_costs(file: UploadFile = File(...), _t: str = Depends(require_tenant)):
+async def backfill_costs(file: UploadFile = File(...), _t: str = Depends(billing.require_import_export)):
     """
     Bulk-update real collaboration prices from a CSV/Excel file.
 
@@ -682,7 +682,7 @@ def download_template_excel():
 
 
 @router.get("/kols/export")
-def export_csv(_t: str = Depends(require_tenant)):
+def export_csv(_t: str = Depends(billing.require_import_export)):
     """Export all KOLs as a downloadable CSV file."""
     from fastapi.responses import StreamingResponse
 

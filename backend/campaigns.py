@@ -16,7 +16,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
 
 from backend import db, tenancy
-from backend import calibration
+from backend import billing, calibration
 from backend.auth import require_tenant
 
 router = APIRouter()
@@ -82,6 +82,7 @@ class ActualResultsUpdate(BaseModel):
 def save_campaign(req: CampaignCreate, _t: str = Depends(require_tenant)):
     """Persist an optimization result as a trackable campaign."""
     data = _load()
+    billing.check_campaign_quota(_t, len(data))
     campaign = {
         "id":             _next_id(data),
         "name":           req.name,

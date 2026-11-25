@@ -1,0 +1,15 @@
+.git
+.github
+**/__pycache__
+**/*.pyc
+.pytest_cache
+node_modules
+tests
+experiments
+docs
+data/app.db*
+data/users.json
+data/tenants
+data/fastmoss
+.env
+*.bat

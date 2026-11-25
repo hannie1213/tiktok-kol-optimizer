@@ -63,6 +63,33 @@
         /* View toggle border */
         .view-toggle { border-color: #353530 !important; }
         .view-toggle button { color: #a7a7a0 !important; }
+        /* ── Onboarding quick starts ── */
+        .quick-starts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .quick-starts button { text-align: left; border: 1px solid #353530; background: #20201b; border-radius: 12px; padding: 12px 14px; color: #e5e2da; cursor: pointer; transition: border-color .2s, transform .2s; }
+        .quick-starts button:hover { border-color: #00F2EA; transform: translateY(-2px); }
+        .quick-starts b { display: block; font-size: 13px; }
+        .quick-starts span { font-size: 12px; color: #a7a7a0; }
+        .onboard-steps { list-style: none; padding: 0; margin: 18px 0 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; font-size: 12.5px; color: #a7a7a0; text-align: left; }
+        .onboard-steps b { color: #e5e2da; }
+        @media (max-width: 700px) { .quick-starts, .onboard-steps { grid-template-columns: 1fr; } }
+        /* ── Mobile app shell: sidebar slides in from the left ── */
+        #menu-btn, #sidebar-scrim { display: none; }
+        @media (max-width: 900px) {
+            #app-sidebar { transform: translateX(-100%); transition: transform .25s ease; width: 86vw !important; max-width: 300px; overflow-y: auto; }
+            body.sidebar-open #app-sidebar { transform: none; }
+            #sidebar-scrim { position: fixed; inset: 0; background: rgba(0,0,0,.55); z-index: 45; }
+            body.sidebar-open #sidebar-scrim { display: block; }
+            #app-main { margin-left: 0 !important; }
+            #app-main > header { padding-left: 12px !important; padding-right: 12px !important; gap: 8px; }
+            #menu-btn { display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 10px; border: 1px solid #353530; background: #20201b; color: #e5e2da; flex-shrink: 0; }
+            #page-title { font-size: 18px !important; line-height: 1.2 !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+            #algo-status-badge { display: none !important; }
+            #app-main [class*="p-margin-desktop"] { padding: 14px !important; }
+            #app-main .grid-cols-12, #app-main .grid-cols-5, #app-main .grid-cols-4, #app-main .grid-cols-3 { grid-template-columns: 1fr !important; }
+            #app-main [class*="col-span-"] { grid-column: auto !important; }
+            #app-main table { display: block; overflow-x: auto; }
+        }
+        .view-toggle button.active { color: #031414 !important; font-weight: 700; }
         /* Plan card colors */
         .border-\[\#FE2C55\] { border-color: #FF0050 !important; }
         /* Technical view utilities not in compiled CSS */
@@ -348,7 +375,27 @@
         .lp-reveal { opacity: 0; transform: translateY(34px); transition: opacity .7s var(--spring-soft), transform .7s var(--spring); }
         .lp-reveal.in { opacity: 1; transform: translateY(0); }
 
+        /* Pricing */
+        .lp-pricing { display: grid; grid-template-columns: repeat(3,1fr); gap: 22px; align-items: stretch; }
+        .lp-price { border-radius: 22px; padding: 30px; display: flex; flex-direction: column; gap: 14px; position: relative; }
+        .lp-price.featured { border-color: rgba(0,242,234,.55); box-shadow: 0 24px 60px -28px rgba(0,242,234,.6); }
+        .lp-price .tag { position: absolute; top: -12px; left: 30px; background: #00F2EA; color: #031414; font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 999px; letter-spacing: .4px; }
+        .lp-price h3 { font-size: 20px; font-weight: 700; margin: 0; }
+        .lp-price .amt { font-size: 40px; font-weight: 800; letter-spacing: -1px; }
+        .lp-price .amt small { font-size: 14px; font-weight: 500; color: #b8b7ad; letter-spacing: 0; }
+        .lp-price ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 9px; font-size: 14px; color: #d6d5cc; flex: 1; }
+        .lp-price li::before { content: "✓"; color: #00F2EA; font-weight: 800; margin-right: 8px; }
+        .lp-price .lp-btn { justify-content: center; }
+        /* In-app upgrade dialog */
+        .up-plans { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+        .up-plan { border: 1px solid rgba(127,127,127,.25); border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 8px; font-size: 12.5px; }
+        .up-plan.current { border-color: #0FB5AE; }
+        .up-plan h4 { font-size: 15px; font-weight: 800; margin: 0; }
+        .up-plan .amt { font-size: 22px; font-weight: 800; }
+        .up-plan ul { margin: 0; padding-left: 16px; flex: 1; color: #7B8794; }
+        @media (max-width: 700px) { .up-plans, .up-pay-grid { grid-template-columns: 1fr !important; } }
         @media (max-width: 900px) {
+            .lp-pricing { grid-template-columns: 1fr; gap: 28px; }
             .lp-hero { grid-template-columns: 1fr; gap: 40px; padding: 40px 0 60px; }
             .lp-h1 { font-size: 40px; }
             .lp-trust { grid-template-columns: repeat(2,1fr); }
@@ -369,7 +416,7 @@
                 <div style="width:34px;height:34px;border-radius:9px;background:#000;display:flex;align-items:center;justify-content:center">
                     <span style="color:#fff;font-weight:800;font-size:12px;letter-spacing:-.5px">tiko</span>
                 </div>
-                <span style="font-weight:800;font-size:17px;color:var(--on-surface,#1f2933)">KOL Optimizer</span>
+                <span style="font-weight:800;font-size:17px;color:#e5e2da">KOL Optimizer</span>
             </div>
             <p id="auth-title" style="font-size:20px;font-weight:800;margin:14px 0 2px">Sign in</p>
             <p id="auth-sub" style="font-size:12.5px;color:#7B8794;margin-bottom:18px">Each merchant gets a private, isolated creator library.</p>
@@ -387,6 +434,84 @@
                 <span id="auth-switch-text">No account yet?</span>
                 <button onclick="authToggleMode()" id="auth-switch-btn" style="color:#0FB5AE;font-weight:700;background:none;border:none;cursor:pointer">Create one</button>
             </p>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════ UPGRADE / BILLING DIALOG (manual QR payment) ═══════════════════════ -->
+    <div id="upgrade-overlay" onclick="if(event.target===this)closeUpgrade()" style="display:none;position:fixed;inset:0;z-index:2100;background:rgba(10,15,20,.72);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:16px">
+        <div class="glass-card" style="width:100%;max-width:720px;border-radius:20px;padding:26px;max-height:92vh;overflow:auto">
+            <div style="display:flex;justify-content:space-between;align-items:start;gap:12px">
+                <div>
+                    <p id="upgrade-title" style="font-size:19px;font-weight:800;margin:0">Choose your plan</p>
+                    <p id="upgrade-reason" style="font-size:12.5px;color:#7B8794;margin:4px 0 16px">Unlock unlimited optimizations, imports and exports.</p>
+                </div>
+                <button onclick="closeUpgrade()" title="Close" style="background:none;border:none;cursor:pointer;color:#7B8794"><span class="material-symbols-outlined">close</span></button>
+            </div>
+
+            <!-- Step 1: pick plan + months -->
+            <div id="up-step-plan">
+                <div class="up-plans">
+                    <div class="up-plan" data-plan="free">
+                        <h4>Free</h4><div class="amt">RM0</div>
+                        <ul><li>10 optimizations / month</li><li>2 campaigns</li><li>No import / export</li></ul>
+                        <button class="btn btn-outline" disabled style="justify-content:center">Included</button>
+                    </div>
+                    <div class="up-plan" data-plan="pro">
+                        <h4>Pro</h4><div class="amt">RM<span data-price="pro">99</span><span style="font-size:12px;font-weight:500">/mo</span></div>
+                        <ul><li>Unlimited optimizations</li><li>Unlimited campaigns</li><li>Import + export</li></ul>
+                        <button class="btn btn-primary" onclick="choosePlan('pro')" style="justify-content:center">Choose Pro</button>
+                    </div>
+                    <div class="up-plan" data-plan="agency">
+                        <h4>Agency</h4><div class="amt">RM<span data-price="agency">399</span><span style="font-size:12px;font-weight:500">/mo</span></div>
+                        <ul><li>Everything in Pro</li><li>For multi-brand agencies</li><li>Priority support</li></ul>
+                        <button class="btn btn-outline" onclick="choosePlan('agency')" style="justify-content:center">Choose Agency</button>
+                    </div>
+                </div>
+                <p style="font-size:11px;color:#7B8794;margin:14px 0 0;text-align:center">Pay once by QR for 1, 3 or 12 months. No card needed, no auto-renewal.</p>
+            </div>
+
+            <!-- Step 2: scan, pay, submit proof -->
+            <div id="up-step-pay" style="display:none">
+                <div style="display:grid;grid-template-columns:minmax(0,220px) 1fr;gap:20px;align-items:start" class="up-pay-grid">
+                    <div style="text-align:center">
+                        <img id="pay-qr" src="" alt="Payment QR code" style="width:100%;max-width:220px;border-radius:12px;background:#fff;padding:8px" />
+                        <p id="pay-qr-missing" style="display:none;font-size:12px;color:#ef4444">The payment QR is not set up yet. Please contact support.</p>
+                        <p id="pay-payee" style="font-size:12px;color:#7B8794;margin-top:6px"></p>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:10px;font-size:13px">
+                        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+                            <span style="font-weight:700" id="pay-plan-name">Pro</span>
+                            <select id="pay-months" class="form-input" style="width:auto;padding:6px 10px" onchange="renderAmount()">
+                                <option value="1">1 month</option><option value="3">3 months</option><option value="12">12 months</option>
+                            </select>
+                        </div>
+                        <div>Amount to pay: <span id="pay-amount" style="font-size:22px;font-weight:800">RM99</span></div>
+                        <ol style="margin:0;padding-left:18px;color:#7B8794;line-height:1.6">
+                            <li>Scan the QR with DuitNow, Touch 'n Go or your bank app.</li>
+                            <li>Pay the exact amount. Put <b id="pay-email" style="color:inherit"></b> in the transfer note.</li>
+                            <li>Enter the transaction / reference number from your receipt below.</li>
+                        </ol>
+                        <input id="pay-ref" class="form-input" placeholder="Transaction / reference no." style="width:100%" />
+                        <label style="font-size:12px;color:#7B8794">Receipt screenshot (recommended)
+                            <input id="pay-proof" type="file" accept="image/png,image/jpeg,image/webp,image/gif" style="display:block;margin-top:4px;font-size:12px" />
+                        </label>
+                        <p id="pay-error" style="display:none;font-size:12px;color:#ef4444;margin:0"></p>
+                        <div style="display:flex;gap:8px">
+                            <button class="btn btn-outline" onclick="showUpStep('plan')" style="justify-content:center">Back</button>
+                            <button id="pay-submit" class="btn btn-primary" onclick="submitPayment()" style="justify-content:center;flex:1">I've paid, submit for review</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3: waiting for review -->
+            <div id="up-step-pending" style="display:none;text-align:center;padding:10px 0">
+                <span class="material-symbols-outlined" style="font-size:44px;color:#0FB5AE">hourglass_top</span>
+                <p style="font-size:16px;font-weight:800;margin:8px 0 4px">Payment under review</p>
+                <p id="pending-detail" style="font-size:13px;color:#7B8794;margin:0 0 14px"></p>
+                <p style="font-size:12px;color:#7B8794;margin:0 0 14px">Usually confirmed within a few hours. You'll get an email, and your plan switches on automatically.</p>
+                <button class="btn btn-outline" onclick="cancelPayment()" style="justify-content:center">Cancel this request</button>
+            </div>
         </div>
     </div>
 
@@ -410,6 +535,7 @@
                     <a href="#features">Capabilities</a>
                     <a href="#how">How it works</a>
                     <a href="#metrics">Results</a>
+                    <a href="#pricing">Pricing</a>
                     <button class="lp-btn lp-btn-ghost" style="padding:9px 18px;font-size:14px" onclick="enterApp()">Launch Console</button>
                 </div>
             </nav>
@@ -425,7 +551,7 @@
                             <span class="material-symbols-outlined" style="font-size:20px">bolt</span>
                             Start Optimizing Free
                         </button>
-                        <button class="lp-btn lp-btn-ghost" onclick="enterApp()">
+                        <button class="lp-btn lp-btn-ghost" onclick="seeDemo()">
                             <span class="material-symbols-outlined" style="font-size:20px">play_circle</span>
                             See Live Demo
                         </button>
@@ -535,6 +661,49 @@
                 </div>
             </section>
 
+            <!-- Pricing -->
+            <section class="lp-section" id="pricing">
+                <div class="lp-eyebrow lp-reveal">PRICING</div>
+                <h2 class="lp-h2 lp-reveal">Start free. Upgrade when it pays for itself.</h2>
+                <p class="lp-section-sub lp-reveal">One better creator pick usually covers a month. Prices in Malaysian Ringgit; pay by DuitNow / Touch 'n Go QR, no auto-renewal.</p>
+                <div class="lp-pricing">
+                    <div class="lp-price lp-glass lp-reveal">
+                        <h3>Free</h3>
+                        <div class="amt">RM0<small> / month</small></div>
+                        <ul>
+                            <li>10 optimizations per month</li>
+                            <li>All 6 algorithms + 3 risk plans</li>
+                            <li>Curated SEA creator library</li>
+                            <li>Track up to 2 campaigns</li>
+                        </ul>
+                        <button class="lp-btn lp-btn-ghost" onclick="startPlan('free')">Start free</button>
+                    </div>
+                    <div class="lp-price lp-glass featured lp-reveal">
+                        <span class="tag">MOST POPULAR</span>
+                        <h3>Pro</h3>
+                        <div class="amt">RM99<small> / month</small></div>
+                        <ul>
+                            <li>Unlimited optimizations</li>
+                            <li>Unlimited campaigns + self-calibrating predictions</li>
+                            <li>Import your own creators (CSV / Excel / FastMoss)</li>
+                            <li>Export creator lists</li>
+                        </ul>
+                        <button class="lp-btn lp-btn-primary" onclick="startPlan('pro')">Go Pro</button>
+                    </div>
+                    <div class="lp-price lp-glass lp-reveal">
+                        <h3>Agency</h3>
+                        <div class="amt">RM399<small> / month</small></div>
+                        <ul>
+                            <li>Everything in Pro</li>
+                            <li>Built for agencies running many brands</li>
+                            <li>Priority support</li>
+                            <li>Early access to new markets and connectors</li>
+                        </ul>
+                        <button class="lp-btn lp-btn-ghost" onclick="startPlan('agency')">Choose Agency</button>
+                    </div>
+                </div>
+            </section>
+
             <!-- Final CTA -->
             <section class="lp-wrap" style="max-width:1180px">
                 <div class="lp-final lp-glass lp-reveal">
@@ -557,7 +726,8 @@
     </div>
 
     <!-- ═══════════ SIDEBAR ═══════════ -->
-    <aside
+    <div id="sidebar-scrim" onclick="toggleSidebar(false)"></div>
+    <aside id="app-sidebar"
         class="h-screen w-[280px] fixed left-0 top-0 border-r border-outline-variant bg-surface-container flex flex-col py-lg px-md z-50">
         <button id="brand-home" type="button" onclick="backToLanding()" title="Back to home"
             class="flex items-center gap-md mb-xl px-xs w-full text-left group">
@@ -664,6 +834,14 @@
             </div>
         </nav>
         <div class="mt-auto pt-md border-t border-outline-variant/30">
+            <div id="plan-card" class="mx-xs mb-2 p-2 rounded-lg" style="background:rgba(15,181,174,.08);display:none">
+                <div class="flex items-center justify-between">
+                    <span class="text-[12px] font-bold"><span id="plan-name">Free</span> plan</span>
+                    <button id="plan-action" onclick="openUpgrade()" class="text-[11.5px] font-bold" style="color:#0FB5AE;background:none;border:none;cursor:pointer">Upgrade</button>
+                </div>
+                <div id="plan-usage" class="text-[11px] text-on-surface-variant mt-1"></div>
+                <a id="admin-link" href="/admin.html" class="text-[11px] font-bold" style="display:none;color:#0FB5AE">Review payments →</a>
+            </div>
             <div class="flex items-center gap-2 px-xs py-2">
                 <span class="material-symbols-outlined text-[18px] text-on-surface-variant">account_circle</span>
                 <span id="account-email" class="text-[12px] text-on-surface-variant truncate flex-1" title="">—</span>
@@ -679,10 +857,13 @@
     </aside>
 
     <!-- ═══════════ MAIN ═══════════ -->
-    <main class="ml-[280px] h-screen overflow-y-auto bg-background">
+    <main id="app-main" class="ml-[280px] h-screen overflow-y-auto bg-background">
         <header
             class="sticky top-0 z-40 flex justify-between items-center px-margin-desktop h-16 bg-background/80 backdrop-blur-xl border-b border-outline-variant">
-            <h2 id="page-title" class="font-headline-lg text-headline-lg text-on-surface">Optimizer Dashboard</h2>
+            <div class="flex items-center gap-sm min-w-0">
+                <button id="menu-btn" type="button" onclick="toggleSidebar()" aria-label="Open menu"><span class="material-symbols-outlined">menu</span></button>
+                <h2 id="page-title" class="font-headline-lg text-headline-lg text-on-surface">Optimizer Dashboard</h2>
+            </div>
             <div class="flex items-center gap-md">
                 <div id="error-banner"
                     class="hidden bg-error-container text-on-error-container px-md py-sm rounded-lg text-sm font-bold">
@@ -709,6 +890,19 @@
                 <h3 class="font-headline-lg text-headline-lg text-on-surface mb-sm">Ready to Optimize</h3>
                 <p class="text-on-surface-variant max-w-md">Configure your campaign settings on the left, then click
                     <span class="text-primary font-bold">Run Optimization</span> to find the best KOL matrix.</p>
+                <div class="mt-lg w-full max-w-2xl">
+                    <p class="text-[12px] uppercase tracking-wider text-on-surface-variant mb-sm">Or try a quick start</p>
+                    <div class="quick-starts">
+                        <button type="button" onclick="quickStart(['MY'],'beauty',3000)"><b>🇲🇾 Malaysia · Beauty</b><span>$3,000 budget</span></button>
+                        <button type="button" onclick="quickStart(['ID','TH'],'fashion',8000)"><b>🇮🇩🇹🇭 Indonesia + Thailand · Fashion</b><span>$8,000 budget</span></button>
+                        <button type="button" onclick="quickStart(['PH'],'fmcg',1500)"><b>🇵🇭 Philippines · FMCG</b><span>$1,500 budget</span></button>
+                    </div>
+                    <ol class="onboard-steps">
+                        <li><b>1. Pick</b> a budget, markets and a category.</li>
+                        <li><b>2. Run</b> to get your best creator lineup and three risk plans.</li>
+                        <li><b>3. Save</b> it as a campaign, then log real sales to sharpen future predictions.</li>
+                    </ol>
+                </div>
             </div>
 
             <!-- Results -->
@@ -1091,15 +1285,15 @@
                                 <span class="material-symbols-outlined text-[14px]">price_check</span>Backfill Prices
                                 <input type="file" accept=".csv,.xlsx" onchange="backfillCosts(this)" class="hidden" />
                             </label>
-                            <a href="http://localhost:8000/kols/template-excel" class="btn btn-outline flex items-center gap-1 text-[12px] py-1 px-2" title="Download an Excel template with the expected columns">
+                            <a href="/kols/template-excel" class="btn btn-outline flex items-center gap-1 text-[12px] py-1 px-2" title="Download an Excel template with the expected columns">
                                 <span class="material-symbols-outlined text-[14px]">download</span>Excel Template
                             </a>
-                            <a href="http://localhost:8000/kols/template" class="btn btn-outline flex items-center gap-1 text-[12px] py-1 px-2" title="Download a CSV template">
+                            <a href="/kols/template" class="btn btn-outline flex items-center gap-1 text-[12px] py-1 px-2" title="Download a CSV template">
                                 <span class="material-symbols-outlined text-[14px]">download</span>CSV
                             </a>
-                            <a href="http://localhost:8000/kols/export" class="btn btn-outline flex items-center gap-1 text-[12px] py-1 px-2">
+                            <button onclick="exportKols()" class="btn btn-outline flex items-center gap-1 text-[12px] py-1 px-2">
                                 <span class="material-symbols-outlined text-[14px]">file_download</span>Export
-                            </a>
+                            </button>
                             <button onclick="resetDatabase()" class="btn btn-danger flex items-center gap-1 text-[12px] py-1 px-2">
                                 <span class="material-symbols-outlined text-[14px]">restart_alt</span>Reset
                             </button>
@@ -1603,6 +1797,9 @@
                 }
                 return _fetch(url, opts).then(r => {
                     if (r.status === 401 && typeof u === 'string' && !u.includes('/auth/')) handleAuthExpired();
+                    if (r.status === 402) {
+                        r.clone().json().then(d => openUpgrade((d.detail && d.detail.message) || null)).catch(() => openUpgrade());
+                    }
                     return r;
                 });
             };
@@ -1677,6 +1874,7 @@
             document.getElementById('auth-password').value = '';
             document.getElementById('auth-password2').value = '';
             toast(msg);
+            afterSignIn();
         }
         async function authSubmit() {
             const email = document.getElementById('auth-email').value.trim();
@@ -1725,6 +1923,139 @@
             toast('Session expired — please sign in again', 'err');
             showAuth();
         }
+
+        // ══════════ BILLING (MYR plans, usage, manual QR payment) ══════════
+        let BILLING = null;
+        let PLANS_INFO = null;
+        let UP_PLAN = 'pro';
+        let PENDING_PLAN = sessionStorage.getItem('kol_pending_plan');
+        const fmtDate = iso => iso ? new Date(iso).toLocaleDateString('en-MY', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
+        async function loadPlansInfo() {
+            if (PLANS_INFO) return PLANS_INFO;
+            try {
+                const r = await fetch(`${API}/billing/plans`);
+                PLANS_INFO = await r.json();
+                ['pro', 'agency'].forEach(p => document.querySelectorAll(`[data-price="${p}"]`).forEach(el => el.textContent = PLANS_INFO.plans[p].price_myr));
+            } catch (_) {}
+            return PLANS_INFO;
+        }
+        async function loadBilling() {
+            if (!AUTH_TOKEN) return;
+            try {
+                const r = await fetch(`${API}/billing/status`);
+                if (!r.ok) return;
+                BILLING = await r.json();
+                document.getElementById('plan-card').style.display = '';
+                document.getElementById('plan-name').textContent = BILLING.limits.name;
+                const cap = BILLING.limits.optimizations_per_month;
+                let line = cap == null ? 'Unlimited optimizations' : `${BILLING.usage.optimizations} / ${cap} optimizations this month`;
+                if (BILLING.plan_expires_at) line += ` · until ${fmtDate(BILLING.plan_expires_at)}`;
+                if (BILLING.pending_request) line = 'Payment under review';
+                document.getElementById('plan-usage').textContent = line;
+                document.getElementById('plan-action').textContent = BILLING.pending_request ? 'View' : (BILLING.plan === 'free' ? 'Upgrade' : 'Renew');
+                document.getElementById('admin-link').style.display = BILLING.is_admin ? '' : 'none';
+            } catch (_) {}
+        }
+        function showUpStep(step) {
+            ['plan', 'pay', 'pending'].forEach(x => document.getElementById('up-step-' + x).style.display = x === step ? '' : 'none');
+            document.getElementById('upgrade-title').textContent =
+                step === 'pay' ? 'Scan to pay' : step === 'pending' ? 'Thanks!' : 'Choose your plan';
+        }
+        async function openUpgrade(reason) {
+            if (!AUTH_TOKEN) { showAuth('register'); return; }
+            await loadPlansInfo();
+            await loadBilling();
+            let why = reason || 'Unlock unlimited optimizations, imports and exports.';
+            const last = BILLING && BILLING.last_decision;
+            if (!reason && last && last.status === 'rejected') why = `Your last payment (ref ${last.reference}) was not confirmed: ${last.reject_reason}`;
+            document.getElementById('upgrade-reason').textContent = why;
+            const plan = BILLING ? BILLING.plan : 'free';
+            document.querySelectorAll('.up-plan').forEach(el => el.classList.toggle('current', el.dataset.plan === plan));
+            if (BILLING && BILLING.pending_request) {
+                const p = BILLING.pending_request;
+                document.getElementById('pending-detail').textContent =
+                    `${p.plan === 'agency' ? 'Agency' : 'Pro'} × ${p.months} month(s), RM${p.amount_myr}, ref ${p.reference}`;
+                showUpStep('pending');
+            } else showUpStep('plan');
+            document.getElementById('upgrade-overlay').style.display = 'flex';
+        }
+        function closeUpgrade() { document.getElementById('upgrade-overlay').style.display = 'none'; }
+        function renderAmount() {
+            const m = +document.getElementById('pay-months').value;
+            const price = PLANS_INFO ? PLANS_INFO.plans[UP_PLAN].price_myr : (UP_PLAN === 'agency' ? 399 : 99);
+            document.getElementById('pay-amount').textContent = 'RM' + (price * m);
+        }
+        async function choosePlan(plan) {
+            if (!AUTH_TOKEN) { sessionStorage.setItem('kol_pending_plan', plan); PENDING_PLAN = plan; showAuth('register'); return; }
+            UP_PLAN = plan;
+            const info = await loadPlansInfo();
+            document.getElementById('pay-plan-name').textContent = plan === 'agency' ? 'Agency' : 'Pro';
+            document.getElementById('pay-email').textContent = AUTH_EMAIL || 'your account email';
+            const qrOk = info && info.qr_available;
+            document.getElementById('pay-qr').style.display = qrOk ? '' : 'none';
+            document.getElementById('pay-qr-missing').style.display = qrOk ? 'none' : '';
+            if (qrOk) document.getElementById('pay-qr').src = `${API}/billing/qr?t=${Date.now()}`;
+            document.getElementById('pay-payee').textContent = (info && info.payee) || '';
+            document.getElementById('pay-ref').value = '';
+            document.getElementById('pay-proof').value = '';
+            document.getElementById('pay-error').style.display = 'none';
+            renderAmount();
+            showUpStep('pay');
+            document.getElementById('upgrade-overlay').style.display = 'flex';
+        }
+        async function submitPayment() {
+            const err = document.getElementById('pay-error');
+            const ref = document.getElementById('pay-ref').value.trim();
+            if (ref.length < 4) { err.textContent = 'Please enter the transaction / reference number from your receipt.'; err.style.display = 'block'; return; }
+            const form = new FormData();
+            form.append('plan', UP_PLAN);
+            form.append('months', document.getElementById('pay-months').value);
+            form.append('reference', ref);
+            const f = document.getElementById('pay-proof').files[0];
+            if (f) form.append('proof', f);
+            const btn = document.getElementById('pay-submit'); btn.disabled = true;
+            try {
+                const r = await fetch(`${API}/billing/requests`, { method: 'POST', body: form });
+                const d = await r.json();
+                if (!r.ok) { err.textContent = errMsg(d); err.style.display = 'block'; return; }
+                toast('Payment submitted for review');
+                await openUpgrade();
+            } catch (_) { err.textContent = 'Cannot reach the server.'; err.style.display = 'block'; }
+            finally { btn.disabled = false; }
+        }
+        async function cancelPayment() {
+            await fetch(`${API}/billing/requests/pending`, { method: 'DELETE' });
+            await loadBilling();
+            showUpStep('plan');
+        }
+        // Pricing buttons on the landing page.
+        function startPlan(plan) {
+            if (plan === 'free') { enterApp(); return; }
+            if (AUTH_TOKEN) enterApp();
+            choosePlan(plan);
+        }
+        // Runs after sign-in: resume the plan chosen before the account existed.
+        function afterSignIn() {
+            loadBilling();
+            if (sessionStorage.getItem('kol_pending_demo')) {
+                sessionStorage.removeItem('kol_pending_demo');
+                setTimeout(() => quickStart(['MY'], 'beauty', 3000), 700);
+            }
+            if (PENDING_PLAN) {
+                const p = PENDING_PLAN; PENDING_PLAN = null; sessionStorage.removeItem('kol_pending_plan');
+                choosePlan(p);
+            }
+        }
+        async function exportKols() {
+            const r = await fetch(`${API}/kols/export`);
+            if (!r.ok) return;   // 402 opens the upgrade dialog via the fetch wrapper
+            const blob = await r.blob();
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob); a.download = 'kols_export.csv';
+            document.body.appendChild(a); a.click(); a.remove();
+            setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+        }
+        if (AUTH_TOKEN) loadBilling();
 
         // Opened from a password-reset email: go straight to the "choose a new password" form.
         if (RESET_TOKEN) showAuth('reset');
@@ -1786,7 +2117,8 @@
         }
 
         // ══════════ COUNTRY MULTI-SELECT ══════════
-        const COUNTRY_LABELS = { MY:'MY', ID:'ID', TH:'TH', PH:'PH', SG:'SG', VN:'VN' };
+        const COUNTRY_LABELS = { MY:'🇲🇾 Malaysia', ID:'🇮🇩 Indonesia', TH:'🇹🇭 Thailand', PH:'🇵🇭 Philippines', SG:'🇸🇬 Singapore', VN:'🇻🇳 Vietnam' };
+        const COUNTRY_SHORT = { MY:'🇲🇾 MY', ID:'🇮🇩 ID', TH:'🇹🇭 TH', PH:'🇵🇭 PH', SG:'🇸🇬 SG', VN:'🇻🇳 VN' };
 
         function toggleCountryDropdown() {
             const dd = document.getElementById('country-dropdown');
@@ -1815,8 +2147,9 @@
             const selected = [...document.querySelectorAll('.country-cb:checked')].map(cb => cb.value);
             const el = document.getElementById('country-display');
             el.textContent = selected.length === 0 ? '🌏 All Countries'
-                : selected.length <= 3 ? selected.map(c => COUNTRY_LABELS[c]).join(' · ')
-                : selected.slice(0, 2).map(c => COUNTRY_LABELS[c]).join(' · ') + ` +${selected.length - 2}`;
+                : selected.length === 1 ? COUNTRY_LABELS[selected[0]]
+                : selected.length <= 3 ? selected.map(c => COUNTRY_SHORT[c]).join(' · ')
+                : selected.slice(0, 2).map(c => COUNTRY_SHORT[c]).join(' · ') + ` +${selected.length - 2}`;
         }
 
         function getSelectedCountries() {
@@ -1848,7 +2181,31 @@
 
         // ══════════ SIDEBAR ══════════
         const budgetSlider = document.getElementById('budget-slider'), budgetDisplay = document.getElementById('budget-display');
-        budgetSlider.addEventListener('input', () => { const v = parseInt(budgetSlider.value); budgetDisplay.textContent = v >= 1000 ? '$' + (v / 1000).toFixed(0) + 'k' : '$' + v; });
+        budgetSlider.addEventListener('input', () => { budgetDisplay.textContent = '$' + parseInt(budgetSlider.value).toLocaleString('en-US'); });
+
+        function toggleSidebar(open) {
+            const on = open === undefined ? !document.body.classList.contains('sidebar-open') : open;
+            document.body.classList.toggle('sidebar-open', on);
+        }
+        // Close the mobile menu after choosing a page or running.
+        document.querySelectorAll('.nav-item').forEach(el => el.addEventListener('click', () => toggleSidebar(false)));
+        document.getElementById('run-btn').addEventListener('click', () => toggleSidebar(false));
+
+        // Preset a campaign and run it (empty-state quick starts and the landing "See Live Demo").
+        function quickStart(countries, category, budget) {
+            document.querySelectorAll('.country-cb').forEach(cb => { cb.checked = countries.includes(cb.value); });
+            document.getElementById('country-all').checked = countries.length === 0;
+            refreshCountryDisplay();
+            document.getElementById('category-select').value = category;
+            budgetSlider.value = budget;
+            budgetSlider.dispatchEvent(new Event('input'));
+            document.getElementById('run-btn').click();
+        }
+        function seeDemo() {
+            if (!AUTH_TOKEN) { sessionStorage.setItem('kol_pending_demo', '1'); showAuth('register'); return; }
+            enterApp();
+            setTimeout(() => quickStart(['MY'], 'beauty', 3000), 700);
+        }
 
         function showError(msg) { const b = document.getElementById('error-banner'); b.textContent = msg; b.classList.remove('hidden'); setTimeout(() => b.classList.add('hidden'), 5000); }
         function toast(msg, type = 'ok') { const t = document.createElement('div'); t.className = 'toast ' + type; t.textContent = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 3000); }
@@ -2034,14 +2391,16 @@
                     fetch(API + '/optimize', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }),
                     fetch(API + '/optimize-plans', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
                 ]);
-                if (!optRes.ok) { const err = await optRes.json(); throw new Error(err.detail || 'Request failed'); }
+                if (!optRes.ok) { const err = await optRes.json(); throw new Error(errMsg(err)); }
                 const data = await optRes.json();
+                loadBilling();
                 if (plansRes.ok) { const plansData = await plansRes.json(); renderPlans(plansData.plans, data); }
                 else { allPlansData = null; }
                 // Pre-fetch enhanced KOL data for enriched cards
                 try {
                     const firstCountry = (payload.countries && payload.countries.length > 0) ? payload.countries[0] : '';
-                    const kolParams = new URLSearchParams({ limit: 200, country: firstCountry, category: payload.category });
+                    const kolParams = new URLSearchParams({ limit: 200, category: payload.category });
+                    if (firstCountry) kolParams.set('country', firstCountry);
                     const kolRes = await fetch(`${API}/kols?${kolParams}`);
                     if (kolRes.ok) {
                         const kolData = await kolRes.json();
@@ -2497,7 +2856,7 @@
             try {
                 const r = await fetch(`${API}/kols/import`, { method: 'POST', body: form });
                 const d = await r.json();
-                if (!r.ok) { toast((d.detail || 'Import failed'), 'err'); input.value = ''; return; }
+                if (!r.ok) { toast(errMsg(d), 'err'); input.value = ''; return; }
                 let msg = `Imported ${d.added} creators`;
                 const ad = d.applied_defaults || {};
                 if (ad.category || ad.country) msg += ` as ${[ad.category, ad.country].filter(Boolean).join(' / ')}`;
@@ -2514,7 +2873,7 @@
             try {
                 const r = await fetch(`${API}/kols/backfill-costs`, { method: 'POST', body: form });
                 const d = await r.json();
-                if (!r.ok) { toast((d.detail || 'Backfill failed'), 'err'); input.value = ''; return; }
+                if (!r.ok) { toast(errMsg(d), 'err'); input.value = ''; return; }
                 let msg = `Updated ${d.updated} prices`;
                 if (d.unmatched_count) msg += ` · ${d.unmatched_count} unmatched`;
                 if (d.no_price_rows) msg += ` · ${d.no_price_rows} had no price`;
@@ -2561,7 +2920,7 @@
             };
             try {
                 const r = await fetch(`${API}/campaigns`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                if (!r.ok) { const e = await r.json(); throw new Error(e.detail || 'Save failed'); }
+                if (!r.ok) { const e = await r.json(); throw new Error(errMsg(e)); }
                 toast('Campaign saved! View it in the Campaigns tab.');
                 closeSaveCampaignModal();
             } catch (e) { toast(e.message, 'err'); }

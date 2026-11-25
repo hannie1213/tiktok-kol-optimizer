@@ -1,0 +1,42 @@
+# Render Blueprint: New > Blueprint > pick this repo. About US$7.25/month
+# (Starter instance + 1 GB persistent disk for the SQLite database).
+services:
+  - type: web
+    name: kol-optimizer
+    runtime: docker
+    plan: starter
+    region: singapore
+    healthCheckPath: /health
+    autoDeploy: true
+    disk:
+      name: app-data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: DATABASE_PATH
+        value: /var/data/app.db
+      - key: JWT_SECRET
+        generateValue: true
+      - key: PUBLIC_BASE_URL        # e.g. https://kol-optimizer.onrender.com, later your own domain
+        sync: false
+      - key: SMTP_HOST              # e.g. smtp.resend.com
+        sync: false
+      - key: SMTP_PORT
+        value: "587"
+      - key: SMTP_USER              # Resend: the literal word "resend"
+        sync: false
+      - key: SMTP_PASSWORD          # Resend: your API key
+        sync: false
+      - key: SMTP_FROM              # e.g. KOL Optimizer <no-reply@yourdomain.com>
+        sync: false
+      # Manual QR payments (see docs/DEPLOY.md, part five)
+      - key: ADMIN_EMAILS           # your login email(s), comma-separated
+        sync: false
+      - key: PAYMENT_PAYEE          # name shown under the QR, e.g. YUHAN (DuitNow)
+        sync: false
+      - key: PRICE_PRO_MYR
+        value: "99"
+      - key: PRICE_AGENCY_MYR
+        value: "399"
