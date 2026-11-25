@@ -10,6 +10,8 @@
 
 For Southeast-Asia TikTok Shop merchants and agencies who must allocate a marketing budget across hundreds of creators — and **prove the ROI afterwards**. The system filters the creator pool by market and category, compares **six optimization algorithms** to maximize predicted GMV, explains *why* each creator was chosen, and feeds predicted-vs-actual GMV back into the model so every campaign **automatically** sharpens the next. Each merchant works in their own isolated, login-gated tenant.
 
+> **🚀 Deploy:** one-click Render Blueprint (`render.yaml`, Docker, ~US$7/month) — see [`docs/DEPLOY.md`](docs/DEPLOY.md).
+>
 > **▶ Live demo:** `start_server.bat` (Windows) or `uvicorn backend.main:app --reload`, then open **http://localhost:8000/**
 
 ---
