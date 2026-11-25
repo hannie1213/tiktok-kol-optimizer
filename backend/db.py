@@ -343,6 +343,41 @@ _ADDED_COLUMNS = [
 ]
 
 
+class NewsSource(Base):
+    """An RSS/Atom feed the operator follows for the console's industry-news page.
+    Shared by every workspace (not tenant data)."""
+    __tablename__ = "news_sources"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    name: Mapped[str] = mapped_column(String(120))
+    url: Mapped[str] = mapped_column(String(500), unique=True)
+    lang: Mapped[str] = mapped_column(String(8), default="en")
+    enabled: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[str] = mapped_column(String(40), default="")
+    last_fetched: Mapped[str] = mapped_column(String(40), default="")
+    last_error: Mapped[str] = mapped_column(String(300), default="")
+    item_count: Mapped[int] = mapped_column(Integer, default=0)
+
+
+class NewsItem(Base):
+    """One article on the industry-news page: from a feed, or added by the
+    operator from a pasted link (e.g. a WeChat official-account article)."""
+    __tablename__ = "news_items"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    source_id: Mapped[int] = mapped_column(Integer, nullable=True, index=True)
+    source_name: Mapped[str] = mapped_column(String(120), default="")
+    url: Mapped[str] = mapped_column(String(700), unique=True)
+    title: Mapped[str] = mapped_column(String(300))
+    summary: Mapped[str] = mapped_column(Text, default="")
+    image: Mapped[str] = mapped_column(String(700), default="")
+    lang: Mapped[str] = mapped_column(String(8), default="en")
+    published_at: Mapped[str] = mapped_column(String(40), default="", index=True)
+    added_at: Mapped[str] = mapped_column(String(40), default="")
+    pinned: Mapped[bool] = mapped_column(Boolean, default=False)
+    hidden: Mapped[bool] = mapped_column(Boolean, default=False)
+
+
 def _migrate_added_columns():
     from sqlalchemy import inspect, text
     inspector = inspect(engine)

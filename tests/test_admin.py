@@ -256,5 +256,5 @@ def test_user_rows_carry_members_and_last_active():
 
 def test_run_jobs_now_is_audited():
     r = client.post("/admin/jobs/run", headers=H)
-    assert r.status_code == 200 and set(r.json()["result"]) == {"reminders", "orders_expired", "demos_swept"}
+    assert r.status_code == 200 and set(r.json()["result"]) == {"reminders", "orders_expired", "demos_swept", "news_fetched"}
     assert client.get("/admin/audit", headers=H).json()["entries"][0]["action"] == "jobs.run"

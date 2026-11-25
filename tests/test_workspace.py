@@ -303,7 +303,7 @@ def test_old_lapses_are_not_mailed(outbox):
 
 def test_run_once_reports_every_job_and_shows_in_status():
     result = jobs.run_once()
-    assert set(result) == {"reminders", "orders_expired", "demos_swept"}
+    assert set(result) == {"reminders", "orders_expired", "demos_swept", "news_fetched"}
     st = client.get("/admin/status", headers={"X-Admin-Key": KEY}).json()["jobs"]
     assert st["last_run"] and st["last_result"] == result
 

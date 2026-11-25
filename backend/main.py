@@ -68,6 +68,7 @@ from backend.pipeline import router as pipeline_router
 from backend.collab import router as collab_router
 from backend.pool import router as pool_router
 from backend.studio import router as studio_router
+from backend.news import router as news_router, admin_router as news_admin_router
 from backend.aivideo import router as aivideo_router
 from backend import jobs
 
@@ -109,6 +110,8 @@ app.include_router(collab_router)
 app.include_router(pool_router)
 app.include_router(aivideo_router)
 app.include_router(studio_router)
+app.include_router(news_router)
+app.include_router(news_admin_router)
 
 
 @app.exception_handler(StarletteHTTPException)
