@@ -11,7 +11,7 @@ Configuration (env vars)
   SMTP_PORT        Default 587 (STARTTLS); 465 → implicit TLS.
   SMTP_USER        Login (often "apikey"/"resend" or the mailbox address).
   SMTP_PASSWORD    Password or API key.
-  SMTP_FROM        From header, e.g. "tiko <no-reply@yourdomain.com>".
+  SMTP_FROM        From header, e.g. "Lumio <no-reply@yourdomain.com>".
                    Defaults to SMTP_USER.
   SMTP_SECURITY    starttls (default) | ssl | none. Port 465 implies ssl.
   APP_BASE_URL     Public origin used to build links in emails, e.g.
@@ -42,7 +42,7 @@ SMTP_FROM = (os.environ.get("SMTP_FROM") or SMTP_USER).strip()
 SMTP_SECURITY = (os.environ.get("SMTP_SECURITY") or ("ssl" if SMTP_PORT == 465 else "starttls")).strip().lower()
 APP_BASE_URL = (os.environ.get("APP_BASE_URL") or "").strip().rstrip("/")
 
-BRAND = "tiko"
+BRAND = "Lumio"
 
 
 def enabled() -> bool:
@@ -147,7 +147,7 @@ def send_verification(to: str, link: str, lang: str = "en") -> bool:
     if _zh(lang):
         subject = f"请验证你的 {BRAND} 邮箱"
         text, body = _compose(
-            "欢迎使用 tiko，请验证你的邮箱",
+            "欢迎使用 Lumio，请验证你的邮箱",
             ["你的账号已创建。点击下方按钮确认这个邮箱属于你——之后找回密码、接收套餐与付款通知都会发到这里。",
              "链接 48 小时内有效。"],
             "如果这不是你本人注册的，忽略这封邮件即可。",
@@ -155,7 +155,7 @@ def send_verification(to: str, link: str, lang: str = "en") -> bool:
     else:
         subject = f"Verify your {BRAND} email"
         text, body = _compose(
-            "Welcome to tiko — please verify your email",
+            "Welcome to Lumio — please verify your email",
             ["Your account is ready. Confirm that this address is yours — password resets and plan "
              "and payment notices are sent here.",
              "The link is valid for 48 hours."],
@@ -208,14 +208,14 @@ def send_plan_changed(to: str, plan_name: str, link: str = "", lang: str = "en",
         paragraphs = [f"你的账号现在是 {plan_name} 套餐，新的额度已立即生效。"]
         if expires_on:
             paragraphs.append(f"有效期至 {expires_on}。")
-        text, body = _compose("套餐已更新", paragraphs, "感谢使用 tiko。",
+        text, body = _compose("套餐已更新", paragraphs, "感谢使用 Lumio。",
                               ("打开控制台", link) if link else None)
     else:
         subject = f"Your {BRAND} plan is now {plan_name}"
         paragraphs = [f"Your account is now on the {plan_name} plan. The new limits apply immediately."]
         if expires_on:
             paragraphs.append(f"It is active until {expires_on}.")
-        text, body = _compose("Your plan was updated", paragraphs, "Thanks for using tiko.",
+        text, body = _compose("Your plan was updated", paragraphs, "Thanks for using Lumio.",
                               ("Open the console", link) if link else None)
     return send(to, subject, text, body)
 
@@ -253,7 +253,7 @@ def send_plan_expired(to: str, plan_name: str, link: str = "", lang: str = "en")
             f"{plan_name} 套餐已到期",
             ["你的账号已回到免费版。创作者库、活动和校准数据都还在。",
              "随时续费即可恢复原来的额度和团队成员的访问。"],
-            "感谢使用 tiko。", ("续费", link) if link else None)
+            "感谢使用 Lumio。", ("续费", link) if link else None)
     else:
         subject = f"Your {BRAND} {plan_name} plan has ended"
         text, body = _compose(
@@ -261,7 +261,7 @@ def send_plan_expired(to: str, plan_name: str, link: str = "", lang: str = "en")
             ["Your account is back on the Free plan. Your creator library, campaigns and "
              "calibration are all still there.",
              "Renew any time to restore your allowances and your team's access."],
-            "Thanks for using tiko.", ("Renew", link) if link else None)
+            "Thanks for using Lumio.", ("Renew", link) if link else None)
     return send(to, subject, text, body)
 
 

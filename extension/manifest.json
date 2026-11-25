@@ -1,13 +1,13 @@
 {
   "manifest_version": 3,
-  "name": "tiko Creator Capture",
+  "name": "Lumio Creator Capture",
   "version": "1.0.0",
-  "description": "Adds the creator profiles you open to tiko's Explore pool, so your team can find and shortlist them.",
+  "description": "Adds the creator profiles you open to Lumio's Explore pool, so your team can find and shortlist them.",
   "permissions": ["storage"],
   "host_permissions": ["https://www.tiktok.com/*"],
   "optional_host_permissions": ["https://*/*", "http://localhost/*", "http://127.0.0.1/*"],
   "background": { "service_worker": "background.js" },
-  "action": { "default_popup": "popup.html", "default_title": "tiko Creator Capture" },
+  "action": { "default_popup": "popup.html", "default_title": "Lumio Creator Capture" },
   "content_scripts": [
     {
       "matches": ["https://www.tiktok.com/*"],

@@ -361,7 +361,7 @@ def _system_prompt(tenant_id: str) -> str:
     plan = repo.plan_get(tenant_id)
     limits = PLANS.get(plan, PLANS["free"])
     return (
-        "You are tiko's campaign copilot inside a TikTok Shop KOL optimization console. "
+        "You are Lumio's campaign copilot inside a TikTok Shop KOL optimization console. "
         "The merchant assembles creator (KOL) lineups for SEA markets (MY, ID, TH, PH, SG, VN) "
         "across 15 categories (beauty, fashion, accessories, muslim_fashion, home, kitchen, "
         "appliances, electronics, mother_baby, fmcg, health, sports_outdoor, pet, toys, "

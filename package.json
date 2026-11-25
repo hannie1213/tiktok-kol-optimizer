@@ -1,7 +1,7 @@
 {
-  "name": "tiko-kol-optimizer",
+  "name": "lumio-kol-optimizer",
   "version": "1.0.0",
-  "description": "tiko — TikTok Shop KOL Matrix Optimizer",
+  "description": "Lumio — TikTok Shop KOL Matrix Optimizer",
   "private": true,
   "scripts": {
     "build:css": "npx tailwindcss -i ./frontend/src/input.css -o ./frontend/dist/output.css --minify",

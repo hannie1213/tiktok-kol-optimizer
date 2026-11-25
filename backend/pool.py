@@ -117,9 +117,9 @@ def extension_download():
         for name in sorted(os.listdir(_EXT_DIR)):
             path = os.path.join(_EXT_DIR, name)
             if os.path.isfile(path) and not name.startswith("."):
-                z.write(path, "tiko-capture/" + name)
+                z.write(path, "lumio-capture/" + name)
     return Response(buf.getvalue(), media_type="application/zip",
-                    headers={"Content-Disposition": 'attachment; filename="tiko-capture.zip"'})
+                    headers={"Content-Disposition": 'attachment; filename="lumio-capture.zip"'})
 
 
 # ── Capture ───────────────────────────────────────────────────────

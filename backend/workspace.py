@@ -10,7 +10,7 @@ Joining is by invitation only: the owner invites an email address, which
 produces a signed 7-day link (emailed when SMTP is on, and always returned to
 the owner so it can be passed on by hand). The invitee opens it, chooses a
 password, and gets an account inside the owner's workspace. An address that
-already has a tiko account cannot be invited — one account, one workspace.
+already has a Lumio account cannot be invited — one account, one workspace.
 
 If a paid term lapses and the workspace then holds more accounts than its
 plan has seats, members are locked out (backend/auth.py) until the owner
@@ -138,7 +138,7 @@ def invite(req: InviteRequest, request: Request, background: BackgroundTasks,
                     "emailed": False}
     if repo.user_find(email):
         raise HTTPException(status_code=409,
-                            detail="This email already has its own tiko account, so it can't join another workspace.")
+                            detail="This email already has its own Lumio account, so it can't join another workspace.")
     seats = _seats(tenant_id)
     if len(members) + len(invites) >= seats:
         raise HTTPException(status_code=402,
@@ -194,7 +194,7 @@ def accept(req: AcceptRequest, request: Request):
     _check_password_rules(req.password)
     if repo.user_find(inv["email"]):
         raise HTTPException(status_code=409,
-                            detail="This email already has a tiko account — sign in instead.")
+                            detail="This email already has a Lumio account — sign in instead.")
     if not tenancy.tenant_exists(inv["tenant_id"]):
         raise HTTPException(status_code=400, detail="This workspace no longer exists.")
     # The plan may have changed since the invitation was sent.
@@ -240,7 +240,7 @@ def export_workspace(tenant_id: str = Depends(require_owner)):
                                       "status", "reference", "created_at", "decided_at")}
                    for o in repo.orders_for_tenant(tenant_id, limit=500)],
     }
-    name = f"tiko-export-{datetime.now(timezone.utc):%Y%m%d}.json"
+    name = f"lumio-export-{datetime.now(timezone.utc):%Y%m%d}.json"
     return Response(json.dumps(doc, ensure_ascii=False, indent=2, default=str),
                     media_type="application/json",
                     headers={"Content-Disposition": f'attachment; filename="{name}"'})

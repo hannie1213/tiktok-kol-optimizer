@@ -4,15 +4,15 @@
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>tiko — AI KOL Optimizer</title>
-    <meta name="description" content="tiko picks the creator lineup with the highest predicted GMV for your budget, then helps you run the campaign: outreach, contracts, results and AI insights. Built for social-commerce sellers in Southeast Asia." />
+    <title>Lumio — AI KOL Optimizer</title>
+    <meta name="description" content="Lumio picks the creator lineup with the highest predicted GMV for your budget, then helps you run the campaign: outreach, contracts, results and AI insights. Built for social-commerce sellers in Southeast Asia." />
     <meta name="theme-color" content="#08080A" />
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="tiko" />
-    <meta property="og:title" content="tiko — put every dollar behind the creators who actually sell" />
+    <meta property="og:site_name" content="Lumio" />
+    <meta property="og:title" content="Lumio — put every dollar behind the creators who actually sell" />
     <meta property="og:description" content="AI creator selection and campaign management for social-commerce sellers in Southeast Asia. Free to start." />
     <meta name="twitter:card" content="summary" />
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23000000'/><text x='50%25' y='50%25' dominant-baseline='central' text-anchor='middle' font-family='Inter,sans-serif' font-weight='800' font-size='38' fill='%23ffffff'>tiko</text></svg>" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'><defs><linearGradient id='s' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%23FFFFFF'/><stop offset='.45' stop-color='%23BFC3CA'/><stop offset='.7' stop-color='%237E838C'/><stop offset='1' stop-color='%23E6E8EB'/></linearGradient></defs><rect width='40' height='40' rx='10' fill='%230A0A0B'/><circle cx='20' cy='20' r='10' fill='none' stroke='url(%23s)' stroke-width='1.8'/><path d='M27.07 8.6Q27.07 12.93 31.4 12.93Q27.07 12.93 27.07 17.26Q27.07 12.93 22.74 12.93Q27.07 12.93 27.07 8.6Z' fill='%23FFFFFF'/></svg>" />
     <link href="./dist/output.css?v=refine1" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
         rel="stylesheet" />
@@ -70,14 +70,14 @@
         #conv-sa { stroke: var(--good) !important; }
         #conv-hc { stroke: #FB923C !important; }
         #conv-rs { stroke: var(--dim) !important; }
-        #conv-ga { stroke: #A855F7 !important; }
+        #conv-ga { stroke: #BFC3CA !important; }
         #conv-ts { stroke: #06B6D4 !important; }
-        #conv-gr { stroke: #F59E0B !important; }
+        #conv-gr { stroke: #80858E !important; }
         /* View toggle border */
         .view-toggle { border-color: var(--line) !important; }
         .view-toggle button { color: var(--mut) !important; }
         /* Plan card colors */
-        .border-\[\#FE2C55\] { border-color: #FF0050 !important; }
+        .border-\[\#FE2C55\] { border-color: #6E727A !important; }
         /* Technical view utilities not in compiled CSS */
         .min-h-\[96px\] { min-height: 96px; }
         .w-2\.5 { width: 10px; }
@@ -138,15 +138,15 @@
             --c-cyan: var(--accent);
             --c-pink: #FF0050;
             --c-green: var(--good);
-            --c-purple: #A855F7;
+            --c-purple: #BFC3CA;
         }
 
         /* ── Mesh-gradient backdrop on the main canvas (vibrant, low-key) ── */
         main.bg-background {
             background:
                 radial-gradient(900px 600px at 12% -8%, rgba(var(--accent-rgb),.10), transparent 60%),
-                radial-gradient(820px 560px at 105% 4%, rgba(255,0,80,.10), transparent 58%),
-                radial-gradient(760px 700px at 78% 112%, rgba(168,85,247,.09), transparent 60%),
+                radial-gradient(820px 560px at 105% 4%, rgba(160,165,175,.07), transparent 58%),
+                radial-gradient(760px 700px at 78% 112%, rgba(191,195,202,.09), transparent 60%),
                 var(--bg0) !important;
         }
 
@@ -167,7 +167,7 @@
             position: absolute; inset: 0;
             border-radius: inherit;
             padding: 1px;
-            background: linear-gradient(140deg, rgba(var(--accent-rgb),.35), rgba(var(--tint),0) 35%, rgba(255,0,80,.22));
+            background: linear-gradient(140deg, rgba(var(--accent-rgb),.35), rgba(var(--tint),0) 35%, rgba(160,165,175,.22));
             -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
             -webkit-mask-composite: xor; mask-composite: exclude;
             opacity: .5; pointer-events: none;
@@ -195,7 +195,7 @@
         .btn-primary { box-shadow: 0 8px 22px -10px rgba(var(--accent-rgb),.6); }
 
         .primary-gradient {
-            background: linear-gradient(110deg, var(--accent) 0%, var(--good) 45%, #FF0050 100%) !important;
+            background: linear-gradient(110deg, var(--accent) 0%, var(--good) 45%, #9EA3AD 100%) !important;
             background-size: 200% 100% !important;
             transition: transform .4s var(--spring), background-position .6s var(--spring-soft), box-shadow .4s var(--spring-soft) !important;
         }
@@ -255,7 +255,7 @@
             scroll-behavior: smooth;
             --lp-ink: #ece9e2;
             --lp-mut: #8B8B93;
-            --lp-cy: #00F2EA;
+            --lp-cy: #D9DCE1;
             --lp-line: rgba(236,233,226,.14);
             --lp-mono: var(--font-ui);
             --ease-out: cubic-bezier(.16,1,.3,1);
@@ -300,17 +300,17 @@
         /* ── Custom cursor: dot + trailing ring ── */
         #lp-cursor, #lp-cursor-ring { position: fixed; top: 0; left: 0; z-index: 1300; pointer-events: none; border-radius: 50%; opacity: 0; transition: opacity .25s ease; }
         #lp-cursor { width: 8px; height: 8px; background: var(--lp-cy); margin: -4px 0 0 -4px; }
-        #lp-cursor-ring { width: 34px; height: 34px; border: 1px solid rgba(0,242,234,.55); margin: -17px 0 0 -17px; transition: opacity .25s ease, width .3s var(--ease-out), height .3s var(--ease-out), margin .3s var(--ease-out), background .3s ease; }
-        #lp-cursor-ring.big { width: 62px; height: 62px; margin: -31px 0 0 -31px; background: rgba(0,242,234,.08); }
+        #lp-cursor-ring { width: 34px; height: 34px; border: 1px solid rgba(217,220,225,.55); margin: -17px 0 0 -17px; transition: opacity .25s ease, width .3s var(--ease-out), height .3s var(--ease-out), margin .3s var(--ease-out), background .3s ease; }
+        #lp-cursor-ring.big { width: 62px; height: 62px; margin: -31px 0 0 -31px; background: rgba(217,220,225,.08); }
         @media (pointer: coarse) { #lp-cursor, #lp-cursor-ring { display: none; } }
 
         /* ── Aurora drift layer: big soft colour washes so the dark never reads flat ── */
         .lp-aurora { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
         .lp-aurora i { position: absolute; border-radius: 50%; filter: blur(110px); will-change: transform; }
-        .lp-aurora .a1 { width: 62vw; height: 62vw; top: -24vw; left: -14vw; opacity: .34; background: radial-gradient(circle, #00F2EA, transparent 64%); animation: auroraDrift 22s ease-in-out infinite alternate; }
-        .lp-aurora .a2 { width: 56vw; height: 56vw; bottom: -22vw; right: -16vw; opacity: .28; background: radial-gradient(circle, #0e8a6e, transparent 64%); animation: auroraDrift 30s ease-in-out infinite alternate-reverse; }
-        .lp-aurora .a3 { width: 48vw; height: 48vw; top: 30%; left: 54%; opacity: .18; background: radial-gradient(circle, #b89a4a, transparent 64%); animation: auroraDrift 38s ease-in-out infinite alternate; }
-        .lp-aurora .a4 { width: 44vw; height: 44vw; top: 58%; left: -12vw; opacity: .16; background: radial-gradient(circle, #7c5cff, transparent 64%); animation: auroraDrift 34s ease-in-out infinite alternate-reverse; }
+        .lp-aurora .a1 { width: 62vw; height: 62vw; top: -24vw; left: -14vw; opacity: .34; background: radial-gradient(circle, #D9DCE1, transparent 64%); animation: auroraDrift 22s ease-in-out infinite alternate; }
+        .lp-aurora .a2 { width: 56vw; height: 56vw; bottom: -22vw; right: -16vw; opacity: .28; background: radial-gradient(circle, #3A3D44, transparent 64%); animation: auroraDrift 30s ease-in-out infinite alternate-reverse; }
+        .lp-aurora .a3 { width: 48vw; height: 48vw; top: 30%; left: 54%; opacity: .18; background: radial-gradient(circle, #9EA3AD, transparent 64%); animation: auroraDrift 38s ease-in-out infinite alternate; }
+        .lp-aurora .a4 { width: 44vw; height: 44vw; top: 58%; left: -12vw; opacity: .16; background: radial-gradient(circle, #5E626B, transparent 64%); animation: auroraDrift 34s ease-in-out infinite alternate-reverse; }
         @keyframes auroraDrift { from { transform: translate(0,0) scale(1); } to { transform: translate(9vw,7vh) scale(1.18); } }
 
         /* ── Cursor-following soft glow ── */
@@ -387,7 +387,7 @@
         /* Accent words: same typeface, cyan gradient fill — no italics */
         .lp-h1 em, .lp-h2 em, .lp-final h2 em {
             font-style: normal; font-family: inherit; font-weight: inherit; letter-spacing: inherit;
-            background: linear-gradient(100deg, #00F2EA 10%, #6ee9c8 90%);
+            background: linear-gradient(100deg, #D9DCE1 10%, #6ee9c8 90%);
             -webkit-background-clip: text; background-clip: text; color: transparent;
         }
         .lp-hero-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 40px; flex-wrap: wrap; }
@@ -420,7 +420,7 @@
         }
         .lp-btn:hover { transform: translateY(-3px); }
         .lp-btn:active { transform: translateY(0) scale(.97); transition-duration: .1s; }
-        .lp-btn-primary { color: #052e2c; background: var(--lp-cy); box-shadow: 0 14px 38px -14px rgba(0,242,234,.6); }
+        .lp-btn-primary { color: #052e2c; background: var(--lp-cy); box-shadow: 0 14px 38px -14px rgba(217,220,225,.6); }
         .lp-btn-primary:hover { background: var(--lp-ink); color: #0a0b09; box-shadow: 0 22px 50px -16px rgba(236,233,226,.35); }
         .lp-btn-ghost { color: var(--lp-ink); background: transparent; border-color: var(--lp-line); }
         .lp-btn-ghost:hover { border-color: var(--lp-cy); color: var(--lp-cy); }
@@ -445,7 +445,7 @@
         .lp-trust { display: grid; grid-template-columns: repeat(4,1fr); border-top: 1px solid var(--lp-line); }
         .lp-trust .t { padding: 34px 26px 38px; border-bottom: 1px solid var(--lp-line); border-right: 1px solid var(--lp-line); transition: background .35s ease; }
         .lp-trust .t:first-child { border-left: 1px solid var(--lp-line); }
-        .lp-trust .t:hover { background: rgba(0,242,234,.045); }
+        .lp-trust .t:hover { background: rgba(217,220,225,.045); }
         .lp-trust .t .n { font-size: clamp(44px, 5vw, 72px); font-weight: 500; letter-spacing: -.02em; line-height: 1; color: var(--lp-ink); }
         .lp-trust .t:hover .n { color: var(--lp-cy); }
         .lp-trust .t .d { font-family: var(--font-ui); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--lp-mut); margin-top: 14px; line-height: 1.7; }
@@ -457,7 +457,7 @@
             padding: 34px 6px; border-bottom: 1px solid var(--lp-line); position: relative;
             transition: padding-left .45s var(--ease-out), background .35s ease;
         }
-        .lp-row:hover { padding-left: 26px; background: rgba(0,242,234,.04); }
+        .lp-row:hover { padding-left: 26px; background: rgba(217,220,225,.04); }
         .lp-row .idx { font-family: var(--font-ui); font-size: 12px; letter-spacing: .12em; color: var(--lp-mut); transition: color .3s; }
         .lp-row:hover .idx { color: var(--lp-cy); }
         .lp-row h3 { font-size: clamp(20px, 2.3vw, 30px); font-weight: 500; letter-spacing: -.015em; margin: 0; line-height: 1.1; }
@@ -475,7 +475,7 @@
             box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 24px 60px -38px rgba(0,0,0,.8);
             transition: transform .5s var(--ease-out), background .35s ease, border-color .35s ease;
         }
-        .lp-step:hover { transform: translateY(-8px); border-color: rgba(0,242,234,.35); background: linear-gradient(160deg, rgba(0,242,234,.07), rgba(255,255,255,.015)); }
+        .lp-step:hover { transform: translateY(-8px); border-color: rgba(217,220,225,.35); background: linear-gradient(160deg, rgba(217,220,225,.07), rgba(255,255,255,.015)); }
         .lp-step .num { font-size: clamp(64px, 7vw, 110px); font-weight: 500; letter-spacing: -.02em; line-height: 1; color: transparent; -webkit-text-stroke: 1px rgba(236,233,226,.28); margin-bottom: 26px; transition: color .4s ease; }
         .lp-step:hover .num { color: var(--lp-cy); -webkit-text-stroke: 1px transparent; }
         .lp-step h3 { font-size: 19px; font-weight: 600; letter-spacing: -.02em; margin: 0 0 10px; }
@@ -491,8 +491,8 @@
             box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 24px 60px -38px rgba(0,0,0,.8);
             transition: transform .5s var(--ease-out), border-color .35s ease;
         }
-        .lp-plan:hover { transform: translateY(-8px); border-color: rgba(0,242,234,.3); }
-        .lp-plan.hot { border-color: rgba(0,242,234,.4); }
+        .lp-plan:hover { transform: translateY(-8px); border-color: rgba(217,220,225,.3); }
+        .lp-plan.hot { border-color: rgba(217,220,225,.4); }
         .lp-plan .tag { font-family: var(--font-ui); font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--lp-mut); }
         .lp-plan.hot .tag { color: var(--lp-cy); }
         .lp-plan .price { font-size: 52px; font-weight: 500; letter-spacing: -.05em; line-height: 1; }
@@ -545,27 +545,27 @@
         #page-title { font-family: var(--font-ui); letter-spacing: -.02em; }
 
         /* ── AI copilot chat widget ── */
-        #agent-fab { position: fixed; right: 26px; bottom: 26px; z-index: 90; width: 56px; height: 56px; border-radius: 50%; border: none; cursor: pointer; background: linear-gradient(135deg, #00F2EA, #00C853); color: #052e2c; display: flex; align-items: center; justify-content: center; box-shadow: 0 14px 38px -12px rgba(0,242,234,.7); transition: transform .35s var(--spring); }
+        #agent-fab { position: fixed; right: 26px; bottom: 26px; z-index: 90; width: 56px; height: 56px; border-radius: 50%; border: none; cursor: pointer; background: linear-gradient(135deg, #D9DCE1, #EDEEF0); color: #052e2c; display: flex; align-items: center; justify-content: center; box-shadow: 0 14px 38px -12px rgba(217,220,225,.7); transition: transform .35s var(--spring); }
         #agent-fab:hover { transform: translateY(-3px) scale(1.05); }
         #agent-fab .material-symbols-outlined { font-size: 26px; }
         #agent-panel { position: fixed; right: 26px; bottom: 94px; z-index: 95; width: 390px; max-width: calc(100vw - 40px); height: 540px; max-height: 72vh; display: flex; flex-direction: column; border-radius: 18px; overflow: hidden; background: linear-gradient(160deg, rgba(20,20,23,.94), rgba(14,14,17,.92)); border: 1px solid rgba(255,255,255,.1); backdrop-filter: blur(24px) saturate(140%); -webkit-backdrop-filter: blur(24px) saturate(140%); box-shadow: 0 30px 80px -30px rgba(0,0,0,.85); }
         #agent-panel.hidden { display: none; }
         .ag-head { display: flex; align-items: center; gap: 10px; padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,.08); flex-shrink: 0; }
-        .ag-head .dot { width: 8px; height: 8px; border-radius: 50%; background: #00F2EA; box-shadow: 0 0 10px #00F2EA; animation: blink 1.6s ease-in-out infinite; }
+        .ag-head .dot { width: 8px; height: 8px; border-radius: 50%; background: #D9DCE1; box-shadow: 0 0 10px #D9DCE1; animation: blink 1.6s ease-in-out infinite; }
         .ag-head h4 { font-size: 14px; font-weight: 700; color: #ece9e2; flex: 1; margin: 0; }
         .ag-head button { background: none; border: none; color: #8B8B93; cursor: pointer; display: flex; }
         .ag-head button:hover { color: #ece9e2; }
         #ag-body { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
         .ag-msg { max-width: 86%; padding: 10px 13px; border-radius: 14px; font-size: 13px; line-height: 1.55; white-space: pre-wrap; word-break: break-word; }
-        .ag-msg.user { align-self: flex-end; background: #00F2EA; color: #052e2c; border-bottom-right-radius: 4px; font-weight: 500; }
+        .ag-msg.user { align-self: flex-end; background: #D9DCE1; color: #052e2c; border-bottom-right-radius: 4px; font-weight: 500; }
         .ag-msg.bot { align-self: flex-start; background: rgba(255,255,255,.06); color: #e5e2da; border: 1px solid rgba(255,255,255,.07); border-bottom-left-radius: 4px; }
-        .ag-msg .ag-h { color: #00F2EA; font-weight: 700; }
+        .ag-msg .ag-h { color: #D9DCE1; font-weight: 700; }
         .ag-msg .ag-hr { display: block; height: 1px; background: rgba(255,255,255,.14); margin: 5px 0; }
         .ag-tool { align-self: flex-start; font-family: var(--font-ui); font-size: 10.5px; color: #8B8B93; padding: 2px 6px; max-width: 95%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .ag-foot { display: flex; gap: 8px; padding: 12px; border-top: 1px solid rgba(255,255,255,.08); flex-shrink: 0; }
         .ag-foot input { flex: 1; background: rgba(0,0,0,.35); border: 1px solid rgba(255,255,255,.1); border-radius: 10px; color: #ece9e2; font-size: 13px; padding: 10px 12px; outline: none; }
-        .ag-foot input:focus { border-color: #00F2EA; }
-        .ag-foot button { background: #00F2EA; color: #052e2c; border: none; border-radius: 10px; padding: 0 16px; font-weight: 700; font-size: 13px; cursor: pointer; }
+        .ag-foot input:focus { border-color: #D9DCE1; }
+        .ag-foot button { background: #D9DCE1; color: #052e2c; border: none; border-radius: 10px; padding: 0 16px; font-weight: 700; font-size: 13px; cursor: pointer; }
         .ag-foot button:disabled { opacity: .5; cursor: wait; }
 
         /* ── Creator avatars (initials fallback) ── */
@@ -585,7 +585,7 @@
         /* ── Creator wall: virtual example creators ── */
         .lp-cwall { display: grid; grid-template-columns: repeat(6,1fr); gap: 16px; margin-top: 56px; }
         .lp-cwall .cwc { padding: 26px 12px 22px; text-align: center; border-radius: 20px; transition: transform .5s var(--ease-out), border-color .35s ease; }
-        .lp-cwall .cwc:hover { transform: translateY(-8px); border-color: rgba(0,242,234,.35); }
+        .lp-cwall .cwc:hover { transform: translateY(-8px); border-color: rgba(217,220,225,.35); }
         .lp-cwall .lp-ava { margin: 0 auto 14px; }
         .lp-cwall .cwn { font-family: var(--font-ui); font-size: 15.5px; font-weight: 600; letter-spacing: -.01em; color: var(--lp-ink); }
         .lp-cwall .cwh { font-family: var(--font-ui); font-size: 10.5px; letter-spacing: .06em; color: var(--lp-cy); margin-top: 5px; }
@@ -647,7 +647,7 @@
     <style>
         :root {
             
-                        --tk-cy: #25F4EE; --tk-rd: #FE2C55;
+                        --tk-cy: #E6E8EB; --tk-rd: #6E727A;
             --sig: -3px 3px 0 var(--tk-cy), 3px -3px 0 var(--tk-rd);
             /* Calm, decisive motion — no overshoot. */
             --spring: cubic-bezier(.2,.8,.2,1); --spring-soft: cubic-bezier(.2,.8,.2,1); --spring-snappy: cubic-bezier(.2,.8,.2,1);
@@ -866,20 +866,20 @@
             --ink: #ece9e2; --mut: #9A9AA2; --mut-rgb: 154,154,162; --mut2: #8B8B93; --dim: #5C5C64;
             --tint: 255,255,255;
             --hair: rgba(255,255,255,.08); --hair2: rgba(255,255,255,.16);
-            --accent: #00F2EA; --accent-rgb: 0,242,234; --teal: #0FB5AE;
-            --good: #00C853; --good-rgb: 0,200,83;
+            --accent: #D9DCE1; --accent-rgb: 217,220,225; --teal: #BFC3CA;
+            --good: #EDEEF0; --good-rgb: 237,238,240;
             --btn-bg: #EDEDEF; --btn-bg-hover: #ffffff; --btn-fg: #0A0A0B;
-            --card-shadow: inset 0 1px 0 rgba(255,255,255,.035); --gold: #FFC24D; --warn: #fcd34d;
+            --card-shadow: inset 0 1px 0 rgba(255,255,255,.035); --gold: #D9DCE1; --warn: #C7CBD2;
             color-scheme: dark;
         }
         html[data-theme="light"] {
             --bg0: #F4F5F8; --bg1: #FFFFFF; --bg2: #F1F3F6; --bg3: #E9ECF1; --bg4: #DDE1E8;
             --bg0-rgb: 244,245,248; --line: #E2E5EB; --line-rgb: 226,229,235;
-            --ink: #12141A; --mut: #5A6170; --mut-rgb: 90,97,112; --mut2: #6B7280; --dim: #7C8493; --gold: #A9690A; --warn: #9A5B06;
+            --ink: #12141A; --mut: #5A6170; --mut-rgb: 90,97,112; --mut2: #6B7280; --dim: #7C8493; --gold: #4A4E56; --warn: #5A5E66;
             --tint: 18,20,26;
             --hair: rgba(18,20,26,.09); --hair2: rgba(18,20,26,.2);
-            --accent: #0A8F8A; --accent-rgb: 10,143,138; --teal: #0A8F8A;
-            --good: #0A9548; --good-rgb: 10,149,72;
+            --accent: #3A3D44; --accent-rgb: 58,61,68; --teal: #3A3D44;
+            --good: #2A2D33; --good-rgb: 42,45,51;
             --btn-bg: #12141A; --btn-bg-hover: #000000; --btn-fg: #FFFFFF;
             --card-shadow: 0 1px 2px rgba(16,24,40,.05), 0 12px 28px -20px rgba(16,24,40,.22);
             color-scheme: light;
@@ -1032,9 +1032,9 @@
         .sv-scene small { display: block; margin-top: 5px; font-size: 12px; line-height: 1.5; color: var(--mut); }
         @media (max-width: 1180px) { .sv-wrap { grid-template-columns: 1fr; } .sv-stage canvas { margin: 0 auto; } }
         #notice-bar { align-items: center; gap: 10px; padding: 10px 32px; font-size: 13px; color: var(--ink); background: rgba(var(--accent-rgb),.1); border-bottom: 1px solid rgba(var(--accent-rgb),.25); }
-        #notice-bar.warn { background: rgba(245,158,11,.12); border-bottom-color: rgba(245,158,11,.35); }
+        #notice-bar.warn { background: rgba(128,133,142,.12); border-bottom-color: rgba(128,133,142,.35); }
         #notice-bar .material-symbols-outlined { font-size: 18px; color: var(--accent); }
-        #notice-bar.warn .material-symbols-outlined { color: #f59e0b; }
+        #notice-bar.warn .material-symbols-outlined { color: #80858E; }
         #notice-bar button { border: 0; background: transparent; cursor: pointer; display: flex; padding: 2px; }
         #notice-bar button .material-symbols-outlined { color: var(--mut); }
         @media (max-width: 900px) { #notice-bar { padding: 10px 16px; } }
@@ -1070,19 +1070,102 @@
         .st-k { margin: 0; font-size: 14px; font-weight: 700; color: var(--ink); }
         .st-d { margin: 3px 0 0; font-size: 12.5px; color: var(--mut); }
         html[data-theme="light"] main.bg-background {
-            background: radial-gradient(1200px 520px at 20% -260px, rgba(10,143,138,.09), transparent 70%), var(--bg0) !important;
+            background: radial-gradient(1200px 520px at 20% -260px, rgba(58,61,68,.09), transparent 70%), var(--bg0) !important;
         }
         html[data-theme="light"] .text-error, html[data-theme="light"] .hover\:text-error:hover { color: #C92A2A !important; }
         html[data-theme="light"] .kb-card, html[data-theme="light"] .st-select { background-color: var(--bg1); }
         html[data-theme="light"] .kpi-delta.down { color: #C92A2A; }
         html[data-theme="light"] .plan-active-badge, html[data-theme="light"] #algo-status-badge span { color: var(--good) !important; }
         html[data-theme="light"] .plan-toggle-btn:not(.active) { color: var(--mut) !important; }
-        html[data-theme="light"] [style*="f1c40f"], html[data-theme="light"] [style*="F59E0B"], html[data-theme="light"] [style*="f59e0b"] { color: #9A5B06 !important; }
+        html[data-theme="light"] [style*="f1c40f"], html[data-theme="light"] [style*="F59E0B"], html[data-theme="light"] [style*="f59e0b"] { color: #5A5E66 !important; }
         html[data-theme="light"] #algo-status-badge { background: var(--bg1) !important; border-color: var(--hair) !important; }
         /* bright status colours are tuned for black — deepen them on white */
         html[data-theme="light"] :is(.kpi-ico .material-symbols-outlined, .st-chip, .st-select, .nav-count, .pg-head h3 .material-symbols-outlined) { filter: brightness(.72) saturate(1.5); }
         html[data-theme="light"] .modal-overlay { background: rgba(16,20,28,.45); }
-        html[data-theme="light"] ::selection { background: #0A8F8A; color: #fff; }
+        html[data-theme="light"] ::selection { background: #3A3D44; color: #fff; }
+    </style>
+
+    <!-- ═══════════ LUMIO LAYER · black / silver / white, starry sky, living motion ═══════════ -->
+    <style>
+        :root { --lumio-metal: linear-gradient(110deg, #FFFFFF 0%, #C9CDD4 30%, #8E939C 50%, #E9EBEE 70%, #FFFFFF 100%); }
+        .lumio-mark { display: inline-block; flex-shrink: 0; vertical-align: middle; filter: drop-shadow(0 4px 14px rgba(255,255,255,.10)); }
+        .lumio-mark .lumio-star { transform-origin: 27.07px 12.93px; animation: lumioTwinkle 3.6s ease-in-out infinite; }
+        @keyframes lumioTwinkle { 0%,100% { transform: scale(1) rotate(0); opacity: 1; } 50% { transform: scale(.72) rotate(45deg); opacity: .8; } }
+        .wordmark { font-family: var(--font-ui); font-weight: 600; letter-spacing: .32em; text-transform: uppercase;
+            background: var(--lumio-metal); background-size: 220% 100%; -webkit-background-clip: text; background-clip: text;
+            color: transparent !important; -webkit-text-fill-color: transparent; animation: lumioSheen 7s ease-in-out infinite; }
+        html[data-theme="light"] .wordmark { background-image: linear-gradient(110deg, #12141A 0%, #5E626B 40%, #12141A 60%, #3A3D44 100%); }
+        @keyframes lumioSheen { 0%,100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+        .lp-brand { display: inline-flex; align-items: center; gap: 12px; }
+        .lp-brand .wordmark { font-size: 15px; letter-spacing: .34em; }
+        #brand-home { gap: 12px; }
+
+        /* Landing: animated starfield + galaxy band, behind all content */
+        #lp-stars { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+        .lp-galaxy { position: fixed; top: -10vh; left: -20vw; width: 140vw; height: 120vh; z-index: 0; pointer-events: none;
+            background: radial-gradient(ellipse 55% 14% at 50% 50%, rgba(220,224,232,.08), transparent 70%),
+                        radial-gradient(ellipse 30% 7% at 46% 50%, rgba(255,255,255,.05), transparent 70%);
+            transform: rotate(-18deg); filter: blur(8px); animation: galaxyBreath 14s ease-in-out infinite; }
+        @keyframes galaxyBreath { 0%,100% { opacity: .75; } 50% { opacity: 1; } }
+
+        /* Accent words: liquid-silver text with a light sweep instead of the colour offset */
+        .lp-h1 em, .lp-h2 em, .lp-final h2 em, .lp-marquee .track em {
+            text-shadow: none !important; color: transparent !important; -webkit-text-fill-color: transparent;
+            background: linear-gradient(100deg, #8E939C 0%, #F5F6F8 18%, #FFFFFF 24%, #A9AEB6 40%, #E6E8EB 62%, #FFFFFF 70%, #8E939C 100%);
+            background-size: 250% 100%; -webkit-background-clip: text; background-clip: text;
+            animation: lumioFlow 5.5s linear infinite; filter: drop-shadow(0 0 22px rgba(255,255,255,.14));
+        }
+        @keyframes lumioFlow { from { background-position: 125% 0; } to { background-position: -125% 0; } }
+
+        /* Primary actions: metallic face, light sweep on hover, soft halo */
+        .lp-btn-primary, #auth-submit { position: relative; overflow: hidden; isolation: isolate;
+            background: linear-gradient(110deg, #FFFFFF 0%, #D4D7DC 40%, #A9AEB6 72%, #EDEEF0 100%) !important; color: #0A0A0B !important; }
+        .lp-btn-primary::after, #auth-submit::after { content: ""; position: absolute; inset: 0; z-index: -1;
+            background: linear-gradient(115deg, transparent 30%, rgba(255,255,255,.95) 48%, transparent 66%);
+            transform: translateX(-120%); transition: transform .8s cubic-bezier(.2,.8,.2,1); }
+        .lp-btn-primary:hover::after, #auth-submit:hover::after { transform: translateX(120%); }
+        .lp-btn-primary:hover, #auth-submit:hover { box-shadow: 0 0 0 1px rgba(255,255,255,.5), 0 10px 40px -8px rgba(255,255,255,.45) !important; transform: translateY(-2px) !important; }
+        .lp-btn-ghost:hover { box-shadow: 0 0 0 1px rgba(255,255,255,.25), 0 8px 30px -12px rgba(255,255,255,.3); }
+        .lp-nav-cta { transition: box-shadow .3s ease, border-color .3s ease; }
+        .lp-nav-cta:hover { box-shadow: 0 0 24px -6px rgba(255,255,255,.45); }
+
+        /* Kicker dot: a pulsing star */
+        .lp-kicker .dot { background: #FFFFFF !important; box-shadow: 0 0 0 0 rgba(255,255,255,.6), 0 0 14px rgba(255,255,255,.8) !important; animation: starPulse 2.4s ease-out infinite !important; }
+        @keyframes starPulse { 0% { box-shadow: 0 0 0 0 rgba(255,255,255,.55), 0 0 14px rgba(255,255,255,.8); } 70% { box-shadow: 0 0 0 10px rgba(255,255,255,0), 0 0 14px rgba(255,255,255,.8); } 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0), 0 0 14px rgba(255,255,255,.8); } }
+
+        /* Cards: cursor-following silver spotlight + lift */
+        .lp-glass, .lp-plan, .lp-cwall .cwc, .lp-row, .glass-card { --mx: 50%; --my: 0%; }
+        .lp-glass::before, .lp-plan::before, .lp-cwall .cwc::before {
+            content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0; transition: opacity .35s ease;
+            background: radial-gradient(380px circle at var(--mx) var(--my), rgba(255,255,255,.09), transparent 60%);
+        }
+        .lp-glass:hover::before, .lp-plan:hover::before, .lp-cwall .cwc:hover::before { opacity: 1; }
+        .lp-glass, .lp-plan, .lp-cwall .cwc { position: relative; transition: transform .45s var(--spring), border-color .3s ease, box-shadow .45s ease !important; }
+        .lp-plan:hover, .lp-cwall .cwc:hover { box-shadow: 0 24px 60px -30px rgba(255,255,255,.25), inset 0 1px 0 rgba(255,255,255,.08) !important; }
+        .lp-plan.hot::after { background: linear-gradient(90deg, transparent, #FFFFFF, #8E939C, #FFFFFF, transparent) !important; background-size: 200% 100% !important; animation: lumioFlow 3.5s linear infinite; }
+        .lp-plan.hot { box-shadow: 0 0 0 1px rgba(255,255,255,.18), 0 30px 80px -40px rgba(255,255,255,.35) !important; }
+
+        /* Console: faint star dust + brighter hover states so it feels alive */
+        main.bg-background {
+            background:
+                radial-gradient(1px 1px at 23px 41px, rgba(var(--tint),.45), transparent 60%),
+                radial-gradient(1px 1px at 117px 163px, rgba(var(--tint),.28), transparent 60%),
+                radial-gradient(1.4px 1.4px at 181px 77px, rgba(var(--tint),.42), transparent 60%),
+                radial-gradient(1px 1px at 67px 211px, rgba(var(--tint),.25), transparent 60%),
+                radial-gradient(1px 1px at 263px 251px, rgba(var(--tint),.35), transparent 60%),
+                radial-gradient(1px 1px at 301px 139px, rgba(var(--tint),.22), transparent 60%),
+                radial-gradient(1100px 460px at 50% -240px, rgba(var(--tint),.07), transparent 70%), var(--bg0) !important;
+            background-size: 340px 290px, 340px 290px, 340px 290px, 340px 290px, 340px 290px, 340px 290px, auto, auto !important;
+            background-attachment: fixed !important;
+        }
+        html[data-theme="light"] main.bg-background { background: radial-gradient(1100px 460px at 50% -240px, rgba(var(--tint),.05), transparent 70%), var(--bg0) !important; }
+        .glass-card { transition: transform .4s var(--spring), border-color .3s ease, box-shadow .4s ease; }
+        .glass-card:hover { border-color: var(--hair2) !important; }
+        ::selection { background: #E6E8EB; color: #0A0A0B; }
+
+        @media (prefers-reduced-motion: reduce) {
+            .wordmark, .lumio-mark .lumio-star, .lp-h1 em, .lp-h2 em, .lp-final h2 em, .lp-marquee .track em, .lp-galaxy, .lp-plan.hot::after, .lp-kicker .dot { animation: none !important; }
+        }
     </style>
 </head>
 
@@ -1092,10 +1175,8 @@
     <div id="auth-overlay" style="display:none;position:fixed;inset:0;z-index:2000;background:rgba(10,15,20,.72);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:24px">
         <div class="glass-card" style="width:100%;max-width:400px;border-radius:20px;padding:30px">
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
-                <div style="width:34px;height:34px;border-radius:9px;background:#000;display:flex;align-items:center;justify-content:center">
-                    <span style="color:#fff;font-weight:800;font-size:12px;letter-spacing:-.5px">tiko</span>
-                </div>
-                <span style="font-weight:800;font-size:17px;color:var(--on-surface,#1f2933)">KOL Optimizer</span>
+                <svg class="lumio-mark" width="34" height="34" viewBox="0 0 40 40" aria-hidden="true"><defs><linearGradient id="lmD" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".45" stop-color="#BFC3CA"/><stop offset=".7" stop-color="#7E838C"/><stop offset="1" stop-color="#E6E8EB"/></linearGradient></defs><rect width="40" height="40" rx="10" fill="#0A0A0B"/><rect x=".5" y=".5" width="39" height="39" rx="9.5" fill="none" stroke="url(#lmD)" stroke-opacity=".55"/><circle cx="20" cy="20" r="10" fill="none" stroke="url(#lmD)" stroke-width="1.6"/><path class="lumio-star" d="M27.07 8.6Q27.07 12.93 31.4 12.93Q27.07 12.93 27.07 17.26Q27.07 12.93 22.74 12.93Q27.07 12.93 27.07 8.6Z" fill="#FFFFFF"/><circle cx="12.6" cy="27.6" r=".9" fill="#FFFFFF" fill-opacity=".55"/></svg>
+                <span class="wordmark" style="font-size:16px">Lumio</span>
             </div>
             <p id="auth-title" style="font-size:20px;font-weight:800;margin:14px 0 2px">Sign in</p>
             <p id="auth-sub" style="font-size:12.5px;color:#7B8794;margin-bottom:18px" data-i18n="auth.sub">Each merchant gets a private, isolated creator library.</p>
@@ -1107,12 +1188,12 @@
             </div>
             <p id="auth-switch-row" style="font-size:12.5px;color:#7B8794;text-align:center;margin-top:16px">
                 <span id="auth-switch-text">No account yet?</span>
-                <button onclick="authToggleMode()" id="auth-switch-btn" style="color:#0FB5AE;font-weight:700;background:none;border:none;cursor:pointer">Create one</button>
+                <button onclick="authToggleMode()" id="auth-switch-btn" style="color:#BFC3CA;font-weight:700;background:none;border:none;cursor:pointer">Create one</button>
             </p>
             <p id="auth-forgot-row" style="font-size:12px;text-align:center;margin-top:8px">
                 <button onclick="forgotPassword()" style="color:#7B8794;background:none;border:none;cursor:pointer;text-decoration:underline" data-i18n="auth.forgot">Forgot your password?</button>
             </p>
-            <p style="font-size:11px;color:#9AA5B1;text-align:center;margin-top:12px;line-height:1.6" data-i18n-html="auth.legal">By continuing you agree to our <a href="./legal.html#terms" target="_blank" rel="noopener" style="color:#0FB5AE">Terms</a> and <a href="./legal.html#privacy" target="_blank" rel="noopener" style="color:#0FB5AE">Privacy Policy</a>.</p>
+            <p style="font-size:11px;color:#9AA5B1;text-align:center;margin-top:12px;line-height:1.6" data-i18n-html="auth.legal">By continuing you agree to our <a href="./legal.html#terms" target="_blank" rel="noopener" style="color:#BFC3CA">Terms</a> and <a href="./legal.html#privacy" target="_blank" rel="noopener" style="color:#BFC3CA">Privacy Policy</a>.</p>
         </div>
     </div>
 
@@ -1120,11 +1201,13 @@
     <div id="landing-page">
         <!-- Preloader: percentage counter, curtain lift -->
         <div id="lp-preloader" aria-hidden="true">
-            <div class="pl-meta">tiko<sup>™</sup> — <span data-i18n="pl.meta">kol optimizer</span></div>
+            <div class="pl-meta"><span class="wordmark">Lumio</span> — <span data-i18n="pl.meta">kol optimizer</span></div>
             <div class="pl-count"><span id="pl-num">0</span><span class="pct">%</span></div>
         </div>
 
         <!-- Aurora colour washes (behind everything) -->
+        <canvas id="lp-stars" aria-hidden="true"></canvas>
+        <div class="lp-galaxy" aria-hidden="true"></div>
         <div class="lp-aurora" aria-hidden="true"><i class="a1"></i><i class="a2"></i><i class="a3"></i><i class="a4"></i></div>
 
         <!-- Particle point-cloud backdrop (Three.js) -->
@@ -1140,7 +1223,7 @@
 
         <!-- Nav -->
         <nav class="lp-nav">
-            <button class="lp-brand" type="button" onclick="document.getElementById('landing-page').scrollTo({top:0,behavior:'smooth'})">tiko<sup>™</sup></button>
+            <button class="lp-brand" type="button" onclick="document.getElementById('landing-page').scrollTo({top:0,behavior:'smooth'})"><svg class="lumio-mark" width="32" height="32" viewBox="0 0 40 40" aria-hidden="true"><defs><linearGradient id="lmA" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".45" stop-color="#BFC3CA"/><stop offset=".7" stop-color="#7E838C"/><stop offset="1" stop-color="#E6E8EB"/></linearGradient></defs><rect width="40" height="40" rx="10" fill="#0A0A0B"/><rect x=".5" y=".5" width="39" height="39" rx="9.5" fill="none" stroke="url(#lmA)" stroke-opacity=".55"/><circle cx="20" cy="20" r="10" fill="none" stroke="url(#lmA)" stroke-width="1.6"/><path class="lumio-star" d="M27.07 8.6Q27.07 12.93 31.4 12.93Q27.07 12.93 27.07 17.26Q27.07 12.93 22.74 12.93Q27.07 12.93 27.07 8.6Z" fill="#FFFFFF"/><circle cx="12.6" cy="27.6" r=".9" fill="#FFFFFF" fill-opacity=".55"/></svg><span class="wordmark">Lumio</span></button>
             <div class="lp-nav-links">
                 <a href="#features" data-i18n="nav.cap">capabilities</a>
                 <a href="#copilot" data-i18n="nav.copilot">ai copilot</a>
@@ -1162,7 +1245,7 @@
                 <span class="line stag s4" data-i18n="h1.l3">who actually sell</span>
             </h1>
             <div class="lp-hero-row stag s5">
-                <p class="lp-sub" data-i18n="hero.sub">Tell tiko your budget and product — the AI engine picks the highest-GMV creator lineup from thousands of KOLs in seconds, and your built-in AI copilot runs the whole campaign from a chat. Stop guessing, start selling.</p>
+                <p class="lp-sub" data-i18n="hero.sub">Tell Lumio your budget and product — the AI engine picks the highest-GMV creator lineup from thousands of KOLs in seconds, and your built-in AI copilot runs the whole campaign from a chat. Stop guessing, start selling.</p>
                 <div class="lp-cta-row">
                     <button class="lp-btn lp-btn-primary" onclick="enterApp()" data-i18n="cta.start">start optimizing free</button>
                     <button class="lp-btn lp-btn-ghost" onclick="enterDemo(this)" data-i18n="cta.demo">see live demo</button>
@@ -1243,7 +1326,7 @@
                         <button class="lp-btn lp-btn-primary" onclick="enterApp()" data-i18n="cp.cta">chat with your copilot — free</button>
                     </div>
                     <div class="lp-cp-chat lp-glass" aria-hidden="true">
-                        <div class="cp-head"><span class="dot"></span><span data-i18n="cp.title">tiko copilot</span><span class="cp-live" data-i18n="cp.live">live in your console</span></div>
+                        <div class="cp-head"><span class="dot"></span><span data-i18n="cp.title">Lumio copilot</span><span class="cp-live" data-i18n="cp.live">live in your console</span></div>
                         <div class="cp-body">
                             <div class="cp-msg u" data-i18n="cp.u1">I have $3,000 for beauty in Indonesia — who should I book?</div>
                             <div class="cp-tool"><span class="material-symbols-outlined">bolt</span><span data-i18n="cp.t1">run_optimization — budget $3,000 · Indonesia · beauty</span></div>
@@ -1335,7 +1418,7 @@
             <footer class="lp-footer">
                 <div class="lp-foot-grid">
                     <div class="lp-foot-brand">
-                        <button class="lp-brand" type="button" onclick="document.getElementById('landing-page').scrollTo({top:0,behavior:'smooth'})">tiko<sup>™</sup></button>
+                        <button class="lp-brand" type="button" onclick="document.getElementById('landing-page').scrollTo({top:0,behavior:'smooth'})"><svg class="lumio-mark" width="34" height="34" viewBox="0 0 40 40" aria-hidden="true"><defs><linearGradient id="lmB" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".45" stop-color="#BFC3CA"/><stop offset=".7" stop-color="#7E838C"/><stop offset="1" stop-color="#E6E8EB"/></linearGradient></defs><rect width="40" height="40" rx="10" fill="#0A0A0B"/><rect x=".5" y=".5" width="39" height="39" rx="9.5" fill="none" stroke="url(#lmB)" stroke-opacity=".55"/><circle cx="20" cy="20" r="10" fill="none" stroke="url(#lmB)" stroke-width="1.6"/><path class="lumio-star" d="M27.07 8.6Q27.07 12.93 31.4 12.93Q27.07 12.93 27.07 17.26Q27.07 12.93 22.74 12.93Q27.07 12.93 27.07 8.6Z" fill="#FFFFFF"/><circle cx="12.6" cy="27.6" r=".9" fill="#FFFFFF" fill-opacity=".55"/></svg><span class="wordmark">Lumio</span></button>
                         <p data-i18n="footer.tag">AI-powered creator selection for social commerce. Put every dollar behind the creators who actually sell.</p>
                         <button class="lp-foot-cta" type="button" onclick="enterApp()"><span data-i18n="cta.start">start optimizing free</span> <span class="material-symbols-outlined">north_east</span></button>
                     </div>
@@ -1358,8 +1441,8 @@
                     </nav>
                 </div>
                 <div class="lp-foot-bar">
-                    <span data-i18n="footer.r">© 2026 tiko. All rights reserved.</span>
-                    <p class="lp-footer-legal" data-i18n="footer.legal">tiko is an independent analytics tool and is not affiliated with, endorsed by or sponsored by any e-commerce or social platform. All trademarks belong to their respective owners. Predicted GMV and ROI are statistical estimates, not a guarantee of actual sales.</p>
+                    <span data-i18n="footer.r">© 2026 Lumio. All rights reserved.</span>
+                    <p class="lp-footer-legal" data-i18n="footer.legal">Lumio is an independent analytics tool and is not affiliated with, endorsed by or sponsored by any e-commerce or social platform. All trademarks belong to their respective owners. Predicted GMV and ROI are statistical estimates, not a guarantee of actual sales.</p>
                 </div>
             </footer>
         </div>
@@ -1370,13 +1453,10 @@
         class="h-screen w-[280px] fixed left-0 top-0 border-r border-outline-variant bg-surface-container flex flex-col py-lg px-md z-50">
         <button id="brand-home" type="button" onclick="backToLanding()" title="Back to home" data-i18n-title="tt.home"
             class="flex items-center gap-md mb-xl px-xs w-full text-left group">
-            <div class="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
-                style="background:#000000">
-                <span style="color:#ffffff" class="font-extrabold text-[13px] tracking-tighter leading-none">tiko</span>
-            </div>
+            <svg class="lumio-mark" width="36" height="36" viewBox="0 0 40 40" aria-hidden="true"><defs><linearGradient id="lmC" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".45" stop-color="#BFC3CA"/><stop offset=".7" stop-color="#7E838C"/><stop offset="1" stop-color="#E6E8EB"/></linearGradient></defs><rect width="40" height="40" rx="10" fill="#0A0A0B"/><rect x=".5" y=".5" width="39" height="39" rx="9.5" fill="none" stroke="url(#lmC)" stroke-opacity=".55"/><circle cx="20" cy="20" r="10" fill="none" stroke="url(#lmC)" stroke-width="1.6"/><path class="lumio-star" d="M27.07 8.6Q27.07 12.93 31.4 12.93Q27.07 12.93 27.07 17.26Q27.07 12.93 22.74 12.93Q27.07 12.93 27.07 8.6Z" fill="#FFFFFF"/><circle cx="12.6" cy="27.6" r=".9" fill="#FFFFFF" fill-opacity=".55"/></svg>
             <div class="min-w-0">
-                <p class="text-on-surface font-bold text-[15px] leading-none" data-i18n="side.brand">KOL Optimizer</p>
-                <p class="text-on-surface-variant font-label-sm text-label-sm tracking-wider mt-1">Creator Commerce</p>
+                <p class="wordmark text-[15px] leading-none">Lumio</p>
+                <p class="text-on-surface-variant font-label-sm text-label-sm tracking-wider mt-1" data-i18n="side.brand">KOL Optimizer</p>
             </div>
             <span class="material-symbols-outlined text-[18px] text-on-surface-variant ml-auto opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" style="transition:opacity .2s">home</span>
         </button>
@@ -1420,7 +1500,7 @@
                     <span class="material-symbols-outlined text-[18px]">logout</span>
                 </button>
             </div>
-            <p class="text-[10px] text-on-surface-variant/40 font-data-mono tracking-tighter text-center pt-1" data-i18n="side.tag">tiko · AI-powered KOL optimization</p>
+            <p class="text-[10px] text-on-surface-variant/40 font-data-mono tracking-tighter text-center pt-1" data-i18n="side.tag">Lumio · AI-powered KOL optimization</p>
         </div>
     </aside>
 
@@ -1563,7 +1643,7 @@
 
                 <!-- ══ Small-pool warning banner ══ -->
                 <div id="pool-size-warning" class="hidden rounded-xl px-lg py-md text-sm font-medium"
-                     style="background:rgba(255,160,0,0.12);border:1px solid rgba(255,160,0,0.4);color:#FFA000;"></div>
+                     style="background:rgba(199,203,210,0.12);border:1px solid rgba(199,203,210,0.4);color:#C7CBD2;"></div>
 
                 <!-- ══ BUSINESS VIEW (default) ══ -->
                 <div id="biz-view" class="space-y-xl">
@@ -1695,7 +1775,7 @@
                                 </h3>
                                 <div class="flex flex-wrap gap-md">
                                     <span class="flex items-center gap-xs text-[10px] text-on-surface-variant font-bold uppercase">
-                                        <span class="w-2.5 h-2.5 rounded-full inline-block flex-shrink-0" style="background:#A855F7"></span> GA
+                                        <span class="w-2.5 h-2.5 rounded-full inline-block flex-shrink-0" style="background:#BFC3CA"></span> GA
                                         <span id="lv-ga" class="font-data-mono text-on-surface opacity-60 normal-case font-medium"></span>
                                     </span>
                                     <span class="flex items-center gap-xs text-[10px] text-on-surface-variant font-bold uppercase">
@@ -1703,7 +1783,7 @@
                                         <span id="lv-ts" class="font-data-mono text-on-surface opacity-60 normal-case font-medium"></span>
                                     </span>
                                     <span class="flex items-center gap-xs text-[10px] text-on-surface-variant font-bold uppercase">
-                                        <span class="w-2.5 h-2.5 rounded-full inline-block flex-shrink-0" style="background:#F59E0B"></span> Greedy
+                                        <span class="w-2.5 h-2.5 rounded-full inline-block flex-shrink-0" style="background:#80858E"></span> Greedy
                                         <span id="lv-gr" class="font-data-mono text-on-surface opacity-60 normal-case font-medium"></span>
                                     </span>
                                     <span class="flex items-center gap-xs text-[10px] text-on-surface-variant font-bold uppercase">
@@ -1726,10 +1806,10 @@
                                 <g id="conv-ticks"></g>
                                 <path id="conv-rs" fill="none" stroke="#5C5C64" stroke-width="1.5" stroke-dasharray="5 4" />
                                 <path id="conv-hc" fill="none" stroke="#FB923C" stroke-width="2" />
-                                <path id="conv-sa" fill="none" stroke="#00C853" stroke-width="2" />
-                                <path id="conv-gr" fill="none" stroke="#F59E0B" stroke-width="2" stroke-dasharray="3 3" />
+                                <path id="conv-sa" fill="none" stroke="#EDEEF0" stroke-width="2" />
+                                <path id="conv-gr" fill="none" stroke="#80858E" stroke-width="2" stroke-dasharray="3 3" />
                                 <path id="conv-ts" fill="none" stroke="#06B6D4" stroke-width="2.5" />
-                                <path id="conv-ga" fill="none" stroke="#A855F7" stroke-width="3" />
+                                <path id="conv-ga" fill="none" stroke="#BFC3CA" stroke-width="3" />
                             </svg>
                             <!-- X-axis labels — all histories are normalised to 400 points -->
                             <div class="flex justify-between text-[10px] text-on-surface-variant mt-sm opacity-60" style="padding-left:65px;padding-right:12px">
@@ -1769,7 +1849,7 @@
                         <div class="flex items-start justify-between gap-lg">
                             <div class="max-w-xl">
                                 <h3 class="font-title-md text-title-md text-on-surface flex items-center gap-xs">
-                                    <span class="material-symbols-outlined text-[#F59E0B]">query_stats</span>
+                                    <span class="material-symbols-outlined text-[#80858E]">query_stats</span>
                                     <span data-i18n="d.poolSim">Creator Pool Simulator</span>
                                 </h3>
                                 <p class="text-[12px] text-on-surface-variant mt-xs leading-relaxed" data-i18n-html="d.poolSimDesc">
@@ -1905,13 +1985,13 @@
                 </div>
                 <div class="grid grid-cols-4 gap-md">
                     <!-- Manual Import — ACTIVE -->
-                    <div class="glass-card rounded-xl p-md flex flex-col gap-sm" style="border:1px solid rgba(var(--color-primary-rgb,120,184,0),0.35)">
+                    <div class="glass-card rounded-xl p-md flex flex-col gap-sm" style="border:1px solid rgba(var(--color-primary-rgb,237,238,240),0.35)">
                         <div class="flex items-start justify-between">
                             <div class="flex items-center gap-2">
                                 <span class="material-symbols-outlined text-primary text-[20px]">upload_file</span>
                                 <span class="font-label-md text-on-surface text-sm font-semibold" data-i18n="cr.manual">Manual Import</span>
                             </div>
-                            <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full" style="background:rgba(120,184,0,0.15);color:var(--good)" data-i18n="cr.activeBadge">● Active</span>
+                            <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full" style="background:rgba(237,238,240,0.15);color:var(--good)" data-i18n="cr.activeBadge">● Active</span>
                         </div>
                         <p class="text-[11px] text-outline leading-relaxed" data-i18n="cr.manualDesc">Add creators individually or import in bulk from CSV / Excel (FastMoss exports supported). Export your roster anytime.</p>
                         <div class="flex flex-wrap gap-2 mt-auto pt-sm border-t border-outline-variant">
@@ -2490,8 +2570,8 @@
             <div class="glass-card rounded-xl p-6 w-[560px]" style="max-width:calc(100vw - 32px)">
                 <h3 style="margin:0;font-size:18px;font-weight:700;color:var(--ink)" data-i18n="ext.title">Grow the pool with the browser extension</h3>
                 <p style="margin:6px 0 10px;font-size:12.5px;color:var(--mut)" data-i18n="ext.sub">With the extension installed, every creator profile you or your team open is added to the pool automatically. It reads only what the public profile page shows.</p>
-                <div class="ext-step"><i>1</i><div style="flex:1"><b data-i18n="ext.s1">Download and unzip</b><span data-i18n="ext.s1d">A small Chrome / Edge extension.</span><div><button class="btn btn-quiet" style="margin-top:8px" onclick="downloadFile('/extension/download','tiko-capture.zip')"><span class="material-symbols-outlined">download</span><span data-i18n="ext.download">Download extension</span></button></div></div></div>
-                <div class="ext-step"><i>2</i><div><b data-i18n="ext.s2">Load it in your browser</b><span data-i18n-html="ext.s2d">Open <code>chrome://extensions</code>, switch on <b>Developer mode</b>, click <b>Load unpacked</b> and choose the unzipped <code>tiko-capture</code> folder.</span></div></div>
+                <div class="ext-step"><i>1</i><div style="flex:1"><b data-i18n="ext.s1">Download and unzip</b><span data-i18n="ext.s1d">A small Chrome / Edge extension.</span><div><button class="btn btn-quiet" style="margin-top:8px" onclick="downloadFile('/extension/download','lumio-capture.zip')"><span class="material-symbols-outlined">download</span><span data-i18n="ext.download">Download extension</span></button></div></div></div>
+                <div class="ext-step"><i>2</i><div><b data-i18n="ext.s2">Load it in your browser</b><span data-i18n-html="ext.s2d">Open <code>chrome://extensions</code>, switch on <b>Developer mode</b>, click <b>Load unpacked</b> and choose the unzipped <code>lumio-capture</code> folder.</span></div></div>
                 <div class="ext-step"><i>3</i><div style="flex:1"><b data-i18n="ext.s3">Connect it to your account</b><span data-i18n="ext.s3d">Create a connection code, then paste it into the extension's pop-up. The code can only submit creators — it cannot open your workspace.</span>
                     <div><button id="ext-gen" class="btn btn-primary" style="margin-top:8px" onclick="makeExtensionCode()"><span class="material-symbols-outlined">key</span><span data-i18n="ext.gen">Create connection code</span></button></div>
                     <textarea id="ext-code" class="form-input ext-code" rows="4" readonly style="display:none" onclick="this.select()"></textarea></div></div>
@@ -2633,7 +2713,7 @@
             </div>
 
             <!-- Coming Soon banner -->
-            <div class="rounded-xl p-md mb-5 flex items-start gap-3" style="background:rgba(255,180,0,0.08);border:1px solid rgba(255,180,0,0.25)">
+            <div class="rounded-xl p-md mb-5 flex items-start gap-3" style="background:rgba(199,203,210,0.08);border:1px solid rgba(199,203,210,0.25)">
                 <span class="material-symbols-outlined text-[20px] flex-shrink-0" style="color:var(--gold)">construction</span>
                 <div>
                     <p class="text-sm font-semibold" style="color:var(--gold)" data-i18n="api.coming">Coming in a future release</p>
@@ -2968,7 +3048,7 @@
     <div id="agent-panel" class="hidden">
         <div class="ag-head">
             <span class="dot"></span>
-            <h4 data-i18n="ag.title">tiko Copilot</h4>
+            <h4 data-i18n="ag.title">Lumio Copilot</h4>
             <button onclick="agClear()" title="Clear conversation" data-i18n-title="tt.clear"><span class="material-symbols-outlined" style="font-size:18px">mop</span></button>
             <button onclick="agToggle()"><span class="material-symbols-outlined" style="font-size:20px">close</span></button>
         </div>
@@ -3426,8 +3506,8 @@
 
         const TIER_BADGE = { Mega: 'tier-mega', Macro: 'tier-macro', Micro: 'tier-micro', Nano: 'tier-nano' };
         const TIER_EMOJI = { Mega: '🟣', Macro: '🔵', Micro: '🟢', Nano: '🟡' };
-        const ALGO_COLORS = { 'Simulated Annealing': '#00C853', 'Hill Climber': '#FB923C', 'Random Search': '#5C5C64', 'Genetic Algorithm': '#A855F7', 'Tabu Search': '#06B6D4', 'Greedy Ranking': '#F59E0B' };
-        const PLAN_COLORS = { Aggressive: '#FF0050', Balanced: '#00C853', Safe: '#f1c40f' };
+        const ALGO_COLORS = { 'Simulated Annealing': '#EDEEF0', 'Hill Climber': '#FB923C', 'Random Search': '#5C5C64', 'Genetic Algorithm': '#BFC3CA', 'Tabu Search': '#06B6D4', 'Greedy Ranking': '#80858E' };
+        const PLAN_COLORS = { Aggressive: '#FFFFFF', Balanced: '#EDEEF0', Safe: '#C7CBD2' };
         const fmt = n => { if (n == null || isNaN(n)) return '$0'; return '$' + Number(n).toLocaleString('en-US', { maximumFractionDigits: 0 }); };
         const fmtF = n => { if (n == null || isNaN(n)) return '0'; return n >= 1e6 ? (n / 1e6).toFixed(1) + 'M' : n >= 1e3 ? (n / 1e3).toFixed(0) + 'K' : String(n); };
         const formatCampaignCountries = c => {
@@ -3444,14 +3524,14 @@
                 'nav.cap': 'capabilities', 'nav.copilot': 'ai copilot', 'nav.how': 'how it works', 'nav.results': 'results', 'nav.pricing': 'pricing', 'nav.launch': 'launch console',
                 'kicker': 'Social commerce · 6 SEA markets · AI creator-optimization engine',
                 'h1.l1': 'Put every dollar', 'h1.l2': 'behind <em>the creators</em>', 'h1.l3': 'who actually sell',
-                'hero.sub': 'Tell tiko your budget and product — the AI engine picks the highest-GMV creator lineup from thousands of KOLs in seconds, and your built-in AI copilot runs the whole campaign from a chat. Stop guessing, start selling.',
+                'hero.sub': 'Tell Lumio your budget and product — the AI engine picks the highest-GMV creator lineup from thousands of KOLs in seconds, and your built-in AI copilot runs the whole campaign from a chat. Stop guessing, start selling.',
                 'cta.start': 'start optimizing free', 'cta.demo': 'see live demo',
                 'foot.scroll': 'scroll<br>to discover', 'foot.note': 'instant trial<br>© 2026',
                 'chip.gmv': 'avg. gmv lift', 'chip.solve': 'solve time', 'chip.stack': 'mega-stars to micro-kols',
                 'sec1.num': '01 / results', 'sec1.h': 'Numbers that<br><em>do the talking</em>',
                 'trust.d1': 'AI copilot on call for every campaign', 'trust.d2': 'avg. GMV lift vs. manual selection', 'trust.d3': 'SEA markets ready out of the box', 'trust.d4': 'avg. solve time per optimization',
                 'cw.f1': '482K followers', 'cw.f2': '1.2M followers', 'cw.f3': '356K followers', 'cw.f4': '91K followers', 'cw.f5': '28K followers', 'cw.f6': '640K followers',
-                'cw.note': 'Virtual creators for illustration — not real accounts. tiko ranks the creators in your own library with the same engine.',
+                'cw.note': 'Virtual creators for illustration — not real accounts. Lumio ranks the creators in your own library with the same engine.',
                 'sec2.num': '01 / capabilities', 'sec2.h': 'A decision engine<br><em>built to sell</em>',
                 'feat.sub': 'Not just a list of creators — a campaign brain that predicts outcomes, explains its reasoning, and lets you review results anytime.',
                 'f1.h': 'Smart budget allocation', 'f1.p': 'Enter your budget, category and target markets — the algorithm solves for the optimal lineup across thousands of creators, maximizing predicted GMV within your constraints.',
@@ -3466,7 +3546,7 @@
                 'cp.b2': '<b>Knows your creator library</b> — filters, compares and recommends from the KOLs you actually work with.',
                 'cp.b3': '<b>Reviews your campaigns</b> — predicted vs. actual GMV, accuracy, and what to change next time.',
                 'cp.b4': '<b>Speaks 中文 & English</b> — answers in whichever language you write.',
-                'cp.cta': 'chat with your copilot — free', 'cp.title': 'tiko copilot', 'cp.live': 'live in your console',
+                'cp.cta': 'chat with your copilot — free', 'cp.title': 'Lumio copilot', 'cp.live': 'live in your console',
                 'cp.u1': 'I have $3,000 for beauty in Indonesia — who should I book?',
                 'cp.t1': 'run_optimization — budget $3,000 · Indonesia · beauty',
                 'cp.a1': '<b>Done — 7 creators picked.</b><br>Predicted GMV <b>$11,400</b> · ROI <b>3.8×</b><br>Top pick: Aisyah R. — 890K followers, 7.2% engagement.<br>Want the safer or the aggressive variant?',
@@ -3483,8 +3563,8 @@
                 'p3.l1': '✓ <b>Unlimited optimization runs</b>', 'p3.copilot': '✓ <b>Unlimited AI Copilot</b>', 'p3.l2': '✓ 10 team seats', 'p3.l4': '✓ Unlimited creator library', 'p3.l5': '✓ Priority support',
                 'p.start': 'start free', 'p.upgrade': 'upgrade in console',
                 'final.h': 'Hand your next campaign<br><em>to the data</em>', 'final.btn': 'launch console — optimize free',
-                'footer.tag': 'AI-powered creator selection for social commerce. Put every dollar behind the creators who actually sell.', 'footer.h1': 'Product', 'footer.h2': 'Get started', 'footer.h3': 'Legal', 'footer.r': '© 2026 tiko. All rights reserved.',
-                'footer.legal': 'tiko is an independent analytics tool and is not affiliated with, endorsed by or sponsored by any e-commerce or social platform. All trademarks belong to their respective owners. Predicted GMV and ROI are statistical estimates, not a guarantee of actual sales.',
+                'footer.tag': 'AI-powered creator selection for social commerce. Put every dollar behind the creators who actually sell.', 'footer.h1': 'Product', 'footer.h2': 'Get started', 'footer.h3': 'Legal', 'footer.r': '© 2026 Lumio. All rights reserved.',
+                'footer.legal': 'Lumio is an independent analytics tool and is not affiliated with, endorsed by or sponsored by any e-commerce or social platform. All trademarks belong to their respective owners. Predicted GMV and ROI are statistical estimates, not a guarantee of actual sales.',
                 'side.brand': 'KOL Optimizer', 'side.settings': 'Campaign Settings', 'side.budget': 'Marketing Budget', 'side.countries': 'Target Countries', 'side.category': 'Product Category',
                 'c.ALL': '🌏 All Countries', 'c.MY': '🇲🇾 Malaysia', 'c.ID': '🇮🇩 Indonesia', 'c.TH': '🇹🇭 Thailand', 'c.PH': '🇵🇭 Philippines', 'c.SG': '🇸🇬 Singapore', 'c.VN': '🇻🇳 Vietnam',
                 'cat.personal_care': '🧴 Personal Care', 'cat.womenswear': '👚 Womenswear', 'cat.menswear': '👔 Menswear', 'cat.kids_fashion': '🧒 Kids\' Fashion', 'cat.shoes': '👟 Shoes', 'cat.bags': '🎒 Bags & Luggage', 'cat.jewelry': '💍 Jewelry & Watches', 'cat.computers': '💻 Computers & Office', 'cat.furniture': '🛋️ Furniture', 'cat.textiles': '🛏️ Home Textiles', 'cat.tools': '🔧 Tools & Home Improvement', 'cat.food': '🍜 Food & Beverages', 'cat.stationery': '📚 Books & Stationery', 'catg.beauty': 'Beauty & Personal Care', 'catg.fashion': 'Fashion', 'catg.electronics': 'Electronics & Appliances', 'catg.home': 'Home & Living', 'catg.family': 'Baby, Toys & Books', 'catg.food_health': 'Food & Health', 'catg.leisure': 'Sports, Pets & Auto', 'cat.beauty': '💄 Beauty', 'cat.fashion': '👗 Fashion (general)', 'cat.home': '🏠 Home & Living', 'cat.fmcg': '🛒 Household Essentials',
@@ -3494,10 +3574,10 @@
                 'ct.badgeLive': 'LIVE', 'ct.badgeVideo': 'VIDEO', 'ct.badgeBoth': 'LIVE+VID', 'm.ctype': 'Selling Format',
                 'side.run': 'Run Optimization', 'side.adv': 'Advanced Settings', 'side.seed': 'Result Seed', 'side.rand': 'Randomize',
                 'side.seedHelp': 'Fix this number to get identical results across runs. Leave as-is for varied results each time.',
-                'side.g.workspace': 'Workspace', 'side.nav.contracts': 'Contracts', 'side.nav.start': 'Getting started', 'side.nav.templates': 'Templates', 'side.nav.messages': 'Message log', 'side.nav.activity': 'Activity', 'ob.title': 'Getting started', 'ob.sub': 'The path from an empty workspace to your first measured campaign.', 'ob.progress': '{d} of {t} done', 'ob.allDone': 'All set — you have run the full loop.', 'ob.go': 'Go', 'ob.creators': 'Build your creator library', 'ob.creators.d': 'Import a CSV / Excel file or add creators by hand.', 'ob.optimize': 'Run your first optimization', 'ob.optimize.d': 'Set budget, markets and category, then let the engine pick a lineup.', 'ob.campaign': 'Save a campaign', 'ob.campaign.d': 'Saving a lineup starts tracking its creators.', 'ob.outreach': 'Reach out to a creator', 'ob.outreach.d': 'Send an invitation from Collaborations and move them along the pipeline.', 'ob.contract': 'Create a contract', 'ob.contract.d': 'Generate an agreement from a template once terms are agreed.', 'ob.results': 'Record the results', 'ob.results.d': 'Log actual GMV so predictions calibrate to your store.', 'ob.team': 'Invite a teammate', 'ob.team.d': 'Share the workspace — available on Pro and Team plans.', 'tp.title': 'Templates', 'tp.sub': 'Reusable outreach messages and contracts. Variables in {braces} are filled in for each creator.', 'tp.kMessage': 'Messages', 'tp.kContract': 'Contracts', 'tp.new': 'New template', 'tp.name': 'Name', 'tp.body': 'Content', 'tp.vars': 'Insert a variable', 'tp.delete': 'Delete', 'tp.deleteConfirm': 'Delete this template?', 'tp.deleted': 'Deleted', 'tp.untitled': 'Untitled template', 'tp.empty': 'No templates yet — create one.', 'tp.need': 'Give the template a name and some content.', 'ct.title': 'Contracts', 'ct.sub': 'Agreements generated from your templates. Create one from a creator\'s row in Collaborations.', 'ct.empty': 'No contracts yet. Open a creator in Collaborations and choose Contract.', 'ct.th.no': 'No.', 'ct.th.creator': 'Creator', 'ct.th.campaign': 'Campaign', 'ct.th.fee': 'Fee', 'ct.th.status': 'Status', 'ct.th.updated': 'Updated', 'ct.view': 'Open', 'ct.s.draft': 'Draft', 'ct.s.sent': 'Sent', 'ct.s.signed': 'Signed', 'ct.s.cancelled': 'Cancelled', 'ct.new': 'Contract', 'ct.newFor': 'Contract for {n}', 'ct.deliverables': 'Deliverables', 'ct.phDeliverables': 'e.g. 2 short videos (30–60s) + 1 livestream mention', 'ct.start': 'Start date', 'ct.end': 'End date', 'ct.create': 'Create contract', 'ct.created': 'Contract {n} created', 'ct.close': 'Close', 'ct.print': 'Print / PDF', 'ct.deleteConfirm': 'Delete this contract?', 'ct.signedLock': 'Signed contracts are locked.', 'ct.noTemplate': 'Create a contract template first (Workspace → Templates).', 'ml.title': 'Message log', 'ml.sub': 'Every outreach message your team sent from Collaborations — who, when and what.', 'ml.empty': 'No messages logged yet.', 'ml.th.when': 'Sent', 'ml.th.creator': 'Creator', 'ml.th.channel': 'Channel', 'ml.th.message': 'Message', 'ml.th.by': 'By', 'ml.ch.whatsapp': 'WhatsApp', 'ml.ch.email': 'Email', 'ml.ch.copy': 'Copied', 'ac.title': 'Activity', 'ac.sub': 'What everyone in this workspace has done, newest first.', 'ac.empty': 'Nothing has happened yet.', 'act.campaign.save': 'saved campaign', 'act.campaign.results': 'recorded results for', 'act.collab.stage': 'moved', 'act.collab.assign': 'assigned', 'act.message.send': 'messaged', 'act.contract.create': 'created a contract for', 'act.contract.status': 'updated the contract for', 'act.contract.delete': 'deleted the contract for', 'act.team.invite': 'invited', 'act.team.remove': 'removed', 'msg.open': 'Message', 'msg.titleFor': 'Message {n}', 'msg.sub': 'Review the message, then send it from your own WhatsApp or mail app. We log it for your team.', 'msg.template': 'Template', 'msg.body': 'Message', 'msg.copy': 'Copy', 'msg.email': 'Email', 'msg.whatsapp': 'Open WhatsApp', 'msg.logged': 'Logged', 'msg.loggedInvited': 'Logged — creator marked as invited', 'msg.blank': 'Blank message', 'msg.empty': 'Write a message first.', 'pl.assignee': 'Owner', 'pl.unassigned': 'Unassigned', 'pl.mine': 'Mine only ({n})', 'cr.est': 'est.', 'pl.meta': 'kol optimizer', 'mq.1': 'optimize', 'mq.2': 'predict', 'mq.3': 'allocate', 'mq.4': 'review', 'mq.5': 'repeat —', 'tier.Mega': 'Mega', 'tier.Macro': 'Macro', 'tier.Micro': 'Micro', 'tier.Nano': 'Nano', 'tierf.Mega': '🟣 Mega', 'tierf.Macro': '🔵 Macro', 'tierf.Micro': '🟢 Micro', 'tierf.Nano': '🟡 Nano', 'd.cap': '{p}% of budget', 'tt.home': 'Back to home', 'tt.plan': 'View plan & usage', 'tt.logout': 'Log out', 'tt.xlsxTpl': 'Download an Excel template with the expected columns', 'tt.csvTpl': 'Download a CSV template', 'tt.clear': 'Clear conversation', 'tt.view': 'View', 'tt.record': 'Record actual results', 'tt.delete': 'Delete', 'ph.target': 'e.g. 150000', 'ph.creator': 'e.g. Lisa Beauty', 'ph.auto': 'Auto', 'ph.campaign': 'e.g. Beauty MY June 2026', 'ph.actual': 'e.g. 48500', 'ph.notes': 'Campaign observations, context…', 't.accountCreated': 'Account created', 't.signedIn': 'Signed in', 't.sessionExpired': 'Session expired — please sign in again', 't.copilotLimit': 'Copilot limit reached — upgrade to continue', 'side.nav.explore': 'Explore', 'ex.title': 'Explore creators', 'ex.sub': 'A shared pool of creators beyond your own library. Add the ones that fit to your library with one click.', 'ex.extBtn': 'Browser extension', 'ex.poolSize': '{n} creators in the pool', 'ex.fSearch': 'Search name, handle or bio', 'ex.phSearch': 'e.g. skincare, @handle', 'ex.fCountry': 'Country', 'ex.anyCountry': 'Any country', 'ex.fSize': 'Audience size', 'ex.anySize': 'Any size', 'ex.size1': 'Under 10K', 'ex.size2': '10K – 100K', 'ex.size3': '100K – 1M', 'ex.size4': 'Over 1M', 'ex.fSort': 'Sort by', 'ex.sortFollowers': 'Most followers', 'ex.sortRecent': 'Recently seen', 'ex.sortLikes': 'Most likes', 'ex.prev': 'Previous', 'ex.next': 'Next', 'ex.range': 'Showing {a}–{b} of {t}', 'ex.followers': 'followers', 'ex.likes': 'likes', 'ex.videos': 'videos', 'ex.seen': 'Seen {d}', 'ex.add': 'Add to library', 'ex.inLibrary': 'In your library', 'ex.unknownCountry': 'Country unknown', 'ex.emptyTitle': 'No creators match that search yet.', 'ex.emptyBody': 'The pool grows as people capture creators with the browser extension. If your team browses a profile with it installed, it will show up here.', 'ex.emptyPoolTitle': 'The pool is empty so far.', 'ex.addTitle': 'Add {n} to your library', 'ex.addNote': 'The pool only knows public counts. The fee is estimated from audience size and marked as an estimate — replace it with the real quote once you have one.', 'ex.addBtn': 'Add to my library', 'ex.added': '{n} added to your library', 'ext.title': 'Grow the pool with the browser extension', 'ext.sub': 'With the extension installed, every creator profile you or your team open is added to the pool automatically. It reads only what the public profile page shows.', 'ext.s1': 'Download and unzip', 'ext.s1d': 'A small Chrome / Edge extension.', 'ext.download': 'Download extension', 'ext.s2': 'Load it in your browser', 'ext.s2d': 'Open <code>chrome://extensions</code>, switch on <b>Developer mode</b>, click <b>Load unpacked</b> and choose the unzipped <code>tiko-capture</code> folder.', 'ext.s3': 'Connect it to your account', 'ext.s3d': 'Create a connection code, then paste it into the extension\'s pop-up. The code can only submit creators — it cannot open your workspace.', 'ext.gen': 'Create connection code', 'ext.copied': 'Connection code copied — paste it into the extension', 'ext.s4': 'Browse as usual', 'ext.s4d': 'Open creator profiles; they appear here within seconds. Changing your password disconnects the extension.', 'act.creator.explore_add': 'added from Explore', 'sc.tabVideo': 'Sales video', 'sc.tabOps': 'Operations copy', 'sc.tabSaved': 'Saved', 'sc.savedOk': 'Saved', 'sc.savedEmpty': 'Nothing saved yet. Generate something and press Save.', 'sc.t.storyboard': 'Video', 'sc.t.ops': 'Copy', 'sc.t.script': 'Script', 'sc.t.review': 'Review', 'sv.offer': 'Offer (optional)', 'sv.phOffer': 'e.g. RM39, free shipping this week', 'sv.capLang': 'Caption language', 'sv.photos': 'Product photos (optional, up to 8)', 'sv.photosNote': 'Photos stay on this device — they are used to render the video in your browser and are never uploaded.', 'sv.photosN': '{n} photo(s) ready', 'sv.genBtn': 'Generate video', 'sv.busy': 'Planning the video…', 'sv.play': 'Preview', 'sv.export': 'Export video', 'sv.scenes': 'Scenes — edit the captions, then preview again', 'sv.recording': 'Recording… {p}%', 'sv.done': 'Video downloaded', 'sv.noRecorder': 'This browser cannot export video. Try the latest Chrome or Edge.', 'sv.result': 'Sales video', 'sv.voice': 'Voiceover', 'sv.show': 'Show', 'sv.cta': 'Call to action', 'sv.tags': 'Hashtags', 'sv.music': 'Music', 'sv.hint': '{d}s · {n} scenes · 9:16. Add voiceover and music in your editing app after export.', 'op.kind': 'What do you need?', 'op.live_script': 'Livestream run-of-show', 'op.listing': 'Product listing (title + bullets)', 'op.caption': 'Post captions + hashtags', 'op.outreach': 'Creator outreach message', 'op.faq': 'Customer-service Q&A', 'op.calendar': '7-day content plan', 'op.audience': 'Audience', 'op.phAudience': 'e.g. students, new mums', 'op.lang': 'Write in', 'op.btn': 'Write it', 'op.result': 'Operations copy', 'av.tab': 'AI video', 'av.off': 'AI video is not set up on this server yet. The operator needs to add a video-generation API token.', 'av.prompt': 'Describe the shot *', 'av.phPrompt': 'e.g. A glass serum bottle on wet stone, soft morning light, slow push-in, water droplets on the label', 'av.image': 'Product photo (optional)', 'av.imageNote': 'With a photo, the clip animates it and keeps its shape. The photo is sent to the video service to make this clip.', 'av.aspect': 'Shape', 'av.portrait': '9:16 vertical', 'av.square': '1:1 square', 'av.landscape': '16:9 landscape', 'av.btn': 'Generate AI video', 'av.quota': '{u} of {l} AI clips used this month. Clips that fail are not counted.', 'av.result': 'AI video clips', 'av.empty': 'Your AI clips will appear here. Each one takes about one to three minutes.', 'av.s.ready': 'Ready', 'av.s.failed': 'Failed', 'av.s.running': 'Generating…', 'av.withImage': 'from photo', 'av.download': 'Download', 'av.needPrompt': 'Describe the shot first.', 'av.started': 'Started — the clip will appear here in a minute or two', 'av.deleteConfirm': 'Delete this clip?', 'av.fromScene': 'AI-generate this shot', 'av.productIs': 'The product is {p}.', 'av.style': 'Vertical social-commerce product video, clean lighting, smooth camera movement.', 'side.g.account': 'Account', 'side.nav.settings': 'Settings', 'st.title': 'Settings', 'st.sub': 'Appearance, your team, sign-in and your data.', 'st.appearance': 'Appearance', 'st.theme': 'Theme', 'st.themeNote': 'Applies to the console on this device.', 'st.light': 'Light', 'st.dark': 'Dark', 'st.system': 'System', 'st.lang': 'Language', 'st.langNote': 'Emails we send you follow this language too.', 'side.g.overview': 'Overview', 'side.g.talent': 'Creators', 'side.g.campaigns': 'Campaigns', 'side.g.more': 'Resources', 'side.nav.analytics': 'Analytics', 'side.nav.pipeline': 'Collaborations', 'side.nav.scripts': 'AI Studio', 'c.refresh': 'Refresh', 'c.cancel': 'Cancel', 'an.title': 'Analytics', 'an.sub': 'How your campaigns, spend and creator outreach are performing.', 'an.export': 'Export report', 'an.aiTitle': 'AI portfolio insights', 'an.aiSub': 'What is working, where the bottlenecks are, and what to do next — written from the numbers on this page. Uses one copilot message.', 'an.aiBtn': 'Generate AI insights', 'an.aiBusy': 'Analysing…', 'an.trend': 'Predicted vs. actual GMV', 'an.trendSub': 'By the month each campaign was saved, last 6 months.', 'an.predicted': 'Predicted', 'an.actual': 'Actual', 'an.funnel': 'Outreach funnel', 'an.funnelSub': 'Where every creator in your campaigns currently stands.', 'an.top': 'Top creators', 'an.topActual': 'Ranked by actual GMV you recorded.', 'an.topPredicted': 'Ranked by predicted GMV — record campaign results to rank by real sales.', 'an.cats': 'By category', 'an.catsSub': 'Campaigns and GMV per product category.', 'an.k.campaigns': 'Campaigns', 'an.k.campaignsSub': '{a} active · {c} completed', 'an.k.predicted': 'Predicted GMV', 'an.k.predictedSub': 'Predicted ROI {r}', 'an.k.actual': 'Actual GMV', 'an.k.actualSub': 'Actual ROI {r}', 'an.k.accuracy': 'Prediction accuracy', 'an.k.accuracySub': '{n} collaborations · {p} accepted', 'an.k.noData': 'no results recorded yet', 'an.vsLast': 'vs last month', 'an.empty': 'No campaigns yet — run the optimizer and save a campaign to see analytics here.', 'an.noRows': 'Nothing to show yet.', 'an.th.creator': 'Creator', 'an.th.campaigns': 'Campaigns', 'an.th.spend': 'Planned cost', 'an.th.predicted': 'Predicted', 'an.th.actual': 'Actual', 'an.th.category': 'Category', 'pl.title': 'Collaborations', 'pl.sub': 'Every creator in your saved campaigns, from first invitation to payment.', 'pl.list': 'List', 'pl.board': 'Kanban', 'pl.csv': 'Export CSV', 'pl.fStatus': 'Status', 'pl.fCampaign': 'Campaign', 'pl.fSearch': 'Search creator, contact or campaign', 'pl.phSearch': 'Filter…', 'pl.allStatus': 'All statuses', 'pl.allCampaigns': 'All campaigns', 'pl.s.shortlisted': 'Shortlisted', 'pl.s.invited': 'Invited', 'pl.s.negotiating': 'Negotiating', 'pl.s.contracted': 'Contracted', 'pl.s.submitted': 'Content submitted', 'pl.s.live': 'Live', 'pl.s.paid': 'Paid', 'pl.s.declined': 'Declined', 'pl.th.creator': 'Creator', 'pl.th.campaign': 'Campaign', 'pl.th.status': 'Status', 'pl.th.fee': 'Fee', 'pl.th.planned': 'Planned', 'pl.th.contact': 'Contact', 'pl.th.updated': 'Updated', 'pl.empty': 'No collaborations match your filters.', 'pl.emptyAll': 'No collaborations yet — run the optimizer and save a campaign; its creators appear here.', 'pl.showing': 'Showing {n} of {t}', 'pl.details': 'Details', 'pl.fee': 'Agreed fee (USD)', 'pl.contact': 'Contact', 'pl.phContact': 'WhatsApp, email or agency', 'pl.link': 'Content link', 'pl.note': 'Notes', 'pl.save': 'Save', 'pl.saved': 'Saved', 'pl.moved': 'Moved to {s}', 'pl.dragHint': 'Drag a card to another column to change its stage.', 'pl.open': 'Open content', 'stu.title': 'AI Studio', 'sc.sub': 'Sales videos, AI video clips, scripts and everyday operations copy. Text tools use one copilot message per run; AI video has its own monthly allowance.', 'sc.tabGen': 'Script', 'sc.tabChk': 'Check', 'sc.product': 'Product *', 'sc.phProduct': 'e.g. Vitamin C brightening serum 30ml', 'sc.points': 'Selling points', 'sc.phPoints': 'One per line: key ingredient, who it is for, what makes it different, current offer…', 'sc.format': 'Format', 'sc.video': 'Short video', 'sc.live': 'Livestream segment', 'sc.length': 'Length', 'sc.spoken': 'Spoken language', 'sc.tone': 'Tone', 'sc.phTone': 'e.g. playful, honest review', 'sc.genBtn': 'Generate script', 'sc.draft': 'Script to check *', 'sc.phDraft': 'Paste the script the creator plans to film…', 'sc.chkBtn': 'Check script', 'sc.disclaimer': 'Editorial guidance only — not legal advice. Check the platform\'s ad rules for your market.', 'sc.result': 'Result', 'sc.resultScript': 'Script', 'sc.resultReview': 'Review', 'sc.sendCheck': 'Check this script', 'sc.copy': 'Copy', 'sc.empty': 'Your video, script or copy will appear here.', 'sc.busy': 'Writing…', 'sc.needProduct': 'Tell us what the product is.', 'sc.needDraft': 'Paste a script of at least a couple of sentences.', 'side.nav.dashboard': 'Optimizer', 'side.nav.creators': 'Creators', 'side.nav.campaigns': 'Campaigns', 'side.nav.guide': 'Seller Academy', 'side.nav.billing': 'Plan & Billing',
+                'side.g.workspace': 'Workspace', 'side.nav.contracts': 'Contracts', 'side.nav.start': 'Getting started', 'side.nav.templates': 'Templates', 'side.nav.messages': 'Message log', 'side.nav.activity': 'Activity', 'ob.title': 'Getting started', 'ob.sub': 'The path from an empty workspace to your first measured campaign.', 'ob.progress': '{d} of {t} done', 'ob.allDone': 'All set — you have run the full loop.', 'ob.go': 'Go', 'ob.creators': 'Build your creator library', 'ob.creators.d': 'Import a CSV / Excel file or add creators by hand.', 'ob.optimize': 'Run your first optimization', 'ob.optimize.d': 'Set budget, markets and category, then let the engine pick a lineup.', 'ob.campaign': 'Save a campaign', 'ob.campaign.d': 'Saving a lineup starts tracking its creators.', 'ob.outreach': 'Reach out to a creator', 'ob.outreach.d': 'Send an invitation from Collaborations and move them along the pipeline.', 'ob.contract': 'Create a contract', 'ob.contract.d': 'Generate an agreement from a template once terms are agreed.', 'ob.results': 'Record the results', 'ob.results.d': 'Log actual GMV so predictions calibrate to your store.', 'ob.team': 'Invite a teammate', 'ob.team.d': 'Share the workspace — available on Pro and Team plans.', 'tp.title': 'Templates', 'tp.sub': 'Reusable outreach messages and contracts. Variables in {braces} are filled in for each creator.', 'tp.kMessage': 'Messages', 'tp.kContract': 'Contracts', 'tp.new': 'New template', 'tp.name': 'Name', 'tp.body': 'Content', 'tp.vars': 'Insert a variable', 'tp.delete': 'Delete', 'tp.deleteConfirm': 'Delete this template?', 'tp.deleted': 'Deleted', 'tp.untitled': 'Untitled template', 'tp.empty': 'No templates yet — create one.', 'tp.need': 'Give the template a name and some content.', 'ct.title': 'Contracts', 'ct.sub': 'Agreements generated from your templates. Create one from a creator\'s row in Collaborations.', 'ct.empty': 'No contracts yet. Open a creator in Collaborations and choose Contract.', 'ct.th.no': 'No.', 'ct.th.creator': 'Creator', 'ct.th.campaign': 'Campaign', 'ct.th.fee': 'Fee', 'ct.th.status': 'Status', 'ct.th.updated': 'Updated', 'ct.view': 'Open', 'ct.s.draft': 'Draft', 'ct.s.sent': 'Sent', 'ct.s.signed': 'Signed', 'ct.s.cancelled': 'Cancelled', 'ct.new': 'Contract', 'ct.newFor': 'Contract for {n}', 'ct.deliverables': 'Deliverables', 'ct.phDeliverables': 'e.g. 2 short videos (30–60s) + 1 livestream mention', 'ct.start': 'Start date', 'ct.end': 'End date', 'ct.create': 'Create contract', 'ct.created': 'Contract {n} created', 'ct.close': 'Close', 'ct.print': 'Print / PDF', 'ct.deleteConfirm': 'Delete this contract?', 'ct.signedLock': 'Signed contracts are locked.', 'ct.noTemplate': 'Create a contract template first (Workspace → Templates).', 'ml.title': 'Message log', 'ml.sub': 'Every outreach message your team sent from Collaborations — who, when and what.', 'ml.empty': 'No messages logged yet.', 'ml.th.when': 'Sent', 'ml.th.creator': 'Creator', 'ml.th.channel': 'Channel', 'ml.th.message': 'Message', 'ml.th.by': 'By', 'ml.ch.whatsapp': 'WhatsApp', 'ml.ch.email': 'Email', 'ml.ch.copy': 'Copied', 'ac.title': 'Activity', 'ac.sub': 'What everyone in this workspace has done, newest first.', 'ac.empty': 'Nothing has happened yet.', 'act.campaign.save': 'saved campaign', 'act.campaign.results': 'recorded results for', 'act.collab.stage': 'moved', 'act.collab.assign': 'assigned', 'act.message.send': 'messaged', 'act.contract.create': 'created a contract for', 'act.contract.status': 'updated the contract for', 'act.contract.delete': 'deleted the contract for', 'act.team.invite': 'invited', 'act.team.remove': 'removed', 'msg.open': 'Message', 'msg.titleFor': 'Message {n}', 'msg.sub': 'Review the message, then send it from your own WhatsApp or mail app. We log it for your team.', 'msg.template': 'Template', 'msg.body': 'Message', 'msg.copy': 'Copy', 'msg.email': 'Email', 'msg.whatsapp': 'Open WhatsApp', 'msg.logged': 'Logged', 'msg.loggedInvited': 'Logged — creator marked as invited', 'msg.blank': 'Blank message', 'msg.empty': 'Write a message first.', 'pl.assignee': 'Owner', 'pl.unassigned': 'Unassigned', 'pl.mine': 'Mine only ({n})', 'cr.est': 'est.', 'pl.meta': 'kol optimizer', 'mq.1': 'optimize', 'mq.2': 'predict', 'mq.3': 'allocate', 'mq.4': 'review', 'mq.5': 'repeat —', 'tier.Mega': 'Mega', 'tier.Macro': 'Macro', 'tier.Micro': 'Micro', 'tier.Nano': 'Nano', 'tierf.Mega': '🟣 Mega', 'tierf.Macro': '🔵 Macro', 'tierf.Micro': '🟢 Micro', 'tierf.Nano': '🟡 Nano', 'd.cap': '{p}% of budget', 'tt.home': 'Back to home', 'tt.plan': 'View plan & usage', 'tt.logout': 'Log out', 'tt.xlsxTpl': 'Download an Excel template with the expected columns', 'tt.csvTpl': 'Download a CSV template', 'tt.clear': 'Clear conversation', 'tt.view': 'View', 'tt.record': 'Record actual results', 'tt.delete': 'Delete', 'ph.target': 'e.g. 150000', 'ph.creator': 'e.g. Lisa Beauty', 'ph.auto': 'Auto', 'ph.campaign': 'e.g. Beauty MY June 2026', 'ph.actual': 'e.g. 48500', 'ph.notes': 'Campaign observations, context…', 't.accountCreated': 'Account created', 't.signedIn': 'Signed in', 't.sessionExpired': 'Session expired — please sign in again', 't.copilotLimit': 'Copilot limit reached — upgrade to continue', 'side.nav.explore': 'Explore', 'ex.title': 'Explore creators', 'ex.sub': 'A shared pool of creators beyond your own library. Add the ones that fit to your library with one click.', 'ex.extBtn': 'Browser extension', 'ex.poolSize': '{n} creators in the pool', 'ex.fSearch': 'Search name, handle or bio', 'ex.phSearch': 'e.g. skincare, @handle', 'ex.fCountry': 'Country', 'ex.anyCountry': 'Any country', 'ex.fSize': 'Audience size', 'ex.anySize': 'Any size', 'ex.size1': 'Under 10K', 'ex.size2': '10K – 100K', 'ex.size3': '100K – 1M', 'ex.size4': 'Over 1M', 'ex.fSort': 'Sort by', 'ex.sortFollowers': 'Most followers', 'ex.sortRecent': 'Recently seen', 'ex.sortLikes': 'Most likes', 'ex.prev': 'Previous', 'ex.next': 'Next', 'ex.range': 'Showing {a}–{b} of {t}', 'ex.followers': 'followers', 'ex.likes': 'likes', 'ex.videos': 'videos', 'ex.seen': 'Seen {d}', 'ex.add': 'Add to library', 'ex.inLibrary': 'In your library', 'ex.unknownCountry': 'Country unknown', 'ex.emptyTitle': 'No creators match that search yet.', 'ex.emptyBody': 'The pool grows as people capture creators with the browser extension. If your team browses a profile with it installed, it will show up here.', 'ex.emptyPoolTitle': 'The pool is empty so far.', 'ex.addTitle': 'Add {n} to your library', 'ex.addNote': 'The pool only knows public counts. The fee is estimated from audience size and marked as an estimate — replace it with the real quote once you have one.', 'ex.addBtn': 'Add to my library', 'ex.added': '{n} added to your library', 'ext.title': 'Grow the pool with the browser extension', 'ext.sub': 'With the extension installed, every creator profile you or your team open is added to the pool automatically. It reads only what the public profile page shows.', 'ext.s1': 'Download and unzip', 'ext.s1d': 'A small Chrome / Edge extension.', 'ext.download': 'Download extension', 'ext.s2': 'Load it in your browser', 'ext.s2d': 'Open <code>chrome://extensions</code>, switch on <b>Developer mode</b>, click <b>Load unpacked</b> and choose the unzipped <code>lumio-capture</code> folder.', 'ext.s3': 'Connect it to your account', 'ext.s3d': 'Create a connection code, then paste it into the extension\'s pop-up. The code can only submit creators — it cannot open your workspace.', 'ext.gen': 'Create connection code', 'ext.copied': 'Connection code copied — paste it into the extension', 'ext.s4': 'Browse as usual', 'ext.s4d': 'Open creator profiles; they appear here within seconds. Changing your password disconnects the extension.', 'act.creator.explore_add': 'added from Explore', 'sc.tabVideo': 'Sales video', 'sc.tabOps': 'Operations copy', 'sc.tabSaved': 'Saved', 'sc.savedOk': 'Saved', 'sc.savedEmpty': 'Nothing saved yet. Generate something and press Save.', 'sc.t.storyboard': 'Video', 'sc.t.ops': 'Copy', 'sc.t.script': 'Script', 'sc.t.review': 'Review', 'sv.offer': 'Offer (optional)', 'sv.phOffer': 'e.g. RM39, free shipping this week', 'sv.capLang': 'Caption language', 'sv.photos': 'Product photos (optional, up to 8)', 'sv.photosNote': 'Photos stay on this device — they are used to render the video in your browser and are never uploaded.', 'sv.photosN': '{n} photo(s) ready', 'sv.genBtn': 'Generate video', 'sv.busy': 'Planning the video…', 'sv.play': 'Preview', 'sv.export': 'Export video', 'sv.scenes': 'Scenes — edit the captions, then preview again', 'sv.recording': 'Recording… {p}%', 'sv.done': 'Video downloaded', 'sv.noRecorder': 'This browser cannot export video. Try the latest Chrome or Edge.', 'sv.result': 'Sales video', 'sv.voice': 'Voiceover', 'sv.show': 'Show', 'sv.cta': 'Call to action', 'sv.tags': 'Hashtags', 'sv.music': 'Music', 'sv.hint': '{d}s · {n} scenes · 9:16. Add voiceover and music in your editing app after export.', 'op.kind': 'What do you need?', 'op.live_script': 'Livestream run-of-show', 'op.listing': 'Product listing (title + bullets)', 'op.caption': 'Post captions + hashtags', 'op.outreach': 'Creator outreach message', 'op.faq': 'Customer-service Q&A', 'op.calendar': '7-day content plan', 'op.audience': 'Audience', 'op.phAudience': 'e.g. students, new mums', 'op.lang': 'Write in', 'op.btn': 'Write it', 'op.result': 'Operations copy', 'av.tab': 'AI video', 'av.off': 'AI video is not set up on this server yet. The operator needs to add a video-generation API token.', 'av.prompt': 'Describe the shot *', 'av.phPrompt': 'e.g. A glass serum bottle on wet stone, soft morning light, slow push-in, water droplets on the label', 'av.image': 'Product photo (optional)', 'av.imageNote': 'With a photo, the clip animates it and keeps its shape. The photo is sent to the video service to make this clip.', 'av.aspect': 'Shape', 'av.portrait': '9:16 vertical', 'av.square': '1:1 square', 'av.landscape': '16:9 landscape', 'av.btn': 'Generate AI video', 'av.quota': '{u} of {l} AI clips used this month. Clips that fail are not counted.', 'av.result': 'AI video clips', 'av.empty': 'Your AI clips will appear here. Each one takes about one to three minutes.', 'av.s.ready': 'Ready', 'av.s.failed': 'Failed', 'av.s.running': 'Generating…', 'av.withImage': 'from photo', 'av.download': 'Download', 'av.needPrompt': 'Describe the shot first.', 'av.started': 'Started — the clip will appear here in a minute or two', 'av.deleteConfirm': 'Delete this clip?', 'av.fromScene': 'AI-generate this shot', 'av.productIs': 'The product is {p}.', 'av.style': 'Vertical social-commerce product video, clean lighting, smooth camera movement.', 'side.g.account': 'Account', 'side.nav.settings': 'Settings', 'st.title': 'Settings', 'st.sub': 'Appearance, your team, sign-in and your data.', 'st.appearance': 'Appearance', 'st.theme': 'Theme', 'st.themeNote': 'Applies to the console on this device.', 'st.light': 'Light', 'st.dark': 'Dark', 'st.system': 'System', 'st.lang': 'Language', 'st.langNote': 'Emails we send you follow this language too.', 'side.g.overview': 'Overview', 'side.g.talent': 'Creators', 'side.g.campaigns': 'Campaigns', 'side.g.more': 'Resources', 'side.nav.analytics': 'Analytics', 'side.nav.pipeline': 'Collaborations', 'side.nav.scripts': 'AI Studio', 'c.refresh': 'Refresh', 'c.cancel': 'Cancel', 'an.title': 'Analytics', 'an.sub': 'How your campaigns, spend and creator outreach are performing.', 'an.export': 'Export report', 'an.aiTitle': 'AI portfolio insights', 'an.aiSub': 'What is working, where the bottlenecks are, and what to do next — written from the numbers on this page. Uses one copilot message.', 'an.aiBtn': 'Generate AI insights', 'an.aiBusy': 'Analysing…', 'an.trend': 'Predicted vs. actual GMV', 'an.trendSub': 'By the month each campaign was saved, last 6 months.', 'an.predicted': 'Predicted', 'an.actual': 'Actual', 'an.funnel': 'Outreach funnel', 'an.funnelSub': 'Where every creator in your campaigns currently stands.', 'an.top': 'Top creators', 'an.topActual': 'Ranked by actual GMV you recorded.', 'an.topPredicted': 'Ranked by predicted GMV — record campaign results to rank by real sales.', 'an.cats': 'By category', 'an.catsSub': 'Campaigns and GMV per product category.', 'an.k.campaigns': 'Campaigns', 'an.k.campaignsSub': '{a} active · {c} completed', 'an.k.predicted': 'Predicted GMV', 'an.k.predictedSub': 'Predicted ROI {r}', 'an.k.actual': 'Actual GMV', 'an.k.actualSub': 'Actual ROI {r}', 'an.k.accuracy': 'Prediction accuracy', 'an.k.accuracySub': '{n} collaborations · {p} accepted', 'an.k.noData': 'no results recorded yet', 'an.vsLast': 'vs last month', 'an.empty': 'No campaigns yet — run the optimizer and save a campaign to see analytics here.', 'an.noRows': 'Nothing to show yet.', 'an.th.creator': 'Creator', 'an.th.campaigns': 'Campaigns', 'an.th.spend': 'Planned cost', 'an.th.predicted': 'Predicted', 'an.th.actual': 'Actual', 'an.th.category': 'Category', 'pl.title': 'Collaborations', 'pl.sub': 'Every creator in your saved campaigns, from first invitation to payment.', 'pl.list': 'List', 'pl.board': 'Kanban', 'pl.csv': 'Export CSV', 'pl.fStatus': 'Status', 'pl.fCampaign': 'Campaign', 'pl.fSearch': 'Search creator, contact or campaign', 'pl.phSearch': 'Filter…', 'pl.allStatus': 'All statuses', 'pl.allCampaigns': 'All campaigns', 'pl.s.shortlisted': 'Shortlisted', 'pl.s.invited': 'Invited', 'pl.s.negotiating': 'Negotiating', 'pl.s.contracted': 'Contracted', 'pl.s.submitted': 'Content submitted', 'pl.s.live': 'Live', 'pl.s.paid': 'Paid', 'pl.s.declined': 'Declined', 'pl.th.creator': 'Creator', 'pl.th.campaign': 'Campaign', 'pl.th.status': 'Status', 'pl.th.fee': 'Fee', 'pl.th.planned': 'Planned', 'pl.th.contact': 'Contact', 'pl.th.updated': 'Updated', 'pl.empty': 'No collaborations match your filters.', 'pl.emptyAll': 'No collaborations yet — run the optimizer and save a campaign; its creators appear here.', 'pl.showing': 'Showing {n} of {t}', 'pl.details': 'Details', 'pl.fee': 'Agreed fee (USD)', 'pl.contact': 'Contact', 'pl.phContact': 'WhatsApp, email or agency', 'pl.link': 'Content link', 'pl.note': 'Notes', 'pl.save': 'Save', 'pl.saved': 'Saved', 'pl.moved': 'Moved to {s}', 'pl.dragHint': 'Drag a card to another column to change its stage.', 'pl.open': 'Open content', 'stu.title': 'AI Studio', 'sc.sub': 'Sales videos, AI video clips, scripts and everyday operations copy. Text tools use one copilot message per run; AI video has its own monthly allowance.', 'sc.tabGen': 'Script', 'sc.tabChk': 'Check', 'sc.product': 'Product *', 'sc.phProduct': 'e.g. Vitamin C brightening serum 30ml', 'sc.points': 'Selling points', 'sc.phPoints': 'One per line: key ingredient, who it is for, what makes it different, current offer…', 'sc.format': 'Format', 'sc.video': 'Short video', 'sc.live': 'Livestream segment', 'sc.length': 'Length', 'sc.spoken': 'Spoken language', 'sc.tone': 'Tone', 'sc.phTone': 'e.g. playful, honest review', 'sc.genBtn': 'Generate script', 'sc.draft': 'Script to check *', 'sc.phDraft': 'Paste the script the creator plans to film…', 'sc.chkBtn': 'Check script', 'sc.disclaimer': 'Editorial guidance only — not legal advice. Check the platform\'s ad rules for your market.', 'sc.result': 'Result', 'sc.resultScript': 'Script', 'sc.resultReview': 'Review', 'sc.sendCheck': 'Check this script', 'sc.copy': 'Copy', 'sc.empty': 'Your video, script or copy will appear here.', 'sc.busy': 'Writing…', 'sc.needProduct': 'Tell us what the product is.', 'sc.needDraft': 'Paste a script of at least a couple of sentences.', 'side.nav.dashboard': 'Optimizer', 'side.nav.creators': 'Creators', 'side.nav.campaigns': 'Campaigns', 'side.nav.guide': 'Seller Academy', 'side.nav.billing': 'Plan & Billing',
                 'g.heroH': 'From store setup to breakout sales — the official playbooks, distilled',
                 'g.heroP': 'Store setup, product selection, market insights, mega-sale tactics and real merchant case studies — distilled from official platform guidance for SEA sellers. The AI copilot (bottom-right) knows this entire library, so you can also just ask it.',
-                'side.tag': 'tiko · AI-powered KOL optimization',
+                'side.tag': 'Lumio · AI-powered KOL optimization',
                 'view.biz': 'Business', 'view.tech': 'Technical',
                 'empty.h': 'Ready to Optimize', 'empty.p': 'Set your budget, markets and category above, then click <span class="text-primary font-bold">Run Optimization</span> to find the best KOL matrix.',
                 'auth.sub': 'Each merchant gets a private, isolated creator library.',
@@ -3511,14 +3591,14 @@
                 'nav.cap': '功能', 'nav.copilot': 'AI 助手', 'nav.how': '工作原理', 'nav.results': '成效', 'nav.pricing': '价格', 'nav.launch': '进入控制台',
                 'kicker': '社交电商 · 东南亚 6 大市场 · AI 达人优化引擎',
                 'h1.l1': '把每一分预算', 'h1.l2': '都投给<em>真正能卖货</em>', 'h1.l3': '的达人',
-                'hero.sub': '告诉 tiko 你的预算和商品——AI 引擎数秒内从数千位达人中选出 GMV 最高的达人阵容，内置 AI 投放助手，聊着天就能跑完整场投放。别再靠猜，开始卖货。',
+                'hero.sub': '告诉 Lumio 你的预算和商品——AI 引擎数秒内从数千位达人中选出 GMV 最高的达人阵容，内置 AI 投放助手，聊着天就能跑完整场投放。别再靠猜，开始卖货。',
                 'cta.start': '免费开始优化', 'cta.demo': '查看在线演示',
                 'foot.scroll': '向下滚动<br>探索更多', 'foot.note': '即刻试用<br>© 2026',
                 'chip.gmv': '平均 GMV 提升', 'chip.solve': '求解耗时', 'chip.stack': '头部到腰部达人 · 一网打尽',
                 'sec1.num': '01 / 成效', 'sec1.h': '数字<br><em>自己会说话</em>',
                 'trust.d1': 'AI 投放助手全天候待命', 'trust.d2': '对比人工选择的平均 GMV 提升', 'trust.d3': '个东南亚市场开箱即用', 'trust.d4': '单次优化平均求解时间',
                 'cw.f1': '粉丝 48.2 万', 'cw.f2': '粉丝 120 万', 'cw.f3': '粉丝 35.6 万', 'cw.f4': '粉丝 9.1 万', 'cw.f5': '粉丝 2.8 万', 'cw.f6': '粉丝 64 万',
-                'cw.note': '以上为虚拟达人示例，并非真实账号——tiko 用同一套引擎为你达人库中的每位达人排序打分。',
+                'cw.note': '以上为虚拟达人示例，并非真实账号——Lumio 用同一套引擎为你达人库中的每位达人排序打分。',
                 'sec2.num': '01 / 核心能力', 'sec2.h': '一台<em>为卖货而生</em>的<br>决策引擎',
                 'feat.sub': '不止是一份达人名单——而是能预测结果、解释理由、随时复盘的投放大脑。',
                 'f1.h': '智能预算分配', 'f1.p': '输入预算、品类与目标市场，算法在数千位达人中求解最优阵容，在预算约束内最大化预测 GMV。',
@@ -3533,7 +3613,7 @@
                 'cp.b2': '<b>熟悉你的达人库</b>——在你真实合作的达人中筛选、对比、给出推荐。',
                 'cp.b3': '<b>帮你复盘投放</b>——预测 vs 实际 GMV、准确率，以及下次该怎么调。',
                 'cp.b4': '<b>中英文双语</b>——你用什么语言问，它就用什么语言答。',
-                'cp.cta': '免费和助手聊聊', 'cp.title': 'tiko 投放助手', 'cp.live': '已内置于控制台',
+                'cp.cta': '免费和助手聊聊', 'cp.title': 'Lumio 投放助手', 'cp.live': '已内置于控制台',
                 'cp.u1': '我有 $3,000 想在印尼投美妆，该找哪些达人？',
                 'cp.t1': 'run_optimization — 预算 $3,000 · 印尼 · 美妆',
                 'cp.a1': '<b>搞定——已选出 7 位达人。</b><br>预测 GMV <b>$11,400</b> · ROI <b>3.8×</b><br>首选：Aisyah R.——89 万粉丝，互动率 7.2%。<br>要看稳健版还是激进版方案？',
@@ -3550,8 +3630,8 @@
                 'p3.l1': '✓ <b>不限优化次数</b>', 'p3.copilot': '✓ <b>不限 AI 投放助手</b>', 'p3.l2': '✓ 10 个团队席位', 'p3.l4': '✓ 无限达人库', 'p3.l5': '✓ 优先支持',
                 'p.start': '免费开始', 'p.upgrade': '在控制台升级',
                 'final.h': '把下一次投放<br><em>交给数据</em>', 'final.btn': '进入控制台 — 免费优化',
-                'footer.tag': 'AI 驱动的达人投放优化。把每一分预算，都投给真正能卖货的达人。', 'footer.h1': '产品', 'footer.h2': '开始使用', 'footer.h3': '法律', 'footer.r': '© 2026 tiko · 保留所有权利',
-                'footer.legal': 'tiko 是独立的数据分析工具，与任何电商或社交平台均无隶属、赞助或认可关系，所提及的商标归其各自所有者所有。预测 GMV 与 ROI 为统计估算，不构成对实际销售额的保证。',
+                'footer.tag': 'AI 驱动的达人投放优化。把每一分预算，都投给真正能卖货的达人。', 'footer.h1': '产品', 'footer.h2': '开始使用', 'footer.h3': '法律', 'footer.r': '© 2026 Lumio · 保留所有权利',
+                'footer.legal': 'Lumio 是独立的数据分析工具，与任何电商或社交平台均无隶属、赞助或认可关系，所提及的商标归其各自所有者所有。预测 GMV 与 ROI 为统计估算，不构成对实际销售额的保证。',
                 'side.brand': 'KOL 优化器', 'side.settings': '投放设置', 'side.budget': '营销预算', 'side.countries': '目标国家', 'side.category': '商品品类',
                 'c.ALL': '🌏 全部国家', 'c.MY': '🇲🇾 马来西亚', 'c.ID': '🇮🇩 印度尼西亚', 'c.TH': '🇹🇭 泰国', 'c.PH': '🇵🇭 菲律宾', 'c.SG': '🇸🇬 新加坡', 'c.VN': '🇻🇳 越南',
                 'cat.personal_care': '🧴 个护清洁', 'cat.womenswear': '👚 女装', 'cat.menswear': '👔 男装', 'cat.kids_fashion': '🧒 童装', 'cat.shoes': '👟 鞋靴', 'cat.bags': '🎒 箱包', 'cat.jewelry': '💍 珠宝腕表', 'cat.computers': '💻 电脑办公', 'cat.furniture': '🛋️ 家具', 'cat.textiles': '🛏️ 家纺布艺', 'cat.tools': '🔧 五金工具', 'cat.food': '🍜 食品饮料', 'cat.stationery': '📚 图书文具', 'catg.beauty': '美妆个护', 'catg.fashion': '服饰鞋包', 'catg.electronics': '数码家电', 'catg.home': '家居生活', 'catg.family': '母婴玩具', 'catg.food_health': '食品健康', 'catg.leisure': '运动 · 宠物 · 汽车', 'cat.beauty': '💄 美妆', 'cat.fashion': '👗 服饰（综合）', 'cat.home': '🏠 家居生活', 'cat.fmcg': '🛒 日用百货',
@@ -3561,10 +3641,10 @@
                 'ct.badgeLive': '直播', 'ct.badgeVideo': '短视频', 'ct.badgeBoth': '双栖', 'm.ctype': '带货方式',
                 'side.run': '运行优化', 'side.adv': '高级设置', 'side.seed': '随机种子', 'side.rand': '随机',
                 'side.seedHelp': '固定该数字可在多次运行间获得完全一致的结果；保持默认则每次结果略有不同。',
-                'side.g.workspace': '工作区', 'side.nav.contracts': '合同', 'side.nav.start': '新手引导', 'side.nav.templates': '模板', 'side.nav.messages': '消息记录', 'side.nav.activity': '操作日志', 'ob.title': '新手引导', 'ob.sub': '从空白工作区到第一次有数据复盘的投放，需要走完这几步。', 'ob.progress': '已完成 {d} / {t}', 'ob.allDone': '全部完成——你已经跑通了整个流程。', 'ob.go': '前往', 'ob.creators': '建立达人库', 'ob.creators.d': '导入 CSV / Excel，或手动添加达人。', 'ob.optimize': '运行第一次优化', 'ob.optimize.d': '设置预算、市场和品类，让引擎选出阵容。', 'ob.campaign': '保存一次投放', 'ob.campaign.d': '保存阵容后，入选的达人就开始被跟踪。', 'ob.outreach': '联系一位达人', 'ob.outreach.d': '在「合作管理」里发出邀约，并推进合作阶段。', 'ob.contract': '生成一份合同', 'ob.contract.d': '条件谈定后，用模板生成合作协议。', 'ob.results': '录入投放结果', 'ob.results.d': '录入实际 GMV，预测会按你店铺的情况自动校准。', 'ob.team': '邀请同事', 'ob.team.d': '和团队共用工作区——Pro 和 Team 套餐可用。', 'tp.title': '模板', 'tp.sub': '可复用的邀约消息和合同。花括号里的变量会按每位达人自动填入。', 'tp.kMessage': '消息', 'tp.kContract': '合同', 'tp.new': '新建模板', 'tp.name': '名称', 'tp.body': '内容', 'tp.vars': '插入变量', 'tp.delete': '删除', 'tp.deleteConfirm': '确定删除这个模板吗？', 'tp.deleted': '已删除', 'tp.untitled': '未命名模板', 'tp.empty': '还没有模板——新建一个吧。', 'tp.need': '请填写模板名称和内容。', 'ct.title': '合同', 'ct.sub': '用模板生成的合作协议。在「合作管理」里打开某位达人即可创建。', 'ct.empty': '还没有合同。在「合作管理」里打开一位达人，点「合同」即可生成。', 'ct.th.no': '编号', 'ct.th.creator': '达人', 'ct.th.campaign': '投放', 'ct.th.fee': '费用', 'ct.th.status': '状态', 'ct.th.updated': '更新时间', 'ct.view': '打开', 'ct.s.draft': '草稿', 'ct.s.sent': '已发送', 'ct.s.signed': '已签署', 'ct.s.cancelled': '已取消', 'ct.new': '合同', 'ct.newFor': '为 {n} 生成合同', 'ct.deliverables': '交付内容', 'ct.phDeliverables': '例如：2 条短视频（30–60 秒）+ 1 次直播口播', 'ct.start': '开始日期', 'ct.end': '结束日期', 'ct.create': '生成合同', 'ct.created': '合同 {n} 已生成', 'ct.close': '关闭', 'ct.print': '打印 / PDF', 'ct.deleteConfirm': '确定删除这份合同吗？', 'ct.signedLock': '已签署的合同不能修改。', 'ct.noTemplate': '请先创建一个合同模板（工作区 → 模板）。', 'ml.title': '消息记录', 'ml.sub': '团队在「合作管理」里发出的每一条邀约消息：谁发的、什么时候、发了什么。', 'ml.empty': '还没有消息记录。', 'ml.th.when': '发送时间', 'ml.th.creator': '达人', 'ml.th.channel': '渠道', 'ml.th.message': '内容', 'ml.th.by': '发送人', 'ml.ch.whatsapp': 'WhatsApp', 'ml.ch.email': '邮件', 'ml.ch.copy': '已复制', 'ac.title': '操作日志', 'ac.sub': '工作区里每个人做过的操作，最新的在前。', 'ac.empty': '还没有任何操作记录。', 'act.campaign.save': '保存了投放', 'act.campaign.results': '录入了投放结果：', 'act.collab.stage': '推进了', 'act.collab.assign': '指派了', 'act.message.send': '联系了', 'act.contract.create': '生成了合同：', 'act.contract.status': '更新了合同状态：', 'act.contract.delete': '删除了合同：', 'act.team.invite': '邀请了', 'act.team.remove': '移除了', 'msg.open': '发消息', 'msg.titleFor': '联系 {n}', 'msg.sub': '确认内容后，用你自己的 WhatsApp 或邮箱发送。我们会为团队记录这条消息。', 'msg.template': '模板', 'msg.body': '消息内容', 'msg.copy': '复制', 'msg.email': '邮件', 'msg.whatsapp': '打开 WhatsApp', 'msg.logged': '已记录', 'msg.loggedInvited': '已记录——达人已标记为「已邀约」', 'msg.blank': '空白消息', 'msg.empty': '请先填写消息内容。', 'pl.assignee': '负责人', 'pl.unassigned': '未指派', 'pl.mine': '只看我负责的（{n}）', 'cr.est': '估算', 'pl.meta': '达人投放优化', 'mq.1': '优化', 'mq.2': '预测', 'mq.3': '分配', 'mq.4': '复盘', 'mq.5': '循环 —', 'tier.Mega': '超头部', 'tier.Macro': '头部', 'tier.Micro': '腰部', 'tier.Nano': '尾部', 'tierf.Mega': '🟣 超头部', 'tierf.Macro': '🔵 头部', 'tierf.Micro': '🟢 腰部', 'tierf.Nano': '🟡 尾部', 'd.cap': '预算的 {p}%', 'tt.home': '返回首页', 'tt.plan': '查看套餐与用量', 'tt.logout': '退出登录', 'tt.xlsxTpl': '下载带标准列名的 Excel 模板', 'tt.csvTpl': '下载 CSV 模板', 'tt.clear': '清空对话', 'tt.view': '查看', 'tt.record': '录入实际结果', 'tt.delete': '删除', 'ph.target': '例如 150000', 'ph.creator': '例如 Lisa Beauty', 'ph.auto': '自动', 'ph.campaign': '例如：美妆 马来西亚 2026 年 6 月', 'ph.actual': '例如 48500', 'ph.notes': '投放观察、背景说明…', 't.accountCreated': '账号已创建', 't.signedIn': '已登录', 't.sessionExpired': '登录已过期，请重新登录', 't.copilotLimit': 'AI 助手额度已用完——升级后可继续使用', 'side.nav.explore': '发现达人', 'ex.title': '发现达人', 'ex.sub': '一个超出你自己达人库的共享达人池。看到合适的，一键加入你的达人库。', 'ex.extBtn': '浏览器扩展', 'ex.poolSize': '达人池共 {n} 位达人', 'ex.fSearch': '搜索名称、账号或简介', 'ex.phSearch': '例如：护肤、@账号', 'ex.fCountry': '国家', 'ex.anyCountry': '不限国家', 'ex.fSize': '粉丝规模', 'ex.anySize': '不限规模', 'ex.size1': '1 万以下', 'ex.size2': '1 万 – 10 万', 'ex.size3': '10 万 – 100 万', 'ex.size4': '100 万以上', 'ex.fSort': '排序', 'ex.sortFollowers': '粉丝最多', 'ex.sortRecent': '最近采集', 'ex.sortLikes': '获赞最多', 'ex.prev': '上一页', 'ex.next': '下一页', 'ex.range': '第 {a}–{b} 位，共 {t} 位', 'ex.followers': '粉丝', 'ex.likes': '获赞', 'ex.videos': '视频', 'ex.seen': '采集于 {d}', 'ex.add': '加入达人库', 'ex.inLibrary': '已在达人库', 'ex.unknownCountry': '国家未知', 'ex.emptyTitle': '还没有符合条件的达人。', 'ex.emptyBody': '达人池靠浏览器扩展采集而增长。只要你的团队在安装了扩展的浏览器里打开过某位达人的主页，TA 就会出现在这里。', 'ex.emptyPoolTitle': '达人池现在还是空的。', 'ex.addTitle': '把 {n} 加入达人库', 'ex.addNote': '达人池只有公开的数量信息。报价会按粉丝规模估算并标记为“估算”，拿到真实报价后请替换。', 'ex.addBtn': '加入我的达人库', 'ex.added': '{n} 已加入达人库', 'ext.title': '用浏览器扩展扩充达人池', 'ext.sub': '安装扩展后，你和团队打开的每一个达人主页都会自动进入达人池。扩展只读取达人主页上公开显示的信息。', 'ext.s1': '下载并解压', 'ext.s1d': '一个很小的 Chrome / Edge 扩展。', 'ext.download': '下载扩展', 'ext.s2': '在浏览器里加载', 'ext.s2d': '打开 <code>chrome://extensions</code>，开启<b>开发者模式</b>，点击<b>加载已解压的扩展程序</b>，选择解压出的 <code>tiko-capture</code> 文件夹。', 'ext.s3': '连接到你的账号', 'ext.s3d': '生成一个连接码，粘贴到扩展的弹窗里。连接码只能用来提交达人，无法打开你的工作区。', 'ext.gen': '生成连接码', 'ext.copied': '连接码已复制——请粘贴到扩展里', 'ext.s4': '照常浏览', 'ext.s4d': '打开达人主页，几秒内就会出现在这里。修改密码会断开扩展的连接。', 'act.creator.explore_add': '从发现页添加了', 'sc.tabVideo': '带货视频', 'sc.tabOps': '运营文案', 'sc.tabSaved': '已保存', 'sc.savedOk': '已保存', 'sc.savedEmpty': '还没有保存的内容。生成后点「保存」即可。', 'sc.t.storyboard': '视频', 'sc.t.ops': '文案', 'sc.t.script': '脚本', 'sc.t.review': '检查', 'sv.offer': '优惠信息（选填）', 'sv.phOffer': '例如：RM39，本周包邮', 'sv.capLang': '字幕语言', 'sv.photos': '商品图片（选填，最多 8 张）', 'sv.photosNote': '图片只留在这台设备上，用来在你的浏览器里合成视频，不会上传。', 'sv.photosN': '已选 {n} 张图片', 'sv.genBtn': '生成视频', 'sv.busy': '正在策划视频…', 'sv.play': '预览', 'sv.export': '导出视频', 'sv.scenes': '分镜——可以修改字幕，改完再预览', 'sv.recording': '正在录制… {p}%', 'sv.done': '视频已下载', 'sv.noRecorder': '当前浏览器不支持导出视频，请使用最新版 Chrome 或 Edge。', 'sv.result': '带货视频', 'sv.voice': '口播', 'sv.show': '画面', 'sv.cta': '行动号召', 'sv.tags': '话题标签', 'sv.music': '配乐', 'sv.hint': '{d} 秒 · {n} 个分镜 · 9:16 竖屏。导出后可在剪辑软件里加口播和配乐。', 'op.kind': '需要什么内容？', 'op.live_script': '直播流程与话术', 'op.listing': '商品标题与卖点', 'op.caption': '发布文案与话题标签', 'op.outreach': '达人邀约私信', 'op.faq': '客服常见问答', 'op.calendar': '一周内容排期', 'op.audience': '目标人群', 'op.phAudience': '例如：学生、新手妈妈', 'op.lang': '输出语言', 'op.btn': '生成文案', 'op.result': '运营文案', 'av.tab': 'AI 视频', 'av.off': '服务器还没有开启 AI 视频。需要运营者配置视频生成服务的 API 密钥。', 'av.prompt': '描述画面 *', 'av.phPrompt': '例如：湿润石面上的玻璃精华瓶，柔和晨光，镜头缓慢推近，瓶身挂着水珠', 'av.image': '商品图片（选填）', 'av.imageNote': '上传图片后，视频会让这张图动起来并保持商品外观。图片会发送给视频生成服务用于制作这条视频。', 'av.aspect': '画面比例', 'av.portrait': '9:16 竖屏', 'av.square': '1:1 方形', 'av.landscape': '16:9 横屏', 'av.btn': '生成 AI 视频', 'av.quota': '本月已用 {u} / {l} 条 AI 视频，生成失败的不计入。', 'av.result': 'AI 视频', 'av.empty': '生成的 AI 视频会显示在这里，每条大约需要 1–3 分钟。', 'av.s.ready': '已完成', 'av.s.failed': '失败', 'av.s.running': '生成中…', 'av.withImage': '基于图片', 'av.download': '下载', 'av.needPrompt': '请先描述画面。', 'av.started': '已开始生成——一两分钟后会出现在这里', 'av.deleteConfirm': '确定删除这条视频吗？', 'av.fromScene': '用 AI 生成这一镜', 'av.productIs': '商品是 {p}。', 'av.style': '竖屏社交电商商品视频，干净的布光，平稳的运镜。', 'side.g.account': '账号', 'side.nav.settings': '设置', 'st.title': '设置', 'st.sub': '外观、团队、登录与数据。', 'st.appearance': '外观', 'st.theme': '颜色主题', 'st.themeNote': '只对这台设备上的控制台生效。', 'st.light': '浅色', 'st.dark': '深色', 'st.system': '跟随系统', 'st.lang': '语言', 'st.langNote': '我们发给你的邮件也会使用这个语言。', 'side.g.overview': '概览', 'side.g.talent': '达人', 'side.g.campaigns': '投放', 'side.g.more': '资源', 'side.nav.analytics': '数据分析', 'side.nav.pipeline': '合作管理', 'side.nav.scripts': 'AI 工作室', 'c.refresh': '刷新', 'c.cancel': '取消', 'an.title': '数据分析', 'an.sub': '投放、花费与达人邀约的整体表现。', 'an.export': '导出报告', 'an.aiTitle': 'AI 投放洞察', 'an.aiSub': '根据本页的数据，总结哪些有效、瓶颈在哪、下一步做什么。每次消耗 1 次 AI 助手对话额度。', 'an.aiBtn': '生成 AI 洞察', 'an.aiBusy': '分析中…', 'an.trend': '预测 GMV 与实际 GMV', 'an.trendSub': '按投放保存的月份统计，最近 6 个月。', 'an.predicted': '预测', 'an.actual': '实际', 'an.funnel': '邀约漏斗', 'an.funnelSub': '所有投放中的达人目前各处于哪个阶段。', 'an.top': '表现最好的达人', 'an.topActual': '按你录入的实际 GMV 排序。', 'an.topPredicted': '按预测 GMV 排序——录入投放结果后会改按真实销售排序。', 'an.cats': '按品类', 'an.catsSub': '各商品品类的投放数与 GMV。', 'an.k.campaigns': '投放数', 'an.k.campaignsSub': '进行中 {a} · 已完成 {c}', 'an.k.predicted': '预测 GMV', 'an.k.predictedSub': '预测 ROI {r}', 'an.k.actual': '实际 GMV', 'an.k.actualSub': '实际 ROI {r}', 'an.k.accuracy': '预测准确率', 'an.k.accuracySub': '{n} 次合作 · 接受率 {p}', 'an.k.noData': '还没有录入结果', 'an.vsLast': '较上月', 'an.empty': '还没有投放——先在优化器里运行并保存一次投放，这里就会有数据。', 'an.noRows': '暂无数据。', 'an.th.creator': '达人', 'an.th.campaigns': '投放数', 'an.th.spend': '计划成本', 'an.th.predicted': '预测', 'an.th.actual': '实际', 'an.th.category': '品类', 'pl.title': '合作管理', 'pl.sub': '已保存投放中的每一位达人，从首次邀约到结算的全过程。', 'pl.list': '列表', 'pl.board': '看板', 'pl.csv': '导出 CSV', 'pl.fStatus': '状态', 'pl.fCampaign': '投放', 'pl.fSearch': '搜索达人、联系方式或投放', 'pl.phSearch': '输入关键词…', 'pl.allStatus': '全部状态', 'pl.allCampaigns': '全部投放', 'pl.s.shortlisted': '待邀约', 'pl.s.invited': '已邀约', 'pl.s.negotiating': '洽谈中', 'pl.s.contracted': '已签约', 'pl.s.submitted': '内容已提交', 'pl.s.live': '已发布', 'pl.s.paid': '已结算', 'pl.s.declined': '已拒绝', 'pl.th.creator': '达人', 'pl.th.campaign': '投放', 'pl.th.status': '状态', 'pl.th.fee': '费用', 'pl.th.planned': '计划', 'pl.th.contact': '联系方式', 'pl.th.updated': '更新时间', 'pl.empty': '没有符合筛选条件的合作记录。', 'pl.emptyAll': '还没有合作记录——在优化器里运行并保存一次投放，入选的达人就会出现在这里。', 'pl.showing': '显示 {n} / 共 {t} 条', 'pl.details': '详情', 'pl.fee': '谈定费用（美元）', 'pl.contact': '联系方式', 'pl.phContact': 'WhatsApp、邮箱或经纪公司', 'pl.link': '内容链接', 'pl.note': '备注', 'pl.save': '保存', 'pl.saved': '已保存', 'pl.moved': '已移到「{s}」', 'pl.dragHint': '把卡片拖到另一列即可更改阶段。', 'pl.open': '打开内容', 'stu.title': 'AI 工作室', 'sc.sub': '带货视频、AI 视频、拍摄脚本和日常运营文案。文字类每次消耗 1 次 AI 助手额度，AI 视频单独按月计算。', 'sc.tabGen': '拍摄脚本', 'sc.tabChk': '脚本检查', 'sc.product': '商品 *', 'sc.phProduct': '例如：维 C 亮肤精华 30ml', 'sc.points': '卖点', 'sc.phPoints': '每行一条：核心成分、适合人群、差异点、当前优惠…', 'sc.format': '形式', 'sc.video': '短视频', 'sc.live': '直播片段', 'sc.length': '时长', 'sc.spoken': '口播语言', 'sc.tone': '语气', 'sc.phTone': '例如：活泼、真实测评', 'sc.genBtn': '生成脚本', 'sc.draft': '待检查的脚本 *', 'sc.phDraft': '粘贴达人准备拍摄的脚本…', 'sc.chkBtn': '检查脚本', 'sc.disclaimer': '仅为内容建议，不构成法律意见。请以所在市场的平台广告规范为准。', 'sc.result': '结果', 'sc.resultScript': '脚本', 'sc.resultReview': '检查结果', 'sc.sendCheck': '检查这份脚本', 'sc.copy': '复制', 'sc.empty': '生成的视频、脚本或文案会显示在这里。', 'sc.busy': '撰写中…', 'sc.needProduct': '请填写商品名称。', 'sc.needDraft': '请粘贴至少几句话的脚本。', 'side.nav.dashboard': '优化器', 'side.nav.creators': '达人库', 'side.nav.campaigns': '投放记录', 'side.nav.guide': '商家学院', 'side.nav.billing': '套餐与计费',
+                'side.g.workspace': '工作区', 'side.nav.contracts': '合同', 'side.nav.start': '新手引导', 'side.nav.templates': '模板', 'side.nav.messages': '消息记录', 'side.nav.activity': '操作日志', 'ob.title': '新手引导', 'ob.sub': '从空白工作区到第一次有数据复盘的投放，需要走完这几步。', 'ob.progress': '已完成 {d} / {t}', 'ob.allDone': '全部完成——你已经跑通了整个流程。', 'ob.go': '前往', 'ob.creators': '建立达人库', 'ob.creators.d': '导入 CSV / Excel，或手动添加达人。', 'ob.optimize': '运行第一次优化', 'ob.optimize.d': '设置预算、市场和品类，让引擎选出阵容。', 'ob.campaign': '保存一次投放', 'ob.campaign.d': '保存阵容后，入选的达人就开始被跟踪。', 'ob.outreach': '联系一位达人', 'ob.outreach.d': '在「合作管理」里发出邀约，并推进合作阶段。', 'ob.contract': '生成一份合同', 'ob.contract.d': '条件谈定后，用模板生成合作协议。', 'ob.results': '录入投放结果', 'ob.results.d': '录入实际 GMV，预测会按你店铺的情况自动校准。', 'ob.team': '邀请同事', 'ob.team.d': '和团队共用工作区——Pro 和 Team 套餐可用。', 'tp.title': '模板', 'tp.sub': '可复用的邀约消息和合同。花括号里的变量会按每位达人自动填入。', 'tp.kMessage': '消息', 'tp.kContract': '合同', 'tp.new': '新建模板', 'tp.name': '名称', 'tp.body': '内容', 'tp.vars': '插入变量', 'tp.delete': '删除', 'tp.deleteConfirm': '确定删除这个模板吗？', 'tp.deleted': '已删除', 'tp.untitled': '未命名模板', 'tp.empty': '还没有模板——新建一个吧。', 'tp.need': '请填写模板名称和内容。', 'ct.title': '合同', 'ct.sub': '用模板生成的合作协议。在「合作管理」里打开某位达人即可创建。', 'ct.empty': '还没有合同。在「合作管理」里打开一位达人，点「合同」即可生成。', 'ct.th.no': '编号', 'ct.th.creator': '达人', 'ct.th.campaign': '投放', 'ct.th.fee': '费用', 'ct.th.status': '状态', 'ct.th.updated': '更新时间', 'ct.view': '打开', 'ct.s.draft': '草稿', 'ct.s.sent': '已发送', 'ct.s.signed': '已签署', 'ct.s.cancelled': '已取消', 'ct.new': '合同', 'ct.newFor': '为 {n} 生成合同', 'ct.deliverables': '交付内容', 'ct.phDeliverables': '例如：2 条短视频（30–60 秒）+ 1 次直播口播', 'ct.start': '开始日期', 'ct.end': '结束日期', 'ct.create': '生成合同', 'ct.created': '合同 {n} 已生成', 'ct.close': '关闭', 'ct.print': '打印 / PDF', 'ct.deleteConfirm': '确定删除这份合同吗？', 'ct.signedLock': '已签署的合同不能修改。', 'ct.noTemplate': '请先创建一个合同模板（工作区 → 模板）。', 'ml.title': '消息记录', 'ml.sub': '团队在「合作管理」里发出的每一条邀约消息：谁发的、什么时候、发了什么。', 'ml.empty': '还没有消息记录。', 'ml.th.when': '发送时间', 'ml.th.creator': '达人', 'ml.th.channel': '渠道', 'ml.th.message': '内容', 'ml.th.by': '发送人', 'ml.ch.whatsapp': 'WhatsApp', 'ml.ch.email': '邮件', 'ml.ch.copy': '已复制', 'ac.title': '操作日志', 'ac.sub': '工作区里每个人做过的操作，最新的在前。', 'ac.empty': '还没有任何操作记录。', 'act.campaign.save': '保存了投放', 'act.campaign.results': '录入了投放结果：', 'act.collab.stage': '推进了', 'act.collab.assign': '指派了', 'act.message.send': '联系了', 'act.contract.create': '生成了合同：', 'act.contract.status': '更新了合同状态：', 'act.contract.delete': '删除了合同：', 'act.team.invite': '邀请了', 'act.team.remove': '移除了', 'msg.open': '发消息', 'msg.titleFor': '联系 {n}', 'msg.sub': '确认内容后，用你自己的 WhatsApp 或邮箱发送。我们会为团队记录这条消息。', 'msg.template': '模板', 'msg.body': '消息内容', 'msg.copy': '复制', 'msg.email': '邮件', 'msg.whatsapp': '打开 WhatsApp', 'msg.logged': '已记录', 'msg.loggedInvited': '已记录——达人已标记为「已邀约」', 'msg.blank': '空白消息', 'msg.empty': '请先填写消息内容。', 'pl.assignee': '负责人', 'pl.unassigned': '未指派', 'pl.mine': '只看我负责的（{n}）', 'cr.est': '估算', 'pl.meta': '达人投放优化', 'mq.1': '优化', 'mq.2': '预测', 'mq.3': '分配', 'mq.4': '复盘', 'mq.5': '循环 —', 'tier.Mega': '超头部', 'tier.Macro': '头部', 'tier.Micro': '腰部', 'tier.Nano': '尾部', 'tierf.Mega': '🟣 超头部', 'tierf.Macro': '🔵 头部', 'tierf.Micro': '🟢 腰部', 'tierf.Nano': '🟡 尾部', 'd.cap': '预算的 {p}%', 'tt.home': '返回首页', 'tt.plan': '查看套餐与用量', 'tt.logout': '退出登录', 'tt.xlsxTpl': '下载带标准列名的 Excel 模板', 'tt.csvTpl': '下载 CSV 模板', 'tt.clear': '清空对话', 'tt.view': '查看', 'tt.record': '录入实际结果', 'tt.delete': '删除', 'ph.target': '例如 150000', 'ph.creator': '例如 Lisa Beauty', 'ph.auto': '自动', 'ph.campaign': '例如：美妆 马来西亚 2026 年 6 月', 'ph.actual': '例如 48500', 'ph.notes': '投放观察、背景说明…', 't.accountCreated': '账号已创建', 't.signedIn': '已登录', 't.sessionExpired': '登录已过期，请重新登录', 't.copilotLimit': 'AI 助手额度已用完——升级后可继续使用', 'side.nav.explore': '发现达人', 'ex.title': '发现达人', 'ex.sub': '一个超出你自己达人库的共享达人池。看到合适的，一键加入你的达人库。', 'ex.extBtn': '浏览器扩展', 'ex.poolSize': '达人池共 {n} 位达人', 'ex.fSearch': '搜索名称、账号或简介', 'ex.phSearch': '例如：护肤、@账号', 'ex.fCountry': '国家', 'ex.anyCountry': '不限国家', 'ex.fSize': '粉丝规模', 'ex.anySize': '不限规模', 'ex.size1': '1 万以下', 'ex.size2': '1 万 – 10 万', 'ex.size3': '10 万 – 100 万', 'ex.size4': '100 万以上', 'ex.fSort': '排序', 'ex.sortFollowers': '粉丝最多', 'ex.sortRecent': '最近采集', 'ex.sortLikes': '获赞最多', 'ex.prev': '上一页', 'ex.next': '下一页', 'ex.range': '第 {a}–{b} 位，共 {t} 位', 'ex.followers': '粉丝', 'ex.likes': '获赞', 'ex.videos': '视频', 'ex.seen': '采集于 {d}', 'ex.add': '加入达人库', 'ex.inLibrary': '已在达人库', 'ex.unknownCountry': '国家未知', 'ex.emptyTitle': '还没有符合条件的达人。', 'ex.emptyBody': '达人池靠浏览器扩展采集而增长。只要你的团队在安装了扩展的浏览器里打开过某位达人的主页，TA 就会出现在这里。', 'ex.emptyPoolTitle': '达人池现在还是空的。', 'ex.addTitle': '把 {n} 加入达人库', 'ex.addNote': '达人池只有公开的数量信息。报价会按粉丝规模估算并标记为“估算”，拿到真实报价后请替换。', 'ex.addBtn': '加入我的达人库', 'ex.added': '{n} 已加入达人库', 'ext.title': '用浏览器扩展扩充达人池', 'ext.sub': '安装扩展后，你和团队打开的每一个达人主页都会自动进入达人池。扩展只读取达人主页上公开显示的信息。', 'ext.s1': '下载并解压', 'ext.s1d': '一个很小的 Chrome / Edge 扩展。', 'ext.download': '下载扩展', 'ext.s2': '在浏览器里加载', 'ext.s2d': '打开 <code>chrome://extensions</code>，开启<b>开发者模式</b>，点击<b>加载已解压的扩展程序</b>，选择解压出的 <code>lumio-capture</code> 文件夹。', 'ext.s3': '连接到你的账号', 'ext.s3d': '生成一个连接码，粘贴到扩展的弹窗里。连接码只能用来提交达人，无法打开你的工作区。', 'ext.gen': '生成连接码', 'ext.copied': '连接码已复制——请粘贴到扩展里', 'ext.s4': '照常浏览', 'ext.s4d': '打开达人主页，几秒内就会出现在这里。修改密码会断开扩展的连接。', 'act.creator.explore_add': '从发现页添加了', 'sc.tabVideo': '带货视频', 'sc.tabOps': '运营文案', 'sc.tabSaved': '已保存', 'sc.savedOk': '已保存', 'sc.savedEmpty': '还没有保存的内容。生成后点「保存」即可。', 'sc.t.storyboard': '视频', 'sc.t.ops': '文案', 'sc.t.script': '脚本', 'sc.t.review': '检查', 'sv.offer': '优惠信息（选填）', 'sv.phOffer': '例如：RM39，本周包邮', 'sv.capLang': '字幕语言', 'sv.photos': '商品图片（选填，最多 8 张）', 'sv.photosNote': '图片只留在这台设备上，用来在你的浏览器里合成视频，不会上传。', 'sv.photosN': '已选 {n} 张图片', 'sv.genBtn': '生成视频', 'sv.busy': '正在策划视频…', 'sv.play': '预览', 'sv.export': '导出视频', 'sv.scenes': '分镜——可以修改字幕，改完再预览', 'sv.recording': '正在录制… {p}%', 'sv.done': '视频已下载', 'sv.noRecorder': '当前浏览器不支持导出视频，请使用最新版 Chrome 或 Edge。', 'sv.result': '带货视频', 'sv.voice': '口播', 'sv.show': '画面', 'sv.cta': '行动号召', 'sv.tags': '话题标签', 'sv.music': '配乐', 'sv.hint': '{d} 秒 · {n} 个分镜 · 9:16 竖屏。导出后可在剪辑软件里加口播和配乐。', 'op.kind': '需要什么内容？', 'op.live_script': '直播流程与话术', 'op.listing': '商品标题与卖点', 'op.caption': '发布文案与话题标签', 'op.outreach': '达人邀约私信', 'op.faq': '客服常见问答', 'op.calendar': '一周内容排期', 'op.audience': '目标人群', 'op.phAudience': '例如：学生、新手妈妈', 'op.lang': '输出语言', 'op.btn': '生成文案', 'op.result': '运营文案', 'av.tab': 'AI 视频', 'av.off': '服务器还没有开启 AI 视频。需要运营者配置视频生成服务的 API 密钥。', 'av.prompt': '描述画面 *', 'av.phPrompt': '例如：湿润石面上的玻璃精华瓶，柔和晨光，镜头缓慢推近，瓶身挂着水珠', 'av.image': '商品图片（选填）', 'av.imageNote': '上传图片后，视频会让这张图动起来并保持商品外观。图片会发送给视频生成服务用于制作这条视频。', 'av.aspect': '画面比例', 'av.portrait': '9:16 竖屏', 'av.square': '1:1 方形', 'av.landscape': '16:9 横屏', 'av.btn': '生成 AI 视频', 'av.quota': '本月已用 {u} / {l} 条 AI 视频，生成失败的不计入。', 'av.result': 'AI 视频', 'av.empty': '生成的 AI 视频会显示在这里，每条大约需要 1–3 分钟。', 'av.s.ready': '已完成', 'av.s.failed': '失败', 'av.s.running': '生成中…', 'av.withImage': '基于图片', 'av.download': '下载', 'av.needPrompt': '请先描述画面。', 'av.started': '已开始生成——一两分钟后会出现在这里', 'av.deleteConfirm': '确定删除这条视频吗？', 'av.fromScene': '用 AI 生成这一镜', 'av.productIs': '商品是 {p}。', 'av.style': '竖屏社交电商商品视频，干净的布光，平稳的运镜。', 'side.g.account': '账号', 'side.nav.settings': '设置', 'st.title': '设置', 'st.sub': '外观、团队、登录与数据。', 'st.appearance': '外观', 'st.theme': '颜色主题', 'st.themeNote': '只对这台设备上的控制台生效。', 'st.light': '浅色', 'st.dark': '深色', 'st.system': '跟随系统', 'st.lang': '语言', 'st.langNote': '我们发给你的邮件也会使用这个语言。', 'side.g.overview': '概览', 'side.g.talent': '达人', 'side.g.campaigns': '投放', 'side.g.more': '资源', 'side.nav.analytics': '数据分析', 'side.nav.pipeline': '合作管理', 'side.nav.scripts': 'AI 工作室', 'c.refresh': '刷新', 'c.cancel': '取消', 'an.title': '数据分析', 'an.sub': '投放、花费与达人邀约的整体表现。', 'an.export': '导出报告', 'an.aiTitle': 'AI 投放洞察', 'an.aiSub': '根据本页的数据，总结哪些有效、瓶颈在哪、下一步做什么。每次消耗 1 次 AI 助手对话额度。', 'an.aiBtn': '生成 AI 洞察', 'an.aiBusy': '分析中…', 'an.trend': '预测 GMV 与实际 GMV', 'an.trendSub': '按投放保存的月份统计，最近 6 个月。', 'an.predicted': '预测', 'an.actual': '实际', 'an.funnel': '邀约漏斗', 'an.funnelSub': '所有投放中的达人目前各处于哪个阶段。', 'an.top': '表现最好的达人', 'an.topActual': '按你录入的实际 GMV 排序。', 'an.topPredicted': '按预测 GMV 排序——录入投放结果后会改按真实销售排序。', 'an.cats': '按品类', 'an.catsSub': '各商品品类的投放数与 GMV。', 'an.k.campaigns': '投放数', 'an.k.campaignsSub': '进行中 {a} · 已完成 {c}', 'an.k.predicted': '预测 GMV', 'an.k.predictedSub': '预测 ROI {r}', 'an.k.actual': '实际 GMV', 'an.k.actualSub': '实际 ROI {r}', 'an.k.accuracy': '预测准确率', 'an.k.accuracySub': '{n} 次合作 · 接受率 {p}', 'an.k.noData': '还没有录入结果', 'an.vsLast': '较上月', 'an.empty': '还没有投放——先在优化器里运行并保存一次投放，这里就会有数据。', 'an.noRows': '暂无数据。', 'an.th.creator': '达人', 'an.th.campaigns': '投放数', 'an.th.spend': '计划成本', 'an.th.predicted': '预测', 'an.th.actual': '实际', 'an.th.category': '品类', 'pl.title': '合作管理', 'pl.sub': '已保存投放中的每一位达人，从首次邀约到结算的全过程。', 'pl.list': '列表', 'pl.board': '看板', 'pl.csv': '导出 CSV', 'pl.fStatus': '状态', 'pl.fCampaign': '投放', 'pl.fSearch': '搜索达人、联系方式或投放', 'pl.phSearch': '输入关键词…', 'pl.allStatus': '全部状态', 'pl.allCampaigns': '全部投放', 'pl.s.shortlisted': '待邀约', 'pl.s.invited': '已邀约', 'pl.s.negotiating': '洽谈中', 'pl.s.contracted': '已签约', 'pl.s.submitted': '内容已提交', 'pl.s.live': '已发布', 'pl.s.paid': '已结算', 'pl.s.declined': '已拒绝', 'pl.th.creator': '达人', 'pl.th.campaign': '投放', 'pl.th.status': '状态', 'pl.th.fee': '费用', 'pl.th.planned': '计划', 'pl.th.contact': '联系方式', 'pl.th.updated': '更新时间', 'pl.empty': '没有符合筛选条件的合作记录。', 'pl.emptyAll': '还没有合作记录——在优化器里运行并保存一次投放，入选的达人就会出现在这里。', 'pl.showing': '显示 {n} / 共 {t} 条', 'pl.details': '详情', 'pl.fee': '谈定费用（美元）', 'pl.contact': '联系方式', 'pl.phContact': 'WhatsApp、邮箱或经纪公司', 'pl.link': '内容链接', 'pl.note': '备注', 'pl.save': '保存', 'pl.saved': '已保存', 'pl.moved': '已移到「{s}」', 'pl.dragHint': '把卡片拖到另一列即可更改阶段。', 'pl.open': '打开内容', 'stu.title': 'AI 工作室', 'sc.sub': '带货视频、AI 视频、拍摄脚本和日常运营文案。文字类每次消耗 1 次 AI 助手额度，AI 视频单独按月计算。', 'sc.tabGen': '拍摄脚本', 'sc.tabChk': '脚本检查', 'sc.product': '商品 *', 'sc.phProduct': '例如：维 C 亮肤精华 30ml', 'sc.points': '卖点', 'sc.phPoints': '每行一条：核心成分、适合人群、差异点、当前优惠…', 'sc.format': '形式', 'sc.video': '短视频', 'sc.live': '直播片段', 'sc.length': '时长', 'sc.spoken': '口播语言', 'sc.tone': '语气', 'sc.phTone': '例如：活泼、真实测评', 'sc.genBtn': '生成脚本', 'sc.draft': '待检查的脚本 *', 'sc.phDraft': '粘贴达人准备拍摄的脚本…', 'sc.chkBtn': '检查脚本', 'sc.disclaimer': '仅为内容建议，不构成法律意见。请以所在市场的平台广告规范为准。', 'sc.result': '结果', 'sc.resultScript': '脚本', 'sc.resultReview': '检查结果', 'sc.sendCheck': '检查这份脚本', 'sc.copy': '复制', 'sc.empty': '生成的视频、脚本或文案会显示在这里。', 'sc.busy': '撰写中…', 'sc.needProduct': '请填写商品名称。', 'sc.needDraft': '请粘贴至少几句话的脚本。', 'side.nav.dashboard': '优化器', 'side.nav.creators': '达人库', 'side.nav.campaigns': '投放记录', 'side.nav.guide': '商家学院', 'side.nav.billing': '套餐与计费',
                 'g.heroH': '从开店到爆单——官方打法一站看全',
                 'g.heroP': '开店流程、选品思路、五国市场洞察、大促打法与真实商家案例，全部提炼自平台面向东南亚商家的官方内容。AI 投放助手也学习了整套知识库，点击右下角的助手图标即可直接提问。',
-                'side.tag': 'tiko · AI 驱动的 KOL 投放优化',
+                'side.tag': 'Lumio · AI 驱动的 KOL 投放优化',
                 'view.biz': '商业视图', 'view.tech': '技术视图',
                 'empty.h': '准备就绪', 'empty.p': '在上方设置预算、市场和品类，然后点击<span class="text-primary font-bold">运行优化</span>，寻找最优 KOL 组合。',
                 'auth.sub': '每个商家都拥有独立隔离的达人库。',
@@ -3577,7 +3657,7 @@
         };
         // ── Console dynamic-content dictionary ──
         Object.assign(I18N.en, {
-            'toast.demo': 'Welcome to the live demo — running your first optimization…', 'toast.demoFail': 'Demo unavailable — is the backend running?', 'toast.dlFail': 'Download failed', 't.copied': 'Copied', 'b.until': 'active until {d}', 'qr.term': '{m} mo', 'qr.payExactly': 'Pay exactly', 'qr.copyAmount': 'Copy amount', 'qr.payee': 'Payee:', 'qr.order': 'Order:', 'qr.s1': 'Scan the QR with any DuitNow-enabled banking app or e-wallet (Touch \'n Go, GrabPay, Boost, MAE …).', 'qr.s2': 'Pay exactly <b>{a}</b> — the amount identifies your order, so please do not round it.', 'qr.s3': 'Paste the transaction reference from your receipt below and submit.', 'qr.phRef': 'Transaction reference / receipt no.', 'qr.paid': 'I have paid — submit', 'qr.needRef': 'Enter the transaction reference from your receipt.', 'qr.submitted': 'Submitted — we will activate your plan once the payment is confirmed', 'qr.waitTitle': 'Payment submitted — awaiting confirmation', 'qr.waitBody': 'Order {n} · {a} · reference {r}. We check it against our account and activate your plan, usually within a few hours. You will get an email when it is done.', 'qr.rejected': 'We could not find this payment', 'qr.help': 'Problem with a payment?', 'qr.banner.pending': 'You have an unfinished payment for {p} ({a}).', 'qr.banner.submitted': 'Payment {n} ({a}) is awaiting confirmation.', 'qr.banner.rejected': 'We could not confirm payment {n} ({a}) — please check and resubmit.', 'qr.continue': 'Continue', 'qr.view': 'View', 'auth.phNewPass': 'New password (min 8 chars)', 'auth.resetTitle': 'Choose a new password', 'auth.resetBtn': 'Save and sign in', 'auth.forgotNeedEmail': 'Type your account email above first, then click again.', 'auth.forgotSent': 'If an account exists for <b>{e}</b>, a reset link is on its way. It is valid for 30 minutes — check your spam folder too.', 'auth.verifySent': 'Account created — we emailed you a link to verify your address', 'auth.verified': 'Email verified — thank you', 'acct.verified': '{e} is verified.', 'acct.unverified': '{e} is not verified yet — password resets and payment notices are sent to this address.', 'acct.resend': 'Resend link', 'auth.forgot': 'Forgot your password?', 'auth.forgotHelp': 'Message us on <a href="{wa}" target="_blank" rel="noopener" style="color:var(--teal)">WhatsApp</a> or WeChat (<b>{wc}</b>) from the contact you signed up with — we verify it is you and send a temporary password.', 'auth.legal': 'By continuing you agree to our <a href="./legal.html#terms" target="_blank" rel="noopener" style="color:var(--teal)">Terms</a> and <a href="./legal.html#privacy" target="_blank" rel="noopener" style="color:var(--teal)">Privacy Policy</a>.', 'footer.terms': 'Terms', 'footer.privacy': 'Privacy', 'team.title': 'Team', 'team.seats': '{u} of {s} seats used', 'team.phEmail': 'teammate@company.com', 'team.invite': 'Invite', 'team.owner': 'Owner', 'team.member': 'Member', 'team.pending': 'Invited', 'team.you': 'you', 'team.remove': 'Remove', 'team.revoke': 'Withdraw', 'team.copy': 'Copy link', 'team.sent': 'Invitation emailed to {e}', 'team.linkReady': 'Invitation link copied — send it to {e}', 'team.removeConfirm': 'Remove {e} from this workspace? They will be signed out and lose access. The data stays.', 'team.removed': 'Member removed', 'team.revoked': 'Invitation withdrawn', 'team.hint': 'Teammates share this creator library, campaigns and monthly allowance. Only you can manage billing and the team.', 'team.full': 'All {s} seats are in use — upgrade your plan to invite more people.', 'team.fullFree': 'The Free plan is for one person. Upgrade to Pro (3 seats) or Team (10 seats) to invite teammates.', 'team.memberNote': 'You are a member of <b>{e}</b>\'s workspace. Billing and the team are managed by the owner.', 'team.joinTitle': 'Join the workspace', 'team.joinBtn': 'Join', 'team.joinNote': '<b>{o}</b> invited you. You will join as <b>{e}</b> — choose a password.', 'team.joined': 'Welcome — you have joined the workspace', 'acct.delNoteMember': 'Removes your own sign-in from this workspace. The workspace and its data stay with the owner.', 'ord.title': 'Payment history', 'ord.receipt': 'Receipt', 'ord.months': '{m} mo', 'ord.pending': 'Awaiting payment', 'ord.submitted': 'Under review', 'ord.paid': 'Paid', 'ord.rejected': 'Not confirmed', 'ord.expired': 'Expired', 'ord.cancelled': 'Cancelled', 'ord.popup': 'Allow pop-ups for this site to open the receipt.', 'rc.title': 'Payment receipt', 'rc.no': 'Receipt no.', 'rc.date': 'Date paid', 'rc.to': 'Billed to', 'rc.item': 'Description', 'rc.amount': 'Amount paid', 'rc.method': 'Payment method', 'rc.ref': 'Transaction reference', 'rc.payee': 'Received by', 'rc.line': 'tiko {p} plan — {m} month(s)', 'rc.foot': 'This is a receipt for a payment received. It is not a tax invoice.', 'rc.print': 'Print / save as PDF', 'exp.title': 'Your data', 'exp.note': 'Download everything in this workspace — creators, campaigns, calibration and payment history — as one JSON file.', 'exp.btn': 'Export data', 'acct.title': 'Account', 'acct.pwTitle': 'Change password', 'acct.pwNote': 'Changing it signs out every other device.', 'acct.phCurrent': 'Current password', 'acct.phNew': 'New password (min 8 chars)', 'acct.pwBtn': 'Update password', 'acct.delTitle': 'Delete account', 'acct.delNote': 'Permanently removes your account, creator library, campaigns and usage history. This cannot be undone.', 'acct.phConfirm': 'Confirm with your password', 'acct.delBtn': 'Delete my account', 'acct.fill': 'Please fill in the password fields.', 'acct.fail': 'Could not complete the request.', 'acct.pwOk': 'Password updated', 'acct.delConfirm': 'Delete your account and ALL of its data permanently? This cannot be undone.', 'acct.delOk': 'Your account has been deleted',
+            'toast.demo': 'Welcome to the live demo — running your first optimization…', 'toast.demoFail': 'Demo unavailable — is the backend running?', 'toast.dlFail': 'Download failed', 't.copied': 'Copied', 'b.until': 'active until {d}', 'qr.term': '{m} mo', 'qr.payExactly': 'Pay exactly', 'qr.copyAmount': 'Copy amount', 'qr.payee': 'Payee:', 'qr.order': 'Order:', 'qr.s1': 'Scan the QR with any DuitNow-enabled banking app or e-wallet (Touch \'n Go, GrabPay, Boost, MAE …).', 'qr.s2': 'Pay exactly <b>{a}</b> — the amount identifies your order, so please do not round it.', 'qr.s3': 'Paste the transaction reference from your receipt below and submit.', 'qr.phRef': 'Transaction reference / receipt no.', 'qr.paid': 'I have paid — submit', 'qr.needRef': 'Enter the transaction reference from your receipt.', 'qr.submitted': 'Submitted — we will activate your plan once the payment is confirmed', 'qr.waitTitle': 'Payment submitted — awaiting confirmation', 'qr.waitBody': 'Order {n} · {a} · reference {r}. We check it against our account and activate your plan, usually within a few hours. You will get an email when it is done.', 'qr.rejected': 'We could not find this payment', 'qr.help': 'Problem with a payment?', 'qr.banner.pending': 'You have an unfinished payment for {p} ({a}).', 'qr.banner.submitted': 'Payment {n} ({a}) is awaiting confirmation.', 'qr.banner.rejected': 'We could not confirm payment {n} ({a}) — please check and resubmit.', 'qr.continue': 'Continue', 'qr.view': 'View', 'auth.phNewPass': 'New password (min 8 chars)', 'auth.resetTitle': 'Choose a new password', 'auth.resetBtn': 'Save and sign in', 'auth.forgotNeedEmail': 'Type your account email above first, then click again.', 'auth.forgotSent': 'If an account exists for <b>{e}</b>, a reset link is on its way. It is valid for 30 minutes — check your spam folder too.', 'auth.verifySent': 'Account created — we emailed you a link to verify your address', 'auth.verified': 'Email verified — thank you', 'acct.verified': '{e} is verified.', 'acct.unverified': '{e} is not verified yet — password resets and payment notices are sent to this address.', 'acct.resend': 'Resend link', 'auth.forgot': 'Forgot your password?', 'auth.forgotHelp': 'Message us on <a href="{wa}" target="_blank" rel="noopener" style="color:var(--teal)">WhatsApp</a> or WeChat (<b>{wc}</b>) from the contact you signed up with — we verify it is you and send a temporary password.', 'auth.legal': 'By continuing you agree to our <a href="./legal.html#terms" target="_blank" rel="noopener" style="color:var(--teal)">Terms</a> and <a href="./legal.html#privacy" target="_blank" rel="noopener" style="color:var(--teal)">Privacy Policy</a>.', 'footer.terms': 'Terms', 'footer.privacy': 'Privacy', 'team.title': 'Team', 'team.seats': '{u} of {s} seats used', 'team.phEmail': 'teammate@company.com', 'team.invite': 'Invite', 'team.owner': 'Owner', 'team.member': 'Member', 'team.pending': 'Invited', 'team.you': 'you', 'team.remove': 'Remove', 'team.revoke': 'Withdraw', 'team.copy': 'Copy link', 'team.sent': 'Invitation emailed to {e}', 'team.linkReady': 'Invitation link copied — send it to {e}', 'team.removeConfirm': 'Remove {e} from this workspace? They will be signed out and lose access. The data stays.', 'team.removed': 'Member removed', 'team.revoked': 'Invitation withdrawn', 'team.hint': 'Teammates share this creator library, campaigns and monthly allowance. Only you can manage billing and the team.', 'team.full': 'All {s} seats are in use — upgrade your plan to invite more people.', 'team.fullFree': 'The Free plan is for one person. Upgrade to Pro (3 seats) or Team (10 seats) to invite teammates.', 'team.memberNote': 'You are a member of <b>{e}</b>\'s workspace. Billing and the team are managed by the owner.', 'team.joinTitle': 'Join the workspace', 'team.joinBtn': 'Join', 'team.joinNote': '<b>{o}</b> invited you. You will join as <b>{e}</b> — choose a password.', 'team.joined': 'Welcome — you have joined the workspace', 'acct.delNoteMember': 'Removes your own sign-in from this workspace. The workspace and its data stay with the owner.', 'ord.title': 'Payment history', 'ord.receipt': 'Receipt', 'ord.months': '{m} mo', 'ord.pending': 'Awaiting payment', 'ord.submitted': 'Under review', 'ord.paid': 'Paid', 'ord.rejected': 'Not confirmed', 'ord.expired': 'Expired', 'ord.cancelled': 'Cancelled', 'ord.popup': 'Allow pop-ups for this site to open the receipt.', 'rc.title': 'Payment receipt', 'rc.no': 'Receipt no.', 'rc.date': 'Date paid', 'rc.to': 'Billed to', 'rc.item': 'Description', 'rc.amount': 'Amount paid', 'rc.method': 'Payment method', 'rc.ref': 'Transaction reference', 'rc.payee': 'Received by', 'rc.line': 'Lumio {p} plan — {m} month(s)', 'rc.foot': 'This is a receipt for a payment received. It is not a tax invoice.', 'rc.print': 'Print / save as PDF', 'exp.title': 'Your data', 'exp.note': 'Download everything in this workspace — creators, campaigns, calibration and payment history — as one JSON file.', 'exp.btn': 'Export data', 'acct.title': 'Account', 'acct.pwTitle': 'Change password', 'acct.pwNote': 'Changing it signs out every other device.', 'acct.phCurrent': 'Current password', 'acct.phNew': 'New password (min 8 chars)', 'acct.pwBtn': 'Update password', 'acct.delTitle': 'Delete account', 'acct.delNote': 'Permanently removes your account, creator library, campaigns and usage history. This cannot be undone.', 'acct.phConfirm': 'Confirm with your password', 'acct.delBtn': 'Delete my account', 'acct.fill': 'Please fill in the password fields.', 'acct.fail': 'Could not complete the request.', 'acct.pwOk': 'Password updated', 'acct.delConfirm': 'Delete your account and ALL of its data permanently? This cannot be undone.', 'acct.delOk': 'Your account has been deleted',
             't.backend': 'Backend unavailable', 't.failed': 'Failed', 't.loadFail': 'Failed to load', 't.netFail': 'Could not reach the server',
             't.planFail': 'Could not switch plan', 't.planOk': 'Plan updated', 'b.confirmFree': 'Switch to the Free plan?',
             't.runFirst': 'Run an optimization first', 't.campName': 'Enter a campaign name', 't.campSaved': 'Campaign saved! View it in the Campaigns tab.',
@@ -3675,12 +3755,12 @@
             'cd.record': 'Record Actual Results', 'cd.noActual': 'No actual results yet. Click "Record Actual Results" after the campaign ends.',
             'ar.title': 'Record Actual Results', 'ar.pred': 'Predicted GMV', 'ar.actual': 'Actual Total GMV (USD) *', 'ar.notes': 'Notes (optional)', 'ar.record': 'Record Results',
             'sim.hit': '🎯 To reach <span class="font-bold text-secondary">{t}</span> GMV at a <span class="font-data-mono">{b}</span> budget, you\'d need roughly <span class="font-bold text-secondary">{n} creators</span> in your library. <span class="text-on-surface-variant">Import or source more in Creators, then run a real optimization.</span>',
-            'sim.miss': '⚠️ <span class="font-bold" style="color:#FFA000">{t}</span> isn\'t reachable even with {n} creators at a <span class="font-data-mono">{b}</span> budget (max ≈ <span class="font-data-mono">{m}</span>). Raise the budget or lower the target.',
+            'sim.miss': '⚠️ <span class="font-bold" style="color:#C7CBD2">{t}</span> isn\'t reachable even with {n} creators at a <span class="font-data-mono">{b}</span> budget (max ≈ <span class="font-data-mono">{m}</span>). Raise the budget or lower the target.',
             'sim.info': '📈 At a <span class="font-data-mono">{b}</span> budget, a pool of <span class="font-bold">{n1}</span> creators reaches ~<span class="font-data-mono">{g1}</span>, growing to ~<span class="font-bold text-secondary">{g2}</span> at <span class="font-bold">{n2}</span>. Enter a <span class="text-on-surface">Target GMV</span> above to see how many creators you\'d need.',
             'sim.target': 'Target', 'sim.targetMark': '← target'
         });
         Object.assign(I18N.zh, {
-            'toast.demo': '欢迎体验在线演示——正在为你运行第一次优化…', 'toast.demoFail': '演示暂不可用——请确认后端已启动', 'toast.dlFail': '下载失败', 't.copied': '已复制', 'b.until': '有效期至 {d}', 'qr.term': '{m} 个月', 'qr.payExactly': '请支付', 'qr.copyAmount': '复制金额', 'qr.payee': '收款人：', 'qr.order': '订单号：', 'qr.s1': '用任意支持 DuitNow 的银行 App 或电子钱包（Touch \'n Go、GrabPay、Boost、MAE 等）扫码。', 'qr.s2': '请准确支付 <b>{a}</b>——我们靠金额识别你的订单，请勿四舍五入。', 'qr.s3': '把付款凭证上的交易参考号填到下方并提交。', 'qr.phRef': '交易参考号 / 凭证编号', 'qr.paid': '我已付款，提交', 'qr.needRef': '请填写付款凭证上的交易参考号。', 'qr.submitted': '已提交——确认到账后我们会为你开通套餐', 'qr.waitTitle': '付款已提交，等待确认', 'qr.waitBody': '订单 {n} · {a} · 参考号 {r}。我们核对到账后会为你开通套餐，通常在几小时内完成，届时会邮件通知你。', 'qr.rejected': '我们没有找到这笔付款', 'qr.help': '付款遇到问题？', 'qr.banner.pending': '你有一笔未完成的 {p} 付款（{a}）。', 'qr.banner.submitted': '付款 {n}（{a}）正在等待确认。', 'qr.banner.rejected': '付款 {n}（{a}）未能确认——请核对后重新提交。', 'qr.continue': '继续', 'qr.view': '查看', 'auth.phNewPass': '新密码（至少 8 位）', 'auth.resetTitle': '设置新密码', 'auth.resetBtn': '保存并登录', 'auth.forgotNeedEmail': '请先在上方填写账号邮箱，再点一次。', 'auth.forgotSent': '如果 <b>{e}</b> 已注册，重置链接已发往该邮箱，30 分钟内有效——也请检查垃圾邮件。', 'auth.verifySent': '账号已创建——验证链接已发送到你的邮箱', 'auth.verified': '邮箱验证成功', 'acct.verified': '{e} 已验证。', 'acct.unverified': '{e} 尚未验证——找回密码和付款通知都会发到这个邮箱。', 'acct.resend': '重新发送', 'auth.forgot': '忘记密码？', 'auth.forgotHelp': '请用注册时的联系方式通过 <a href="{wa}" target="_blank" rel="noopener" style="color:var(--teal)">WhatsApp</a> 或微信（<b>{wc}</b>）联系我们，核实身份后我们会发给你一个临时密码。', 'auth.legal': '继续即表示你同意我们的<a href="./legal.html#terms" target="_blank" rel="noopener" style="color:var(--teal)">服务条款</a>和<a href="./legal.html#privacy" target="_blank" rel="noopener" style="color:var(--teal)">隐私政策</a>。', 'footer.terms': '服务条款', 'footer.privacy': '隐私政策', 'team.title': '团队', 'team.seats': '已用 {u} / {s} 个席位', 'team.phEmail': '同事的邮箱', 'team.invite': '邀请', 'team.owner': '所有者', 'team.member': '成员', 'team.pending': '已邀请', 'team.you': '你', 'team.remove': '移除', 'team.revoke': '撤回', 'team.copy': '复制链接', 'team.sent': '邀请邮件已发送给 {e}', 'team.linkReady': '邀请链接已复制——请发给 {e}', 'team.removeConfirm': '确定把 {e} 移出工作区吗？对方会立即退出登录并失去访问权限，数据不受影响。', 'team.removed': '成员已移除', 'team.revoked': '邀请已撤回', 'team.hint': '团队成员共用这个达人库、投放活动和每月额度。只有你能管理账单和团队。', 'team.full': '{s} 个席位已全部使用——升级套餐后可邀请更多人。', 'team.fullFree': '免费版仅限一人使用。升级到 Pro（3 个席位）或 Team（10 个席位）即可邀请同事。', 'team.memberNote': '你是 <b>{e}</b> 工作区的成员。账单和团队由所有者管理。', 'team.joinTitle': '加入工作区', 'team.joinBtn': '加入', 'team.joinNote': '<b>{o}</b> 邀请了你。你将以 <b>{e}</b> 加入——请设置一个密码。', 'team.joined': '欢迎——你已加入工作区', 'acct.delNoteMember': '只会移除你自己在这个工作区的登录账号，工作区和数据仍归所有者。', 'ord.title': '付款记录', 'ord.receipt': '收据', 'ord.months': '{m} 个月', 'ord.pending': '待付款', 'ord.submitted': '审核中', 'ord.paid': '已付款', 'ord.rejected': '未确认', 'ord.expired': '已过期', 'ord.cancelled': '已取消', 'ord.popup': '请允许本站弹出窗口以打开收据。', 'rc.title': '付款收据', 'rc.no': '收据编号', 'rc.date': '付款日期', 'rc.to': '付款方', 'rc.item': '项目', 'rc.amount': '实付金额', 'rc.method': '付款方式', 'rc.ref': '交易参考号', 'rc.payee': '收款方', 'rc.line': 'tiko {p} 套餐 — {m} 个月', 'rc.foot': '本收据仅证明已收到款项，不是税务发票。', 'rc.print': '打印 / 另存为 PDF', 'exp.title': '你的数据', 'exp.note': '把这个工作区的全部内容——达人、投放活动、校准和付款记录——下载为一个 JSON 文件。', 'exp.btn': '导出数据', 'acct.title': '账号', 'acct.pwTitle': '修改密码', 'acct.pwNote': '修改后其他设备会自动退出登录。', 'acct.phCurrent': '当前密码', 'acct.phNew': '新密码（至少 8 位）', 'acct.pwBtn': '更新密码', 'acct.delTitle': '注销账号', 'acct.delNote': '将永久删除你的账号、达人库、投放活动和用量记录，且无法恢复。', 'acct.phConfirm': '输入密码以确认', 'acct.delBtn': '注销我的账号', 'acct.fill': '请填写密码。', 'acct.fail': '操作未能完成。', 'acct.pwOk': '密码已更新', 'acct.delConfirm': '确定要永久注销账号并删除全部数据吗？此操作无法撤销。', 'acct.delOk': '账号已注销',
+            'toast.demo': '欢迎体验在线演示——正在为你运行第一次优化…', 'toast.demoFail': '演示暂不可用——请确认后端已启动', 'toast.dlFail': '下载失败', 't.copied': '已复制', 'b.until': '有效期至 {d}', 'qr.term': '{m} 个月', 'qr.payExactly': '请支付', 'qr.copyAmount': '复制金额', 'qr.payee': '收款人：', 'qr.order': '订单号：', 'qr.s1': '用任意支持 DuitNow 的银行 App 或电子钱包（Touch \'n Go、GrabPay、Boost、MAE 等）扫码。', 'qr.s2': '请准确支付 <b>{a}</b>——我们靠金额识别你的订单，请勿四舍五入。', 'qr.s3': '把付款凭证上的交易参考号填到下方并提交。', 'qr.phRef': '交易参考号 / 凭证编号', 'qr.paid': '我已付款，提交', 'qr.needRef': '请填写付款凭证上的交易参考号。', 'qr.submitted': '已提交——确认到账后我们会为你开通套餐', 'qr.waitTitle': '付款已提交，等待确认', 'qr.waitBody': '订单 {n} · {a} · 参考号 {r}。我们核对到账后会为你开通套餐，通常在几小时内完成，届时会邮件通知你。', 'qr.rejected': '我们没有找到这笔付款', 'qr.help': '付款遇到问题？', 'qr.banner.pending': '你有一笔未完成的 {p} 付款（{a}）。', 'qr.banner.submitted': '付款 {n}（{a}）正在等待确认。', 'qr.banner.rejected': '付款 {n}（{a}）未能确认——请核对后重新提交。', 'qr.continue': '继续', 'qr.view': '查看', 'auth.phNewPass': '新密码（至少 8 位）', 'auth.resetTitle': '设置新密码', 'auth.resetBtn': '保存并登录', 'auth.forgotNeedEmail': '请先在上方填写账号邮箱，再点一次。', 'auth.forgotSent': '如果 <b>{e}</b> 已注册，重置链接已发往该邮箱，30 分钟内有效——也请检查垃圾邮件。', 'auth.verifySent': '账号已创建——验证链接已发送到你的邮箱', 'auth.verified': '邮箱验证成功', 'acct.verified': '{e} 已验证。', 'acct.unverified': '{e} 尚未验证——找回密码和付款通知都会发到这个邮箱。', 'acct.resend': '重新发送', 'auth.forgot': '忘记密码？', 'auth.forgotHelp': '请用注册时的联系方式通过 <a href="{wa}" target="_blank" rel="noopener" style="color:var(--teal)">WhatsApp</a> 或微信（<b>{wc}</b>）联系我们，核实身份后我们会发给你一个临时密码。', 'auth.legal': '继续即表示你同意我们的<a href="./legal.html#terms" target="_blank" rel="noopener" style="color:var(--teal)">服务条款</a>和<a href="./legal.html#privacy" target="_blank" rel="noopener" style="color:var(--teal)">隐私政策</a>。', 'footer.terms': '服务条款', 'footer.privacy': '隐私政策', 'team.title': '团队', 'team.seats': '已用 {u} / {s} 个席位', 'team.phEmail': '同事的邮箱', 'team.invite': '邀请', 'team.owner': '所有者', 'team.member': '成员', 'team.pending': '已邀请', 'team.you': '你', 'team.remove': '移除', 'team.revoke': '撤回', 'team.copy': '复制链接', 'team.sent': '邀请邮件已发送给 {e}', 'team.linkReady': '邀请链接已复制——请发给 {e}', 'team.removeConfirm': '确定把 {e} 移出工作区吗？对方会立即退出登录并失去访问权限，数据不受影响。', 'team.removed': '成员已移除', 'team.revoked': '邀请已撤回', 'team.hint': '团队成员共用这个达人库、投放活动和每月额度。只有你能管理账单和团队。', 'team.full': '{s} 个席位已全部使用——升级套餐后可邀请更多人。', 'team.fullFree': '免费版仅限一人使用。升级到 Pro（3 个席位）或 Team（10 个席位）即可邀请同事。', 'team.memberNote': '你是 <b>{e}</b> 工作区的成员。账单和团队由所有者管理。', 'team.joinTitle': '加入工作区', 'team.joinBtn': '加入', 'team.joinNote': '<b>{o}</b> 邀请了你。你将以 <b>{e}</b> 加入——请设置一个密码。', 'team.joined': '欢迎——你已加入工作区', 'acct.delNoteMember': '只会移除你自己在这个工作区的登录账号，工作区和数据仍归所有者。', 'ord.title': '付款记录', 'ord.receipt': '收据', 'ord.months': '{m} 个月', 'ord.pending': '待付款', 'ord.submitted': '审核中', 'ord.paid': '已付款', 'ord.rejected': '未确认', 'ord.expired': '已过期', 'ord.cancelled': '已取消', 'ord.popup': '请允许本站弹出窗口以打开收据。', 'rc.title': '付款收据', 'rc.no': '收据编号', 'rc.date': '付款日期', 'rc.to': '付款方', 'rc.item': '项目', 'rc.amount': '实付金额', 'rc.method': '付款方式', 'rc.ref': '交易参考号', 'rc.payee': '收款方', 'rc.line': 'Lumio {p} 套餐 — {m} 个月', 'rc.foot': '本收据仅证明已收到款项，不是税务发票。', 'rc.print': '打印 / 另存为 PDF', 'exp.title': '你的数据', 'exp.note': '把这个工作区的全部内容——达人、投放活动、校准和付款记录——下载为一个 JSON 文件。', 'exp.btn': '导出数据', 'acct.title': '账号', 'acct.pwTitle': '修改密码', 'acct.pwNote': '修改后其他设备会自动退出登录。', 'acct.phCurrent': '当前密码', 'acct.phNew': '新密码（至少 8 位）', 'acct.pwBtn': '更新密码', 'acct.delTitle': '注销账号', 'acct.delNote': '将永久删除你的账号、达人库、投放活动和用量记录，且无法恢复。', 'acct.phConfirm': '输入密码以确认', 'acct.delBtn': '注销我的账号', 'acct.fill': '请填写密码。', 'acct.fail': '操作未能完成。', 'acct.pwOk': '密码已更新', 'acct.delConfirm': '确定要永久注销账号并删除全部数据吗？此操作无法撤销。', 'acct.delOk': '账号已注销',
             't.backend': '后端不可用', 't.failed': '操作失败', 't.loadFail': '加载失败', 't.netFail': '无法连接服务器',
             't.planFail': '切换套餐失败', 't.planOk': '套餐已更新', 'b.confirmFree': '确定切换到免费版？',
             't.runFirst': '请先运行一次优化', 't.campName': '请输入投放名称', 't.campSaved': '投放已保存！可在「投放记录」中查看。',
@@ -3778,7 +3858,7 @@
             'cd.record': '录入实际结果', 'cd.noActual': '暂无实际结果。投放结束后点击「录入实际结果」。',
             'ar.title': '录入实际结果', 'ar.pred': '预测 GMV', 'ar.actual': '实际总 GMV（USD）*', 'ar.notes': '备注（可选）', 'ar.record': '提交结果',
             'sim.hit': '🎯 要在 <span class="font-data-mono">{b}</span> 预算下达到 <span class="font-bold text-secondary">{t}</span> GMV，你的达人库大约需要 <span class="font-bold text-secondary">{n} 位达人</span>。<span class="text-on-surface-variant">去「达人库」导入或补充更多，然后运行真正的优化。</span>',
-            'sim.miss': '⚠️ 在 <span class="font-data-mono">{b}</span> 预算下，即使有 {n} 位达人也无法达到 <span class="font-bold" style="color:#FFA000">{t}</span>（上限 ≈ <span class="font-data-mono">{m}</span>）。请提高预算或调低目标。',
+            'sim.miss': '⚠️ 在 <span class="font-data-mono">{b}</span> 预算下，即使有 {n} 位达人也无法达到 <span class="font-bold" style="color:#C7CBD2">{t}</span>（上限 ≈ <span class="font-data-mono">{m}</span>）。请提高预算或调低目标。',
             'sim.info': '📈 在 <span class="font-data-mono">{b}</span> 预算下，{n1} 位达人的池子可达约 <span class="font-data-mono">{g1}</span>，扩大到 {n2} 位时约 <span class="font-bold text-secondary">{g2}</span>。在上方输入<span class="text-on-surface">目标 GMV</span>，即可估算所需达人数量。',
             'sim.target': '目标', 'sim.targetMark': '← 目标'
         });
@@ -3790,7 +3870,7 @@
             'bench.noteLabel': 'Optimization Note:', 'bench.found': ' found the best portfolio',
             'bench.aboveHc': '{p}% above Hill Climber', 'bench.spread': '{p}% spread between best and worst',
             't.backendDown': '⚠️ Backend unavailable — run: uvicorn backend.main:app --reload',
-            'ag.title': 'tiko Copilot', 'ag.send': 'Send', 'ag.thinking': 'thinking…',
+            'ag.title': 'Lumio Copilot', 'ag.send': 'Send', 'ag.thinking': 'thinking…',
             'ag.ph': 'Ask about budgets, lineups, campaigns…',
             'ag.hello': 'Hi! I\'m your campaign copilot. I can run optimizations, browse your creator library and review campaigns for you.\nTry: "How should I spend $5,000 on beauty in Malaysia?"',
             'ag.err': 'Copilot unavailable — check the server and DEEPSEEK_API_KEY.'
@@ -4007,8 +4087,8 @@
             const unlimited = limit == null;
             const pct = unlimited ? 0 : Math.min(100, Math.round(used / limit * 100));
             const bar = unlimited || pct < 80
-                ? 'linear-gradient(90deg,#00F2EA,#00C853)'
-                : pct >= 100 ? '#FF0050' : '#ffb400';
+                ? 'linear-gradient(90deg,#D9DCE1,#EDEEF0)'
+                : pct >= 100 ? '#FF0050' : '#C7CBD2';
             const right = unlimited
                 ? `<span class="text-[12px] font-data-mono text-on-surface font-bold">${used.toLocaleString('en-US')} <span style="color:var(--good)">· ${T('b.unlimited')}</span></span>`
                 : `<span class="text-[12px] font-data-mono text-on-surface font-bold">${used.toLocaleString('en-US')} <span class="text-on-surface-variant/70 font-normal">/ ${limit.toLocaleString('en-US')}</span></span>`;
@@ -4070,7 +4150,7 @@
                 badge(T(m.role === 'member' ? 'team.member' : 'team.owner'), m.role === 'member' ? 'var(--mut)' : 'var(--teal)')
                 + (t.can_manage && m.role === 'member' ? `<button class="btn" data-email="${esc(m.email)}" onclick="teamRemove(this.dataset.email)">${T('team.remove')}</button>` : '')));
             const invites = t.invites.map(i => row('schedule_send', esc(i.email),
-                badge(T('team.pending'), '#f59e0b')
+                badge(T('team.pending'), '#80858E')
                 + `<button class="btn" data-link="${esc(i.link)}" onclick="copyText(this.dataset.link)">${T('team.copy')}</button>`
                 + `<button class="btn" onclick="teamRevoke(${Number(i.id)})">${T('team.revoke')}</button>`));
             document.getElementById('team-list').innerHTML = members.concat(invites).join('');
@@ -4129,7 +4209,7 @@
             if (!sec || !AUTH_TOKEN) return;
             ORDER_HISTORY = await myOrders();
             sec.style.display = ORDER_HISTORY.length ? '' : 'none';
-            const color = { paid: 'var(--good)', submitted: '#f59e0b', pending: 'var(--teal)', rejected: '#ef4444' };
+            const color = { paid: 'var(--good)', submitted: '#80858E', pending: 'var(--teal)', rejected: '#ef4444' };
             document.getElementById('orders-list').innerHTML = ORDER_HISTORY.map(o => `<div class="flex items-center gap-3">
                 <span class="text-on-surface-variant" style="width:86px">${esc((o.decided_at || o.created_at || '').slice(0, 10))}</span>
                 <span style="flex:1;min-width:0">${esc(o.plan_name)} · ${T('ord.months', { m: Number(o.months) })} <span class="text-on-surface-variant">· ${esc(o.order_no)}</span></span>
@@ -4149,13 +4229,13 @@
             w.document.write(`<!doctype html><html lang="${LANG}"><head><meta charset="utf-8"><title>${T('rc.title')} ${esc(o.order_no)}</title>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400..800&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
 <style>body{font:14px/1.6 Manrope,"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;color:#111;max-width:640px;margin:48px auto;padding:0 24px}
-h1{font-size:22px;margin:0}.brand{font-size:26px;font-weight:800;letter-spacing:-.5px;color:#0FB5AE}
+h1{font-size:22px;margin:0}.brand{font-size:26px;font-weight:800;letter-spacing:-.5px;color:#BFC3CA}
 .head{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:2px solid #111;padding-bottom:14px;margin-bottom:22px}
 table{width:100%;border-collapse:collapse}td{padding:9px 0;border-bottom:1px solid #e5e5e5;vertical-align:top}td.k{color:#666;width:42%}
 .total td{font-size:18px;font-weight:700;border-bottom:2px solid #111}.foot{margin-top:26px;color:#666;font-size:12px}
 button{margin-top:22px;padding:9px 16px;border:1px solid #111;background:#fff;border-radius:8px;font:inherit;cursor:pointer}
 @media print{button{display:none}body{margin:0 auto}}</style></head><body>
-<div class="head"><span class="brand">tiko</span><h1>${T('rc.title')}</h1></div>
+<div class="head"><span class="brand">Lumio</span><h1>${T('rc.title')}</h1></div>
 <table>
 ${line(T('rc.no'), esc(o.order_no))}
 ${line(T('rc.date'), esc((o.decided_at || '').slice(0, 10)))}
@@ -4172,7 +4252,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
             w.document.close();
         }
         function exportWorkspace() {
-            downloadFile('/account/export', `tiko-export-${new Date().toISOString().slice(0, 10)}.json`);
+            downloadFile('/account/export', `lumio-export-${new Date().toISOString().slice(0, 10)}.json`);
         }
 
         // ── Settings page: appearance, team, sign-in, data ──
@@ -4219,7 +4299,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
             document.getElementById('pay-plan-name').textContent = `${T('plan.' + id)} — $${price}${T('per.month')}`;
             document.getElementById('pay-account-email').textContent = AUTH_EMAIL || '—';
             document.getElementById('pay-wc-id').textContent = PAY_CONTACT.wechat;
-            const msg = encodeURIComponent(`Hi tiko! I'd like to upgrade to the ${name} plan ($${price}/mo). Account: ${AUTH_EMAIL || ''}`);
+            const msg = encodeURIComponent(`Hi Lumio! I'd like to upgrade to the ${name} plan ($${price}/mo). Account: ${AUTH_EMAIL || ''}`);
             document.getElementById('pay-wa-link').href = `https://wa.me/${PAY_CONTACT.whatsapp}?text=${msg}`;
             document.getElementById('pay-modal').classList.remove('hidden');
             initQrPay(id);
@@ -4271,7 +4351,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
         }
         function renderQrPay() {
             const o = PAY_ORDER, cfg = PAY_CFG, qr = document.getElementById('pay-qr');
-            const wa = `https://wa.me/${PAY_CONTACT.whatsapp}?text=${encodeURIComponent('Hi tiko! About my payment ' + o.order_no + ' — account: ' + (AUTH_EMAIL || ''))}`;
+            const wa = `https://wa.me/${PAY_CONTACT.whatsapp}?text=${encodeURIComponent('Hi Lumio! About my payment ' + o.order_no + ' — account: ' + (AUTH_EMAIL || ''))}`;
             const help = `<p class="text-[11px] text-on-surface-variant/70 mt-3">${T('qr.help')} <a href="${wa}" target="_blank" rel="noopener" style="color:var(--teal)">WhatsApp</a></p>`;
             if (o.status === 'submitted') {
                 qr.innerHTML = `
@@ -4327,7 +4407,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
             const o = (await myOrders()).find(x => ['pending', 'submitted', 'rejected'].includes(x.status));
             if (!o) { box.style.display = 'none'; return; }
             const icon = { pending: 'qr_code_2', submitted: 'hourglass_top', rejected: 'error' }[o.status];
-            const color = { pending: '#00F2EA', submitted: '#f59e0b', rejected: '#ef4444' }[o.status];
+            const color = { pending: '#D9DCE1', submitted: '#80858E', rejected: '#ef4444' }[o.status];
             const vars = { n: esc(o.order_no), a: payMoney(o), p: esc(o.plan_name) };
             box.style.display = 'flex';
             box.innerHTML = `<span class="material-symbols-outlined text-[18px]" style="color:${color}">${icon}</span>
@@ -4397,7 +4477,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
 
         function authNote(html, ok) {
             const e = document.getElementById('auth-error');
-            e.innerHTML = html; e.style.color = ok ? '#0FB5AE' : '#ef4444'; e.style.display = 'block';
+            e.innerHTML = html; e.style.color = ok ? '#BFC3CA' : '#ef4444'; e.style.display = 'block';
         }
         async function resetSubmit() {
             const pw = document.getElementById('auth-password');
@@ -4495,7 +4575,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
                 box.style.display = 'flex';
                 box.innerHTML = me.email_verified
                     ? `<span class="material-symbols-outlined text-[18px]" style="color:var(--good)">verified</span><span>${T('acct.verified', { e: esc(me.email) })}</span>`
-                    : `<span class="material-symbols-outlined text-[18px]" style="color:#f59e0b">mark_email_unread</span><span style="flex:1">${T('acct.unverified', { e: esc(me.email) })}</span><button class="btn" onclick="resendVerification(this)">${T('acct.resend')}</button>`;
+                    : `<span class="material-symbols-outlined text-[18px]" style="color:#80858E">mark_email_unread</span><span style="flex:1">${T('acct.unverified', { e: esc(me.email) })}</span><button class="btn" onclick="resendVerification(this)">${T('acct.resend')}</button>`;
             } catch (_) { /* status line is optional */ }
         }
         async function resendVerification(btn) {
@@ -4522,7 +4602,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
                 } catch (_) { authNote(T('t.netFail')); return; }
             }
             // No email on this server (or it failed): operator-assisted recovery.
-            const msg = encodeURIComponent(`Hi tiko! I forgot my password. Account: ${email}`);
+            const msg = encodeURIComponent(`Hi Lumio! I forgot my password. Account: ${email}`);
             const e = document.getElementById('auth-error');
             e.innerHTML = T('auth.forgotHelp', { wa: `https://wa.me/${PAY_CONTACT.whatsapp}?text=${msg}`, wc: PAY_CONTACT.wechat });
             e.style.color = '#7B8794'; e.style.display = 'block';
@@ -4575,7 +4655,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
 
         // ══════════ WORKFLOW PAGES — analytics, collaborations, AI scripts (backend/pipeline.py) ══════════
         const PL_STAGES = ['shortlisted', 'invited', 'negotiating', 'contracted', 'submitted', 'live', 'paid', 'declined'];
-        const PL_COLOR = { shortlisted: '#8B8B93', invited: '#25F4EE', negotiating: '#f59e0b', contracted: '#A855F7', submitted: '#5AA9FF', live: '#00C853', paid: '#EC4899', declined: '#FE2C55' };
+        const PL_COLOR = { shortlisted: '#8B8B93', invited: '#E6E8EB', negotiating: '#80858E', contracted: '#BFC3CA', submitted: '#BFC3CA', live: '#EDEEF0', paid: '#9EA3AD', declined: '#5C6068' };
         const stageChip = st => `<span class="st-chip" style="color:${PL_COLOR[st]};background:${PL_COLOR[st]}1f"><i style="background:${PL_COLOR[st]}"></i>${T('pl.s.' + st)}</span>`;
         const usdK = v => v >= 1e6 ? '$' + (v / 1e6).toFixed(1) + 'M' : v >= 1e4 ? '$' + Math.round(v / 1e3) + 'K' : '$' + Math.round(v || 0).toLocaleString('en-US');
         async function apiJson(path, opts) {
@@ -4606,10 +4686,10 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
                 <div class="kpi-top"><span class="kpi-ico"><span class="material-symbols-outlined" style="color:${color}">${icon}</span></span><b>${label}</b>${deltaBadge(delta)}</div>
                 <div class="kpi-val">${value}</div><div class="kpi-sub">${sub}</div>${sparkline(series, color)}</div>`;
             document.getElementById('an-kpis').innerHTML =
-                card('campaign', '#25F4EE', T('an.k.campaigns'), d.deltas.campaigns, k.campaigns, T('an.k.campaignsSub', { a: k.campaigns_active, c: k.campaigns_completed }), m.map(r => r.campaigns)) +
-                card('trending_up', '#A855F7', T('an.k.predicted'), d.deltas.predicted_gmv, usdK(k.predicted_gmv), T('an.k.predictedSub', { r: x(k.predicted_roi) }), m.map(r => r.predicted_gmv)) +
-                card('payments', '#00C853', T('an.k.actual'), d.deltas.actual_gmv, usdK(k.actual_gmv), k.campaigns_completed ? T('an.k.actualSub', { r: x(k.actual_roi) }) : T('an.k.noData'), m.map(r => r.actual_gmv)) +
-                card('target', '#f59e0b', T('an.k.accuracy'), null, k.avg_accuracy_pct == null ? '—' : k.avg_accuracy_pct + '%', T('an.k.accuracySub', { n: k.collaborations, p: k.acceptance_rate_pct == null ? '—' : k.acceptance_rate_pct + '%' }), m.map(r => r.spend));
+                card('campaign', '#E6E8EB', T('an.k.campaigns'), d.deltas.campaigns, k.campaigns, T('an.k.campaignsSub', { a: k.campaigns_active, c: k.campaigns_completed }), m.map(r => r.campaigns)) +
+                card('trending_up', '#BFC3CA', T('an.k.predicted'), d.deltas.predicted_gmv, usdK(k.predicted_gmv), T('an.k.predictedSub', { r: x(k.predicted_roi) }), m.map(r => r.predicted_gmv)) +
+                card('payments', '#EDEEF0', T('an.k.actual'), d.deltas.actual_gmv, usdK(k.actual_gmv), k.campaigns_completed ? T('an.k.actualSub', { r: x(k.actual_roi) }) : T('an.k.noData'), m.map(r => r.actual_gmv)) +
+                card('target', '#80858E', T('an.k.accuracy'), null, k.avg_accuracy_pct == null ? '—' : k.avg_accuracy_pct + '%', T('an.k.accuracySub', { n: k.collaborations, p: k.acceptance_rate_pct == null ? '—' : k.acceptance_rate_pct + '%' }), m.map(r => r.spend));
 
             // grouped bars: predicted vs actual per month
             const max = Math.max(...m.map(r => Math.max(r.predicted_gmv, r.actual_gmv)), 1), W = 600, H = 220, pad = 34, bw = (W - pad) / m.length;
@@ -4621,7 +4701,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
             m.forEach((r, i) => {
                 const x0 = pad + i * bw, h1 = (H - 40) * r.predicted_gmv / max, h2 = (H - 40) * r.actual_gmv / max, w = Math.min(22, bw / 3.2);
                 bars += `<rect x="${x0 + bw / 2 - w - 2}" y="${H - 30 - h1}" width="${w}" height="${h1}" rx="3" fill="#5C5C64"><title>${r.month} · ${T('an.predicted')} ${fmt(r.predicted_gmv)}</title></rect>
-                    <rect x="${x0 + bw / 2 + 2}" y="${H - 30 - h2}" width="${w}" height="${h2}" rx="3" fill="#25F4EE"><title>${r.month} · ${T('an.actual')} ${fmt(r.actual_gmv)}</title></rect>
+                    <rect x="${x0 + bw / 2 + 2}" y="${H - 30 - h2}" width="${w}" height="${h2}" rx="3" fill="#E6E8EB"><title>${r.month} · ${T('an.actual')} ${fmt(r.actual_gmv)}</title></rect>
                     <text x="${x0 + bw / 2}" y="${H - 10}" fill="#8B8B93" font-size="10.5" text-anchor="middle">${r.month.slice(2)}</text>`;
             });
             document.getElementById('an-chart').innerHTML = k.campaigns
@@ -4754,7 +4834,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
             if (!d) return;
             toast(T('pl.saved')); closePipelineModal(); loadPipeline();
         }
-        function exportPipeline() { downloadFile('/pipeline/export.csv' + pipelineQuery(), 'tiko-collaborations.csv'); }
+        function exportPipeline() { downloadFile('/pipeline/export.csv' + pipelineQuery(), 'lumio-collaborations.csv'); }
 
         // ── AI scripts ──
         // ── AI Studio (backend/studio.py) ──
@@ -4924,7 +5004,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
                     j.ready ? '' : j.status === 'failed' ? '<span class="material-symbols-outlined">error</span>' : '<span class="material-symbols-outlined av-spin">progress_activity</span>'}</div>
                 <div><p>${esc(j.prompt)}</p>
                     <small>${label(j)} · ${j.duration}s · ${esc(j.aspect)}${j.has_image ? ' · ' + T('av.withImage') : ''} · ${esc(fmtWhen(j.created_at))}${j.status === 'failed' && j.error ? '<br>' + esc(avError(j.error)) : ''}</small>
-                    <div class="pg-actions">${j.ready ? `<button class="btn btn-quiet" onclick="downloadFile('/studio/videos/${j.id}/file','tiko-ai-video-${j.id}.mp4')"><span class="material-symbols-outlined">download</span>${T('av.download')}</button>` : ''}
+                    <div class="pg-actions">${j.ready ? `<button class="btn btn-quiet" onclick="downloadFile('/studio/videos/${j.id}/file','lumio-ai-video-${j.id}.mp4')"><span class="material-symbols-outlined">download</span>${T('av.download')}</button>` : ''}
                         <button class="btn btn-quiet" style="color:#ef4444" onclick="deleteAiVideo(${j.id})"><span class="material-symbols-outlined">delete</span>${T('tp.delete')}</button></div></div>
             </div>`).join('');
             items.filter(j => j.ready).forEach(async j => {
@@ -5061,7 +5141,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
             if (last && board.cta) {                      // call-to-action pill on the closing scene
                 ctx.font = '700 34px Manrope, "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif';
                 const cta = wrapCaption(ctx, board.cta, W - 200)[0] || '', w = ctx.measureText(cta).width + 64;
-                ctx.fillStyle = '#25F4EE'; ctx.beginPath(); ctx.roundRect ? ctx.roundRect(60, y - 30, w, 72, 36) : ctx.rect(60, y - 30, w, 72); ctx.fill();
+                ctx.fillStyle = '#E6E8EB'; ctx.beginPath(); ctx.roundRect ? ctx.roundRect(60, y - 30, w, 72, 36) : ctx.rect(60, y - 30, w, 72); ctx.fill();
                 ctx.fillStyle = '#06090B'; ctx.fillText(cta, 92, y + 18);
             }
             ctx.restore();
@@ -5117,7 +5197,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
             btn.disabled = false;
             const url = URL.createObjectURL(new Blob(chunks, { type: mime.split(';')[0] }));
             const a = document.createElement('a');
-            a.href = url; a.download = `tiko-video-${new Date().toISOString().slice(0, 10)}.${mime.startsWith('video/mp4') ? 'mp4' : 'webm'}`;
+            a.href = url; a.download = `lumio-video-${new Date().toISOString().slice(0, 10)}.${mime.startsWith('video/mp4') ? 'mp4' : 'webm'}`;
             document.body.appendChild(a); a.click(); a.remove();
             setTimeout(() => URL.revokeObjectURL(url), 8000);
             status.textContent = T('sv.hint', { d: Math.round(videoLength()), n: VID.board.scenes.length });
@@ -5270,7 +5350,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
 
         // ── Contracts ──
         let CT_FOR = null, CT_CUR = null;
-        const CT_COLOR = { draft: '#8B8B93', sent: '#5AA9FF', signed: '#00C853', cancelled: '#FE2C55' };
+        const CT_COLOR = { draft: '#8B8B93', sent: '#BFC3CA', signed: '#EDEEF0', cancelled: '#5C6068' };
         async function openContractModal() {
             const r = PL_EDIT; if (!r) return;
             const d = await apiJson('/templates?kind=contract');
@@ -5568,10 +5648,10 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
                 });
 
             const allResults = [
-                { key: 'genetic_algorithm', label: 'Genetic Algorithm',   color: '#A855F7', style: 'population-based evolution' },
+                { key: 'genetic_algorithm', label: 'Genetic Algorithm',   color: '#BFC3CA', style: 'population-based evolution' },
                 { key: 'tabu_search',       label: 'Tabu Search',         color: '#06B6D4', style: 'memory-guided systematic search' },
-                { key: 'greedy_ranking',    label: 'Greedy Ranking',      color: '#F59E0B', style: 'LP relaxation + 2-OPT local swap' },
-                { key: 'simulated_annealing', label: 'Simulated Annealing', color: '#00C853', style: 'thermal exploration' },
+                { key: 'greedy_ranking',    label: 'Greedy Ranking',      color: '#80858E', style: 'LP relaxation + 2-OPT local swap' },
+                { key: 'simulated_annealing', label: 'Simulated Annealing', color: '#EDEEF0', style: 'thermal exploration' },
                 { key: 'hill_climber',      label: 'Hill Climber',        color: '#FB923C', style: 'greedy descent' },
             ].filter(a => !!results[a.key]).map(a => ({ ...a, gmv: results[a.key].total_gmv, obj: results[a.key].objective }));
             if (!allResults.length) return;
@@ -5699,7 +5779,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
             <div class="flex flex-wrap gap-1">
                 ${['Mega','Macro','Micro','Nano'].map(t => tb[t] > 0 ? `<span class="tier-chip ${TIER_BADGE[t] || ''}" style="font-size:10px">${TIER_EMOJI[t] || ''} ${tb[t]}</span>` : '').join('')}
             </div>
-            ${warnings > 0 ? `<div class="flex items-center gap-xs text-[11px] text-[#f1c40f]"><span class="material-symbols-outlined text-[14px]">warning</span> ${T('d.overlaps', { n: warnings })}</div>` : ''}
+            ${warnings > 0 ? `<div class="flex items-center gap-xs text-[11px] text-[#C7CBD2]"><span class="material-symbols-outlined text-[14px]">warning</span> ${T('d.overlaps', { n: warnings })}</div>` : ''}
           </div>`;
             }).join('');
             // Apply initial selection via selectPlan (handles borders + badges)
@@ -5708,7 +5788,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
 
         function selectPlan(name) {
             selectedPlanName = name;
-            const col = PLAN_COLORS[name] || '#00F2EA';
+            const col = PLAN_COLORS[name] || '#D9DCE1';
 
             // Update plan card borders — only selected card gets colored border
             document.querySelectorAll('.plan-card').forEach(c => {
@@ -5820,10 +5900,10 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
                 if (!badge || !data.results) return;
                 const total = 6, found = Object.keys(data.results).length;
                 const ok = found >= total;
-                dot.style.background  = ok ? '#00C853' : '#FF0050';
-                badge.style.borderColor = ok ? 'rgba(0,200,83,0.3)' : 'rgba(255,0,80,0.3)';
+                dot.style.background  = ok ? '#EDEEF0' : '#FF0050';
+                badge.style.borderColor = ok ? 'rgba(237,238,240,0.3)' : 'rgba(255,0,80,0.3)';
                 txt.textContent = ok ? T('d.algos', { f: found, t: total }) : T('d.algosBad', { f: found, t: total });
-                txt.style.color = ok ? '#00C853' : '#FF0050';
+                txt.style.color = ok ? '#EDEEF0' : '#FF0050';
                 badge.classList.remove('hidden');
             })();
             renderConvergence(data.results);
@@ -5881,34 +5961,34 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
                 grid += `<text x="52" y="${(y + 3).toFixed(1)}" fill="#9A9AA2" font-size="10" font-family="Manrope, Noto Sans SC, sans-serif" text-anchor="end">${fmtK(maxY * f)}</text>`;
                 grid += `<line x1="60" y1="${y.toFixed(1)}" x2="835" y2="${y.toFixed(1)}" stroke="#26262B" stroke-width="1" stroke-dasharray="3 4"/>`;
             }
-            const dots = pts.map((p, i) => `<circle cx="${xAt(i).toFixed(1)}" cy="${yAt(p.gmv).toFixed(1)}" r="3.5" fill="#00F2EA"/>`).join('');
+            const dots = pts.map((p, i) => `<circle cx="${xAt(i).toFixed(1)}" cy="${yAt(p.gmv).toFixed(1)}" r="3.5" fill="#D9DCE1"/>`).join('');
             let targetEls = '';
             if (target > 0) {
                 const above = target > maxY;
                 const ty = yAt(Math.min(target, maxY)).toFixed(1);
-                targetEls += `<line x1="60" y1="${ty}" x2="835" y2="${ty}" stroke="#FF0050" stroke-width="1.5" stroke-dasharray="6 4"/>`;
-                targetEls += `<text x="835" y="${(ty - 6)}" fill="#FF0050" font-size="10" text-anchor="end">${T('sim.target')} ${fmtK(target)}${above ? ' ↑' : ''}</text>`;
+                targetEls += `<line x1="60" y1="${ty}" x2="835" y2="${ty}" stroke="#D9DCE1" stroke-width="1.5" stroke-dasharray="6 4"/>`;
+                targetEls += `<text x="835" y="${(ty - 6)}" fill="#D9DCE1" font-size="10" text-anchor="end">${T('sim.target')} ${fmtK(target)}${above ? ' ↑' : ''}</text>`;
                 if (d.needed_n) {
                     const idx = pts.findIndex(p => p.n === d.needed_n);
-                    if (idx >= 0) { const mx = xAt(idx).toFixed(1); targetEls += `<line x1="${mx}" y1="${PLOT_Y}" x2="${mx}" y2="${PLOT_Y + PLOT_H}" stroke="#FF0050" stroke-width="1" stroke-dasharray="2 3" opacity="0.7"/>`; }
+                    if (idx >= 0) { const mx = xAt(idx).toFixed(1); targetEls += `<line x1="${mx}" y1="${PLOT_Y}" x2="${mx}" y2="${PLOT_Y + PLOT_H}" stroke="#D9DCE1" stroke-width="1" stroke-dasharray="2 3" opacity="0.7"/>`; }
                 }
             }
             document.getElementById('sim-svg').innerHTML = grid
                 + `<path d="${pathFor('baseline_gmv')}" fill="none" stroke="#5C5C64" stroke-width="2" stroke-dasharray="5 4"/>`
-                + `<path d="${pathFor('gmv')}" fill="none" stroke="#00F2EA" stroke-width="2.5"/>`
+                + `<path d="${pathFor('gmv')}" fill="none" stroke="#D9DCE1" stroke-width="2.5"/>`
                 + dots + targetEls;
             document.getElementById('sim-xlabels').innerHTML = pts.map(p => `<span>${p.n}</span>`).join('');
 
             const callout = document.getElementById('sim-callout');
             const first = pts[0], last = pts[pts.length - 1];
             if (target > 0 && d.needed_n) {
-                callout.style.background = 'rgba(0,200,83,0.08)'; callout.style.borderColor = 'rgba(0,200,83,0.3)';
+                callout.style.background = 'rgba(237,238,240,0.08)'; callout.style.borderColor = 'rgba(237,238,240,0.3)';
                 callout.innerHTML = T('sim.hit', { t: fmt(target), b: fmt(d.budget), n: d.needed_n });
             } else if (target > 0) {
-                callout.style.background = 'rgba(255,160,0,0.08)'; callout.style.borderColor = 'rgba(255,160,0,0.3)';
+                callout.style.background = 'rgba(199,203,210,0.08)'; callout.style.borderColor = 'rgba(199,203,210,0.3)';
                 callout.innerHTML = T('sim.miss', { t: fmt(target), n: last.n, b: fmt(d.budget), m: fmt(last.gmv) });
             } else {
-                callout.style.background = 'rgba(0,242,234,0.06)'; callout.style.borderColor = 'rgba(0,242,234,0.2)';
+                callout.style.background = 'rgba(217,220,225,0.06)'; callout.style.borderColor = 'rgba(217,220,225,0.2)';
                 callout.innerHTML = T('sim.info', { b: fmt(d.budget), n1: first.n, g1: fmt(first.gmv), g2: fmt(last.gmv), n2: last.n });
             }
 
@@ -6078,9 +6158,9 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
             } catch (e) { body.innerHTML = `<p class="text-[12px]" style="color:#ef4444">${T('t.netFail')}</p>`; }
         }
         const BA_ROLE = {
-            anchor: { color: '#00F2EA', icon: 'anchor' },
-            core:   { color: '#00C853', icon: 'storefront' },
-            test:   { color: '#F59E0B', icon: 'science' },
+            anchor: { color: '#D9DCE1', icon: 'anchor' },
+            core:   { color: '#EDEEF0', icon: 'storefront' },
+            test:   { color: '#80858E', icon: 'science' },
         };
         function renderBudgetPlan(d, el) {
             if (!d.buckets || !d.buckets.length) { el.innerHTML = `<p class="text-[12px] text-on-surface-variant">${T('ba.empty')}</p>`; return; }
@@ -6106,14 +6186,14 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
             if (d.rated_picks && d.rated_picks.length) {
                 html += `<div class="pt-1"><p class="text-[10px] text-on-surface-variant uppercase tracking-wider mb-xs">${T('ba.rated')}</p>
                     <div class="flex flex-wrap gap-xs">` +
-                    d.rated_picks.map(p => `<span class="text-[11px] px-2 py-1 rounded-full" style="background:rgba(255,194,77,.1);color:var(--gold);border:1px solid rgba(255,194,77,.35)" title="${fmt(p.cost)}">★${p.rating} ${p.name}</span>`).join('') +
+                    d.rated_picks.map(p => `<span class="text-[11px] px-2 py-1 rounded-full" style="background:rgba(217,220,225,.1);color:var(--gold);border:1px solid rgba(217,220,225,.35)" title="${fmt(p.cost)}">★${p.rating} ${p.name}</span>`).join('') +
                     `</div></div>`;
             }
             const notes = [];
             if (d.flags.includes('budget_stretch')) notes.push(T('ba.stretch'));
             const thin = d.flags.filter(f => f.startsWith('thin:')).map(f => f.slice(5));
             if (thin.length) notes.push(T('ba.thin', { t: thin.join(' / ') }));
-            if (notes.length) html += `<div class="p-sm rounded-lg text-[11px]" style="background:rgba(255,180,0,.07);border:1px solid rgba(255,180,0,.2);color:var(--warn)">${notes.join('<br>')}</div>`;
+            if (notes.length) html += `<div class="p-sm rounded-lg text-[11px]" style="background:rgba(199,203,210,.07);border:1px solid rgba(199,203,210,.2);color:var(--warn)">${notes.join('<br>')}</div>`;
             el.innerHTML = html;
         }
 
@@ -6147,7 +6227,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
         // ══════════ CREATORS: CRUD ══════════
         let currentPage = 0; const PG = 20; let editingId = null;
         async function loadTable() { const country = document.getElementById('f-country').value, category = document.getElementById('f-category').value, tier = document.getElementById('f-tier').value, ctype = document.getElementById('f-ctype').value, params = new URLSearchParams({ limit: PG, offset: currentPage * PG }); if (country) params.set('country', country); if (category) params.set('category', category); if (tier) params.set('tier', tier); if (ctype) params.set('content_type', ctype); try { const r = await fetch(`${API}/kols?${params}`); const d = await r.json(); renderTable(d.kols, d.total); } catch (e) { toast(T('t.backend'), 'err'); } }
-        function renderTable(kols, total) { document.getElementById('count-badge').textContent = T('cr.count', { n: total }); document.getElementById('page-info').textContent = total ? T('cr.pageInfo', { a: currentPage * PG + 1, b: Math.min((currentPage + 1) * PG, total), t: total }) : ''; document.getElementById('prev-btn').disabled = currentPage === 0; document.getElementById('next-btn').disabled = (currentPage + 1) * PG >= total; const tbody = document.getElementById('kol-tbody'); if (!kols.length) { tbody.innerHTML = '<tr><td colspan="9" class="text-center py-12 text-outline">' + T('cr.noCreators') + '</td></tr>'; return; } tbody.innerHTML = kols.map(k => { const tier = k.tier || 'Micro'; const demoBadge = k.source === 'synthetic' ? ` <span title="${T('cr.demoTip')}" style="padding:1px 6px;border-radius:99px;font-size:9px;font-weight:700;background:rgba(168,85,247,.16);color:#c4b5fd;vertical-align:middle">DEMO</span>` : ''; const estBadge = k.cost_estimated ? ` <span title="${T('cr.estTip')}" style="padding:1px 5px;border-radius:99px;font-size:9px;font-weight:700;background:rgba(245,158,11,.16);color:var(--warn);vertical-align:middle">${T('cr.est')}</span>` : ''; const ct = k.content_type || 'both'; const ctBadge = ct === 'live' ? `<span style="padding:1px 6px;border-radius:99px;font-size:9px;font-weight:700;background:rgba(255,0,80,.14);color:#ff7ba3">🔴 ${T('ct.badgeLive')}</span>` : ct === 'video' ? `<span style="padding:1px 6px;border-radius:99px;font-size:9px;font-weight:700;background:rgba(var(--accent-rgb),.12);color:#7df5f0">🎬 ${T('ct.badgeVideo')}</span>` : `<span style="padding:1px 6px;border-radius:99px;font-size:9px;font-weight:700;background:rgba(var(--mut-rgb),.12);color:var(--mut)">${T('ct.badgeBoth')}</span>`; const rateBadge = k.rating ? `<span title="${T('cr.rateTip')}" style="padding:1px 6px;border-radius:99px;font-size:9px;font-weight:700;background:rgba(255,194,77,.12);color:#FFC24D">★ ${k.rating}</span>` : ''; return `<tr class="row-hover border-t border-[#26262B]"><td class="px-4 py-3"><div class="font-semibold text-white">${k.name}${demoBadge}</div><div class="text-[11px] text-outline font-mono" style="display:flex;align-items:center;gap:6px">${catName(k.category)} · #${k.id} ${ctBadge}${rateBadge}</div></td><td class="px-4 py-3">${k.country}</td><td class="px-4 py-3">${catName(k.category)}</td><td class="px-4 py-3 text-right font-mono">${fmtF(k.followers)}</td><td class="px-4 py-3 text-right font-mono">${(k.engagement_rate * 100).toFixed(1)}%</td><td class="px-4 py-3 text-right font-mono">${fmt(k.cost)}${estBadge}</td><td class="px-4 py-3 text-center"><span class="${TIER_BADGE[tier]}" style="padding:2px 8px;border-radius:99px;font-size:11px;font-weight:700">${tierName(tier)}</span></td><td class="px-4 py-3 text-right font-mono text-secondary">${fmt(k.expected_gmv)}</td><td class="px-4 py-3 text-center"><button onclick="openEditModal(${k.id})" class="text-outline hover:text-secondary transition-colors"><span class="material-symbols-outlined text-[18px]">edit</span></button><button onclick="deleteKol(${k.id},'${k.name.replace(/'/g, "\\'")}' )" class="text-outline hover:text-error transition-colors ml-1"><span class="material-symbols-outlined text-[18px]">delete</span></button></td></tr>`; }).join(''); }
+        function renderTable(kols, total) { document.getElementById('count-badge').textContent = T('cr.count', { n: total }); document.getElementById('page-info').textContent = total ? T('cr.pageInfo', { a: currentPage * PG + 1, b: Math.min((currentPage + 1) * PG, total), t: total }) : ''; document.getElementById('prev-btn').disabled = currentPage === 0; document.getElementById('next-btn').disabled = (currentPage + 1) * PG >= total; const tbody = document.getElementById('kol-tbody'); if (!kols.length) { tbody.innerHTML = '<tr><td colspan="9" class="text-center py-12 text-outline">' + T('cr.noCreators') + '</td></tr>'; return; } tbody.innerHTML = kols.map(k => { const tier = k.tier || 'Micro'; const demoBadge = k.source === 'synthetic' ? ` <span title="${T('cr.demoTip')}" style="padding:1px 6px;border-radius:99px;font-size:9px;font-weight:700;background:rgba(191,195,202,.16);color:#c4b5fd;vertical-align:middle">DEMO</span>` : ''; const estBadge = k.cost_estimated ? ` <span title="${T('cr.estTip')}" style="padding:1px 5px;border-radius:99px;font-size:9px;font-weight:700;background:rgba(128,133,142,.16);color:var(--warn);vertical-align:middle">${T('cr.est')}</span>` : ''; const ct = k.content_type || 'both'; const ctBadge = ct === 'live' ? `<span style="padding:1px 6px;border-radius:99px;font-size:9px;font-weight:700;background:rgba(255,0,80,.14);color:#ff7ba3">🔴 ${T('ct.badgeLive')}</span>` : ct === 'video' ? `<span style="padding:1px 6px;border-radius:99px;font-size:9px;font-weight:700;background:rgba(var(--accent-rgb),.12);color:#7df5f0">🎬 ${T('ct.badgeVideo')}</span>` : `<span style="padding:1px 6px;border-radius:99px;font-size:9px;font-weight:700;background:rgba(var(--mut-rgb),.12);color:var(--mut)">${T('ct.badgeBoth')}</span>`; const rateBadge = k.rating ? `<span title="${T('cr.rateTip')}" style="padding:1px 6px;border-radius:99px;font-size:9px;font-weight:700;background:rgba(217,220,225,.12);color:#D9DCE1">★ ${k.rating}</span>` : ''; return `<tr class="row-hover border-t border-[#26262B]"><td class="px-4 py-3"><div class="font-semibold text-white">${k.name}${demoBadge}</div><div class="text-[11px] text-outline font-mono" style="display:flex;align-items:center;gap:6px">${catName(k.category)} · #${k.id} ${ctBadge}${rateBadge}</div></td><td class="px-4 py-3">${k.country}</td><td class="px-4 py-3">${catName(k.category)}</td><td class="px-4 py-3 text-right font-mono">${fmtF(k.followers)}</td><td class="px-4 py-3 text-right font-mono">${(k.engagement_rate * 100).toFixed(1)}%</td><td class="px-4 py-3 text-right font-mono">${fmt(k.cost)}${estBadge}</td><td class="px-4 py-3 text-center"><span class="${TIER_BADGE[tier]}" style="padding:2px 8px;border-radius:99px;font-size:11px;font-weight:700">${tierName(tier)}</span></td><td class="px-4 py-3 text-right font-mono text-secondary">${fmt(k.expected_gmv)}</td><td class="px-4 py-3 text-center"><button onclick="openEditModal(${k.id})" class="text-outline hover:text-secondary transition-colors"><span class="material-symbols-outlined text-[18px]">edit</span></button><button onclick="deleteKol(${k.id},'${k.name.replace(/'/g, "\\'")}' )" class="text-outline hover:text-error transition-colors ml-1"><span class="material-symbols-outlined text-[18px]">delete</span></button></td></tr>`; }).join(''); }
         function changePage(d) { currentPage = Math.max(0, currentPage + d); loadTable(); }
         function openAddModal() { editingId = null; document.getElementById('modal-title').textContent = T('m.addTitle'); document.getElementById('modal-submit').textContent = T('m.saveCreator'); document.getElementById('modal-submit').onclick = submitAdd; clearForm(); document.getElementById('modal').classList.remove('hidden'); }
         async function openEditModal(id) { editingId = id; document.getElementById('modal-title').textContent = T('m.editTitle'); document.getElementById('modal-submit').textContent = T('m.update'); document.getElementById('modal-submit').onclick = submitEdit; try { const r = await fetch(`${API}/kol/${id}`); const k = await r.json(); document.getElementById('f-name').value = k.name || ''; document.getElementById('f-url').value = k.tiktok_url || ''; document.getElementById('f-m-country').value = k.country || 'MY'; document.getElementById('f-m-cat').value = k.category || 'beauty'; document.getElementById('f-followers').value = k.followers || ''; document.getElementById('f-eng').value = k.engagement_rate || ''; document.getElementById('f-cost').value = k.cost || ''; document.getElementById('f-fit').value = k.fit_score || ''; document.getElementById('f-views').value = k.avg_views || ''; document.getElementById('f-likes').value = k.avg_likes || ''; document.getElementById('f-gender').value = k.gender_ratio || ''; document.getElementById('f-age').value = k.age_group || '18-24'; document.getElementById('f-ctype-modal').value = k.content_type || 'both'; document.getElementById('modal').classList.remove('hidden'); } catch (e) { toast(T('t.loadFail'), 'err'); } }
@@ -6346,7 +6426,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
                     ? '<span style="background:rgba(var(--good-rgb),0.15);color:var(--good);padding:2px 8px;border-radius:99px;font-size:11px;font-weight:700">' + T('cm.stCompleted') + '</span>'
                     : '<span style="background:rgba(var(--accent-rgb),0.1);color:var(--accent);padding:2px 8px;border-radius:99px;font-size:11px;font-weight:700">' + T('cm.stActive') + '</span>';
                 const accuracy = c.accuracy_pct != null
-                    ? `<span class="font-data-mono font-bold" style="color:${c.accuracy_pct>=90?'#00C853':c.accuracy_pct>=70?'#F59E0B':'#FF0050'}">${c.accuracy_pct}%</span>`
+                    ? `<span class="font-data-mono font-bold" style="color:${c.accuracy_pct>=90?'#EDEEF0':c.accuracy_pct>=70?'#80858E':'#FF0050'}">${c.accuracy_pct}%</span>`
                     : '<span class="text-on-surface-variant">—</span>';
                 const actualGmv = c.actual_total_gmv != null ? `<span class="font-data-mono text-secondary">${fmt(c.actual_total_gmv)}</span>` : '<span class="text-on-surface-variant">—</span>';
                 const date = new Date(c.created_at).toLocaleDateString(LANG === 'zh' ? 'zh-CN' : 'en-US',{month:'short',day:'numeric',year:'numeric'});
@@ -6388,12 +6468,12 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
             document.getElementById('cd-actual').textContent = c.actual_total_gmv != null ? fmt(c.actual_total_gmv) : '—';
             const accEl = document.getElementById('cd-accuracy');
             accEl.textContent = c.accuracy_pct != null ? c.accuracy_pct + '%' : '—';
-            accEl.style.color = c.accuracy_pct != null ? (c.accuracy_pct>=90?'#00C853':c.accuracy_pct>=70?'#F59E0B':'#FF0050') : '';
+            accEl.style.color = c.accuracy_pct != null ? (c.accuracy_pct>=90?'#EDEEF0':c.accuracy_pct>=70?'#80858E':'#FF0050') : '';
             document.getElementById('cd-budget').textContent = fmt(c.budget);
             document.getElementById('cd-cost').textContent = fmt(c.total_cost);
             const statusEl = document.getElementById('cd-status');
             statusEl.textContent = c.status === 'completed' ? T('cm.stCompleted') : T('cm.stActive');
-            statusEl.style.color = c.status === 'completed' ? '#00C853' : '#00F2EA';
+            statusEl.style.color = c.status === 'completed' ? '#EDEEF0' : '#D9DCE1';
             // Bar chart
             const bar = document.getElementById('cd-bar-chart');
             if (c.actual_total_gmv != null) {
@@ -6463,7 +6543,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
                 return `${x},${y}`;
             }).join(' ');
             const trend = values[values.length-1] >= values[0] ? '↑' : '↓';
-            const trendColor = values[values.length-1] >= values[0] ? '#00C853' : '#FF0050';
+            const trendColor = values[values.length-1] >= values[0] ? '#EDEEF0' : '#FF0050';
             return `<span style="color:${trendColor};font-size:11px;font-weight:bold">${trend}</span><svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" style="display:inline-block;vertical-align:middle;margin-left:4px"><polyline fill="none" stroke="${color}" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" points="${pts}"/></svg>`;
         }
 
@@ -6484,17 +6564,17 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
                 <div class="grid grid-cols-3 gap-md">
                     <div class="text-center p-md rounded-lg bg-surface-container-low">
                         <p class="text-[10px] text-on-surface-variant uppercase mb-sm">${T('k.engRate')}</p>
-                        <div class="flex items-center justify-center gap-xs">${renderSparkline(engVals,'#00F2EA')}</div>
+                        <div class="flex items-center justify-center gap-xs">${renderSparkline(engVals,'#D9DCE1')}</div>
                         <p class="font-data-mono font-bold text-primary text-[14px] mt-xs">${latestEng}</p>
                     </div>
                     <div class="text-center p-md rounded-lg bg-surface-container-low">
                         <p class="text-[10px] text-on-surface-variant uppercase mb-sm">${T('k.fitLbl')}</p>
-                        <div class="flex items-center justify-center gap-xs">${renderSparkline(fitVals,'#00C853')}</div>
+                        <div class="flex items-center justify-center gap-xs">${renderSparkline(fitVals,'#EDEEF0')}</div>
                         <p class="font-data-mono font-bold text-secondary text-[14px] mt-xs">${latestFit}</p>
                     </div>
                     <div class="text-center p-md rounded-lg bg-surface-container-low">
                         <p class="text-[10px] text-on-surface-variant uppercase mb-sm">${T('k.followersLbl')}</p>
-                        <div class="flex items-center justify-center gap-xs">${renderSparkline(folVals,'#A855F7')}</div>
+                        <div class="flex items-center justify-center gap-xs">${renderSparkline(folVals,'#BFC3CA')}</div>
                         <p class="font-data-mono font-bold text-on-surface text-[14px] mt-xs">${latestFol}</p>
                     </div>
                 </div>
@@ -6610,6 +6690,62 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
         }
 
     </script>
+
+<script>
+// Lumio: silver starfield on the landing page (twinkle, slow drift, occasional shooting star)
+// and a cursor-following spotlight on landing cards.
+(function () {
+    const lp = document.getElementById('landing-page');
+    const cv = document.getElementById('lp-stars');
+    if (!lp || !cv || !cv.getContext) return;
+    const ctx = cv.getContext('2d');
+    const still = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const TONES = ['255,255,255', '232,235,240', '200,205,214', '176,182,192'];
+    let W = 0, H = 0, stars = [], shoot = null, nextShoot = 0, scrollY = 0;
+    function resize() {
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        W = cv.clientWidth; H = cv.clientHeight; cv.width = W * dpr; cv.height = H * dpr;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        const n = Math.min(650, Math.round(W * H / 2400));
+        stars = Array.from({ length: n }, () => { const big = Math.random() < 0.06; const z = Math.random();
+            return { x: Math.random() * W, y: Math.random() * H, z, r: big ? 1.1 + Math.random() * 0.8 : 0.3 + Math.random() * 0.75,
+                a: big ? 0.8 : 0.18 + Math.random() * 0.5, tw: 0.4 + Math.random() * 1.8, ph: Math.random() * 6.28,
+                v: 0.6 + Math.random() * 2.4, big, c: TONES[(Math.random() * TONES.length) | 0] }; });
+    }
+    function draw(t) {
+        ctx.clearRect(0, 0, W, H); const sec = t / 1000;
+        for (const s of stars) {
+            // parallax: nearer stars move more as the page scrolls
+            const y = ((still ? s.y : s.y + sec * s.v) - scrollY * (0.04 + s.z * 0.12)) % H; const yy = y < 0 ? y + H : y;
+            const a = still ? s.a : s.a * (0.5 + 0.5 * Math.sin(sec * s.tw + s.ph));
+            ctx.fillStyle = `rgba(${s.c},${a.toFixed(3)})`; ctx.beginPath(); ctx.arc(s.x, yy, s.r, 0, 6.2832); ctx.fill();
+            if (s.big) { const g = s.r * 5 * (0.6 + 0.4 * a); ctx.strokeStyle = `rgba(235,238,242,${(a * 0.4).toFixed(3)})`; ctx.lineWidth = 0.6;
+                ctx.beginPath(); ctx.moveTo(s.x - g, yy); ctx.lineTo(s.x + g, yy); ctx.moveTo(s.x, yy - g); ctx.lineTo(s.x, yy + g); ctx.stroke(); }
+        }
+        if (still) return;
+        if (!shoot && t > nextShoot) shoot = { x: W * (0.25 + Math.random() * 0.7), y: H * Math.random() * 0.4, t0: t, len: 130 + Math.random() * 110 };
+        if (shoot) { const p = (t - shoot.t0) / 1000;
+            if (p >= 1) { shoot = null; nextShoot = t + 3500 + Math.random() * 5500; }
+            else { const hx = shoot.x - p * 380, hy = shoot.y + p * 190, al = Math.sin(p * Math.PI);
+                const gr = ctx.createLinearGradient(hx, hy, hx + shoot.len * .89, hy - shoot.len * .45);
+                gr.addColorStop(0, `rgba(255,255,255,${(0.9 * al).toFixed(3)})`); gr.addColorStop(1, 'rgba(255,255,255,0)');
+                ctx.strokeStyle = gr; ctx.lineWidth = 1.3; ctx.beginPath(); ctx.moveTo(hx, hy); ctx.lineTo(hx + shoot.len * .89, hy - shoot.len * .45); ctx.stroke();
+                ctx.fillStyle = `rgba(255,255,255,${al.toFixed(3)})`; ctx.beginPath(); ctx.arc(hx, hy, 1.4, 0, 6.2832); ctx.fill(); } }
+    }
+    function loop(t) { if (lp.style.display !== 'none' && !document.hidden) draw(t); requestAnimationFrame(loop); }
+    lp.addEventListener('scroll', () => { scrollY = lp.scrollTop; if (still) draw(0); }, { passive: true });
+    resize(); window.addEventListener('resize', () => { resize(); if (still) draw(0); });
+    nextShoot = performance.now() + 2200;
+    if (still) draw(0); else requestAnimationFrame(loop);
+
+    // spotlight follows the cursor across landing cards
+    lp.addEventListener('pointermove', e => {
+        const el = e.target.closest && e.target.closest('.lp-glass, .lp-plan, .lp-cwall .cwc'); if (!el) return;
+        const r = el.getBoundingClientRect();
+        el.style.setProperty('--mx', (e.clientX - r.left) + 'px'); el.style.setProperty('--my', (e.clientY - r.top) + 'px');
+    }, { passive: true });
+})();
+</script>
 </body>
 
 </html>
