@@ -63,6 +63,33 @@
         /* View toggle border */
         .view-toggle { border-color: #353530 !important; }
         .view-toggle button { color: #a7a7a0 !important; }
+        /* ── Onboarding quick starts ── */
+        .quick-starts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .quick-starts button { text-align: left; border: 1px solid #353530; background: #20201b; border-radius: 12px; padding: 12px 14px; color: #e5e2da; cursor: pointer; transition: border-color .2s, transform .2s; }
+        .quick-starts button:hover { border-color: #00F2EA; transform: translateY(-2px); }
+        .quick-starts b { display: block; font-size: 13px; }
+        .quick-starts span { font-size: 12px; color: #a7a7a0; }
+        .onboard-steps { list-style: none; padding: 0; margin: 18px 0 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; font-size: 12.5px; color: #a7a7a0; text-align: left; }
+        .onboard-steps b { color: #e5e2da; }
+        @media (max-width: 700px) { .quick-starts, .onboard-steps { grid-template-columns: 1fr; } }
+        /* ── Mobile app shell: sidebar slides in from the left ── */
+        #menu-btn, #sidebar-scrim { display: none; }
+        @media (max-width: 900px) {
+            #app-sidebar { transform: translateX(-100%); transition: transform .25s ease; width: 86vw !important; max-width: 300px; overflow-y: auto; }
+            body.sidebar-open #app-sidebar { transform: none; }
+            #sidebar-scrim { position: fixed; inset: 0; background: rgba(0,0,0,.55); z-index: 45; }
+            body.sidebar-open #sidebar-scrim { display: block; }
+            #app-main { margin-left: 0 !important; }
+            #app-main > header { padding-left: 12px !important; padding-right: 12px !important; gap: 8px; }
+            #menu-btn { display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 10px; border: 1px solid #353530; background: #20201b; color: #e5e2da; flex-shrink: 0; }
+            #page-title { font-size: 18px !important; line-height: 1.2 !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+            #algo-status-badge { display: none !important; }
+            #app-main [class*="p-margin-desktop"] { padding: 14px !important; }
+            #app-main .grid-cols-12, #app-main .grid-cols-5, #app-main .grid-cols-4, #app-main .grid-cols-3 { grid-template-columns: 1fr !important; }
+            #app-main [class*="col-span-"] { grid-column: auto !important; }
+            #app-main table { display: block; overflow-x: auto; }
+        }
+        .view-toggle button.active { color: #031414 !important; font-weight: 700; }
         /* Plan card colors */
         .border-\[\#FE2C55\] { border-color: #FF0050 !important; }
         /* Technical view utilities not in compiled CSS */
@@ -389,7 +416,7 @@
                 <div style="width:34px;height:34px;border-radius:9px;background:#000;display:flex;align-items:center;justify-content:center">
                     <span style="color:#fff;font-weight:800;font-size:12px;letter-spacing:-.5px">tiko</span>
                 </div>
-                <span style="font-weight:800;font-size:17px;color:var(--on-surface,#1f2933)">KOL Optimizer</span>
+                <span style="font-weight:800;font-size:17px;color:#e5e2da">KOL Optimizer</span>
             </div>
             <p id="auth-title" style="font-size:20px;font-weight:800;margin:14px 0 2px">Sign in</p>
             <p id="auth-sub" style="font-size:12.5px;color:#7B8794;margin-bottom:18px">Each merchant gets a private, isolated creator library.</p>
@@ -524,7 +551,7 @@
                             <span class="material-symbols-outlined" style="font-size:20px">bolt</span>
                             Start Optimizing Free
                         </button>
-                        <button class="lp-btn lp-btn-ghost" onclick="enterApp()">
+                        <button class="lp-btn lp-btn-ghost" onclick="seeDemo()">
                             <span class="material-symbols-outlined" style="font-size:20px">play_circle</span>
                             See Live Demo
                         </button>
@@ -699,7 +726,8 @@
     </div>
 
     <!-- ═══════════ SIDEBAR ═══════════ -->
-    <aside
+    <div id="sidebar-scrim" onclick="toggleSidebar(false)"></div>
+    <aside id="app-sidebar"
         class="h-screen w-[280px] fixed left-0 top-0 border-r border-outline-variant bg-surface-container flex flex-col py-lg px-md z-50">
         <button id="brand-home" type="button" onclick="backToLanding()" title="Back to home"
             class="flex items-center gap-md mb-xl px-xs w-full text-left group">
@@ -829,10 +857,13 @@
     </aside>
 
     <!-- ═══════════ MAIN ═══════════ -->
-    <main class="ml-[280px] h-screen overflow-y-auto bg-background">
+    <main id="app-main" class="ml-[280px] h-screen overflow-y-auto bg-background">
         <header
             class="sticky top-0 z-40 flex justify-between items-center px-margin-desktop h-16 bg-background/80 backdrop-blur-xl border-b border-outline-variant">
-            <h2 id="page-title" class="font-headline-lg text-headline-lg text-on-surface">Optimizer Dashboard</h2>
+            <div class="flex items-center gap-sm min-w-0">
+                <button id="menu-btn" type="button" onclick="toggleSidebar()" aria-label="Open menu"><span class="material-symbols-outlined">menu</span></button>
+                <h2 id="page-title" class="font-headline-lg text-headline-lg text-on-surface">Optimizer Dashboard</h2>
+            </div>
             <div class="flex items-center gap-md">
                 <div id="error-banner"
                     class="hidden bg-error-container text-on-error-container px-md py-sm rounded-lg text-sm font-bold">
@@ -859,6 +890,19 @@
                 <h3 class="font-headline-lg text-headline-lg text-on-surface mb-sm">Ready to Optimize</h3>
                 <p class="text-on-surface-variant max-w-md">Configure your campaign settings on the left, then click
                     <span class="text-primary font-bold">Run Optimization</span> to find the best KOL matrix.</p>
+                <div class="mt-lg w-full max-w-2xl">
+                    <p class="text-[12px] uppercase tracking-wider text-on-surface-variant mb-sm">Or try a quick start</p>
+                    <div class="quick-starts">
+                        <button type="button" onclick="quickStart(['MY'],'beauty',3000)"><b>🇲🇾 Malaysia · Beauty</b><span>$3,000 budget</span></button>
+                        <button type="button" onclick="quickStart(['ID','TH'],'fashion',8000)"><b>🇮🇩🇹🇭 Indonesia + Thailand · Fashion</b><span>$8,000 budget</span></button>
+                        <button type="button" onclick="quickStart(['PH'],'fmcg',1500)"><b>🇵🇭 Philippines · FMCG</b><span>$1,500 budget</span></button>
+                    </div>
+                    <ol class="onboard-steps">
+                        <li><b>1. Pick</b> a budget, markets and a category.</li>
+                        <li><b>2. Run</b> to get your best creator lineup and three risk plans.</li>
+                        <li><b>3. Save</b> it as a campaign, then log real sales to sharpen future predictions.</li>
+                    </ol>
+                </div>
             </div>
 
             <!-- Results -->
@@ -1993,6 +2037,10 @@
         // Runs after sign-in: resume the plan chosen before the account existed.
         function afterSignIn() {
             loadBilling();
+            if (sessionStorage.getItem('kol_pending_demo')) {
+                sessionStorage.removeItem('kol_pending_demo');
+                setTimeout(() => quickStart(['MY'], 'beauty', 3000), 700);
+            }
             if (PENDING_PLAN) {
                 const p = PENDING_PLAN; PENDING_PLAN = null; sessionStorage.removeItem('kol_pending_plan');
                 choosePlan(p);
@@ -2069,7 +2117,8 @@
         }
 
         // ══════════ COUNTRY MULTI-SELECT ══════════
-        const COUNTRY_LABELS = { MY:'MY', ID:'ID', TH:'TH', PH:'PH', SG:'SG', VN:'VN' };
+        const COUNTRY_LABELS = { MY:'🇲🇾 Malaysia', ID:'🇮🇩 Indonesia', TH:'🇹🇭 Thailand', PH:'🇵🇭 Philippines', SG:'🇸🇬 Singapore', VN:'🇻🇳 Vietnam' };
+        const COUNTRY_SHORT = { MY:'🇲🇾 MY', ID:'🇮🇩 ID', TH:'🇹🇭 TH', PH:'🇵🇭 PH', SG:'🇸🇬 SG', VN:'🇻🇳 VN' };
 
         function toggleCountryDropdown() {
             const dd = document.getElementById('country-dropdown');
@@ -2098,8 +2147,9 @@
             const selected = [...document.querySelectorAll('.country-cb:checked')].map(cb => cb.value);
             const el = document.getElementById('country-display');
             el.textContent = selected.length === 0 ? '🌏 All Countries'
-                : selected.length <= 3 ? selected.map(c => COUNTRY_LABELS[c]).join(' · ')
-                : selected.slice(0, 2).map(c => COUNTRY_LABELS[c]).join(' · ') + ` +${selected.length - 2}`;
+                : selected.length === 1 ? COUNTRY_LABELS[selected[0]]
+                : selected.length <= 3 ? selected.map(c => COUNTRY_SHORT[c]).join(' · ')
+                : selected.slice(0, 2).map(c => COUNTRY_SHORT[c]).join(' · ') + ` +${selected.length - 2}`;
         }
 
         function getSelectedCountries() {
@@ -2131,7 +2181,31 @@
 
         // ══════════ SIDEBAR ══════════
         const budgetSlider = document.getElementById('budget-slider'), budgetDisplay = document.getElementById('budget-display');
-        budgetSlider.addEventListener('input', () => { const v = parseInt(budgetSlider.value); budgetDisplay.textContent = v >= 1000 ? '$' + (v / 1000).toFixed(0) + 'k' : '$' + v; });
+        budgetSlider.addEventListener('input', () => { budgetDisplay.textContent = '$' + parseInt(budgetSlider.value).toLocaleString('en-US'); });
+
+        function toggleSidebar(open) {
+            const on = open === undefined ? !document.body.classList.contains('sidebar-open') : open;
+            document.body.classList.toggle('sidebar-open', on);
+        }
+        // Close the mobile menu after choosing a page or running.
+        document.querySelectorAll('.nav-item').forEach(el => el.addEventListener('click', () => toggleSidebar(false)));
+        document.getElementById('run-btn').addEventListener('click', () => toggleSidebar(false));
+
+        // Preset a campaign and run it (empty-state quick starts and the landing "See Live Demo").
+        function quickStart(countries, category, budget) {
+            document.querySelectorAll('.country-cb').forEach(cb => { cb.checked = countries.includes(cb.value); });
+            document.getElementById('country-all').checked = countries.length === 0;
+            refreshCountryDisplay();
+            document.getElementById('category-select').value = category;
+            budgetSlider.value = budget;
+            budgetSlider.dispatchEvent(new Event('input'));
+            document.getElementById('run-btn').click();
+        }
+        function seeDemo() {
+            if (!AUTH_TOKEN) { sessionStorage.setItem('kol_pending_demo', '1'); showAuth('register'); return; }
+            enterApp();
+            setTimeout(() => quickStart(['MY'], 'beauty', 3000), 700);
+        }
 
         function showError(msg) { const b = document.getElementById('error-banner'); b.textContent = msg; b.classList.remove('hidden'); setTimeout(() => b.classList.add('hidden'), 5000); }
         function toast(msg, type = 'ok') { const t = document.createElement('div'); t.className = 'toast ' + type; t.textContent = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 3000); }
@@ -2325,7 +2399,8 @@
                 // Pre-fetch enhanced KOL data for enriched cards
                 try {
                     const firstCountry = (payload.countries && payload.countries.length > 0) ? payload.countries[0] : '';
-                    const kolParams = new URLSearchParams({ limit: 200, country: firstCountry, category: payload.category });
+                    const kolParams = new URLSearchParams({ limit: 200, category: payload.category });
+                    if (firstCountry) kolParams.set('country', firstCountry);
                     const kolRes = await fetch(`${API}/kols?${kolParams}`);
                     if (kolRes.ok) {
                         const kolData = await kolRes.json();
