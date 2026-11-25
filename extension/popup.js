@@ -15,7 +15,7 @@ const TEXT = zh ? {
     rejected: '连接码已失效或不属于这个网站，请重新生成。', failed: '采集失败。',
     last: '上次采集', reload: '请刷新这个页面后再试。',
     today: '今日采集', total: '累计采集', queue: '待重试', flush: n => `立即重试 ${n} 条`, flushed: n => `已补发 ${n} 条`,
-    update: v => `插件有新版本 ${v}，请到 Lumio 网站「发现达人」重新下载安装。`, openSite: '打开 Lumio',
+    update: v => `插件有新版本 ${v}，请到 Lumio 网站「发现达人」重新下载安装。`, openSite: '打开 Lumio', guide: '使用说明',
 } : {
     sub: 'Creator Capture',
     intro: 'When you open a TikTok creator\'s profile, sends the handle, follower and like counts shown on that page to Lumio\'s Explore pool, so your team can find and shortlist them.',
@@ -31,7 +31,7 @@ const TEXT = zh ? {
     rejected: 'That code has expired or belongs to another site. Create a new one.', failed: 'Capture failed.',
     last: 'Last capture', reload: 'Reload this page and try again.',
     today: 'Today', total: 'All time', queue: 'Waiting', flush: n => `Retry ${n} now`, flushed: n => `Sent ${n}`,
-    update: v => `Version ${v} is available. Download it again from Lumio's Explore page.`, openSite: 'Open Lumio',
+    update: v => `Version ${v} is available. Download it again from Lumio's Explore page.`, openSite: 'Open Lumio', guide: 'How to use',
 };
 const $ = id => document.getElementById(id);
 const fmt = n => n >= 1e6 ? (n / 1e6).toFixed(1) + 'M' : n >= 1e3 ? (n / 1e3).toFixed(1) + 'K' : String(n || 0);
@@ -86,7 +86,7 @@ function labels() {
     [['t-sub', 'sub'], ['t-intro', 'intro'], ['t-code-label', 'codeLabel'], ['connect', 'connect'], ['t-where', 'where'],
      ['t-connected', 'connected'], ['capture', 'capture'], ['t-auto', 'auto'], ['t-toast', 'toast'], ['t-auto-note', 'autoNote'],
      ['disconnect', 'disconnect'], ['t-expired', 'expired'], ['reconnect', 'reconnect'], ['t-today', 'today'],
-     ['t-total', 'total'], ['t-queue', 'queue'], ['open-site', 'openSite']].forEach(([id, k]) => set(id, k));
+     ['t-total', 'total'], ['t-queue', 'queue'], ['open-site', 'openSite'], ['open-guide', 'guide'], ['open-guide2', 'guide']].forEach(([id, k]) => set(id, k));
 }
 
 async function render() {
