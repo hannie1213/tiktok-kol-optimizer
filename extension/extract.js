@@ -97,5 +97,5 @@
 
     const api = { parseCount, handleFromPath, isProfilePath, extractProfile };
     if (typeof module !== 'undefined' && module.exports) module.exports = api;
-    else root.TikoExtract = api;
+    else root.LumioExtract = root.TikoExtract = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

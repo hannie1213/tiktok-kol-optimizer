@@ -165,3 +165,14 @@ def test_extension_zip_contains_a_loadable_extension():
     names = zipfile.ZipFile(io.BytesIO(r.content)).namelist()
     for f in ("manifest.json", "background.js", "content.js", "extract.js", "popup.html", "popup.js"):
         assert f"lumio-capture/{f}" in names
+
+
+def test_extension_zip_includes_icons_and_ping_reports_account():
+    names = zipfile.ZipFile(io.BytesIO(client.get("/extension/download").content)).namelist()
+    assert "lumio-capture/icons/icon128.png" in names
+    h, _tenant = _account()
+    email = client.get("/auth/me", headers=h).json()["email"]
+    d = client.get("/extension/ping", headers=_ext(h)).json()
+    assert d["ok"] and d["email"] == email and d["latest_version"]
+    # a normal sign-in token is not an extension code
+    assert client.get("/extension/ping", headers=h).status_code == 401
