@@ -248,7 +248,7 @@
         #landing-page {
             position: fixed; inset: 0; z-index: 1000;
             overflow-y: auto; overflow-x: hidden;
-            background: var(--lp-bg, #08080A);
+            background: var(--lp-bg, #05070F);
             transition: background 1s ease;
             color: #ece9e2;
             font-family: var(--font-ui);
@@ -853,8 +853,8 @@
     <script>
         // before first paint, so there is no flash of the wrong theme
         (function () {
-            var p = 'dark';
-            try { p = localStorage.getItem('tiko_theme') || 'dark'; } catch (e) {}
+            var p = 'light';
+            try { p = localStorage.getItem('tiko_theme') || 'light'; } catch (e) {}
             var light = p === 'light' || (p === 'system' && window.matchMedia('(prefers-color-scheme: light)').matches);
             document.documentElement.dataset.theme = light ? 'light' : 'dark';
         })();
@@ -1167,6 +1167,73 @@
             .wordmark, .lumio-mark .lumio-star, .lp-h1 em, .lp-h2 em, .lp-final h2 em, .lp-marquee .track em, .lp-galaxy, .lp-plan.hot::after, .lp-kicker .dot { animation: none !important; }
         }
     </style>
+
+    <!-- ═══════════ STARRY ACCENTS · midnight navy, nebula blues, light console by default ═══════════ -->
+    <style>
+        :root { --lumio-navy: #0B1530; --lumio-nebula: #1B2B5C; --lumio-indigo: #3B4F8F; --lumio-starlight: #B9C8F0; }
+        /* Landing: deep-space nebula washes behind the stars */
+        .lp-nebula { position: fixed; inset: -10vh -10vw; z-index: 0; pointer-events: none;
+            background:
+                radial-gradient(60vw 45vh at 78% 12%, rgba(43,66,150,.32), transparent 65%),
+                radial-gradient(50vw 40vh at 12% 70%, rgba(27,43,92,.45), transparent 62%),
+                radial-gradient(40vw 30vh at 55% 105%, rgba(70,92,170,.20), transparent 65%),
+                radial-gradient(30vw 22vh at 30% 18%, rgba(120,140,210,.10), transparent 70%);
+            filter: blur(20px); animation: nebulaDrift 40s ease-in-out infinite alternate; }
+        @keyframes nebulaDrift { from { transform: translate3d(0,0,0) scale(1); } to { transform: translate3d(-3vw,2vh,0) scale(1.06); } }
+        .lp-galaxy { background: radial-gradient(ellipse 55% 14% at 50% 50%, rgba(170,190,245,.10), transparent 70%),
+                                 radial-gradient(ellipse 30% 7% at 46% 50%, rgba(230,236,255,.07), transparent 70%) !important; }
+        .lp-h1 em, .lp-h2 em, .lp-final h2 em, .lp-marquee .track em {
+            background-image: linear-gradient(100deg, #8E9BC0 0%, #F5F7FF 18%, #FFFFFF 24%, #A9B6DA 40%, #E6EBFA 62%, #FFFFFF 70%, #8E9BC0 100%) !important;
+            filter: drop-shadow(0 0 24px rgba(150,175,255,.22)); }
+        .wordmark { background-image: linear-gradient(110deg, #FFFFFF 0%, #C9D2EA 30%, #8E98B4 50%, #E9EDF7 70%, #FFFFFF 100%); }
+        .lp-kicker .dot { box-shadow: 0 0 14px rgba(185,200,240,.9) !important; }
+        .lp-plan.hot { box-shadow: 0 0 0 1px rgba(185,200,240,.22), 0 30px 80px -40px rgba(90,120,220,.45) !important; }
+        .lp-glass::before, .lp-plan::before, .lp-cwall .cwc::before { background: radial-gradient(380px circle at var(--mx) var(--my), rgba(170,190,255,.10), transparent 60%) !important; }
+        #lp-preloader { background: #05070F !important; }
+
+        /* Dark console: a midnight-blue glow at the top */
+        html:not([data-theme="light"]) main.bg-background {
+            background:
+                radial-gradient(1px 1px at 23px 41px, rgba(220,228,255,.45), transparent 60%),
+                radial-gradient(1px 1px at 117px 163px, rgba(220,228,255,.28), transparent 60%),
+                radial-gradient(1.4px 1.4px at 181px 77px, rgba(255,255,255,.42), transparent 60%),
+                radial-gradient(1px 1px at 67px 211px, rgba(190,206,255,.25), transparent 60%),
+                radial-gradient(1px 1px at 263px 251px, rgba(255,255,255,.35), transparent 60%),
+                radial-gradient(1px 1px at 301px 139px, rgba(190,206,255,.22), transparent 60%),
+                radial-gradient(1000px 520px at 85% -200px, rgba(43,66,150,.22), transparent 70%),
+                radial-gradient(800px 420px at 10% -160px, rgba(27,43,92,.30), transparent 70%), #070912 !important;
+            background-size: 340px 290px, 340px 290px, 340px 290px, 340px 290px, 340px 290px, 340px 290px, auto, auto, auto !important;
+            background-attachment: fixed !important;
+        }
+
+        /* Light console (default): cool silver-white with midnight-navy accents */
+        html[data-theme="light"] {
+            --bg0: #F2F4F9; --bg1: #FFFFFF; --bg2: #F5F7FB; --bg3: #EBEEF5; --bg4: #DFE3ED;
+            --bg0-rgb: 242,244,249; --line: #E0E4EE; --line-rgb: 224,228,238;
+            --ink: #0E1428; --mut: #59617A; --mut-rgb: 89,97,122; --mut2: #6A7290; --dim: #8A91A8;
+            --accent: #1E2F5E; --accent-rgb: 30,47,94; --teal: #2B4285;
+            --good: #1E2F5E; --good-rgb: 30,47,94; --gold: #3B4F8F; --warn: #4A557A;
+            --btn-bg: #0E1A3A; --btn-bg-hover: #1B2B5C; --btn-fg: #FFFFFF;
+        }
+        html[data-theme="light"] main.bg-background {
+            background:
+                radial-gradient(1.2px 1.2px at 23px 41px, rgba(30,47,94,.22), transparent 60%),
+                radial-gradient(1px 1px at 181px 77px, rgba(30,47,94,.16), transparent 60%),
+                radial-gradient(1px 1px at 263px 251px, rgba(59,79,143,.18), transparent 60%),
+                radial-gradient(1000px 480px at 85% -220px, rgba(59,79,143,.12), transparent 70%),
+                radial-gradient(900px 420px at 5% -200px, rgba(185,200,240,.35), transparent 70%), var(--bg0) !important;
+            background-size: 340px 290px, 340px 290px, 340px 290px, auto, auto !important;
+            background-attachment: fixed !important;
+        }
+        html[data-theme="light"] .wordmark { background-image: linear-gradient(110deg, #0B1530 0%, #3B4F8F 40%, #0B1530 60%, #2B4285 100%) !important; }
+        html[data-theme="light"] #landing-page .wordmark, html[data-theme="light"] #auth-overlay .wordmark, html[data-theme="light"] #lp-preloader .wordmark {
+            background-image: linear-gradient(110deg, #FFFFFF 0%, #C9D2EA 30%, #8E98B4 50%, #E9EDF7 70%, #FFFFFF 100%) !important; }
+        html[data-theme="light"] .lumio-mark { filter: drop-shadow(0 4px 12px rgba(11,21,48,.25)); }
+        html[data-theme="light"] ::selection { background: #1E2F5E; color: #fff; }
+        html[data-theme="light"] .glass-card:hover { box-shadow: 0 18px 40px -26px rgba(30,47,94,.35) !important; }
+
+        @media (prefers-reduced-motion: reduce) { .lp-nebula { animation: none !important; } }
+    </style>
 </head>
 
 <body class="font-body-base text-on-background antialiased overflow-hidden">
@@ -1207,6 +1274,7 @@
 
         <!-- Aurora colour washes (behind everything) -->
         <canvas id="lp-stars" aria-hidden="true"></canvas>
+        <div class="lp-nebula" aria-hidden="true"></div>
         <div class="lp-galaxy" aria-hidden="true"></div>
         <div class="lp-aurora" aria-hidden="true"><i class="a1"></i><i class="a2"></i><i class="a3"></i><i class="a4"></i></div>
 
@@ -1237,7 +1305,7 @@
         </nav>
 
         <!-- Hero -->
-        <header class="lp-hero" data-bg="#08080A">
+        <header class="lp-hero" data-bg="#05070F">
             <p class="lp-kicker stag s1"><span class="dot"></span><span data-i18n="kicker">Social commerce · 6 SEA markets · AI creator-optimization engine</span></p>
             <h1 class="lp-h1">
                 <span class="line stag s2" data-i18n="h1.l1">Put every dollar</span>
@@ -1268,7 +1336,7 @@
 
         <div class="lp-wrap">
             <!-- Features: index rows -->
-            <section class="lp-section" id="features" data-bg="#08080A">
+            <section class="lp-section" id="features" data-bg="#05070F">
                 <div class="lp-sec-head lp-reveal"><span class="lp-num" data-i18n="sec2.num">01 / capabilities</span><h2 class="lp-h2" data-i18n-html="sec2.h">A decision engine<br><em>built to sell</em></h2></div>
                 <p class="lp-section-sub lp-reveal" data-i18n="feat.sub">Not just a list of creators — a campaign brain that predicts outcomes, explains its reasoning, and lets you review results anytime.</p>
                 <div class="lp-rows lp-reveal">
@@ -1312,7 +1380,7 @@
             </section>
 
             <!-- AI Copilot -->
-            <section class="lp-section" id="copilot" data-bg="#08080A">
+            <section class="lp-section" id="copilot" data-bg="#05070F">
                 <div class="lp-sec-head lp-reveal"><span class="lp-num" data-i18n="seccp.num">02 / ai copilot</span><h2 class="lp-h2" data-i18n-html="seccp.h">Your next campaign<br><em>is one chat away</em></h2></div>
                 <div class="lp-cp lp-reveal">
                     <div class="lp-cp-copy">
@@ -1339,7 +1407,7 @@
             </section>
 
             <!-- How it works -->
-            <section class="lp-section" id="how" data-bg="#08080A">
+            <section class="lp-section" id="how" data-bg="#05070F">
                 <div class="lp-sec-head lp-reveal"><span class="lp-num" data-i18n="sec3.num">03 / process</span><h2 class="lp-h2" data-i18n-html="sec3.h">Budget to lineup,<br><em>in three steps</em></h2></div>
                 <div class="lp-steps lp-reveal">
                     <div class="lp-step">
@@ -1361,7 +1429,7 @@
             </section>
 
             <!-- Pricing -->
-            <section class="lp-section" id="pricing" data-bg="#08080A">
+            <section class="lp-section" id="pricing" data-bg="#05070F">
                 <div class="lp-sec-head lp-reveal"><span class="lp-num" data-i18n="sec4.num">04 / pricing</span><h2 class="lp-h2" data-i18n-html="sec4.h">Start free, scale<br><em>when it pays off</em></h2></div>
                 <p class="lp-section-sub lp-reveal" data-i18n="price.sub">Every plan includes the full AI engine, the AI copilot and an unlimited creator library. Pay only for what powers your growth — optimization runs and copilot chats.</p>
                 <div class="lp-plans lp-reveal">
@@ -1410,7 +1478,7 @@
             </section>
 
             <!-- Final CTA -->
-            <section class="lp-final lp-reveal" data-bg="#08080A">
+            <section class="lp-final lp-reveal" data-bg="#05070F">
                 <h2 data-i18n-html="final.h">Hand your next campaign<br><em>to the data</em></h2>
                 <button class="lp-btn lp-btn-primary big" onclick="enterApp()" data-i18n="final.btn">launch console — optimize free</button>
             </section>
@@ -4256,7 +4324,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
         }
 
         // ── Settings page: appearance, team, sign-in, data ──
-        function themePref() { try { return localStorage.getItem('tiko_theme') || 'dark'; } catch (_) { return 'dark'; } }
+        function themePref() { try { return localStorage.getItem('tiko_theme') || 'light'; } catch (_) { return 'light'; } }
         function applyTheme() {
             const pref = themePref();
             const light = pref === 'light' || (pref === 'system' && window.matchMedia('(prefers-color-scheme: light)').matches);
@@ -6700,7 +6768,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
     if (!lp || !cv || !cv.getContext) return;
     const ctx = cv.getContext('2d');
     const still = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const TONES = ['255,255,255', '232,235,240', '200,205,214', '176,182,192'];
+    const TONES = ['255,255,255', '232,235,240', '200,205,214', '190,206,255', '160,182,240', '214,222,255'];
     let W = 0, H = 0, stars = [], shoot = null, nextShoot = 0, scrollY = 0;
     function resize() {
         const dpr = Math.min(window.devicePixelRatio || 1, 2);
