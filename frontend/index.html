@@ -348,7 +348,27 @@
         .lp-reveal { opacity: 0; transform: translateY(34px); transition: opacity .7s var(--spring-soft), transform .7s var(--spring); }
         .lp-reveal.in { opacity: 1; transform: translateY(0); }
 
+        /* Pricing */
+        .lp-pricing { display: grid; grid-template-columns: repeat(3,1fr); gap: 22px; align-items: stretch; }
+        .lp-price { border-radius: 22px; padding: 30px; display: flex; flex-direction: column; gap: 14px; position: relative; }
+        .lp-price.featured { border-color: rgba(0,242,234,.55); box-shadow: 0 24px 60px -28px rgba(0,242,234,.6); }
+        .lp-price .tag { position: absolute; top: -12px; left: 30px; background: #00F2EA; color: #031414; font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 999px; letter-spacing: .4px; }
+        .lp-price h3 { font-size: 20px; font-weight: 700; margin: 0; }
+        .lp-price .amt { font-size: 40px; font-weight: 800; letter-spacing: -1px; }
+        .lp-price .amt small { font-size: 14px; font-weight: 500; color: #b8b7ad; letter-spacing: 0; }
+        .lp-price ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 9px; font-size: 14px; color: #d6d5cc; flex: 1; }
+        .lp-price li::before { content: "✓"; color: #00F2EA; font-weight: 800; margin-right: 8px; }
+        .lp-price .lp-btn { justify-content: center; }
+        /* In-app upgrade dialog */
+        .up-plans { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+        .up-plan { border: 1px solid rgba(127,127,127,.25); border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 8px; font-size: 12.5px; }
+        .up-plan.current { border-color: #0FB5AE; }
+        .up-plan h4 { font-size: 15px; font-weight: 800; margin: 0; }
+        .up-plan .amt { font-size: 22px; font-weight: 800; }
+        .up-plan ul { margin: 0; padding-left: 16px; flex: 1; color: #7B8794; }
+        @media (max-width: 700px) { .up-plans { grid-template-columns: 1fr; } }
         @media (max-width: 900px) {
+            .lp-pricing { grid-template-columns: 1fr; gap: 28px; }
             .lp-hero { grid-template-columns: 1fr; gap: 40px; padding: 40px 0 60px; }
             .lp-h1 { font-size: 40px; }
             .lp-trust { grid-template-columns: repeat(2,1fr); }
@@ -390,6 +410,40 @@
         </div>
     </div>
 
+    <!-- ═══════════════════════ UPGRADE / BILLING DIALOG ═══════════════════════ -->
+    <div id="upgrade-overlay" onclick="if(event.target===this)closeUpgrade()" style="display:none;position:fixed;inset:0;z-index:2100;background:rgba(10,15,20,.72);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:16px">
+        <div class="glass-card" style="width:100%;max-width:720px;border-radius:20px;padding:26px;max-height:92vh;overflow:auto">
+            <div style="display:flex;justify-content:space-between;align-items:start;gap:12px">
+                <div>
+                    <p style="font-size:19px;font-weight:800;margin:0">Choose your plan</p>
+                    <p id="upgrade-reason" style="font-size:12.5px;color:#7B8794;margin:4px 0 16px">Unlock unlimited optimizations, imports and exports.</p>
+                </div>
+                <button onclick="closeUpgrade()" title="Close" style="background:none;border:none;cursor:pointer;color:#7B8794"><span class="material-symbols-outlined">close</span></button>
+            </div>
+            <div class="up-plans">
+                <div class="up-plan" data-plan="free">
+                    <h4>Free</h4><div class="amt">$0</div>
+                    <ul><li>10 optimizations / month</li><li>2 campaigns</li><li>No import / export</li></ul>
+                    <button class="btn btn-outline" disabled style="justify-content:center">Included</button>
+                </div>
+                <div class="up-plan" data-plan="pro">
+                    <h4>Pro</h4><div class="amt">$29<span style="font-size:12px;font-weight:500">/mo</span></div>
+                    <ul><li>Unlimited optimizations</li><li>Unlimited campaigns</li><li>Import + export</li></ul>
+                    <button class="btn btn-primary" onclick="checkout('pro')" style="justify-content:center">Upgrade to Pro</button>
+                </div>
+                <div class="up-plan" data-plan="agency">
+                    <h4>Agency</h4><div class="amt">$99<span style="font-size:12px;font-weight:500">/mo</span></div>
+                    <ul><li>Everything in Pro</li><li>For multi-brand agencies</li><li>Priority support</li></ul>
+                    <button class="btn btn-outline" onclick="checkout('agency')" style="justify-content:center">Choose Agency</button>
+                </div>
+            </div>
+            <p id="upgrade-portal" style="display:none;font-size:12.5px;margin:16px 0 0;text-align:center">
+                <a id="upgrade-portal-link" href="#" target="_blank" rel="noopener" style="color:#0FB5AE;font-weight:700">Manage subscription, invoices and payment method</a>
+            </p>
+            <p style="font-size:11px;color:#7B8794;margin:14px 0 0;text-align:center">Secure checkout by Lemon Squeezy. Cancel anytime.</p>
+        </div>
+    </div>
+
     <!-- ═══════════════════════ LANDING PAGE (merchant front door) ═══════════════════════ -->
     <div id="landing-page">
         <div class="lp-blob b1"></div>
@@ -410,6 +464,7 @@
                     <a href="#features">Capabilities</a>
                     <a href="#how">How it works</a>
                     <a href="#metrics">Results</a>
+                    <a href="#pricing">Pricing</a>
                     <button class="lp-btn lp-btn-ghost" style="padding:9px 18px;font-size:14px" onclick="enterApp()">Launch Console</button>
                 </div>
             </nav>
@@ -531,6 +586,49 @@
                         <div class="num">3</div>
                         <h3>Compare, Save, Review</h3>
                         <p>Compare the three plans, save as a campaign, then log real GMV afterward to continuously calibrate your model.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Pricing -->
+            <section class="lp-section" id="pricing">
+                <div class="lp-eyebrow lp-reveal">PRICING</div>
+                <h2 class="lp-h2 lp-reveal">Start free. Upgrade when it pays for itself.</h2>
+                <p class="lp-section-sub lp-reveal">One better creator pick usually covers a month. Cancel anytime; prices in USD, local taxes handled at checkout.</p>
+                <div class="lp-pricing">
+                    <div class="lp-price lp-glass lp-reveal">
+                        <h3>Free</h3>
+                        <div class="amt">$0<small> / month</small></div>
+                        <ul>
+                            <li>10 optimizations per month</li>
+                            <li>All 6 algorithms + 3 risk plans</li>
+                            <li>Curated SEA creator library</li>
+                            <li>Track up to 2 campaigns</li>
+                        </ul>
+                        <button class="lp-btn lp-btn-ghost" onclick="startPlan('free')">Start free</button>
+                    </div>
+                    <div class="lp-price lp-glass featured lp-reveal">
+                        <span class="tag">MOST POPULAR</span>
+                        <h3>Pro</h3>
+                        <div class="amt">$29<small> / month</small></div>
+                        <ul>
+                            <li>Unlimited optimizations</li>
+                            <li>Unlimited campaigns + self-calibrating predictions</li>
+                            <li>Import your own creators (CSV / Excel / FastMoss)</li>
+                            <li>Export creator lists</li>
+                        </ul>
+                        <button class="lp-btn lp-btn-primary" onclick="startPlan('pro')">Go Pro</button>
+                    </div>
+                    <div class="lp-price lp-glass lp-reveal">
+                        <h3>Agency</h3>
+                        <div class="amt">$99<small> / month</small></div>
+                        <ul>
+                            <li>Everything in Pro</li>
+                            <li>Built for agencies running many brands</li>
+                            <li>Priority support</li>
+                            <li>Early access to new markets and connectors</li>
+                        </ul>
+                        <button class="lp-btn lp-btn-ghost" onclick="startPlan('agency')">Choose Agency</button>
                     </div>
                 </div>
             </section>
@@ -664,6 +762,13 @@
             </div>
         </nav>
         <div class="mt-auto pt-md border-t border-outline-variant/30">
+            <div id="plan-card" class="mx-xs mb-2 p-2 rounded-lg" style="background:rgba(15,181,174,.08);display:none">
+                <div class="flex items-center justify-between">
+                    <span class="text-[12px] font-bold"><span id="plan-name">Free</span> plan</span>
+                    <button id="plan-action" onclick="openUpgrade()" class="text-[11.5px] font-bold" style="color:#0FB5AE;background:none;border:none;cursor:pointer">Upgrade</button>
+                </div>
+                <div id="plan-usage" class="text-[11px] text-on-surface-variant mt-1"></div>
+            </div>
             <div class="flex items-center gap-2 px-xs py-2">
                 <span class="material-symbols-outlined text-[18px] text-on-surface-variant">account_circle</span>
                 <span id="account-email" class="text-[12px] text-on-surface-variant truncate flex-1" title="">—</span>
@@ -1091,15 +1196,15 @@
                                 <span class="material-symbols-outlined text-[14px]">price_check</span>Backfill Prices
                                 <input type="file" accept=".csv,.xlsx" onchange="backfillCosts(this)" class="hidden" />
                             </label>
-                            <a href="http://localhost:8000/kols/template-excel" class="btn btn-outline flex items-center gap-1 text-[12px] py-1 px-2" title="Download an Excel template with the expected columns">
+                            <a href="/kols/template-excel" class="btn btn-outline flex items-center gap-1 text-[12px] py-1 px-2" title="Download an Excel template with the expected columns">
                                 <span class="material-symbols-outlined text-[14px]">download</span>Excel Template
                             </a>
-                            <a href="http://localhost:8000/kols/template" class="btn btn-outline flex items-center gap-1 text-[12px] py-1 px-2" title="Download a CSV template">
+                            <a href="/kols/template" class="btn btn-outline flex items-center gap-1 text-[12px] py-1 px-2" title="Download a CSV template">
                                 <span class="material-symbols-outlined text-[14px]">download</span>CSV
                             </a>
-                            <a href="http://localhost:8000/kols/export" class="btn btn-outline flex items-center gap-1 text-[12px] py-1 px-2">
+                            <button onclick="exportKols()" class="btn btn-outline flex items-center gap-1 text-[12px] py-1 px-2">
                                 <span class="material-symbols-outlined text-[14px]">file_download</span>Export
-                            </a>
+                            </button>
                             <button onclick="resetDatabase()" class="btn btn-danger flex items-center gap-1 text-[12px] py-1 px-2">
                                 <span class="material-symbols-outlined text-[14px]">restart_alt</span>Reset
                             </button>
@@ -1603,6 +1708,9 @@
                 }
                 return _fetch(url, opts).then(r => {
                     if (r.status === 401 && typeof u === 'string' && !u.includes('/auth/')) handleAuthExpired();
+                    if (r.status === 402) {
+                        r.clone().json().then(d => openUpgrade((d.detail && d.detail.message) || null)).catch(() => openUpgrade());
+                    }
                     return r;
                 });
             };
@@ -1677,6 +1785,7 @@
             document.getElementById('auth-password').value = '';
             document.getElementById('auth-password2').value = '';
             toast(msg);
+            afterSignIn();
         }
         async function authSubmit() {
             const email = document.getElementById('auth-email').value.trim();
@@ -1725,6 +1834,84 @@
             toast('Session expired — please sign in again', 'err');
             showAuth();
         }
+
+        // ══════════ BILLING (plans, usage, Lemon Squeezy checkout) ══════════
+        let BILLING = null;
+        let PENDING_PLAN = sessionStorage.getItem('kol_pending_plan');
+        async function loadBilling() {
+            if (!AUTH_TOKEN) return;
+            try {
+                const r = await fetch(`${API}/billing/status`);
+                if (!r.ok) return;
+                BILLING = await r.json();
+                const card = document.getElementById('plan-card');
+                card.style.display = '';
+                document.getElementById('plan-name').textContent = BILLING.limits.name;
+                const cap = BILLING.limits.optimizations_per_month;
+                document.getElementById('plan-usage').textContent = cap == null
+                    ? 'Unlimited optimizations'
+                    : `${BILLING.usage.optimizations} / ${cap} optimizations this month`;
+                document.getElementById('plan-action').textContent = BILLING.plan === 'free' ? 'Upgrade' : 'Manage';
+            } catch (_) {}
+        }
+        function openUpgrade(reason) {
+            if (!AUTH_TOKEN) { showAuth('register'); return; }
+            document.getElementById('upgrade-reason').textContent = reason || 'Unlock unlimited optimizations, imports and exports.';
+            const plan = BILLING ? BILLING.plan : 'free';
+            document.querySelectorAll('.up-plan').forEach(el => el.classList.toggle('current', el.dataset.plan === plan));
+            const portal = BILLING && BILLING.portal_url;
+            document.getElementById('upgrade-portal').style.display = portal ? '' : 'none';
+            if (portal) document.getElementById('upgrade-portal-link').href = portal;
+            document.getElementById('upgrade-overlay').style.display = 'flex';
+        }
+        // FastAPI error bodies: string detail, validation list, or {message, upgrade}.
+        function errMsg(d) {
+            const x = d && d.detail;
+            if (!x) return 'Request failed';
+            if (typeof x === 'string') return x;
+            if (x.message) return x.message;
+            return 'Please check the fields and try again.';
+        }
+        function closeUpgrade() { document.getElementById('upgrade-overlay').style.display = 'none'; }
+        async function checkout(plan) {
+            if (!AUTH_TOKEN) { sessionStorage.setItem('kol_pending_plan', plan); PENDING_PLAN = plan; showAuth('register'); return; }
+            if (BILLING && BILLING.plan === plan) { toast('You are already on this plan'); return; }
+            try {
+                const r = await fetch(`${API}/billing/checkout`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ plan })
+                });
+                const d = await r.json();
+                if (!r.ok) { toast(errMsg(d), 'err'); return; }
+                window.location.href = d.url;
+            } catch (_) { toast('Cannot reach the server', 'err'); }
+        }
+        // Pricing buttons on the landing page.
+        function startPlan(plan) {
+            if (plan === 'free') { enterApp(); return; }
+            checkout(plan);
+        }
+        // Runs after sign-in: resume a checkout chosen before the account existed.
+        function afterSignIn() {
+            loadBilling();
+            if (PENDING_PLAN) {
+                const p = PENDING_PLAN; PENDING_PLAN = null; sessionStorage.removeItem('kol_pending_plan');
+                checkout(p);
+            }
+        }
+        async function exportKols() {
+            const r = await fetch(`${API}/kols/export`);
+            if (!r.ok) return;   // 402 opens the upgrade dialog via the fetch wrapper
+            const blob = await r.blob();
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob); a.download = 'kols_export.csv';
+            document.body.appendChild(a); a.click(); a.remove();
+            setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+        }
+        if (new URLSearchParams(location.search).get('upgraded')) {
+            history.replaceState(null, '', location.pathname);
+            setTimeout(() => { toast('Thanks! Your plan will update within a minute.'); loadBilling(); setTimeout(loadBilling, 8000); }, 500);
+        }
+        if (AUTH_TOKEN) loadBilling();
 
         // Opened from a password-reset email: go straight to the "choose a new password" form.
         if (RESET_TOKEN) showAuth('reset');
@@ -2034,8 +2221,9 @@
                     fetch(API + '/optimize', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }),
                     fetch(API + '/optimize-plans', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
                 ]);
-                if (!optRes.ok) { const err = await optRes.json(); throw new Error(err.detail || 'Request failed'); }
+                if (!optRes.ok) { const err = await optRes.json(); throw new Error(errMsg(err)); }
                 const data = await optRes.json();
+                loadBilling();
                 if (plansRes.ok) { const plansData = await plansRes.json(); renderPlans(plansData.plans, data); }
                 else { allPlansData = null; }
                 // Pre-fetch enhanced KOL data for enriched cards
@@ -2497,7 +2685,7 @@
             try {
                 const r = await fetch(`${API}/kols/import`, { method: 'POST', body: form });
                 const d = await r.json();
-                if (!r.ok) { toast((d.detail || 'Import failed'), 'err'); input.value = ''; return; }
+                if (!r.ok) { toast(errMsg(d), 'err'); input.value = ''; return; }
                 let msg = `Imported ${d.added} creators`;
                 const ad = d.applied_defaults || {};
                 if (ad.category || ad.country) msg += ` as ${[ad.category, ad.country].filter(Boolean).join(' / ')}`;
@@ -2514,7 +2702,7 @@
             try {
                 const r = await fetch(`${API}/kols/backfill-costs`, { method: 'POST', body: form });
                 const d = await r.json();
-                if (!r.ok) { toast((d.detail || 'Backfill failed'), 'err'); input.value = ''; return; }
+                if (!r.ok) { toast(errMsg(d), 'err'); input.value = ''; return; }
                 let msg = `Updated ${d.updated} prices`;
                 if (d.unmatched_count) msg += ` · ${d.unmatched_count} unmatched`;
                 if (d.no_price_rows) msg += ` · ${d.no_price_rows} had no price`;
@@ -2561,7 +2749,7 @@
             };
             try {
                 const r = await fetch(`${API}/campaigns`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                if (!r.ok) { const e = await r.json(); throw new Error(e.detail || 'Save failed'); }
+                if (!r.ok) { const e = await r.json(); throw new Error(errMsg(e)); }
                 toast('Campaign saved! View it in the Campaigns tab.');
                 closeSaveCampaignModal();
             } catch (e) { toast(e.message, 'err'); }

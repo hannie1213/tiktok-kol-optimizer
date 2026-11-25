@@ -45,6 +45,42 @@ Render 付费磁盘每天自动快照，保留 7 天，可在 **Disks** 页面�
 python -c "import sqlite3,datetime; s=sqlite3.connect('/var/data/app.db'); s.backup(sqlite3.connect(f'/var/data/backup-{datetime.date.today()}.db'))"
 ```
 
+## 五、开通收款（Lemon Squeezy）
+
+Lemon Squeezy 是"代收方"（Merchant of Record）：用户付款、全球增值税/销售税、发票都由它处理，然后把钱结算给你。**个人身份即可注册，不需要公司**。费用约每笔 5% + 0.5 美元。
+
+1. 注册 <https://lemonsqueezy.com>，创建一个 Store，按提示完成身份验证和收款账户（支持 PayPal 或银行卡）。审核通过前可以先用 **Test mode** 调试。
+2. **Products → New product**，建两个"订阅"类产品：
+   - `Pro`：29 美元/月
+   - `Agency`：99 美元/月
+3. 打开每个产品的 variant，记下 **Variant ID**（数字）。在 **Settings → Stores** 记下 **Store ID**。
+4. **Settings → API** 创建 API key。
+5. **Settings → Webhooks → +**：
+   - URL：`https://你的网址/billing/webhook`
+   - Signing secret：自己随便设一串长随机字符串
+   - 勾选所有 `subscription_*` 事件
+6. 在 Render 的 **Environment** 填：
+   | 变量 | 值 |
+   |---|---|
+   | `LEMONSQUEEZY_API_KEY` | 第 4 步的 key |
+   | `LEMONSQUEEZY_STORE_ID` | Store ID |
+   | `LEMONSQUEEZY_VARIANT_PRO` | Pro 的 Variant ID |
+   | `LEMONSQUEEZY_VARIANT_AGENCY` | Agency 的 Variant ID |
+   | `LEMONSQUEEZY_WEBHOOK_SECRET` | 第 5 步的 signing secret |
+7. 在网站上注册一个新账号，点 **Upgrade to Pro**，用测试卡 `4242 4242 4242 4242` 付款。回到网站后左下角应显示 **Pro plan**。确认无误后在 Lemon Squeezy 关闭 Test mode，并把上面的 key 和 ID 换成正式环境的。
+
+没配置这些变量时，网站照常运行，点升级会提示"Payments are not set up yet"。
+
+### 套餐规则（在 `backend/billing.py` 的 `PLANS` 里改）
+
+| | Free | Pro 29 美元 | Agency 99 美元 |
+|---|---|---|---|
+| 每月优化次数 | 10 | 不限 | 不限 |
+| 跟踪的活动数 | 2 | 不限 | 不限 |
+| 导入 / 导出达人 | 不可以 | 可以 | 可以 |
+
+用户取消订阅后，可以用到当期结束，之后自动降回 Free。
+
 ## 环境变量一览
 
 | 变量 | 说明 |
@@ -56,6 +92,7 @@ python -c "import sqlite3,datetime; s=sqlite3.connect('/var/data/app.db'); s.bac
 | `SMTP_*` | 发信配置 |
 | `AUTH_RATE_LIMIT` | 登录/注册限流，默认 `10/60`（每 IP 每分钟 10 次） |
 | `CORS_ORIGINS` | 允许跨域的来源，同域部署时不需要设置 |
+| `LEMONSQUEEZY_*` | 收款配置，见第五部分 |
 
 ## 本地用 Docker 运行
 

@@ -37,7 +37,7 @@ from engine.optimization.tabu_search import tabu_search
 from engine.optimization.greedy_ranking import greedy_ranking
 from engine.scoring.creator_score import compute_creator_score
 from engine.scoring.explainer import generate_reasons, get_tier
-from backend import config, db, tenancy
+from backend import billing, config, db, tenancy
 from backend import calibration
 from backend.auth import router as auth_router, require_tenant
 from backend.crud import router as crud_router
@@ -62,6 +62,7 @@ app.add_middleware(
 app.include_router(auth_router)
 app.include_router(crud_router)
 app.include_router(campaigns_router)
+app.include_router(billing.router)
 
 # ── Enum constants ────────────────────────────────────────────────
 VALID_COUNTRIES = ["MY", "ID", "TH", "PH", "SG", "VN"]
@@ -624,7 +625,7 @@ def shortlist_candidates(kols: List[KOL], scores: List[float], cap: int = CANDID
 
 
 @app.post("/optimize", response_model=OptimizeResponse)
-def optimize(req: OptimizeRequest, _t: str = Depends(require_tenant)):
+def optimize(req: OptimizeRequest, _t: str = Depends(billing.consume_optimization("optimizations"))):
     """Run all six algorithms and return the best KOL matrix."""
     if req.budget <= 0:
         raise HTTPException(status_code=422, detail="budget must be a positive number")
@@ -697,7 +698,7 @@ def optimize(req: OptimizeRequest, _t: str = Depends(require_tenant)):
 
 
 @app.post("/optimize-plans", response_model=OptimizePlansResponse)
-def optimize_plans(req: OptimizeRequest, _t: str = Depends(require_tenant)):
+def optimize_plans(req: OptimizeRequest, _t: str = Depends(billing.consume_optimization("plan_optimizations"))):
     """Return 3 plans with genuinely different selection objectives.
 
     Aggressive  — 120% budget, winner = algorithm with highest total GMV.

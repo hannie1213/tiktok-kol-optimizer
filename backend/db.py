@@ -10,6 +10,7 @@ Tables
   users            accounts (email, password hash, tenant id, plan)
   tenant_docs      one JSON document per (tenant, name), e.g. the creator library
   password_resets  single-use, hashed, expiring reset tokens
+  usage            per-tenant monthly counters for plan limits
   meta             key/value flags (e.g. whether legacy JSON was imported)
 
 Location: env DATABASE_PATH, else <KOL_DATA_DIR or data/>/app.db.
@@ -46,6 +47,13 @@ CREATE TABLE IF NOT EXISTS password_resets (
     user_id     INTEGER NOT NULL REFERENCES users(id),
     expires_at  TEXT NOT NULL,
     used        INTEGER NOT NULL DEFAULT 0
+);
+CREATE TABLE IF NOT EXISTS usage (
+    tenant_id  TEXT    NOT NULL,
+    period     TEXT    NOT NULL,          -- YYYY-MM
+    metric     TEXT    NOT NULL,
+    count      INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY (tenant_id, period, metric)
 );
 CREATE TABLE IF NOT EXISTS meta (
     key    TEXT PRIMARY KEY,
@@ -88,6 +96,7 @@ def init():
         conn = _connect()
         try:
             conn.executescript(_SCHEMA)
+            _migrate(conn)
             _import_legacy_json(conn)
         finally:
             conn.close()
@@ -157,6 +166,23 @@ def tenant_exists(tenant_id: str) -> bool:
         return conn.execute(
             "SELECT 1 FROM tenant_docs WHERE tenant_id=? LIMIT 1", (tenant_id,)
         ).fetchone() is not None
+
+
+# ── Additive column migrations (safe on existing databases) ──────
+_USER_COLUMNS = {
+    "subscription_id": "TEXT",
+    "subscription_status": "TEXT",
+    "subscription_renews_at": "TEXT",
+    "subscription_ends_at": "TEXT",
+    "customer_portal_url": "TEXT",
+}
+
+
+def _migrate(conn: sqlite3.Connection):
+    have = {r["name"] for r in conn.execute("PRAGMA table_info(users)")}
+    for col, typ in _USER_COLUMNS.items():
+        if col not in have:
+            conn.execute(f"ALTER TABLE users ADD COLUMN {col} {typ}")
 
 
 # ── Legacy import ─────────────────────────────────────────────────
