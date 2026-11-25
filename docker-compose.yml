@@ -34,6 +34,9 @@ services:
       JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env}
       ADMIN_KEY: ${ADMIN_KEY:-}
       DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
+      REPLICATE_API_TOKEN: ${REPLICATE_API_TOKEN:-}
+      VIDEO_MODEL: ${VIDEO_MODEL:-bytedance/seedance-1-lite}
+      VIDEO_RESOLUTION: ${VIDEO_RESOLUTION:-720p}
       AGENT_BASE_URL: ${AGENT_BASE_URL:-https://api.deepseek.com}
       AGENT_MODEL: ${AGENT_MODEL:-deepseek-chat}
       SMTP_HOST: ${SMTP_HOST:-}
@@ -57,6 +60,8 @@ services:
       FORWARDED_ALLOW_IPS: "*"
     # Loopback only: the app speaks plain HTTP, so it must sit behind a TLS
     # proxy (the caddy service below, or your own nginx / cloud load balancer).
+    volumes:
+      - appstate:/app/state          # generated AI videos (and the SQLite file, if no PostgreSQL)
     ports:
       - "127.0.0.1:8000:8000"
 
@@ -67,7 +72,7 @@ services:
     depends_on:
       - app
     environment:
-      DOMAIN: ${DOMAIN:?set DOMAIN in .env to use the https profile}
+      DOMAIN: ${DOMAIN:-localhost}   # required only with --profile https; set it in .env
     ports:
       - "80:80"
       - "443:443"
@@ -77,6 +82,7 @@ services:
       - caddy_config:/config
 
 volumes:
+  appstate:
   pgdata:
   caddy_data:
   caddy_config:

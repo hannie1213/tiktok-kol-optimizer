@@ -47,6 +47,8 @@ from backend import tenancy
 
 
 _SQLITE_DIR = os.environ.get("SQLITE_DIR") or tenancy.DATA_DIR
+# Generated AI video clips (backend/aivideo.py), one folder per workspace.
+VIDEO_DIR = os.environ.get("VIDEO_DIR") or os.path.join(_SQLITE_DIR, "videos")
 
 
 def _database_url() -> str:
@@ -120,6 +122,8 @@ class User(Base):
     # "owner" created the workspace (and pays for it); a "member" was invited
     # into it and shares its tenant_id.
     role: Mapped[str] = mapped_column(String(16), default="owner")
+    # Set by the operator to lock an abusive account out without deleting its data.
+    disabled: Mapped[bool] = mapped_column(Boolean, default=False)
 
 
 class TeamInvite(Base):
@@ -283,6 +287,31 @@ class TenantDoc(Base):
     doc: Mapped[dict] = mapped_column(JSON, default=dict)
 
 
+class PoolCreator(Base):
+    """A creator in the shared Explore pool — one catalogue for every workspace,
+    filled by the browser extension from public profile pages. Holds only what
+    the profile page shows; never who captured it or any workspace's own data."""
+    __tablename__ = "pool_creators"
+    __table_args__ = (UniqueConstraint("platform", "handle_key", name="uq_pool_platform_handle"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    platform: Mapped[str] = mapped_column(String(16), default="tiktok")
+    handle: Mapped[str] = mapped_column(String(80))
+    handle_key: Mapped[str] = mapped_column(String(80), index=True)      # lower-cased, for lookups
+    name: Mapped[str] = mapped_column(String(120), default="")
+    profile_url: Mapped[str] = mapped_column(String(255), default="")
+    followers: Mapped[int] = mapped_column(Integer, default=0, index=True)
+    likes: Mapped[int] = mapped_column(Integer, nullable=True)
+    videos: Mapped[int] = mapped_column(Integer, nullable=True)
+    bio: Mapped[str] = mapped_column(String(300), default="")
+    verified: Mapped[bool] = mapped_column(Boolean, default=False)
+    country: Mapped[str] = mapped_column(String(4), nullable=True, index=True)
+    category: Mapped[str] = mapped_column(String(32), nullable=True)
+    first_seen: Mapped[str] = mapped_column(String(40), default="")
+    last_seen: Mapped[str] = mapped_column(String(40), default="", index=True)
+    captures: Mapped[int] = mapped_column(Integer, default=0)
+
+
 class ApiInterest(Base):
     """Early-access interest registration for a coming-soon integration.
     Not tenant data — it is a lead list for the operator console."""
@@ -305,6 +334,7 @@ _ADDED_COLUMNS = [
     ("tenant_plans", "expires_at", "VARCHAR(40)"),
     ("tenant_plans", "reminded", "VARCHAR(64)"),
     ("users", "role", "VARCHAR(16) NOT NULL DEFAULT 'owner'"),
+    ("users", "disabled", "BOOLEAN NOT NULL DEFAULT FALSE"),
 ]
 
 

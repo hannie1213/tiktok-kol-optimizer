@@ -299,6 +299,34 @@
             </table>
         </div>
 
+        <!-- ── Announcement ── -->
+        <h2 class="sec"><span class="n">NOTICE</span>全站公告 <span style="font-size:12px;color:var(--mut);font-weight:400">显示在每个商家控制台顶部，商家可以关闭；两栏都留空即撤下</span></h2>
+        <div class="card" style="padding:18px 20px">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <input id="an-zh" maxlength="300" placeholder="中文内容，例如：今晚 02:00–03:00 系统维护" style="width:100%" />
+                <input id="an-en" maxlength="300" placeholder="English text (shown to English-language users)" style="width:100%" />
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;margin-top:12px;flex-wrap:wrap">
+                <select id="an-level"><option value="info">普通通知</option><option value="warn">重要提醒（橙色）</option></select>
+                <button class="btn primary" onclick="saveAnnouncement()">发布</button>
+                <button class="btn" onclick="clearAnnouncement()">撤下公告</button>
+                <span id="an-state" style="font-size:12px;color:var(--mut)"></span>
+            </div>
+        </div>
+
+        <!-- ── Shared creator pool ── -->
+        <h2 class="sec"><span class="n">POOL</span>共享达人池
+            <span id="pool-total" style="font-size:12px;color:var(--mut);font-weight:400"></span>
+            <span class="spacer"></span>
+            <input id="pool-q" type="search" placeholder="搜索账号 / 名称…" oninput="clearTimeout(window._poolT);window._poolT=setTimeout(loadPool,300)" style="width:230px" />
+        </h2>
+        <div class="card" style="overflow-x:auto">
+            <table>
+                <thead><tr><th>达人</th><th style="text-align:right">粉丝</th><th style="text-align:right">获赞</th><th>国家</th><th style="text-align:right">采集次数</th><th>最近采集</th><th></th></tr></thead>
+                <tbody id="pool-body"><tr><td colspan="7" class="empty">加载中…</td></tr></tbody>
+            </table>
+        </div>
+
         <!-- ── Audit trail ── -->
         <h2 class="sec"><span class="n">03 / AUDIT</span>操作日志 <span style="font-size:12px;color:var(--mut);font-family: var(--font-ui);font-weight:400">最近 100 条后台操作</span></h2>
         <div class="card" style="overflow-x:auto">
@@ -411,6 +439,7 @@
                 renderStatus(st);
                 renderAudit(au.entries);
                 renderGrowth(gr);
+                loadPool(); loadAnnouncement();
                 const pending = ov.pending_orders ?? 0;
                 document.getElementById('orders-count').textContent = pending ? `(${pending})` : '';
                 document.getElementById('k-pending').textContent = pending;
@@ -538,6 +567,67 @@
                 <p style="font-size:11.5px;color:var(--mut);margin-top:22px">这里只显示数量、账单和操作记录，不显示商家的达人、投放或消息内容。</p>`;
         }
 
+        // ── Suspend / restore an account ──
+        async function toggleSuspend(i) {
+            const u = VIEW[i]; if (!u) return;
+            const suspending = !u.disabled;
+            if (suspending && !confirm(`停用 ${u.email}？\n对方将无法登录，浏览器扩展也会失效；数据保留，可随时恢复。`)) return;
+            try {
+                await req('/admin/suspend', { method: 'POST', body: JSON.stringify({ email: u.email, suspended: suspending }) });
+                toast(suspending ? `已停用 ${u.email}` : `已恢复 ${u.email}`);
+                loadAll(true);
+            } catch (e) { toast('操作失败：' + e.message, 'err'); }
+        }
+
+        // ── Site-wide announcement ──
+        async function loadAnnouncement() {
+            if (['an-zh', 'an-en'].includes((document.activeElement || {}).id)) return;      // don't overwrite typing
+            try {
+                const a = (await req('/admin/announcement')).announcement;
+                document.getElementById('an-zh').value = a ? (a.text_zh || '') : '';
+                document.getElementById('an-en').value = a ? (a.text || '') : '';
+                document.getElementById('an-level').value = a ? (a.level || 'info') : 'info';
+                document.getElementById('an-state').textContent = a ? `当前有一条公告在展示（发布于 ${fmtDate(a.created_at)}）` : '当前没有公告';
+            } catch (_) { /* shown on next refresh */ }
+        }
+        async function saveAnnouncement() {
+            const body = { text_zh: document.getElementById('an-zh').value, text: document.getElementById('an-en').value, level: document.getElementById('an-level').value };
+            if (!body.text.trim() && !body.text_zh.trim()) { toast('请至少填写一种语言的内容', 'err'); return; }
+            try { await req('/admin/announcement', { method: 'POST', body: JSON.stringify(body) }); toast('公告已发布'); document.activeElement.blur(); loadAnnouncement(); }
+            catch (e) { toast('发布失败：' + e.message, 'err'); }
+        }
+        async function clearAnnouncement() {
+            try { await req('/admin/announcement', { method: 'POST', body: JSON.stringify({ text: '', text_zh: '' }) }); toast('公告已撤下'); document.activeElement.blur(); loadAnnouncement(); }
+            catch (e) { toast('操作失败：' + e.message, 'err'); }
+        }
+
+        // ── Shared creator pool: look and prune ──
+        let POOL = [];
+        const fmtCount = n => n == null ? '—' : n >= 1e6 ? (n / 1e6).toFixed(1) + 'M' : n >= 1e3 ? (n / 1e3).toFixed(1) + 'K' : String(n);
+        async function loadPool() {
+            try {
+                const q = document.getElementById('pool-q').value.trim();
+                const d = await req('/admin/pool?limit=100' + (q ? '&q=' + encodeURIComponent(q) : ''));
+                POOL = d.items;
+                document.getElementById('pool-total').textContent = `共 ${d.total} 位` + (d.items.length < d.total ? `，显示最近 ${d.items.length} 位` : '');
+                document.getElementById('pool-body').innerHTML = d.items.length ? d.items.map((r, i) => `<tr>
+                    <td class="email">${esc(r.name)}<small><a href="${esc(r.profile_url)}" target="_blank" rel="noopener noreferrer" style="color:inherit">@${esc(r.handle)} ↗</a></small></td>
+                    <td class="num" style="text-align:right">${fmtCount(r.followers)}</td>
+                    <td class="num" style="text-align:right">${fmtCount(r.likes)}</td>
+                    <td>${esc(r.country || '—')}</td>
+                    <td class="num" style="text-align:right">${r.captures}</td>
+                    <td class="num" style="font-size:11.5px;color:var(--mut)">${fmtDate(r.last_seen)}</td>
+                    <td><div class="row-actions"><button class="btn danger" onclick="removePool(${i})">删除</button></div></td></tr>`).join('')
+                    : '<tr><td colspan="7" class="empty">达人池里还没有达人。商家安装浏览器扩展并浏览达人主页后，这里会出现记录。</td></tr>';
+            } catch (_) { /* shown on next refresh */ }
+        }
+        async function removePool(i) {
+            const r = POOL[i]; if (!r) return;
+            if (!confirm(`从达人池删除 @${r.handle}？\n已经把 TA 加入自己达人库的商家不受影响。`)) return;
+            try { await req('/admin/pool/' + r.id, { method: 'DELETE' }); toast(`已删除 @${r.handle}`); loadPool(); }
+            catch (e) { toast('删除失败：' + e.message, 'err'); }
+        }
+
         // ── System status ──
         function renderStatus(st) {
             const chip = (ok, yes, no) => `<span class="chip ${ok ? 'ok' : 'warn'}">${ok ? yes : no}</span>`;
@@ -577,7 +667,8 @@
 
         // ── Audit trail ──
         const AUDIT_LABELS = {
-            'jobs.run': '手动运行定时任务',
+            'jobs.run': '手动运行定时任务', 'user.suspend': '停用账号', 'user.unsuspend': '恢复账号',
+            'announcement.set': '发布公告', 'announcement.clear': '撤下公告', 'pool.delete': '删除达人池记录',
             'plan.set': '设置套餐', 'plan.grant': '接口开通套餐', 'order.confirm': '确认到账', 'order.reject': '驳回付款',
             'user.delete': '删除账号', 'user.reset_password': '重置密码', 'demo.cleanup': '清理 Demo'
         };
@@ -665,7 +756,7 @@
                     : '<span class="umark" title="邮箱未验证">未验证</span>');
                 const role = u.role === 'member' ? '<span class="umark" style="color:var(--mut)" title="受邀加入他人工作区的成员，套餐随所有者">成员</span>' : '';
                 return `<tr>
-                    <td class="email"><span class="lnk" title="查看工作区详情" onclick="openWs(${i})">${esc(u.email)}</span>${mark}${role}${u.members > 1 && u.role !== 'member' ? `<span class="umark" style="color:var(--cy)" title="工作区成员数">${u.members} 人</span>` : ''}<small title="点击复制租户 ID" onclick="copyTid(${i})">${esc(u.tenant_id).slice(0, 12)}…</small></td>
+                    <td class="email"><span class="lnk" title="查看工作区详情" onclick="openWs(${i})">${esc(u.email)}</span>${mark}${role}${u.disabled ? '<span class="umark" style="color:var(--red)" title="已停用：不能登录，数据保留">已停用</span>' : ''}${u.members > 1 && u.role !== 'member' ? `<span class="umark" style="color:var(--cy)" title="工作区成员数">${u.members} 人</span>` : ''}<small title="点击复制租户 ID" onclick="copyTid(${i})">${esc(u.tenant_id).slice(0, 12)}…</small></td>
                     <td>${chip}${expiry}</td>
                     <td class="num" style="text-align:right">${u.optimize_runs}</td>
                     <td class="num" style="text-align:right">${u.agent_messages ?? 0}</td>
@@ -678,6 +769,7 @@
                             ${sel}
                             <button class="btn" onclick="applyPlan(${i})">应用</button>
                             ${u.demo ? '' : `<button class="btn" title="生成一次性临时密码（用户忘记密码时使用）" onclick="resetPw(${i})">重置密码</button>`}
+                            ${u.demo ? '' : `<button class="btn" title="${u.disabled ? '恢复登录' : '禁止登录，数据保留'}" onclick="toggleSuspend(${i})">${u.disabled ? '恢复' : '停用'}</button>`}
                             <button class="btn danger" onclick="removeUser(${i})">删除</button>
                         </div>
                     </td>

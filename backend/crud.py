@@ -59,9 +59,7 @@ def _record_snapshot(kol_record: dict):
                         datetime.utcnow().isoformat(), metrics)
 
 VALID_COUNTRIES = ["MY", "ID", "TH", "PH", "SG", "VN"]
-VALID_CATEGORIES = ["beauty", "fashion", "accessories", "muslim_fashion", "home", "kitchen",
-                    "appliances", "electronics", "mother_baby", "fmcg", "health",
-                    "sports_outdoor", "pet", "toys", "automotive"]
+from backend.categories import VALID_CATEGORIES      # noqa: E402 — the single category list
 
 CSV_TEMPLATE_HEADER = [
     "name", "country", "category", "followers",
@@ -202,20 +200,28 @@ _COUNTRY_NAME_TO_CODE = {
 }
 _CATEGORY_SYNONYMS = {
     "beauty": "beauty", "cosmetics": "beauty", "makeup": "beauty", "skincare": "beauty",
-    "personal_care": "beauty", "beauty_personal_care": "beauty", "beauty_care": "beauty",
+    "beauty_personal_care": "beauty", "beauty_care": "beauty",
+    "personal_care": "personal_care", "body_care": "personal_care", "hair_care": "personal_care", "oral_care": "personal_care", "fragrance": "personal_care",
     "fashion": "fashion", "apparel": "fashion", "clothing": "fashion", "lifestyle": "fashion",
-    "womenswear": "fashion", "menswear": "fashion", "womens_clothing": "fashion", "mens_clothing": "fashion",
+    "womenswear": "womenswear", "womens_clothing": "womenswear", "women_s_clothing": "womenswear", "womens_fashion": "womenswear", "dresses": "womenswear",
+    "menswear": "menswear", "mens_clothing": "menswear", "men_s_clothing": "menswear", "mens_fashion": "menswear",
+    "kids_fashion": "kids_fashion", "kids_clothing": "kids_fashion", "childrens_clothing": "kids_fashion", "children_s_fashion": "kids_fashion", "kidswear": "kids_fashion",
     "underwear": "fashion", "lingerie": "fashion",
-    "accessories": "accessories", "fashion_accessories": "accessories", "bags": "accessories", "luggage": "accessories",
-    "bags_luggage": "accessories", "shoes": "accessories", "footwear": "accessories", "jewelry": "accessories", "jewellery": "accessories", "watches": "accessories",
+    "accessories": "accessories", "fashion_accessories": "accessories", "bags": "bags", "luggage": "bags", "handbags": "bags", "backpacks": "bags",
+    "bags_luggage": "bags", "shoes": "shoes", "footwear": "shoes", "sneakers": "shoes", "jewelry": "jewelry", "jewellery": "jewelry", "watches": "jewelry", "jewelry_watches": "jewelry",
     "muslim_fashion": "muslim_fashion", "muslim": "muslim_fashion", "modest_fashion": "muslim_fashion", "muslim_wear": "muslim_fashion", "islamic_fashion": "muslim_fashion",
-    "home": "home", "home_living": "home", "home_garden": "home", "household": "home", "furniture": "home", "home_supplies": "home", "daily_use": "home",
+    "home": "home", "home_living": "home", "home_garden": "home", "household": "home", "home_supplies": "home", "daily_use": "home",
+    "furniture": "furniture", "home_furniture": "furniture", "textiles": "textiles", "home_textiles": "textiles", "bedding": "textiles", "soft_furnishings": "textiles",
+    "tools": "tools", "home_improvement": "tools", "hardware": "tools", "tools_hardware": "tools", "diy": "tools",
+    "stationery": "stationery", "books": "stationery", "office_supplies": "stationery", "books_stationery": "stationery", "school_supplies": "stationery",
     "kitchen": "kitchen", "kitchenware": "kitchen", "home_kitchen": "kitchen", "kitchen_supplies": "kitchen", "cookware": "kitchen", "tableware": "kitchen",
     "appliances": "appliances", "home_appliances": "appliances", "small_appliances": "appliances", "household_appliances": "appliances", "appliance": "appliances",
     "electronics": "electronics", "consumer_electronics": "electronics", "phones": "electronics", "phones_electronics": "electronics",
-    "mobile": "electronics", "digital": "electronics", "3c": "electronics", "computers": "electronics", "computer_office": "electronics", "gadgets": "electronics", "tech": "electronics",
+    "mobile": "electronics", "digital": "electronics", "3c": "electronics", "gadgets": "electronics", "tech": "electronics",
+    "computers": "computers", "computer_office": "computers", "computers_office": "computers", "laptops": "computers", "pc": "computers",
     "mother_baby": "mother_baby", "mom_baby": "mother_baby", "baby": "mother_baby", "maternity": "mother_baby", "baby_kids": "mother_baby", "maternal_child": "mother_baby", "kids": "mother_baby",
-    "fmcg": "fmcg", "food": "fmcg", "grocery": "fmcg", "beverage": "fmcg", "snacks": "fmcg", "food_beverage": "fmcg", "food_drink": "fmcg", "food_and_beverages": "fmcg",
+    "fmcg": "fmcg", "grocery": "fmcg", "household_supplies": "fmcg", "daily_necessities": "fmcg",
+    "food": "food", "beverage": "food", "beverages": "food", "snacks": "food", "food_beverage": "food", "food_beverages": "food", "food_drink": "food", "food_and_beverages": "food",
     "health": "health", "healthcare": "health", "supplements": "health", "wellness": "health", "nutrition": "health", "health_supplements": "health",
     "personal_care_health": "health", "health_personal_care": "health",
     "sports_outdoor": "sports_outdoor", "sports": "sports_outdoor", "outdoor": "sports_outdoor", "sports_outdoors": "sports_outdoor", "fitness": "sports_outdoor", "camping": "sports_outdoor",

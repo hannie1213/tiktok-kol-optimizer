@@ -28,6 +28,7 @@ from fastapi import FastAPI, HTTPException, Query, Depends, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
+from starlette.exceptions import HTTPException as StarletteHTTPException
 from pydantic import BaseModel, Field
 
 # ── Make project root importable ──────────────────────────────────
@@ -43,7 +44,7 @@ from engine.optimization.tabu_search import tabu_search
 from engine.optimization.greedy_ranking import greedy_ranking
 from engine.scoring.creator_score import compute_creator_score
 from engine.scoring.explainer import generate_reasons, get_tier
-from backend import calibration, mailer, ratelimit, repo, settings, tenancy
+from backend import calibration, categories, i18n, mailer, ratelimit, repo, settings, tenancy
 
 # Refuse to boot an unsafe production configuration (see backend/settings.py).
 settings.validate()
@@ -65,6 +66,9 @@ from backend.payments import router as payments_router
 from backend.workspace import router as workspace_router
 from backend.pipeline import router as pipeline_router
 from backend.collab import router as collab_router
+from backend.pool import router as pool_router
+from backend.studio import router as studio_router
+from backend.aivideo import router as aivideo_router
 from backend import jobs
 
 @contextlib.asynccontextmanager
@@ -102,6 +106,18 @@ app.include_router(payments_router)
 app.include_router(workspace_router)
 app.include_router(pipeline_router)
 app.include_router(collab_router)
+app.include_router(pool_router)
+app.include_router(aivideo_router)
+app.include_router(studio_router)
+
+
+@app.exception_handler(StarletteHTTPException)
+async def _localised_http_error(request: Request, exc: StarletteHTTPException):
+    """Errors are raised in English everywhere; a console running in Chinese
+    (X-Lang: zh) gets the Chinese wording here, in one place."""
+    return JSONResponse(status_code=exc.status_code,
+                        content={"detail": i18n.localise(exc.detail, request.headers.get("x-lang"))},
+                        headers=getattr(exc, "headers", None))
 
 # UI language of the calling client (X-Lang header, set by the frontend).
 # Server-generated text — e.g. the "why this creator" reasons — follows it.
@@ -137,7 +153,8 @@ async def _harden(request: Request, call_next):
     declared = request.headers.get("content-length")
     if declared and declared.isdigit() and int(declared) > settings.MAX_UPLOAD_BYTES:
         return JSONResponse(status_code=413, content={
-            "detail": f"Request too large (limit {settings.MAX_UPLOAD_BYTES // (1024 * 1024)} MB)"})
+            "detail": i18n.localise(f"File too large (limit {settings.MAX_UPLOAD_BYTES // (1024 * 1024)} MB)",
+                                    request.headers.get("x-lang"))})
 
     started = time.perf_counter()
     try:
@@ -175,9 +192,7 @@ async def _throttle_compute(request: Request, tenant_id: str = Depends(require_t
 
 # ── Enum constants ────────────────────────────────────────────────
 VALID_COUNTRIES = ["MY", "ID", "TH", "PH", "SG", "VN"]
-VALID_CATEGORIES = ["beauty", "fashion", "accessories", "muslim_fashion", "home", "kitchen",
-                    "appliances", "electronics", "mother_baby", "fmcg", "health",
-                    "sports_outdoor", "pet", "toys", "automotive"]
+VALID_CATEGORIES = categories.VALID_CATEGORIES      # see backend/categories.py
 VALID_TIERS = ["Mega", "Macro", "Micro", "Nano"]
 
 # The active KOL library is resolved per-tenant at call time (backend/tenancy.py),
@@ -374,10 +389,13 @@ def _kol_meta() -> dict:
 
 def load_kols(countries: Optional[List[str]] = None,
               category: Optional[str] = None,
-              content_type: Optional[str] = None) -> List[KOL]:
+              content_type: Optional[str] = None, related: bool = False) -> List[KOL]:
     """Current tenant's creators, with any country/category filter pushed down
-    to an indexed SQL query instead of loading the whole library."""
-    raw = repo.kols_all(tenancy.current_tenant(), countries=countries, category=category,
+    to an indexed SQL query instead of loading the whole library. `related`
+    widens a specific category to its parent (womenswear -> fashion) — used by
+    the optimizer, not by the library's own filter."""
+    wanted = categories.pool(category) if (category and related) else category
+    raw = repo.kols_all(tenancy.current_tenant(), countries=countries, category=wanted,
                         content_type=content_type)
     _refresh_meta(raw)
     return [_dict_to_kol(_apply_rating_fit(d)) for d in raw]
@@ -719,8 +737,13 @@ def health():
 @app.get("/app-config")
 def app_config():
     """Public feature switches the frontend needs before anyone signs in."""
+    notice = repo.system_get("announcement")
     return {"email_enabled": mailer.enabled(),
-            "billing_self_serve": settings.BILLING_SELF_SERVE}
+            "billing_self_serve": settings.BILLING_SELF_SERVE,
+            # Operator's site-wide notice (maintenance, new features); null when none.
+            "announcement": {"id": notice["created_at"], "text": notice.get("text", ""),
+                             "text_zh": notice.get("text_zh", ""), "level": notice.get("level", "info")}
+            if notice else None}
 
 
 @app.get("/calibration")
@@ -819,7 +842,7 @@ def optimize(req: OptimizeRequest, _t: str = Depends(_throttle_compute)):
         raise HTTPException(status_code=422, detail="content_type must be one of: all, live, video")
 
     active_countries = set(req.countries) if req.countries else set(VALID_COUNTRIES)
-    filtered = load_kols(countries=list(active_countries), category=req.category,
+    filtered = load_kols(countries=list(active_countries), category=req.category, related=True,
                          content_type=None if req.content_type == "all" else req.content_type)
 
     if not filtered:
@@ -913,7 +936,7 @@ def optimize_plans(req: OptimizeRequest, _t: str = Depends(_throttle_compute)):
         raise HTTPException(status_code=422, detail="content_type must be one of: all, live, video")
 
     active_countries = set(req.countries) if req.countries else set(VALID_COUNTRIES)
-    filtered = load_kols(countries=list(active_countries), category=req.category,
+    filtered = load_kols(countries=list(active_countries), category=req.category, related=True,
                          content_type=None if req.content_type == "all" else req.content_type)
 
     if not filtered:
@@ -1028,7 +1051,7 @@ def compute_budget_plan(tenant_id: str, budget: float, countries: List[str],
     """
     import statistics
 
-    raw = repo.kols_all(tenant_id, countries=countries or None, category=category,
+    raw = repo.kols_all(tenant_id, countries=countries or None, category=categories.pool(category),
                         content_type=None if content_type in ("all", "", None) else content_type)
     tiers: Dict[str, dict] = {}
     for t in VALID_TIERS:
@@ -1102,6 +1125,12 @@ def budget_advisor(req: BudgetAdvisorRequest, _t: str = Depends(require_tenant))
         raise HTTPException(status_code=422, detail="content_type must be one of: all, live, video")
     return compute_budget_plan(tenancy.current_tenant(), req.budget, req.countries,
                                req.category, req.content_type)
+
+
+@app.get("/categories")
+def list_categories():
+    """Grouped product categories for the console's pickers."""
+    return {"groups": categories.catalog()}
 
 
 @app.get("/kols", response_model=KOLListResponse)

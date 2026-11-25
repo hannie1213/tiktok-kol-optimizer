@@ -42,6 +42,21 @@ _EXT_CATEGORIES = {
     "pet":             (0.039, 0.078, 32),   # 宠物用品
     "toys":            (0.035, 0.072, 28),   # 玩具和爱好
     "automotive":      (0.028, 0.050, 45),   # 汽车与运输 (VN motorbike / TH car)
+    # ── finer departments (same method: planning estimates, corrected per
+    #    merchant by the calibration layer once real results are recorded) ──
+    "personal_care":   (0.036, 0.085, 26),   # 个护 / 洗护 / 香氛
+    "womenswear":      (0.034, 0.075, 48),   # 女装
+    "menswear":        (0.030, 0.062, 52),   # 男装
+    "kids_fashion":    (0.036, 0.080, 30),   # 童装
+    "shoes":           (0.032, 0.066, 58),   # 鞋靴
+    "bags":            (0.033, 0.068, 62),   # 箱包
+    "jewelry":         (0.031, 0.058, 70),   # 珠宝腕表
+    "computers":       (0.027, 0.045, 210),  # 电脑办公
+    "furniture":       (0.026, 0.042, 160),  # 家具
+    "textiles":        (0.030, 0.064, 42),   # 家纺布艺
+    "tools":           (0.027, 0.052, 48),   # 五金工具 / 家装
+    "food":            (0.040, 0.095, 18),   # 食品饮料
+    "stationery":      (0.033, 0.072, 16),   # 图书文具
 }
 for _cat, (_ctr, _cvr, _aov_my) in _EXT_CATEGORIES.items():
     _CTR[_cat] = {c: _ctr for c in _MARKET_AOV_FACTOR}

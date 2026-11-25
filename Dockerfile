@@ -25,6 +25,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY backend/ backend/
 COPY engine/ engine/
 COPY frontend/ frontend/
+COPY extension/ extension/
 # Read-only reference data baked into the image: the seed library every new
 # tenant starts from, the merchant guide, and the synthetic-pool generator.
 COPY data/generator.py data/seed_kols.json data/merchant_guide.json data/

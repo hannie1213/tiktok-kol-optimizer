@@ -219,7 +219,7 @@ def _user_to_dict(u: User) -> dict:
     return {"id": u.id, "email": u.email, "password_hash": u.password_hash,
             "tenant_id": u.tenant_id, "created_at": u.created_at,
             "email_verified": bool(u.email_verified), "lang": u.lang or "en",
-            "role": u.role or "owner"}
+            "role": u.role or "owner", "disabled": bool(u.disabled)}
 
 
 def user_find(email: str) -> Optional[dict]:
@@ -289,6 +289,10 @@ def tenant_wipe(tenant_id: str) -> None:
         s.query(Calibration).filter(Calibration.tenant_id == tenant_id).delete(synchronize_session=False)
         s.query(Tenant).filter(Tenant.id == tenant_id).delete(synchronize_session=False)
     _migrated.discard(tenant_id)
+    # generated video files live on disk, outside the database
+    import shutil
+    from backend.db import VIDEO_DIR
+    shutil.rmtree(os.path.join(VIDEO_DIR, tenant_id), ignore_errors=True)
 
 
 def user_update(email: str, **fields) -> bool:
@@ -298,7 +302,7 @@ def user_update(email: str, **fields) -> bool:
         if not u:
             return False
         for k, v in fields.items():
-            if k in ("email_verified", "lang"):
+            if k in ("email_verified", "lang", "disabled"):
                 setattr(u, k, v)
         return True
 
@@ -384,15 +388,16 @@ def interests_all(limit: int = 1000) -> List[dict]:
 #  Creators (KOLs)
 # ════════════════════════════════════════════════════════════════
 def kols_all(tenant_id: str, countries: Optional[List[str]] = None,
-             category: Optional[str] = None,
+             category=None,
              content_type: Optional[str] = None) -> List[dict]:
     _ensure_migrated(tenant_id)
     with _session() as s:
         q = select(Kol).where(Kol.tenant_id == tenant_id)
         if countries:
             q = q.where(Kol.country.in_(countries))
-        if category:
-            q = q.where(Kol.category == category)
+        if category:                                  # one category, or several (see categories.pool)
+            wanted = [category] if isinstance(category, str) else list(category)
+            q = q.where(Kol.category.in_(wanted))
         rows = s.scalars(q.order_by(Kol.kol_id)).all()
         out = [_row_to_dict(r) for r in rows]
         # content_type lives in Kol.extra (no schema migration): filter in Python.
@@ -551,6 +556,24 @@ def campaigns_all(tenant_id: str) -> List[dict]:
     with _session() as s:
         rows = s.scalars(select(Campaign).where(Campaign.tenant_id == tenant_id)).all()
         return [dict(r.doc) for r in rows]
+
+
+# ── Operator-wide settings (one row per key, outside any workspace) ──
+SYSTEM_TENANT = "__system__"
+
+
+def system_get(key: str) -> Optional[dict]:
+    rows = docs_list(SYSTEM_TENANT, key, limit=1)
+    return rows[0] if rows else None
+
+
+def system_set(key: str, doc: Optional[dict], created_at: str = ""):
+    """Replace the setting; None clears it."""
+    with _write_lock, _session() as s:
+        s.query(TenantDoc).filter(TenantDoc.tenant_id == SYSTEM_TENANT, TenantDoc.kind == key).delete(
+            synchronize_session=False)
+        if doc is not None:
+            s.add(TenantDoc(tenant_id=SYSTEM_TENANT, kind=key, created_at=created_at, doc=doc))
 
 
 # ── Workspace documents (templates, contracts, message log, activity) ──

@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<style>
+    body { width: 320px; margin: 0; padding: 16px; font: 13px/1.5 system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; color: #12141A; background: #fff; }
+    h1 { margin: 0 0 2px; font-size: 16px; letter-spacing: -.01em; }
+    h1 sup { color: #0A8F8A; font-size: 9px; }
+    p { margin: 0 0 10px; color: #5A6170; }
+    label { display: block; margin: 10px 0 4px; font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: #5A6170; }
+    textarea, input[type=text] { width: 100%; box-sizing: border-box; padding: 8px 10px; border: 1px solid #DDE1E8; border-radius: 8px; font: inherit; resize: none; }
+    button { width: 100%; margin-top: 10px; padding: 9px 12px; border: 0; border-radius: 8px; background: #12141A; color: #fff; font: 600 13px inherit; cursor: pointer; }
+    button.quiet { background: #F1F3F6; color: #12141A; }
+    button:disabled { opacity: .5; cursor: default; }
+    .row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 0; border-top: 1px solid #EEF0F4; }
+    .ok { color: #0A9548; } .bad { color: #C92A2A; }
+    .card { padding: 10px 12px; border-radius: 8px; background: #F4F5F8; margin-top: 10px; }
+    .card b { display: block; }
+    .hidden { display: none; }
+    small { color: #7C8493; }
+</style>
+</head>
+<body>
+    <h1>tiko<sup>™</sup> Creator Capture</h1>
+
+    <div id="setup">
+        <p id="t-intro"></p>
+        <label id="t-code-label" for="code"></label>
+        <textarea id="code" rows="3" spellcheck="false"></textarea>
+        <button id="connect"></button>
+        <p id="setup-msg" class="bad" style="margin-top:8px"></p>
+    </div>
+
+    <div id="main" class="hidden">
+        <p><span class="ok">●</span> <span id="t-connected"></span> <b id="server"></b></p>
+        <div id="page" class="card"></div>
+        <button id="capture"></button>
+        <p id="capture-msg" style="margin-top:8px"></p>
+        <div class="row">
+            <span id="t-auto"></span>
+            <input id="auto" type="checkbox">
+        </div>
+        <small id="t-auto-note"></small>
+        <div id="last" class="card hidden"></div>
+        <button id="disconnect" class="quiet"></button>
+    </div>
+    <script src="popup.js"></script>
+</body>
+</html>

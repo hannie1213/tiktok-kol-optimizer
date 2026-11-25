@@ -428,7 +428,7 @@
 
         /* ── Marquee strip ── */
         .lp-marquee { position: relative; z-index: 1; overflow: hidden; border-top: 1px solid var(--lp-line); border-bottom: 1px solid var(--lp-line); padding: 20px 0; background: rgba(8,8,10,.4); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
-        .lp-marquee .track { display: flex; align-items: baseline; gap: 56px; width: max-content; animation: mq 26s linear infinite; font-size: clamp(26px, 3.6vw, 52px); font-weight: 500; letter-spacing: -.02em; white-space: nowrap; }
+        .lp-marquee .track { display: flex; align-items: baseline; gap: 56px; width: max-content; animation: mq 11s linear infinite; font-size: clamp(26px, 3.6vw, 52px); font-weight: 500; letter-spacing: -.02em; white-space: nowrap; }
         .lp-marquee .track span { color: var(--lp-ink); }
         .lp-marquee .track span.o { color: transparent; -webkit-text-stroke: 1px rgba(236,233,226,.4); }
         .lp-marquee .track em { font-style: normal; font-family: inherit; font-weight: inherit; color: var(--lp-cy); -webkit-text-stroke: 0; }
@@ -1004,6 +1004,68 @@
             .st-row { align-items: flex-start; }
             .kb { grid-auto-columns: 78vw; }
         }
+        .ex-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 14px; }
+        .ex-card { padding: 16px 18px; border-radius: 14px; display: flex; flex-direction: column; gap: 10px; }
+        .ex-card h4 { margin: 0; font-size: 15px; font-weight: 700; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .ex-card a.h { font-size: 12.5px; color: var(--accent); text-decoration: none; }
+        .ex-card a.h:hover { text-decoration: underline; }
+        .ex-card p { margin: 0; font-size: 12.5px; line-height: 1.55; color: var(--mut); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 38px; }
+        .ex-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 10px 0; border-top: 1px solid var(--hair); border-bottom: 1px solid var(--hair); }
+        .ex-stats b { display: block; font-size: 15px; color: var(--ink); font-variant-numeric: tabular-nums; }
+        .ex-stats span { font-size: 11px; color: var(--mut); }
+        .ex-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 11.5px; color: var(--mut); }
+        .ex-flt { display: grid; grid-template-columns: 1fr 170px 170px 170px; gap: 14px; padding: 18px 20px; border-radius: 14px; align-items: end; }
+        .ext-step { display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--hair); }
+        .ext-step:last-child { border-bottom: 0; }
+        .ext-step i { flex-shrink: 0; width: 24px; height: 24px; border-radius: 50%; background: rgba(var(--tint),.08); color: var(--ink); font: 700 12px var(--font-ui); display: flex; align-items: center; justify-content: center; font-style: normal; }
+        .ext-step b { display: block; font-size: 13.5px; color: var(--ink); }
+        .ext-step span { font-size: 12.5px; color: var(--mut); }
+        .ext-code { width: 100%; margin-top: 8px; font: 11.5px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; word-break: break-all; }
+        @media (max-width: 1180px) { .ex-flt { grid-template-columns: 1fr 1fr; } }
+        @media (max-width: 900px) { .ex-flt { grid-template-columns: 1fr !important; } }
+        #sc-tabs { flex-wrap: wrap; }
+        .sv-wrap { display: grid; grid-template-columns: 270px minmax(0, 1fr); gap: 22px; margin-top: 16px; align-items: start; }
+        .sv-stage canvas { display: block; width: 270px; height: 480px; border-radius: 14px; background: #000; border: 1px solid var(--hair); }
+        .sv-scene { display: grid; grid-template-columns: 46px 1fr; gap: 10px; align-items: start; padding: 9px 0; border-bottom: 1px solid var(--hair); }
+        .sv-scene:last-child { border-bottom: 0; }
+        .sv-scene time { font-size: 12px; color: var(--mut); font-variant-numeric: tabular-nums; padding-top: 9px; }
+        .sv-scene small { display: block; margin-top: 5px; font-size: 12px; line-height: 1.5; color: var(--mut); }
+        @media (max-width: 1180px) { .sv-wrap { grid-template-columns: 1fr; } .sv-stage canvas { margin: 0 auto; } }
+        #notice-bar { align-items: center; gap: 10px; padding: 10px 32px; font-size: 13px; color: var(--ink); background: rgba(var(--accent-rgb),.1); border-bottom: 1px solid rgba(var(--accent-rgb),.25); }
+        #notice-bar.warn { background: rgba(245,158,11,.12); border-bottom-color: rgba(245,158,11,.35); }
+        #notice-bar .material-symbols-outlined { font-size: 18px; color: var(--accent); }
+        #notice-bar.warn .material-symbols-outlined { color: #f59e0b; }
+        #notice-bar button { border: 0; background: transparent; cursor: pointer; display: flex; padding: 2px; }
+        #notice-bar button .material-symbols-outlined { color: var(--mut); }
+        @media (max-width: 900px) { #notice-bar { padding: 10px 16px; } }
+        /* plan cards: neutral, one emphasis (the recommended plan), no colour coding */
+        #billing-plans .bp-card { padding: 26px 24px 24px; border-radius: 16px; gap: 0; }
+        #billing-plans .bp-card.is-popular { border-color: rgba(var(--tint),.42) !important; }
+        #billing-plans .bp-head { display: flex; align-items: center; gap: 8px; min-height: 24px; }
+        #billing-plans .bp-name { font-size: 15px; font-weight: 700; color: var(--ink); }
+        #billing-plans .bp-tag { margin-left: auto; padding: 3px 10px; border-radius: 99px; font-size: 11.5px; font-weight: 600; background: var(--btn-bg); color: var(--btn-fg); }
+        #billing-plans .bp-tag.quiet { background: transparent; color: var(--mut); border: 1px solid var(--hair2); }
+        #billing-plans .bp-price { margin: 18px 0 20px; font-size: 42px; font-weight: 800; letter-spacing: -.035em; line-height: 1; color: var(--ink); }
+        #billing-plans .bp-price small { margin-left: 4px; font-size: 13px; font-weight: 500; letter-spacing: 0; color: var(--mut); }
+        #billing-plans .bp-feats { flex: 1; list-style: none; margin: 0 0 22px; padding: 20px 0 0; border-top: 1px solid var(--hair); display: flex; flex-direction: column; gap: 11px; }
+        #billing-plans .bp-feats li { display: flex; gap: 9px; font-size: 13px; line-height: 1.5; color: var(--mut); }
+        #billing-plans .bp-feats .material-symbols-outlined { flex-shrink: 0; margin-top: 1px; font-size: 16px; color: var(--ink); }
+        .bp-btn { width: 100%; padding: 11px 14px; border-radius: 10px; border: 1px solid var(--hair2); background: transparent; color: var(--ink); font: 600 13.5px var(--font-ui); cursor: pointer; transition: background .18s ease, box-shadow .22s ease; }
+        .bp-btn:hover { background: rgba(var(--tint),.05); }
+        .bp-btn.solid { background: var(--btn-bg); border-color: var(--btn-bg); color: var(--btn-fg); }
+        .bp-btn.solid:hover { background: var(--btn-bg-hover); box-shadow: var(--sig); }
+        .bp-btn:disabled { cursor: default; background: transparent; border-color: var(--hair); color: var(--mut); box-shadow: none; }
+        .av-job { display: grid; grid-template-columns: 150px 1fr; gap: 16px; padding: 14px 0; border-bottom: 1px solid var(--hair); }
+        .av-job:last-child { border-bottom: 0; }
+        .av-media { width: 150px; aspect-ratio: 9 / 16; border-radius: 10px; background: rgba(var(--tint),.05); border: 1px solid var(--hair); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .av-media.a11 { aspect-ratio: 1; } .av-media.a169 { aspect-ratio: 16 / 9; }
+        .av-media video { width: 100%; height: 100%; object-fit: cover; background: #000; }
+        .av-media .material-symbols-outlined { font-size: 28px; color: var(--mut); }
+        .av-spin { animation: avSpin 1.2s linear infinite; }
+        @keyframes avSpin { to { transform: rotate(360deg); } }
+        .av-job p { margin: 0 0 8px; font-size: 13px; line-height: 1.6; color: var(--ink); display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+        .av-job small { display: block; font-size: 12px; color: var(--mut); margin-bottom: 10px; }
+        @media (max-width: 900px) { .av-job { grid-template-columns: 110px 1fr; } .av-media { width: 110px; } }
         .st-row { display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
         .st-k { margin: 0; font-size: 14px; font-weight: 700; color: var(--ink); }
         .st-d { margin: 3px 0 0; font-size: 12.5px; color: var(--mut); }
@@ -1058,7 +1120,7 @@
     <div id="landing-page">
         <!-- Preloader: percentage counter, curtain lift -->
         <div id="lp-preloader" aria-hidden="true">
-            <div class="pl-meta">tiko<sup>™</sup> — kol matrix optimizer</div>
+            <div class="pl-meta">tiko<sup>™</sup> — <span data-i18n="pl.meta">kol optimizer</span></div>
             <div class="pl-count"><span id="pl-num">0</span><span class="pct">%</span></div>
         </div>
 
@@ -1083,7 +1145,6 @@
                 <a href="#features" data-i18n="nav.cap">capabilities</a>
                 <a href="#copilot" data-i18n="nav.copilot">ai copilot</a>
                 <a href="#how" data-i18n="nav.how">how it works</a>
-                <a href="#metrics" data-i18n="nav.results">results</a>
                 <a href="#pricing" data-i18n="nav.pricing">pricing</a>
             </div>
             <div style="display:flex;align-items:center;gap:10px">
@@ -1107,10 +1168,6 @@
                     <button class="lp-btn lp-btn-ghost" onclick="enterDemo(this)" data-i18n="cta.demo">see live demo</button>
                 </div>
             </div>
-            <div class="lp-hero-chips" aria-hidden="true">
-                <div class="lp-chip lp-glass c1"><span class="k">+38%</span><span class="v" data-i18n="chip.gmv">avg. gmv lift</span></div>
-                <div class="lp-chip lp-glass c2"><span class="k">&lt;1s</span><span class="v" data-i18n="chip.solve">solve time</span></div>
-            </div>
             <div class="lp-hero-foot stag s6">
                 <span data-i18n-html="foot.scroll">scroll<br>to discover</span>
                 <span class="scroll-line"></span>
@@ -1121,26 +1178,15 @@
         <!-- Marquee -->
         <div class="lp-marquee" aria-hidden="true">
             <div class="track">
-                <span>optimize</span><span class="o">predict</span><span>allocate</span><em>review</em><span class="o">repeat —</span>
-                <span>optimize</span><span class="o">predict</span><span>allocate</span><em>review</em><span class="o">repeat —</span>
+                <span data-i18n="mq.1">optimize</span><span class="o" data-i18n="mq.2">predict</span><span data-i18n="mq.3">allocate</span><em data-i18n="mq.4">review</em><span class="o" data-i18n="mq.5">repeat —</span>
+                <span data-i18n="mq.1">optimize</span><span class="o" data-i18n="mq.2">predict</span><span data-i18n="mq.3">allocate</span><em data-i18n="mq.4">review</em><span class="o" data-i18n="mq.5">repeat —</span>
             </div>
         </div>
 
         <div class="lp-wrap">
-            <!-- Metrics -->
-            <section class="lp-section" id="metrics" data-bg="#08080A">
-                <div class="lp-sec-head lp-reveal"><span class="lp-num" data-i18n="sec1.num">01 / results</span><h2 class="lp-h2" data-i18n-html="sec1.h">Numbers that<br><em>do the talking</em></h2></div>
-                <div class="lp-trust lp-reveal">
-                    <div class="t"><div class="n">24/7</div><div class="d" data-i18n="trust.d1">AI copilot on call for every campaign</div></div>
-                    <div class="t"><div class="n">+38%</div><div class="d" data-i18n="trust.d2">avg. GMV lift vs. manual selection</div></div>
-                    <div class="t"><div class="n">6</div><div class="d" data-i18n="trust.d3">SEA markets ready out of the box</div></div>
-                    <div class="t"><div class="n">&lt;1s</div><div class="d" data-i18n="trust.d4">avg. solve time per optimization</div></div>
-                </div>
-            </section>
-
             <!-- Features: index rows -->
             <section class="lp-section" id="features" data-bg="#08080A">
-                <div class="lp-sec-head lp-reveal"><span class="lp-num" data-i18n="sec2.num">02 / capabilities</span><h2 class="lp-h2" data-i18n-html="sec2.h">A decision engine<br><em>built to sell</em></h2></div>
+                <div class="lp-sec-head lp-reveal"><span class="lp-num" data-i18n="sec2.num">01 / capabilities</span><h2 class="lp-h2" data-i18n-html="sec2.h">A decision engine<br><em>built to sell</em></h2></div>
                 <p class="lp-section-sub lp-reveal" data-i18n="feat.sub">Not just a list of creators — a campaign brain that predicts outcomes, explains its reasoning, and lets you review results anytime.</p>
                 <div class="lp-rows lp-reveal">
                     <div class="lp-row">
@@ -1184,7 +1230,7 @@
 
             <!-- AI Copilot -->
             <section class="lp-section" id="copilot" data-bg="#08080A">
-                <div class="lp-sec-head lp-reveal"><span class="lp-num" data-i18n="seccp.num">03 / ai copilot</span><h2 class="lp-h2" data-i18n-html="seccp.h">Your next campaign<br><em>is one chat away</em></h2></div>
+                <div class="lp-sec-head lp-reveal"><span class="lp-num" data-i18n="seccp.num">02 / ai copilot</span><h2 class="lp-h2" data-i18n-html="seccp.h">Your next campaign<br><em>is one chat away</em></h2></div>
                 <div class="lp-cp lp-reveal">
                     <div class="lp-cp-copy">
                         <p class="lp-cp-lead" data-i18n-html="cp.lead">Meet your <b>AI campaign copilot</b> — a marketing analyst that lives inside the console, knows your creator library and speaks your language. No dashboards to learn: just tell it what you want to sell.</p>
@@ -1211,7 +1257,7 @@
 
             <!-- How it works -->
             <section class="lp-section" id="how" data-bg="#08080A">
-                <div class="lp-sec-head lp-reveal"><span class="lp-num" data-i18n="sec3.num">04 / process</span><h2 class="lp-h2" data-i18n-html="sec3.h">Budget to lineup,<br><em>in three steps</em></h2></div>
+                <div class="lp-sec-head lp-reveal"><span class="lp-num" data-i18n="sec3.num">03 / process</span><h2 class="lp-h2" data-i18n-html="sec3.h">Budget to lineup,<br><em>in three steps</em></h2></div>
                 <div class="lp-steps lp-reveal">
                     <div class="lp-step">
                         <div class="num">01</div>
@@ -1233,7 +1279,7 @@
 
             <!-- Pricing -->
             <section class="lp-section" id="pricing" data-bg="#08080A">
-                <div class="lp-sec-head lp-reveal"><span class="lp-num" data-i18n="sec4.num">05 / pricing</span><h2 class="lp-h2" data-i18n-html="sec4.h">Start free, scale<br><em>when it pays off</em></h2></div>
+                <div class="lp-sec-head lp-reveal"><span class="lp-num" data-i18n="sec4.num">04 / pricing</span><h2 class="lp-h2" data-i18n-html="sec4.h">Start free, scale<br><em>when it pays off</em></h2></div>
                 <p class="lp-section-sub lp-reveal" data-i18n="price.sub">Every plan includes the full AI engine, the AI copilot and an unlimited creator library. Pay only for what powers your growth — optimization runs and copilot chats.</p>
                 <div class="lp-plans lp-reveal">
                     <div class="lp-plan">
@@ -1242,6 +1288,7 @@
                         <ul>
                             <li data-i18n-html="p1.l1">✓ <b>10 optimization runs</b> / month</li>
                             <li data-i18n-html="p1.copilot">✓ <b>AI Copilot</b> — 20 chats / month</li>
+                            <li data-i18n-html="p1.vid">✓ <b>AI video</b> — 1 / month</li>
                             <li data-i18n="p1.l2">✓ Smart lineup picks + "why this creator"</li>
                             <li data-i18n="p1.l3">✓ Unlimited creator library</li>
                             <li data-i18n="p1.l4">✓ CSV / Excel import &amp; export</li>
@@ -1255,6 +1302,7 @@
                         <ul>
                             <li data-i18n-html="p2.l1">✓ <b>300 optimization runs</b> / month</li>
                             <li data-i18n-html="p2.copilot">✓ <b>AI Copilot</b> — 500 chats / month</li>
+                            <li data-i18n-html="p2.vid">✓ <b>AI video</b> — 20 / month</li>
                             <li data-i18n="p2.l2">✓ Self-calibrating GMV predictions</li>
                             <li data-i18n="p2.l3">✓ Campaign attribution &amp; accuracy</li>
                             <li data-i18n="p2.l4">✓ Unlimited creator library</li>
@@ -1268,8 +1316,8 @@
                         <ul>
                             <li data-i18n-html="p3.l1">✓ <b>Unlimited optimization runs</b></li>
                             <li data-i18n-html="p3.copilot">✓ <b>Unlimited AI Copilot</b></li>
-                            <li data-i18n="p3.l2">✓ 10 seats &amp; multi-store support</li>
-                            <li data-i18n="p3.l3">✓ API access</li>
+                            <li data-i18n-html="p3.vid">✓ <b>AI video</b> — 60 / month</li>
+                            <li data-i18n="p3.l2">✓ 10 team seats</li>
                             <li data-i18n="p3.l4">✓ Unlimited creator library</li>
                             <li data-i18n="p3.l5">✓ Priority support</li>
                         </ul>
@@ -1302,7 +1350,6 @@
                         <h4 data-i18n="footer.h2">Get started</h4>
                         <a href="#" onclick="enterApp();return false" data-i18n="nav.launch">launch console</a>
                         <a href="#" onclick="enterDemo(this);return false" data-i18n="cta.demo">see live demo</a>
-                        <a href="#metrics" data-i18n="nav.results">results</a>
                     </nav>
                     <nav class="lp-foot-col" aria-label="Legal">
                         <h4 data-i18n="footer.h3">Legal</h4>
@@ -1321,7 +1368,7 @@
     <!-- ═══════════ SIDEBAR ═══════════ -->
     <aside
         class="h-screen w-[280px] fixed left-0 top-0 border-r border-outline-variant bg-surface-container flex flex-col py-lg px-md z-50">
-        <button id="brand-home" type="button" onclick="backToLanding()" title="Back to home"
+        <button id="brand-home" type="button" onclick="backToLanding()" title="Back to home" data-i18n-title="tt.home"
             class="flex items-center gap-md mb-xl px-xs w-full text-left group">
             <div class="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
                 style="background:#000000">
@@ -1340,6 +1387,7 @@
                 <div class="nav-item" data-page="analytics"><span class="material-symbols-outlined">monitoring</span><span data-i18n="side.nav.analytics">Analytics</span></div>
                 <p class="nav-group" data-i18n="side.g.talent">Creators</p>
                 <div class="nav-item" data-page="creators"><span class="material-symbols-outlined">group</span><span data-i18n="side.nav.creators">Creators</span></div>
+                <div class="nav-item" data-page="explore"><span class="material-symbols-outlined">travel_explore</span><span data-i18n="side.nav.explore">Explore</span></div>
                 <div class="nav-item" data-page="pipeline"><span class="material-symbols-outlined">send</span><span data-i18n="side.nav.pipeline">Collaborations</span><span id="nav-pipeline-count" class="nav-count" style="display:none"></span></div>
                 <p class="nav-group" data-i18n="side.g.campaigns">Campaigns</p>
                 <div class="nav-item" data-page="campaigns"><span class="material-symbols-outlined">analytics</span><span data-i18n="side.nav.campaigns">Campaigns</span></div>
@@ -1363,12 +1411,12 @@
                 <span id="account-email" class="text-[12px] text-on-surface-variant truncate flex-1" title="">—</span>
                 <span id="plan-badge" class="hidden text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider cursor-pointer flex-shrink-0"
                     style="background:rgba(var(--good-rgb),0.12);color:var(--good);border:1px solid rgba(var(--good-rgb),0.3)"
-                    title="View plan & usage" onclick="showPage('billing')">Free</span>
+                    title="View plan & usage" data-i18n-title="tt.plan" onclick="showPage('billing')">Free</span>
                 <button onclick="toggleLang()" title="Switch language / 切换语言" class="text-outline hover:text-primary transition-colors flex items-center gap-1 flex-shrink-0">
                     <span class="material-symbols-outlined text-[16px]">language</span>
                     <span id="side-lang-label" class="text-[10px] font-bold">中文</span>
                 </button>
-                <button onclick="logout()" title="Log out" class="text-outline hover:text-error transition-colors">
+                <button onclick="logout()" title="Log out" data-i18n-title="tt.logout" class="text-outline hover:text-error transition-colors">
                     <span class="material-symbols-outlined text-[18px]">logout</span>
                 </button>
             </div>
@@ -1398,6 +1446,8 @@
                 <!-- (creator actions moved into the Creators page body) -->
             </div>
         </header>
+
+        <div id="notice-bar" style="display:none"><span class="material-symbols-outlined">campaign</span><span id="notice-text" style="flex:1"></span><button type="button" onclick="dismissNotice()" aria-label="Dismiss"><span class="material-symbols-outlined">close</span></button></div>
 
         <!-- ════ PAGE: DASHBOARD ════ -->
         <div id="page-dashboard" class="p-margin-desktop space-y-xl">
@@ -1452,21 +1502,6 @@
                         <select id="category-select"
                             class="w-full border border-outline-variant rounded-lg p-sm text-body-base focus:ring-1 focus:ring-primary outline-none"
                             style="background:var(--bg2);color:var(--ink);border-color:var(--line)">
-                            <option value="beauty" data-i18n="cat.beauty">💄 Beauty</option>
-                            <option value="fashion" data-i18n="cat.fashion">👗 Fashion</option>
-                            <option value="accessories" data-i18n="cat.accessories">👜 Accessories</option>
-                            <option value="muslim_fashion" data-i18n="cat.muslim_fashion">🧕 Muslim Fashion</option>
-                            <option value="home" data-i18n="cat.home">🏠 Home & Living</option>
-                            <option value="kitchen" data-i18n="cat.kitchen">🍳 Kitchenware</option>
-                            <option value="appliances" data-i18n="cat.appliances">🔌 Appliances</option>
-                            <option value="electronics" data-i18n="cat.electronics">📱 Electronics</option>
-                            <option value="mother_baby" data-i18n="cat.mother_baby">🍼 Mother & Baby</option>
-                            <option value="fmcg" data-i18n="cat.fmcg">🛒 FMCG</option>
-                            <option value="health" data-i18n="cat.health">💊 Health</option>
-                            <option value="sports_outdoor" data-i18n="cat.sports_outdoor">⛺ Sports & Outdoor</option>
-                            <option value="pet" data-i18n="cat.pet">🐾 Pet Supplies</option>
-                            <option value="toys" data-i18n="cat.toys">🧸 Toys & Hobbies</option>
-                            <option value="automotive" data-i18n="cat.automotive">🚗 Automotive</option>
                         </select>
                     </div>
                     <div class="space-y-xs">
@@ -1744,7 +1779,7 @@
                             <div class="flex items-end gap-md flex-shrink-0">
                                 <div class="flex flex-col gap-xs">
                                     <label class="text-[10px] text-on-surface-variant uppercase" title="Optional GMV goal — the simulator tells you how many creators reach it" data-i18n="d.targetGmv">Target GMV (optional)</label>
-                                    <input id="sim-target" type="number" min="0" placeholder="e.g. 150000"
+                                    <input id="sim-target" type="number" min="0" placeholder="e.g. 150000" data-i18n-ph="ph.target"
                                         class="w-32 border border-outline-variant rounded-lg p-xs text-body-base outline-none focus:ring-1 focus:ring-primary text-center"
                                         style="background:var(--bg2);color:var(--ink);border-color:var(--line)" />
                                 </div>
@@ -1891,10 +1926,10 @@
                                 <span class="material-symbols-outlined text-[14px]">price_check</span><span data-i18n="cr.backfill">Backfill Prices</span>
                                 <input type="file" accept=".csv,.xlsx" onchange="backfillCosts(this)" class="hidden" />
                             </label>
-                            <button onclick="downloadFile('/kols/template-excel','kol_template.xlsx')" class="btn btn-outline flex items-center gap-1 text-[12px] py-1 px-2" title="Download an Excel template with the expected columns">
+                            <button onclick="downloadFile('/kols/template-excel','kol_template.xlsx')" class="btn btn-outline flex items-center gap-1 text-[12px] py-1 px-2" title="Download an Excel template with the expected columns" data-i18n-title="tt.xlsxTpl">
                                 <span class="material-symbols-outlined text-[14px]">download</span><span data-i18n="cr.tplXlsx">Excel Template</span>
                             </button>
-                            <button onclick="downloadFile('/kols/template','kol_template.csv')" class="btn btn-outline flex items-center gap-1 text-[12px] py-1 px-2" title="Download a CSV template">
+                            <button onclick="downloadFile('/kols/template','kol_template.csv')" class="btn btn-outline flex items-center gap-1 text-[12px] py-1 px-2" title="Download a CSV template" data-i18n-title="tt.csvTpl">
                                 <span class="material-symbols-outlined text-[14px]">download</span>CSV
                             </button>
                             <button onclick="downloadFile('/kols/export','kol_export.csv')" class="btn btn-outline flex items-center gap-1 text-[12px] py-1 px-2">
@@ -1975,28 +2010,13 @@
                 </div>
                 <select id="f-category" onchange="loadTable()" class="form-input" style="width:140px">
                     <option value="" data-i18n="cr.allCats">All Categories</option>
-                    <option value="beauty" data-i18n="cat.beauty">💄 Beauty</option>
-                    <option value="fashion" data-i18n="cat.fashion">👗 Fashion</option>
-                    <option value="accessories" data-i18n="cat.accessories">👜 Accessories</option>
-                    <option value="muslim_fashion" data-i18n="cat.muslim_fashion">🧕 Muslim Fashion</option>
-                    <option value="home" data-i18n="cat.home">🏠 Home & Living</option>
-                    <option value="kitchen" data-i18n="cat.kitchen">🍳 Kitchenware</option>
-                    <option value="appliances" data-i18n="cat.appliances">🔌 Appliances</option>
-                    <option value="electronics" data-i18n="cat.electronics">📱 Electronics</option>
-                    <option value="mother_baby" data-i18n="cat.mother_baby">🍼 Mother & Baby</option>
-                    <option value="fmcg" data-i18n="cat.fmcg">🛒 FMCG</option>
-                    <option value="health" data-i18n="cat.health">💊 Health</option>
-                    <option value="sports_outdoor" data-i18n="cat.sports_outdoor">⛺ Sports & Outdoor</option>
-                    <option value="pet" data-i18n="cat.pet">🐾 Pet Supplies</option>
-                    <option value="toys" data-i18n="cat.toys">🧸 Toys & Hobbies</option>
-                    <option value="automotive" data-i18n="cat.automotive">🚗 Automotive</option>
                 </select>
                 <select id="f-tier" onchange="loadTable()" class="form-input" style="width:130px">
                     <option value="" data-i18n="cr.allTiers">All Tiers</option>
-                    <option value="Mega">🟣 Mega</option>
-                    <option value="Macro">🔵 Macro</option>
-                    <option value="Micro">🟢 Micro</option>
-                    <option value="Nano">🟡 Nano</option>
+                    <option value="Mega" data-i18n="tierf.Mega">🟣 Mega</option>
+                    <option value="Macro" data-i18n="tierf.Macro">🔵 Macro</option>
+                    <option value="Micro" data-i18n="tierf.Micro">🟢 Micro</option>
+                    <option value="Nano" data-i18n="tierf.Nano">🟡 Nano</option>
                 </select>
                 <select id="f-ctype" onchange="loadTable()" class="form-input" style="width:150px">
                     <option value="" data-i18n="ct.all">All Formats</option>
@@ -2116,22 +2136,60 @@
             <div id="pl-board" class="kb" style="display:none"></div>
         </div>
 
-        <!-- ════ PAGE: AI SCRIPTS ════ -->
+        <!-- ════ PAGE: AI STUDIO ════ -->
         <div id="page-scripts" class="hidden p-margin-desktop space-y-lg">
             <div class="pg-head">
                 <div>
-                    <h3><span class="material-symbols-outlined">movie_edit</span><span data-i18n="sc.title">AI Scripts</span></h3>
-                    <p data-i18n="sc.sub">Draft a ready-to-shoot script for a creator, or check one before it is filmed. Each run uses one copilot message.</p>
+                    <h3><span class="material-symbols-outlined">movie_edit</span><span data-i18n="stu.title">AI Studio</span></h3>
+                    <p data-i18n="sc.sub">Sales videos, scripts and everyday operations copy. Each run uses one copilot message.</p>
                 </div>
                 <div class="pg-actions">
-                    <div class="seg">
-                        <button id="sc-t-gen" class="on" onclick="setScriptTab('gen')"><span class="material-symbols-outlined">edit_note</span><span data-i18n="sc.tabGen">Generate</span></button>
+                    <div class="seg" id="sc-tabs">
+                        <button id="sc-t-video" class="on" onclick="setScriptTab('video')"><span class="material-symbols-outlined">smart_display</span><span data-i18n="sc.tabVideo">Sales video</span></button>
+                        <button id="sc-t-aivid" onclick="setScriptTab('aivid')"><span class="material-symbols-outlined">auto_videocam</span><span data-i18n="av.tab">AI video</span></button>
+                        <button id="sc-t-gen" onclick="setScriptTab('gen')"><span class="material-symbols-outlined">edit_note</span><span data-i18n="sc.tabGen">Script</span></button>
+                        <button id="sc-t-ops" onclick="setScriptTab('ops')"><span class="material-symbols-outlined">storefront</span><span data-i18n="sc.tabOps">Operations copy</span></button>
                         <button id="sc-t-chk" onclick="setScriptTab('chk')"><span class="material-symbols-outlined">fact_check</span><span data-i18n="sc.tabChk">Check</span></button>
+                        <button id="sc-t-saved" onclick="setScriptTab('saved')"><span class="material-symbols-outlined">bookmark</span><span data-i18n="sc.tabSaved">Saved</span></button>
                     </div>
                 </div>
             </div>
             <div class="sc-grid">
-                <div class="glass-card sc-form" id="sc-gen">
+                <!-- sales video -->
+                <div class="glass-card sc-form" id="sc-video">
+                    <div><label class="form-label" data-i18n="sc.product">Product *</label><input id="sv-product" class="form-input" maxlength="200" data-i18n-ph="sc.phProduct" placeholder="e.g. Vitamin C brightening serum 30ml" /></div>
+                    <div><label class="form-label" data-i18n="sc.points">Selling points</label><textarea id="sv-points" class="form-input" rows="3" maxlength="1200" data-i18n-ph="sc.phPoints" placeholder="One per line: key ingredient, who it is for, what makes it different, current offer…"></textarea></div>
+                    <div><label class="form-label" data-i18n="sv.offer">Offer (optional)</label><input id="sv-offer" class="form-input" maxlength="160" data-i18n-ph="sv.phOffer" placeholder="e.g. RM39, free shipping this week" /></div>
+                    <div class="sc-row">
+                        <div><label class="form-label" data-i18n="sc.length">Length</label><select id="sv-length" class="form-input"><option value="15">15s</option><option value="20" selected>20s</option><option value="30">30s</option><option value="45">45s</option></select></div>
+                        <div><label class="form-label" data-i18n="sv.capLang">Caption language</label><select id="sv-lang" class="form-input"><option>English</option><option>Bahasa Melayu</option><option>Bahasa Indonesia</option><option>ไทย (Thai)</option><option>Tiếng Việt</option><option>Filipino</option><option>中文</option></select></div>
+                    </div>
+                    <div>
+                        <label class="form-label" data-i18n="sv.photos">Product photos (optional, up to 8)</label>
+                        <input id="sv-photos" type="file" accept="image/*" multiple class="form-input" onchange="loadVideoPhotos(this)" />
+                        <p id="sv-photos-note" style="margin:6px 0 0;font-size:12px;color:var(--mut)" data-i18n="sv.photosNote">Photos stay on this device — they are used to render the video in your browser and are never uploaded.</p>
+                    </div>
+                    <button id="sv-gen-btn" class="btn btn-primary" style="justify-content:center" onclick="genStoryboard()"><span class="material-symbols-outlined">auto_awesome</span><span data-i18n="sv.genBtn">Generate video</span></button>
+                </div>
+                <!-- AI video (generated by a hosted model) -->
+                <div class="glass-card sc-form" id="sc-aivid" style="display:none">
+                    <div id="av-off" class="empty-note" style="display:none;padding:18px 6px;text-align:left" data-i18n="av.off">AI video is not set up on this server yet. The operator needs to add a video-generation API token.</div>
+                    <div id="av-form">
+                        <div><label class="form-label" data-i18n="av.prompt">Describe the shot *</label><textarea id="av-prompt" class="form-input" rows="5" maxlength="1500" data-i18n-ph="av.phPrompt" placeholder="e.g. A glass serum bottle on wet stone, soft morning light, slow push-in, water droplets on the label"></textarea></div>
+                        <div style="margin-top:14px"><label class="form-label" data-i18n="av.image">Product photo (optional)</label>
+                            <input id="av-image" type="file" accept="image/jpeg,image/png,image/webp" class="form-input" onchange="loadAvImage(this)" />
+                            <p style="margin:6px 0 0;font-size:12px;color:var(--mut)" data-i18n="av.imageNote">With a photo, the clip animates it and keeps its shape. The photo is sent to the video service to make this clip.</p>
+                            <img id="av-preview" alt="" style="display:none;margin-top:10px;max-height:140px;border-radius:10px;border:1px solid var(--hair)" /></div>
+                        <div class="sc-row" style="margin-top:14px">
+                            <div><label class="form-label" data-i18n="sc.length">Length</label><select id="av-duration" class="form-input"><option value="5">5s</option><option value="10">10s</option></select></div>
+                            <div><label class="form-label" data-i18n="av.aspect">Shape</label><select id="av-aspect" class="form-input"><option value="9:16" data-i18n="av.portrait">9:16 vertical</option><option value="1:1" data-i18n="av.square">1:1 square</option><option value="16:9" data-i18n="av.landscape">16:9 landscape</option></select></div>
+                        </div>
+                        <button id="av-btn" class="btn btn-primary" style="justify-content:center;width:100%;margin-top:16px" onclick="startAiVideo()"><span class="material-symbols-outlined">auto_videocam</span><span data-i18n="av.btn">Generate AI video</span></button>
+                        <p id="av-quota" style="margin:10px 0 0;font-size:12px;color:var(--mut)"></p>
+                    </div>
+                </div>
+                <!-- script -->
+                <div class="glass-card sc-form" id="sc-gen" style="display:none">
                     <div><label class="form-label" data-i18n="sc.product">Product *</label><input id="sc-product" class="form-input" maxlength="200" data-i18n-ph="sc.phProduct" placeholder="e.g. Vitamin C brightening serum 30ml" /></div>
                     <div><label class="form-label" data-i18n="sc.points">Selling points</label><textarea id="sc-points" class="form-input" rows="4" maxlength="1200" data-i18n-ph="sc.phPoints" placeholder="One per line: key ingredient, who it is for, what makes it different, current offer…"></textarea></div>
                     <div class="sc-row">
@@ -2144,22 +2202,64 @@
                     </div>
                     <button id="sc-gen-btn" class="btn btn-primary" style="justify-content:center" onclick="genScript()"><span class="material-symbols-outlined">auto_awesome</span><span data-i18n="sc.genBtn">Generate script</span></button>
                 </div>
+                <!-- operations copy -->
+                <div class="glass-card sc-form" id="sc-ops" style="display:none">
+                    <div><label class="form-label" data-i18n="op.kind">What do you need?</label><select id="op-kind" class="form-input">
+                        <option value="live_script" data-i18n="op.live_script">Livestream run-of-show</option>
+                        <option value="listing" data-i18n="op.listing">Product listing (title + bullets)</option>
+                        <option value="caption" data-i18n="op.caption">Post captions + hashtags</option>
+                        <option value="outreach" data-i18n="op.outreach">Creator outreach message</option>
+                        <option value="faq" data-i18n="op.faq">Customer-service Q&amp;A</option>
+                        <option value="calendar" data-i18n="op.calendar">7-day content plan</option></select></div>
+                    <div><label class="form-label" data-i18n="sc.product">Product *</label><input id="op-product" class="form-input" maxlength="200" data-i18n-ph="sc.phProduct" placeholder="e.g. Vitamin C brightening serum 30ml" /></div>
+                    <div><label class="form-label" data-i18n="sc.points">Selling points</label><textarea id="op-points" class="form-input" rows="4" maxlength="1200" data-i18n-ph="sc.phPoints" placeholder="One per line: key ingredient, who it is for, what makes it different, current offer…"></textarea></div>
+                    <div class="sc-row">
+                        <div><label class="form-label" data-i18n="op.audience">Audience</label><input id="op-audience" class="form-input" maxlength="160" data-i18n-ph="op.phAudience" placeholder="e.g. students, new mums" /></div>
+                        <div><label class="form-label" data-i18n="op.lang">Write in</label><select id="op-lang" class="form-input"><option>English</option><option>Bahasa Melayu</option><option>Bahasa Indonesia</option><option>ไทย (Thai)</option><option>Tiếng Việt</option><option>Filipino</option><option>中文</option></select></div>
+                    </div>
+                    <button id="op-btn" class="btn btn-primary" style="justify-content:center" onclick="genOps()"><span class="material-symbols-outlined">auto_awesome</span><span data-i18n="op.btn">Write it</span></button>
+                </div>
+                <!-- checker -->
                 <div class="glass-card sc-form" id="sc-chk" style="display:none">
                     <div><label class="form-label" data-i18n="sc.product">Product *</label><input id="sc-chk-product" class="form-input" maxlength="200" data-i18n-ph="sc.phProduct" placeholder="e.g. Vitamin C brightening serum 30ml" /></div>
                     <div><label class="form-label" data-i18n="sc.draft">Script to check *</label><textarea id="sc-draft" class="form-input" rows="12" maxlength="6000" data-i18n-ph="sc.phDraft" placeholder="Paste the script the creator plans to film…"></textarea></div>
                     <button id="sc-chk-btn" class="btn btn-primary" style="justify-content:center" onclick="checkScript()"><span class="material-symbols-outlined">fact_check</span><span data-i18n="sc.chkBtn">Check script</span></button>
                     <p style="margin:0;font-size:12px;color:var(--mut)" data-i18n="sc.disclaimer">Editorial guidance only — not legal advice. Check the platform's ad rules for your market.</p>
                 </div>
+                <!-- saved -->
+                <div class="glass-card tp-list" id="sc-saved" style="display:none"></div>
+
+                <!-- result -->
                 <div class="glass-card sc-out">
-                    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
                         <h4 id="sc-out-title" style="margin:0;font-size:15px;font-weight:700;color:var(--ink)" data-i18n="sc.result">Result</h4>
                         <div class="pg-actions">
                             <button id="sc-to-check" class="btn btn-quiet" style="display:none" onclick="scriptToCheck()"><span class="material-symbols-outlined">fact_check</span><span data-i18n="sc.sendCheck">Check this script</span></button>
-                            <button id="sc-copy" class="btn btn-quiet" style="display:none" onclick="copyText(document.getElementById('sc-out').textContent)"><span class="material-symbols-outlined">content_copy</span><span data-i18n="sc.copy">Copy</span></button>
+                            <button id="sc-copy" class="btn btn-quiet" style="display:none" onclick="copyText(studioText())"><span class="material-symbols-outlined">content_copy</span><span data-i18n="sc.copy">Copy</span></button>
+                            <button id="sc-save" class="btn btn-quiet" style="display:none" onclick="saveStudio()"><span class="material-symbols-outlined">bookmark_add</span><span data-i18n="sc.save">Save</span></button>
+                            <button id="sc-del" class="btn btn-quiet" style="display:none;color:#ef4444" onclick="deleteSaved()"><span class="material-symbols-outlined">delete</span><span data-i18n="tp.delete">Delete</span></button>
                         </div>
                     </div>
                     <pre id="sc-out"></pre>
-                    <div id="sc-empty" class="empty-note" data-i18n="sc.empty">Your script or review will appear here.</div>
+                    <div id="sv-out" style="display:none">
+                        <div class="sv-wrap">
+                            <div class="sv-stage">
+                                <canvas id="sv-canvas" width="720" height="1280"></canvas>
+                                <div class="pg-actions" style="justify-content:center;margin-top:12px">
+                                    <button id="sv-play" class="btn btn-quiet" onclick="playVideo()"><span class="material-symbols-outlined">play_arrow</span><span data-i18n="sv.play">Preview</span></button>
+                                    <button id="sv-export" class="btn btn-primary" onclick="exportVideo()"><span class="material-symbols-outlined">download</span><span data-i18n="sv.export">Export video</span></button>
+                                </div>
+                                <p id="sv-status" style="margin:8px 0 0;text-align:center;font-size:12px;color:var(--mut)"></p>
+                            </div>
+                            <div class="sv-board">
+                                <p class="form-label" data-i18n="sv.scenes">Scenes — edit the captions, then preview again</p>
+                                <div id="sv-scenes"></div>
+                                <div id="sv-meta" style="margin-top:14px;font-size:12.5px;line-height:1.7;color:var(--mut)"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="av-out" style="display:none;margin-top:14px"></div>
+                    <div id="sc-empty" class="empty-note" data-i18n="sc.empty">Your video, script or copy will appear here.</div>
                 </div>
             </div>
         </div>
@@ -2326,6 +2426,77 @@
                         <button id="ct-m-save" class="btn btn-primary" onclick="saveContract()" data-i18n="pl.save">Save</button>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- ════ PAGE: EXPLORE (shared creator pool) ════ -->
+        <div id="page-explore" class="hidden p-margin-desktop space-y-lg">
+            <div class="pg-head">
+                <div>
+                    <h3><span class="material-symbols-outlined">travel_explore</span><span data-i18n="ex.title">Explore creators</span></h3>
+                    <p data-i18n="ex.sub">A shared pool of creators beyond your own library. Add the ones that fit to your library with one click.</p>
+                </div>
+                <div class="pg-actions">
+                    <span id="ex-pool-size" style="font-size:12.5px;color:var(--mut)"></span>
+                    <button class="btn btn-primary" onclick="openExtensionModal()"><span class="material-symbols-outlined">extension</span><span data-i18n="ex.extBtn">Browser extension</span></button>
+                </div>
+            </div>
+            <div class="glass-card ex-flt">
+                <div><label class="form-label" data-i18n="ex.fSearch">Search name, handle or bio</label><input id="ex-q" class="form-input" data-i18n-ph="ex.phSearch" placeholder="e.g. skincare, @handle" oninput="clearTimeout(window._exT);window._exT=setTimeout(()=>loadExplore(0),300)" /></div>
+                <div><label class="form-label" data-i18n="ex.fCountry">Country</label><select id="ex-country" class="form-input" onchange="loadExplore(0)">
+                    <option value="" data-i18n="ex.anyCountry">Any country</option>
+                    <option value="MY" data-i18n="c.MY">🇲🇾 Malaysia</option><option value="ID" data-i18n="c.ID">🇮🇩 Indonesia</option>
+                    <option value="TH" data-i18n="c.TH">🇹🇭 Thailand</option><option value="PH" data-i18n="c.PH">🇵🇭 Philippines</option>
+                    <option value="SG" data-i18n="c.SG">🇸🇬 Singapore</option><option value="VN" data-i18n="c.VN">🇻🇳 Vietnam</option></select></div>
+                <div><label class="form-label" data-i18n="ex.fSize">Audience size</label><select id="ex-size" class="form-input" onchange="loadExplore(0)">
+                    <option value="" data-i18n="ex.anySize">Any size</option>
+                    <option value="0-10000" data-i18n="ex.size1">Under 10K</option><option value="10000-100000" data-i18n="ex.size2">10K – 100K</option>
+                    <option value="100000-1000000" data-i18n="ex.size3">100K – 1M</option><option value="1000000-" data-i18n="ex.size4">Over 1M</option></select></div>
+                <div><label class="form-label" data-i18n="ex.fSort">Sort by</label><select id="ex-sort" class="form-input" onchange="loadExplore(0)">
+                    <option value="followers" data-i18n="ex.sortFollowers">Most followers</option><option value="recent" data-i18n="ex.sortRecent">Recently seen</option>
+                    <option value="likes" data-i18n="ex.sortLikes">Most likes</option></select></div>
+            </div>
+            <div id="ex-results" class="ex-grid"></div>
+            <div id="ex-empty" class="glass-card" style="border-radius:14px;display:none">
+                <div class="empty-note"><b id="ex-empty-title" style="display:block;font-size:15px;color:var(--ink);margin-bottom:6px"></b><span id="ex-empty-body"></span></div>
+            </div>
+            <div id="ex-pager" style="display:none;align-items:center;justify-content:space-between;font-size:12.5px;color:var(--mut)">
+                <span id="ex-range"></span>
+                <span class="pg-actions"><button id="ex-prev" class="btn btn-quiet" onclick="loadExplore(EX_OFFSET - EX_PAGE)" data-i18n="ex.prev">Previous</button><button id="ex-next" class="btn btn-quiet" onclick="loadExplore(EX_OFFSET + EX_PAGE)" data-i18n="ex.next">Next</button></span>
+            </div>
+        </div>
+
+        <!-- Add a pool creator to the library -->
+        <div id="exadd-modal" class="modal-overlay hidden" onclick="if(event.target===this)hideDialog('exadd-modal')">
+            <div class="glass-card rounded-xl p-6 w-[440px]" style="max-width:calc(100vw - 32px)">
+                <h3 id="exadd-title" style="margin:0;font-size:18px;font-weight:700;color:var(--ink)"></h3>
+                <p style="margin:6px 0 16px;font-size:12.5px;color:var(--mut)" data-i18n="ex.addNote">The pool only knows public counts. The fee is estimated from audience size and marked as an estimate — replace it with the real quote once you have one.</p>
+                <div class="sc-row">
+                    <div><label class="form-label" data-i18n="ex.fCountry">Country</label><select id="exadd-country" class="form-input">
+                        <option value="MY" data-i18n="c.MY">🇲🇾 Malaysia</option><option value="ID" data-i18n="c.ID">🇮🇩 Indonesia</option>
+                        <option value="TH" data-i18n="c.TH">🇹🇭 Thailand</option><option value="PH" data-i18n="c.PH">🇵🇭 Philippines</option>
+                        <option value="SG" data-i18n="c.SG">🇸🇬 Singapore</option><option value="VN" data-i18n="c.VN">🇻🇳 Vietnam</option></select></div>
+                    <div><label class="form-label" data-i18n="m.category">Category *</label><select id="exadd-cat" class="form-input"></select></div>
+                </div>
+                <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:20px">
+                    <button class="btn btn-quiet" onclick="hideDialog('exadd-modal')" data-i18n="c.cancel">Cancel</button>
+                    <button id="exadd-save" class="btn btn-primary" onclick="confirmExploreAdd()" data-i18n="ex.addBtn">Add to my library</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Browser extension setup -->
+        <div id="ext-modal" class="modal-overlay hidden" onclick="if(event.target===this)hideDialog('ext-modal')">
+            <div class="glass-card rounded-xl p-6 w-[560px]" style="max-width:calc(100vw - 32px)">
+                <h3 style="margin:0;font-size:18px;font-weight:700;color:var(--ink)" data-i18n="ext.title">Grow the pool with the browser extension</h3>
+                <p style="margin:6px 0 10px;font-size:12.5px;color:var(--mut)" data-i18n="ext.sub">With the extension installed, every creator profile you or your team open is added to the pool automatically. It reads only what the public profile page shows.</p>
+                <div class="ext-step"><i>1</i><div style="flex:1"><b data-i18n="ext.s1">Download and unzip</b><span data-i18n="ext.s1d">A small Chrome / Edge extension.</span><div><button class="btn btn-quiet" style="margin-top:8px" onclick="downloadFile('/extension/download','tiko-capture.zip')"><span class="material-symbols-outlined">download</span><span data-i18n="ext.download">Download extension</span></button></div></div></div>
+                <div class="ext-step"><i>2</i><div><b data-i18n="ext.s2">Load it in your browser</b><span data-i18n-html="ext.s2d">Open <code>chrome://extensions</code>, switch on <b>Developer mode</b>, click <b>Load unpacked</b> and choose the unzipped <code>tiko-capture</code> folder.</span></div></div>
+                <div class="ext-step"><i>3</i><div style="flex:1"><b data-i18n="ext.s3">Connect it to your account</b><span data-i18n="ext.s3d">Create a connection code, then paste it into the extension's pop-up. The code can only submit creators — it cannot open your workspace.</span>
+                    <div><button id="ext-gen" class="btn btn-primary" style="margin-top:8px" onclick="makeExtensionCode()"><span class="material-symbols-outlined">key</span><span data-i18n="ext.gen">Create connection code</span></button></div>
+                    <textarea id="ext-code" class="form-input ext-code" rows="4" readonly style="display:none" onclick="this.select()"></textarea></div></div>
+                <div class="ext-step"><i>4</i><div><b data-i18n="ext.s4">Browse as usual</b><span data-i18n="ext.s4d">Open creator profiles; they appear here within seconds. Changing your password disconnects the extension.</span></div></div>
+                <div style="display:flex;justify-content:flex-end;margin-top:16px"><button class="btn btn-quiet" onclick="hideDialog('ext-modal')" data-i18n="ct.close">Close</button></div>
             </div>
         </div>
 
@@ -2497,7 +2668,7 @@
             </div>
             <div class="grid grid-cols-2 gap-4">
                 <div class="col-span-2"><label class="form-label" data-i18n="m.name">Creator Name *</label><input id="f-name"
-                        class="form-input" placeholder="e.g. Lisa Beauty" /></div>
+                        class="form-input" placeholder="e.g. Lisa Beauty" data-i18n-ph="ph.creator" /></div>
                 <div class="col-span-2"><label class="form-label" data-i18n="m.url">Profile URL</label><input id="f-url" class="form-input"
                         placeholder="https://…/@username" /></div>
                 <div><label class="form-label" data-i18n="m.country">Country *</label><select id="f-m-country" class="form-input">
@@ -2509,21 +2680,6 @@
                         <option value="VN" data-i18n="c.VN">🇻🇳 Vietnam</option>
                     </select></div>
                 <div><label class="form-label" data-i18n="m.category">Category *</label><select id="f-m-cat" class="form-input">
-                        <option value="beauty" data-i18n="cat.beauty">💄 Beauty</option>
-                        <option value="fashion" data-i18n="cat.fashion">👗 Fashion</option>
-                        <option value="accessories" data-i18n="cat.accessories">👜 Accessories</option>
-                        <option value="muslim_fashion" data-i18n="cat.muslim_fashion">🧕 Muslim Fashion</option>
-                        <option value="home" data-i18n="cat.home">🏠 Home & Living</option>
-                        <option value="kitchen" data-i18n="cat.kitchen">🍳 Kitchenware</option>
-                        <option value="appliances" data-i18n="cat.appliances">🔌 Appliances</option>
-                        <option value="electronics" data-i18n="cat.electronics">📱 Electronics</option>
-                        <option value="mother_baby" data-i18n="cat.mother_baby">🍼 Mother & Baby</option>
-                        <option value="fmcg" data-i18n="cat.fmcg">🛒 FMCG</option>
-                        <option value="health" data-i18n="cat.health">💊 Health</option>
-                        <option value="sports_outdoor" data-i18n="cat.sports_outdoor">⛺ Sports & Outdoor</option>
-                        <option value="pet" data-i18n="cat.pet">🐾 Pet Supplies</option>
-                        <option value="toys" data-i18n="cat.toys">🧸 Toys & Hobbies</option>
-                        <option value="automotive" data-i18n="cat.automotive">🚗 Automotive</option>
                     </select></div>
                 <div class="col-span-2"><label class="form-label" data-i18n="m.ctype">Selling Format</label><select id="f-ctype-modal" class="form-input">
                         <option value="both" data-i18n="ct.both">⚡ Live + Short video</option>
@@ -2539,9 +2695,9 @@
                 <div><label class="form-label" data-i18n="m.fit">Fit Score (0~1)</label><input id="f-fit" type="number" step="0.01"
                         class="form-input" placeholder="0.75" /></div>
                 <div><label class="form-label" data-i18n="m.views">Avg Views</label><input id="f-views" type="number" class="form-input"
-                        placeholder="Auto" /></div>
+                        placeholder="Auto" data-i18n-ph="ph.auto" /></div>
                 <div><label class="form-label" data-i18n="m.likes">Avg Likes</label><input id="f-likes" type="number" class="form-input"
-                        placeholder="Auto" /></div>
+                        placeholder="Auto" data-i18n-ph="ph.auto" /></div>
                 <div><label class="form-label" data-i18n="m.gender">Female Ratio (0~1)</label><input id="f-gender" type="number" step="0.01"
                         class="form-input" placeholder="0.5" /></div>
                 <div><label class="form-label" data-i18n="m.age">Age Group</label><select id="f-age" class="form-input">
@@ -2674,7 +2830,7 @@
             <div class="space-y-md mb-lg">
                 <div>
                     <label class="form-label" data-i18n="sc.name">Campaign Name *</label>
-                    <input id="sc-name" class="form-input" placeholder="e.g. Beauty MY June 2026" />
+                    <input id="sc-name" class="form-input" placeholder="e.g. Beauty MY June 2026" data-i18n-ph="ph.campaign" />
                 </div>
                 <div class="glass-card rounded-xl p-md space-y-sm">
                     <div class="flex justify-between text-[12px]">
@@ -2789,11 +2945,11 @@
                 </div>
                 <div>
                     <label class="form-label" data-i18n="ar.actual">Actual Total GMV (USD) *</label>
-                    <input id="ar-actual" type="number" min="0" class="form-input" placeholder="e.g. 48500" />
+                    <input id="ar-actual" type="number" min="0" class="form-input" placeholder="e.g. 48500" data-i18n-ph="ph.actual" />
                 </div>
                 <div>
                     <label class="form-label" data-i18n="ar.notes">Notes (optional)</label>
-                    <textarea id="ar-notes" class="form-input" rows="3" placeholder="Campaign observations, context..."></textarea>
+                    <textarea id="ar-notes" class="form-input" rows="3" placeholder="Campaign observations, context..." data-i18n-ph="ph.notes"></textarea>
                 </div>
             </div>
             <div class="flex gap-3 justify-end">
@@ -2813,7 +2969,7 @@
         <div class="ag-head">
             <span class="dot"></span>
             <h4 data-i18n="ag.title">tiko Copilot</h4>
-            <button onclick="agClear()" title="Clear conversation"><span class="material-symbols-outlined" style="font-size:18px">mop</span></button>
+            <button onclick="agClear()" title="Clear conversation" data-i18n-title="tt.clear"><span class="material-symbols-outlined" style="font-size:18px">mop</span></button>
             <button onclick="agToggle()"><span class="material-symbols-outlined" style="font-size:20px">close</span></button>
         </div>
         <div id="ag-body"></div>
@@ -3237,7 +3393,7 @@
                     body: JSON.stringify({ email, password })
                 });
                 const d = await r.json();
-                if (!r.ok) { errEl.textContent = d.detail || 'Something went wrong.'; errEl.style.display = 'block'; return; }
+                if (!r.ok) { errEl.textContent = d.detail || T('acct.fail'); errEl.style.display = 'block'; return; }
                 AUTH_TOKEN = d.token; AUTH_EMAIL = d.email;
                 localStorage.setItem('kol_token', AUTH_TOKEN); localStorage.setItem('kol_email', AUTH_EMAIL);
                 setAccountEmail();
@@ -3246,7 +3402,7 @@
                 enterApp();
                 if (typeof loadDashboard === 'function') loadDashboard();
                 else if (typeof loadTable === 'function') loadTable();
-                toast(authMode === 'register' ? (d.verification_sent ? T('auth.verifySent') : 'Account created') : 'Signed in');
+                toast(authMode === 'register' ? (d.verification_sent ? T('auth.verifySent') : T('t.accountCreated')) : T('t.signedIn'));
             } catch (e) { errEl.textContent = I18N[LANG]['auth.errNet']; errEl.style.display = 'block'; }
             finally { btn.disabled = false; }
         }
@@ -3264,7 +3420,7 @@
         function handleAuthExpired() {
             if (!AUTH_TOKEN) return;
             AUTH_TOKEN = null; localStorage.removeItem('kol_token');
-            toast('Session expired — please sign in again', 'err');
+            toast(T('t.sessionExpired'), 'err');
             showAuth();
         }
 
@@ -3280,7 +3436,7 @@
             if (!arr.length) return '—';
             return arr.map(cc => (flag[cc] || '') + ' ' + cc).join(' ');
         };
-        const PAGE_TITLES = { dashboard: 'Optimizer Dashboard', creators: 'Creator Management', campaigns: 'Campaign Attribution', guide: 'Seller Academy', billing: 'Plan & Billing', analytics: 'Analytics', pipeline: 'Collaborations', scripts: 'AI Scripts', settings: 'Settings', start: 'Getting started', templates: 'Templates', contracts: 'Contracts', messages: 'Message log', activity: 'Activity' };
+        const PAGE_TITLES = { dashboard: 'Optimizer Dashboard', creators: 'Creator Management', campaigns: 'Campaign Attribution', guide: 'Seller Academy', billing: 'Plan & Billing', analytics: 'Analytics', pipeline: 'Collaborations', scripts: 'AI Studio', settings: 'Settings', start: 'Getting started', templates: 'Templates', contracts: 'Contracts', messages: 'Message log', activity: 'Activity', explore: 'Explore' };
 
         // ══════════ I18N — bilingual EN / 中文 ══════════
         const I18N = {
@@ -3296,7 +3452,7 @@
                 'trust.d1': 'AI copilot on call for every campaign', 'trust.d2': 'avg. GMV lift vs. manual selection', 'trust.d3': 'SEA markets ready out of the box', 'trust.d4': 'avg. solve time per optimization',
                 'cw.f1': '482K followers', 'cw.f2': '1.2M followers', 'cw.f3': '356K followers', 'cw.f4': '91K followers', 'cw.f5': '28K followers', 'cw.f6': '640K followers',
                 'cw.note': 'Virtual creators for illustration — not real accounts. tiko ranks the creators in your own library with the same engine.',
-                'sec2.num': '02 / capabilities', 'sec2.h': 'A decision engine<br><em>built to sell</em>',
+                'sec2.num': '01 / capabilities', 'sec2.h': 'A decision engine<br><em>built to sell</em>',
                 'feat.sub': 'Not just a list of creators — a campaign brain that predicts outcomes, explains its reasoning, and lets you review results anytime.',
                 'f1.h': 'Smart budget allocation', 'f1.p': 'Enter your budget, category and target markets — the algorithm solves for the optimal lineup across thousands of creators, maximizing predicted GMV within your constraints.',
                 'f2.h': 'GMV prediction engine', 'f2.p': 'Estimates each creator\'s sales contribution from followers, engagement, fit and audience overlap — with a clear, explainable "why this creator".',
@@ -3304,7 +3460,7 @@
                 'f4.h': 'Aggressive / balanced / safe plans', 'f4.p': 'Generate three risk-profile plans in one click, auto-scaled by budget cap — choose confidently between pushing volume and playing it safe.',
                 'f5.h': 'Predicted vs. actual review', 'f5.p': 'Save a campaign, then log real GMV — the system computes prediction accuracy automatically, turning every campaign into an optimizable asset.',
                 'f6.h': 'Flexible creator data sources', 'f6.p': 'Manual entry and bulk CSV import, with reserved API slots for creator marketplaces, shop platforms and more.',
-                'seccp.num': '03 / ai copilot', 'seccp.h': 'Your next campaign<br><em>is one chat away</em>',
+                'seccp.num': '02 / ai copilot', 'seccp.h': 'Your next campaign<br><em>is one chat away</em>',
                 'cp.lead': 'Meet your <b>AI campaign copilot</b> — a marketing analyst that lives inside the console, knows your creator library and speaks your language. No dashboards to learn: just tell it what you want to sell.',
                 'cp.b1': '<b>Runs real optimizations from chat</b> — "$3,000 on beauty in Indonesia" returns a bookable lineup with predicted GMV & ROI.',
                 'cp.b2': '<b>Knows your creator library</b> — filters, compares and recommends from the KOLs you actually work with.',
@@ -3315,30 +3471,30 @@
                 'cp.t1': 'run_optimization — budget $3,000 · Indonesia · beauty',
                 'cp.a1': '<b>Done — 7 creators picked.</b><br>Predicted GMV <b>$11,400</b> · ROI <b>3.8×</b><br>Top pick: Aisyah R. — 890K followers, 7.2% engagement.<br>Want the safer or the aggressive variant?',
                 'cp.u2': 'And if I cut the budget to $2,000?',
-                'sec3.num': '04 / process', 'sec3.h': 'Budget to lineup,<br><em>in three steps</em>',
+                'sec3.num': '03 / process', 'sec3.h': 'Budget to lineup,<br><em>in three steps</em>',
                 's1.h': 'Set up your campaign', 's1.p': 'Drag the slider to set your budget, pick target countries and a product category — that\'s it, no expert parameters needed.',
                 's2.h': 'Run optimization in one click', 's2.p': 'Hit Run Optimization — or simply ask the AI copilot. Either way, the optimal creator lineup and predicted returns come back in seconds.',
                 's3.h': 'Compare, save, review', 's3.p': 'Compare the three plans, save as a campaign, then log real GMV afterward to continuously calibrate your model.',
-                'sec4.num': '05 / pricing', 'sec4.h': 'Start free, scale<br><em>when it pays off</em>',
+                'sec4.num': '04 / pricing', 'sec4.h': 'Start free, scale<br><em>when it pays off</em>',
                 'price.sub': 'Every plan includes the full AI engine, the AI copilot and an unlimited creator library. Pay only for what powers your growth — optimization runs and copilot chats.',
                 'p1.tag': 'free', 'p2.tag': 'pro — most popular', 'p3.tag': 'team', 'per.month': ' / month',
-                'p1.l1': '✓ <b>10 optimization runs</b> / month', 'p1.copilot': '✓ <b>AI Copilot</b> — 20 chats / month', 'p1.l2': '✓ Smart lineup picks + "why this creator"', 'p1.l3': '✓ Unlimited creator library', 'p1.l4': '✓ CSV / Excel import & export',
+                'p1.l1': '✓ <b>10 optimization runs</b> / month', 'p1.vid': '✓ <b>AI video</b> — 1 clip / month', 'p2.vid': '✓ <b>AI video</b> — 20 clips / month', 'p3.vid': '✓ <b>AI video</b> — 60 clips / month', 'p1.copilot': '✓ <b>AI Copilot</b> — 20 chats / month', 'p1.l2': '✓ Smart lineup picks + "why this creator"', 'p1.l3': '✓ Unlimited creator library', 'p1.l4': '✓ CSV / Excel import & export',
                 'p2.l1': '✓ <b>300 optimization runs</b> / month', 'p2.copilot': '✓ <b>AI Copilot</b> — 500 chats / month', 'p2.l2': '✓ Self-calibrating GMV predictions', 'p2.l3': '✓ Campaign attribution & accuracy', 'p2.l4': '✓ Unlimited creator library', 'p2.l5': '✓ 3 team seats',
-                'p3.l1': '✓ <b>Unlimited optimization runs</b>', 'p3.copilot': '✓ <b>Unlimited AI Copilot</b>', 'p3.l2': '✓ 10 seats & multi-store support', 'p3.l3': '✓ API access', 'p3.l4': '✓ Unlimited creator library', 'p3.l5': '✓ Priority support',
+                'p3.l1': '✓ <b>Unlimited optimization runs</b>', 'p3.copilot': '✓ <b>Unlimited AI Copilot</b>', 'p3.l2': '✓ 10 team seats', 'p3.l4': '✓ Unlimited creator library', 'p3.l5': '✓ Priority support',
                 'p.start': 'start free', 'p.upgrade': 'upgrade in console',
                 'final.h': 'Hand your next campaign<br><em>to the data</em>', 'final.btn': 'launch console — optimize free',
                 'footer.tag': 'AI-powered creator selection for social commerce. Put every dollar behind the creators who actually sell.', 'footer.h1': 'Product', 'footer.h2': 'Get started', 'footer.h3': 'Legal', 'footer.r': '© 2026 tiko. All rights reserved.',
                 'footer.legal': 'tiko is an independent analytics tool and is not affiliated with, endorsed by or sponsored by any e-commerce or social platform. All trademarks belong to their respective owners. Predicted GMV and ROI are statistical estimates, not a guarantee of actual sales.',
                 'side.brand': 'KOL Optimizer', 'side.settings': 'Campaign Settings', 'side.budget': 'Marketing Budget', 'side.countries': 'Target Countries', 'side.category': 'Product Category',
                 'c.ALL': '🌏 All Countries', 'c.MY': '🇲🇾 Malaysia', 'c.ID': '🇮🇩 Indonesia', 'c.TH': '🇹🇭 Thailand', 'c.PH': '🇵🇭 Philippines', 'c.SG': '🇸🇬 Singapore', 'c.VN': '🇻🇳 Vietnam',
-                'cat.beauty': '💄 Beauty', 'cat.fashion': '👗 Fashion', 'cat.home': '🏠 Home & Living', 'cat.fmcg': '🛒 FMCG',
-                'cat.accessories': '👜 Accessories', 'cat.muslim_fashion': '🧕 Muslim Fashion', 'cat.kitchen': '🍳 Kitchenware', 'cat.appliances': '🔌 Appliances', 'cat.electronics': '📱 Electronics', 'cat.mother_baby': '🍼 Mother & Baby', 'cat.health': '💊 Health', 'cat.sports_outdoor': '⛺ Sports & Outdoor', 'cat.pet': '🐾 Pet Supplies', 'cat.toys': '🧸 Toys & Hobbies', 'cat.automotive': '🚗 Automotive',
+                'cat.personal_care': '🧴 Personal Care', 'cat.womenswear': '👚 Womenswear', 'cat.menswear': '👔 Menswear', 'cat.kids_fashion': '🧒 Kids\' Fashion', 'cat.shoes': '👟 Shoes', 'cat.bags': '🎒 Bags & Luggage', 'cat.jewelry': '💍 Jewelry & Watches', 'cat.computers': '💻 Computers & Office', 'cat.furniture': '🛋️ Furniture', 'cat.textiles': '🛏️ Home Textiles', 'cat.tools': '🔧 Tools & Home Improvement', 'cat.food': '🍜 Food & Beverages', 'cat.stationery': '📚 Books & Stationery', 'catg.beauty': 'Beauty & Personal Care', 'catg.fashion': 'Fashion', 'catg.electronics': 'Electronics & Appliances', 'catg.home': 'Home & Living', 'catg.family': 'Baby, Toys & Books', 'catg.food_health': 'Food & Health', 'catg.leisure': 'Sports, Pets & Auto', 'cat.beauty': '💄 Beauty', 'cat.fashion': '👗 Fashion (general)', 'cat.home': '🏠 Home & Living', 'cat.fmcg': '🛒 Household Essentials',
+                'cat.accessories': '👜 Accessories', 'cat.muslim_fashion': '🧕 Muslim Fashion', 'cat.kitchen': '🍳 Kitchenware', 'cat.appliances': '🔌 Appliances', 'cat.electronics': '📱 Phones & Electronics', 'cat.mother_baby': '🍼 Mother & Baby', 'cat.health': '💊 Health', 'cat.sports_outdoor': '⛺ Sports & Outdoor', 'cat.pet': '🐾 Pet Supplies', 'cat.toys': '🧸 Toys & Hobbies', 'cat.automotive': '🚗 Automotive',
                 'side.ctype': 'Campaign Format', 'ct.any': '⚡ Any format', 'ct.liveSide': '🔴 Livestream push', 'ct.videoSide': '🎬 Short-video seeding',
                 'ct.all': 'All Formats', 'ct.live': '🔴 Livestream', 'ct.video': '🎬 Short Video', 'ct.both': '⚡ Live + Short video',
                 'ct.badgeLive': 'LIVE', 'ct.badgeVideo': 'VIDEO', 'ct.badgeBoth': 'LIVE+VID', 'm.ctype': 'Selling Format',
                 'side.run': 'Run Optimization', 'side.adv': 'Advanced Settings', 'side.seed': 'Result Seed', 'side.rand': 'Randomize',
                 'side.seedHelp': 'Fix this number to get identical results across runs. Leave as-is for varied results each time.',
-                'side.g.workspace': 'Workspace', 'side.nav.contracts': 'Contracts', 'side.nav.start': 'Getting started', 'side.nav.templates': 'Templates', 'side.nav.messages': 'Message log', 'side.nav.activity': 'Activity', 'ob.title': 'Getting started', 'ob.sub': 'The path from an empty workspace to your first measured campaign.', 'ob.progress': '{d} of {t} done', 'ob.allDone': 'All set — you have run the full loop.', 'ob.go': 'Go', 'ob.creators': 'Build your creator library', 'ob.creators.d': 'Import a CSV / Excel file or add creators by hand.', 'ob.optimize': 'Run your first optimization', 'ob.optimize.d': 'Set budget, markets and category, then let the engine pick a lineup.', 'ob.campaign': 'Save a campaign', 'ob.campaign.d': 'Saving a lineup starts tracking its creators.', 'ob.outreach': 'Reach out to a creator', 'ob.outreach.d': 'Send an invitation from Collaborations and move them along the pipeline.', 'ob.contract': 'Create a contract', 'ob.contract.d': 'Generate an agreement from a template once terms are agreed.', 'ob.results': 'Record the results', 'ob.results.d': 'Log actual GMV so predictions calibrate to your store.', 'ob.team': 'Invite a teammate', 'ob.team.d': 'Share the workspace — available on Pro and Team plans.', 'tp.title': 'Templates', 'tp.sub': 'Reusable outreach messages and contracts. Variables in {braces} are filled in for each creator.', 'tp.kMessage': 'Messages', 'tp.kContract': 'Contracts', 'tp.new': 'New template', 'tp.name': 'Name', 'tp.body': 'Content', 'tp.vars': 'Insert a variable', 'tp.delete': 'Delete', 'tp.deleteConfirm': 'Delete this template?', 'tp.deleted': 'Deleted', 'tp.untitled': 'Untitled template', 'tp.empty': 'No templates yet — create one.', 'tp.need': 'Give the template a name and some content.', 'ct.title': 'Contracts', 'ct.sub': 'Agreements generated from your templates. Create one from a creator\'s row in Collaborations.', 'ct.empty': 'No contracts yet. Open a creator in Collaborations and choose Contract.', 'ct.th.no': 'No.', 'ct.th.creator': 'Creator', 'ct.th.campaign': 'Campaign', 'ct.th.fee': 'Fee', 'ct.th.status': 'Status', 'ct.th.updated': 'Updated', 'ct.view': 'Open', 'ct.s.draft': 'Draft', 'ct.s.sent': 'Sent', 'ct.s.signed': 'Signed', 'ct.s.cancelled': 'Cancelled', 'ct.new': 'Contract', 'ct.newFor': 'Contract for {n}', 'ct.deliverables': 'Deliverables', 'ct.phDeliverables': 'e.g. 2 short videos (30–60s) + 1 livestream mention', 'ct.start': 'Start date', 'ct.end': 'End date', 'ct.create': 'Create contract', 'ct.created': 'Contract {n} created', 'ct.close': 'Close', 'ct.print': 'Print / PDF', 'ct.deleteConfirm': 'Delete this contract?', 'ct.signedLock': 'Signed contracts are locked.', 'ct.noTemplate': 'Create a contract template first (Workspace → Templates).', 'ml.title': 'Message log', 'ml.sub': 'Every outreach message your team sent from Collaborations — who, when and what.', 'ml.empty': 'No messages logged yet.', 'ml.th.when': 'Sent', 'ml.th.creator': 'Creator', 'ml.th.channel': 'Channel', 'ml.th.message': 'Message', 'ml.th.by': 'By', 'ml.ch.whatsapp': 'WhatsApp', 'ml.ch.email': 'Email', 'ml.ch.copy': 'Copied', 'ac.title': 'Activity', 'ac.sub': 'What everyone in this workspace has done, newest first.', 'ac.empty': 'Nothing has happened yet.', 'act.campaign.save': 'saved campaign', 'act.campaign.results': 'recorded results for', 'act.collab.stage': 'moved', 'act.collab.assign': 'assigned', 'act.message.send': 'messaged', 'act.contract.create': 'created a contract for', 'act.contract.status': 'updated the contract for', 'act.contract.delete': 'deleted the contract for', 'act.team.invite': 'invited', 'act.team.remove': 'removed', 'msg.open': 'Message', 'msg.titleFor': 'Message {n}', 'msg.sub': 'Review the message, then send it from your own WhatsApp or mail app. We log it for your team.', 'msg.template': 'Template', 'msg.body': 'Message', 'msg.copy': 'Copy', 'msg.email': 'Email', 'msg.whatsapp': 'Open WhatsApp', 'msg.logged': 'Logged', 'msg.loggedInvited': 'Logged — creator marked as invited', 'msg.blank': 'Blank message', 'msg.empty': 'Write a message first.', 'pl.assignee': 'Owner', 'pl.unassigned': 'Unassigned', 'pl.mine': 'Mine only ({n})', 'side.g.account': 'Account', 'side.nav.settings': 'Settings', 'st.title': 'Settings', 'st.sub': 'Appearance, your team, sign-in and your data.', 'st.appearance': 'Appearance', 'st.theme': 'Theme', 'st.themeNote': 'Applies to the console on this device.', 'st.light': 'Light', 'st.dark': 'Dark', 'st.system': 'System', 'st.lang': 'Language', 'st.langNote': 'Emails we send you follow this language too.', 'side.g.overview': 'Overview', 'side.g.talent': 'Creators', 'side.g.campaigns': 'Campaigns', 'side.g.more': 'Resources', 'side.nav.analytics': 'Analytics', 'side.nav.pipeline': 'Collaborations', 'side.nav.scripts': 'AI Scripts', 'c.refresh': 'Refresh', 'c.cancel': 'Cancel', 'an.title': 'Analytics', 'an.sub': 'How your campaigns, spend and creator outreach are performing.', 'an.export': 'Export report', 'an.aiTitle': 'AI portfolio insights', 'an.aiSub': 'What is working, where the bottlenecks are, and what to do next — written from the numbers on this page. Uses one copilot message.', 'an.aiBtn': 'Generate AI insights', 'an.aiBusy': 'Analysing…', 'an.trend': 'Predicted vs. actual GMV', 'an.trendSub': 'By the month each campaign was saved, last 6 months.', 'an.predicted': 'Predicted', 'an.actual': 'Actual', 'an.funnel': 'Outreach funnel', 'an.funnelSub': 'Where every creator in your campaigns currently stands.', 'an.top': 'Top creators', 'an.topActual': 'Ranked by actual GMV you recorded.', 'an.topPredicted': 'Ranked by predicted GMV — record campaign results to rank by real sales.', 'an.cats': 'By category', 'an.catsSub': 'Campaigns and GMV per product category.', 'an.k.campaigns': 'Campaigns', 'an.k.campaignsSub': '{a} active · {c} completed', 'an.k.predicted': 'Predicted GMV', 'an.k.predictedSub': 'Predicted ROI {r}', 'an.k.actual': 'Actual GMV', 'an.k.actualSub': 'Actual ROI {r}', 'an.k.accuracy': 'Prediction accuracy', 'an.k.accuracySub': '{n} collaborations · {p} accepted', 'an.k.noData': 'no results recorded yet', 'an.vsLast': 'vs last month', 'an.empty': 'No campaigns yet — run the optimizer and save a campaign to see analytics here.', 'an.noRows': 'Nothing to show yet.', 'an.th.creator': 'Creator', 'an.th.campaigns': 'Campaigns', 'an.th.spend': 'Planned cost', 'an.th.predicted': 'Predicted', 'an.th.actual': 'Actual', 'an.th.category': 'Category', 'pl.title': 'Collaborations', 'pl.sub': 'Every creator in your saved campaigns, from first invitation to payment.', 'pl.list': 'List', 'pl.board': 'Kanban', 'pl.csv': 'Export CSV', 'pl.fStatus': 'Status', 'pl.fCampaign': 'Campaign', 'pl.fSearch': 'Search creator, contact or campaign', 'pl.phSearch': 'Filter…', 'pl.allStatus': 'All statuses', 'pl.allCampaigns': 'All campaigns', 'pl.s.shortlisted': 'Shortlisted', 'pl.s.invited': 'Invited', 'pl.s.negotiating': 'Negotiating', 'pl.s.contracted': 'Contracted', 'pl.s.submitted': 'Content submitted', 'pl.s.live': 'Live', 'pl.s.paid': 'Paid', 'pl.s.declined': 'Declined', 'pl.th.creator': 'Creator', 'pl.th.campaign': 'Campaign', 'pl.th.status': 'Status', 'pl.th.fee': 'Fee', 'pl.th.planned': 'Planned', 'pl.th.contact': 'Contact', 'pl.th.updated': 'Updated', 'pl.empty': 'No collaborations match your filters.', 'pl.emptyAll': 'No collaborations yet — run the optimizer and save a campaign; its creators appear here.', 'pl.showing': 'Showing {n} of {t}', 'pl.details': 'Details', 'pl.fee': 'Agreed fee (USD)', 'pl.contact': 'Contact', 'pl.phContact': 'WhatsApp, email or agency', 'pl.link': 'Content link', 'pl.note': 'Notes', 'pl.save': 'Save', 'pl.saved': 'Saved', 'pl.moved': 'Moved to {s}', 'pl.dragHint': 'Drag a card to another column to change its stage.', 'pl.open': 'Open content', 'sc.title': 'AI Scripts', 'sc.sub': 'Draft a ready-to-shoot script for a creator, or check one before it is filmed. Each run uses one copilot message.', 'sc.tabGen': 'Generate', 'sc.tabChk': 'Check', 'sc.product': 'Product *', 'sc.phProduct': 'e.g. Vitamin C brightening serum 30ml', 'sc.points': 'Selling points', 'sc.phPoints': 'One per line: key ingredient, who it is for, what makes it different, current offer…', 'sc.format': 'Format', 'sc.video': 'Short video', 'sc.live': 'Livestream segment', 'sc.length': 'Length', 'sc.spoken': 'Spoken language', 'sc.tone': 'Tone', 'sc.phTone': 'e.g. playful, honest review', 'sc.genBtn': 'Generate script', 'sc.draft': 'Script to check *', 'sc.phDraft': 'Paste the script the creator plans to film…', 'sc.chkBtn': 'Check script', 'sc.disclaimer': 'Editorial guidance only — not legal advice. Check the platform\'s ad rules for your market.', 'sc.result': 'Result', 'sc.resultScript': 'Script', 'sc.resultReview': 'Review', 'sc.sendCheck': 'Check this script', 'sc.copy': 'Copy', 'sc.empty': 'Your script or review will appear here.', 'sc.busy': 'Writing…', 'sc.needProduct': 'Tell us what the product is.', 'sc.needDraft': 'Paste a script of at least a couple of sentences.', 'side.nav.dashboard': 'Optimizer', 'side.nav.creators': 'Creators', 'side.nav.campaigns': 'Campaigns', 'side.nav.guide': 'Seller Academy', 'side.nav.billing': 'Plan & Billing',
+                'side.g.workspace': 'Workspace', 'side.nav.contracts': 'Contracts', 'side.nav.start': 'Getting started', 'side.nav.templates': 'Templates', 'side.nav.messages': 'Message log', 'side.nav.activity': 'Activity', 'ob.title': 'Getting started', 'ob.sub': 'The path from an empty workspace to your first measured campaign.', 'ob.progress': '{d} of {t} done', 'ob.allDone': 'All set — you have run the full loop.', 'ob.go': 'Go', 'ob.creators': 'Build your creator library', 'ob.creators.d': 'Import a CSV / Excel file or add creators by hand.', 'ob.optimize': 'Run your first optimization', 'ob.optimize.d': 'Set budget, markets and category, then let the engine pick a lineup.', 'ob.campaign': 'Save a campaign', 'ob.campaign.d': 'Saving a lineup starts tracking its creators.', 'ob.outreach': 'Reach out to a creator', 'ob.outreach.d': 'Send an invitation from Collaborations and move them along the pipeline.', 'ob.contract': 'Create a contract', 'ob.contract.d': 'Generate an agreement from a template once terms are agreed.', 'ob.results': 'Record the results', 'ob.results.d': 'Log actual GMV so predictions calibrate to your store.', 'ob.team': 'Invite a teammate', 'ob.team.d': 'Share the workspace — available on Pro and Team plans.', 'tp.title': 'Templates', 'tp.sub': 'Reusable outreach messages and contracts. Variables in {braces} are filled in for each creator.', 'tp.kMessage': 'Messages', 'tp.kContract': 'Contracts', 'tp.new': 'New template', 'tp.name': 'Name', 'tp.body': 'Content', 'tp.vars': 'Insert a variable', 'tp.delete': 'Delete', 'tp.deleteConfirm': 'Delete this template?', 'tp.deleted': 'Deleted', 'tp.untitled': 'Untitled template', 'tp.empty': 'No templates yet — create one.', 'tp.need': 'Give the template a name and some content.', 'ct.title': 'Contracts', 'ct.sub': 'Agreements generated from your templates. Create one from a creator\'s row in Collaborations.', 'ct.empty': 'No contracts yet. Open a creator in Collaborations and choose Contract.', 'ct.th.no': 'No.', 'ct.th.creator': 'Creator', 'ct.th.campaign': 'Campaign', 'ct.th.fee': 'Fee', 'ct.th.status': 'Status', 'ct.th.updated': 'Updated', 'ct.view': 'Open', 'ct.s.draft': 'Draft', 'ct.s.sent': 'Sent', 'ct.s.signed': 'Signed', 'ct.s.cancelled': 'Cancelled', 'ct.new': 'Contract', 'ct.newFor': 'Contract for {n}', 'ct.deliverables': 'Deliverables', 'ct.phDeliverables': 'e.g. 2 short videos (30–60s) + 1 livestream mention', 'ct.start': 'Start date', 'ct.end': 'End date', 'ct.create': 'Create contract', 'ct.created': 'Contract {n} created', 'ct.close': 'Close', 'ct.print': 'Print / PDF', 'ct.deleteConfirm': 'Delete this contract?', 'ct.signedLock': 'Signed contracts are locked.', 'ct.noTemplate': 'Create a contract template first (Workspace → Templates).', 'ml.title': 'Message log', 'ml.sub': 'Every outreach message your team sent from Collaborations — who, when and what.', 'ml.empty': 'No messages logged yet.', 'ml.th.when': 'Sent', 'ml.th.creator': 'Creator', 'ml.th.channel': 'Channel', 'ml.th.message': 'Message', 'ml.th.by': 'By', 'ml.ch.whatsapp': 'WhatsApp', 'ml.ch.email': 'Email', 'ml.ch.copy': 'Copied', 'ac.title': 'Activity', 'ac.sub': 'What everyone in this workspace has done, newest first.', 'ac.empty': 'Nothing has happened yet.', 'act.campaign.save': 'saved campaign', 'act.campaign.results': 'recorded results for', 'act.collab.stage': 'moved', 'act.collab.assign': 'assigned', 'act.message.send': 'messaged', 'act.contract.create': 'created a contract for', 'act.contract.status': 'updated the contract for', 'act.contract.delete': 'deleted the contract for', 'act.team.invite': 'invited', 'act.team.remove': 'removed', 'msg.open': 'Message', 'msg.titleFor': 'Message {n}', 'msg.sub': 'Review the message, then send it from your own WhatsApp or mail app. We log it for your team.', 'msg.template': 'Template', 'msg.body': 'Message', 'msg.copy': 'Copy', 'msg.email': 'Email', 'msg.whatsapp': 'Open WhatsApp', 'msg.logged': 'Logged', 'msg.loggedInvited': 'Logged — creator marked as invited', 'msg.blank': 'Blank message', 'msg.empty': 'Write a message first.', 'pl.assignee': 'Owner', 'pl.unassigned': 'Unassigned', 'pl.mine': 'Mine only ({n})', 'cr.est': 'est.', 'pl.meta': 'kol optimizer', 'mq.1': 'optimize', 'mq.2': 'predict', 'mq.3': 'allocate', 'mq.4': 'review', 'mq.5': 'repeat —', 'tier.Mega': 'Mega', 'tier.Macro': 'Macro', 'tier.Micro': 'Micro', 'tier.Nano': 'Nano', 'tierf.Mega': '🟣 Mega', 'tierf.Macro': '🔵 Macro', 'tierf.Micro': '🟢 Micro', 'tierf.Nano': '🟡 Nano', 'd.cap': '{p}% of budget', 'tt.home': 'Back to home', 'tt.plan': 'View plan & usage', 'tt.logout': 'Log out', 'tt.xlsxTpl': 'Download an Excel template with the expected columns', 'tt.csvTpl': 'Download a CSV template', 'tt.clear': 'Clear conversation', 'tt.view': 'View', 'tt.record': 'Record actual results', 'tt.delete': 'Delete', 'ph.target': 'e.g. 150000', 'ph.creator': 'e.g. Lisa Beauty', 'ph.auto': 'Auto', 'ph.campaign': 'e.g. Beauty MY June 2026', 'ph.actual': 'e.g. 48500', 'ph.notes': 'Campaign observations, context…', 't.accountCreated': 'Account created', 't.signedIn': 'Signed in', 't.sessionExpired': 'Session expired — please sign in again', 't.copilotLimit': 'Copilot limit reached — upgrade to continue', 'side.nav.explore': 'Explore', 'ex.title': 'Explore creators', 'ex.sub': 'A shared pool of creators beyond your own library. Add the ones that fit to your library with one click.', 'ex.extBtn': 'Browser extension', 'ex.poolSize': '{n} creators in the pool', 'ex.fSearch': 'Search name, handle or bio', 'ex.phSearch': 'e.g. skincare, @handle', 'ex.fCountry': 'Country', 'ex.anyCountry': 'Any country', 'ex.fSize': 'Audience size', 'ex.anySize': 'Any size', 'ex.size1': 'Under 10K', 'ex.size2': '10K – 100K', 'ex.size3': '100K – 1M', 'ex.size4': 'Over 1M', 'ex.fSort': 'Sort by', 'ex.sortFollowers': 'Most followers', 'ex.sortRecent': 'Recently seen', 'ex.sortLikes': 'Most likes', 'ex.prev': 'Previous', 'ex.next': 'Next', 'ex.range': 'Showing {a}–{b} of {t}', 'ex.followers': 'followers', 'ex.likes': 'likes', 'ex.videos': 'videos', 'ex.seen': 'Seen {d}', 'ex.add': 'Add to library', 'ex.inLibrary': 'In your library', 'ex.unknownCountry': 'Country unknown', 'ex.emptyTitle': 'No creators match that search yet.', 'ex.emptyBody': 'The pool grows as people capture creators with the browser extension. If your team browses a profile with it installed, it will show up here.', 'ex.emptyPoolTitle': 'The pool is empty so far.', 'ex.addTitle': 'Add {n} to your library', 'ex.addNote': 'The pool only knows public counts. The fee is estimated from audience size and marked as an estimate — replace it with the real quote once you have one.', 'ex.addBtn': 'Add to my library', 'ex.added': '{n} added to your library', 'ext.title': 'Grow the pool with the browser extension', 'ext.sub': 'With the extension installed, every creator profile you or your team open is added to the pool automatically. It reads only what the public profile page shows.', 'ext.s1': 'Download and unzip', 'ext.s1d': 'A small Chrome / Edge extension.', 'ext.download': 'Download extension', 'ext.s2': 'Load it in your browser', 'ext.s2d': 'Open <code>chrome://extensions</code>, switch on <b>Developer mode</b>, click <b>Load unpacked</b> and choose the unzipped <code>tiko-capture</code> folder.', 'ext.s3': 'Connect it to your account', 'ext.s3d': 'Create a connection code, then paste it into the extension\'s pop-up. The code can only submit creators — it cannot open your workspace.', 'ext.gen': 'Create connection code', 'ext.copied': 'Connection code copied — paste it into the extension', 'ext.s4': 'Browse as usual', 'ext.s4d': 'Open creator profiles; they appear here within seconds. Changing your password disconnects the extension.', 'act.creator.explore_add': 'added from Explore', 'sc.tabVideo': 'Sales video', 'sc.tabOps': 'Operations copy', 'sc.tabSaved': 'Saved', 'sc.savedOk': 'Saved', 'sc.savedEmpty': 'Nothing saved yet. Generate something and press Save.', 'sc.t.storyboard': 'Video', 'sc.t.ops': 'Copy', 'sc.t.script': 'Script', 'sc.t.review': 'Review', 'sv.offer': 'Offer (optional)', 'sv.phOffer': 'e.g. RM39, free shipping this week', 'sv.capLang': 'Caption language', 'sv.photos': 'Product photos (optional, up to 8)', 'sv.photosNote': 'Photos stay on this device — they are used to render the video in your browser and are never uploaded.', 'sv.photosN': '{n} photo(s) ready', 'sv.genBtn': 'Generate video', 'sv.busy': 'Planning the video…', 'sv.play': 'Preview', 'sv.export': 'Export video', 'sv.scenes': 'Scenes — edit the captions, then preview again', 'sv.recording': 'Recording… {p}%', 'sv.done': 'Video downloaded', 'sv.noRecorder': 'This browser cannot export video. Try the latest Chrome or Edge.', 'sv.result': 'Sales video', 'sv.voice': 'Voiceover', 'sv.show': 'Show', 'sv.cta': 'Call to action', 'sv.tags': 'Hashtags', 'sv.music': 'Music', 'sv.hint': '{d}s · {n} scenes · 9:16. Add voiceover and music in your editing app after export.', 'op.kind': 'What do you need?', 'op.live_script': 'Livestream run-of-show', 'op.listing': 'Product listing (title + bullets)', 'op.caption': 'Post captions + hashtags', 'op.outreach': 'Creator outreach message', 'op.faq': 'Customer-service Q&A', 'op.calendar': '7-day content plan', 'op.audience': 'Audience', 'op.phAudience': 'e.g. students, new mums', 'op.lang': 'Write in', 'op.btn': 'Write it', 'op.result': 'Operations copy', 'av.tab': 'AI video', 'av.off': 'AI video is not set up on this server yet. The operator needs to add a video-generation API token.', 'av.prompt': 'Describe the shot *', 'av.phPrompt': 'e.g. A glass serum bottle on wet stone, soft morning light, slow push-in, water droplets on the label', 'av.image': 'Product photo (optional)', 'av.imageNote': 'With a photo, the clip animates it and keeps its shape. The photo is sent to the video service to make this clip.', 'av.aspect': 'Shape', 'av.portrait': '9:16 vertical', 'av.square': '1:1 square', 'av.landscape': '16:9 landscape', 'av.btn': 'Generate AI video', 'av.quota': '{u} of {l} AI clips used this month. Clips that fail are not counted.', 'av.result': 'AI video clips', 'av.empty': 'Your AI clips will appear here. Each one takes about one to three minutes.', 'av.s.ready': 'Ready', 'av.s.failed': 'Failed', 'av.s.running': 'Generating…', 'av.withImage': 'from photo', 'av.download': 'Download', 'av.needPrompt': 'Describe the shot first.', 'av.started': 'Started — the clip will appear here in a minute or two', 'av.deleteConfirm': 'Delete this clip?', 'av.fromScene': 'AI-generate this shot', 'av.productIs': 'The product is {p}.', 'av.style': 'Vertical social-commerce product video, clean lighting, smooth camera movement.', 'side.g.account': 'Account', 'side.nav.settings': 'Settings', 'st.title': 'Settings', 'st.sub': 'Appearance, your team, sign-in and your data.', 'st.appearance': 'Appearance', 'st.theme': 'Theme', 'st.themeNote': 'Applies to the console on this device.', 'st.light': 'Light', 'st.dark': 'Dark', 'st.system': 'System', 'st.lang': 'Language', 'st.langNote': 'Emails we send you follow this language too.', 'side.g.overview': 'Overview', 'side.g.talent': 'Creators', 'side.g.campaigns': 'Campaigns', 'side.g.more': 'Resources', 'side.nav.analytics': 'Analytics', 'side.nav.pipeline': 'Collaborations', 'side.nav.scripts': 'AI Studio', 'c.refresh': 'Refresh', 'c.cancel': 'Cancel', 'an.title': 'Analytics', 'an.sub': 'How your campaigns, spend and creator outreach are performing.', 'an.export': 'Export report', 'an.aiTitle': 'AI portfolio insights', 'an.aiSub': 'What is working, where the bottlenecks are, and what to do next — written from the numbers on this page. Uses one copilot message.', 'an.aiBtn': 'Generate AI insights', 'an.aiBusy': 'Analysing…', 'an.trend': 'Predicted vs. actual GMV', 'an.trendSub': 'By the month each campaign was saved, last 6 months.', 'an.predicted': 'Predicted', 'an.actual': 'Actual', 'an.funnel': 'Outreach funnel', 'an.funnelSub': 'Where every creator in your campaigns currently stands.', 'an.top': 'Top creators', 'an.topActual': 'Ranked by actual GMV you recorded.', 'an.topPredicted': 'Ranked by predicted GMV — record campaign results to rank by real sales.', 'an.cats': 'By category', 'an.catsSub': 'Campaigns and GMV per product category.', 'an.k.campaigns': 'Campaigns', 'an.k.campaignsSub': '{a} active · {c} completed', 'an.k.predicted': 'Predicted GMV', 'an.k.predictedSub': 'Predicted ROI {r}', 'an.k.actual': 'Actual GMV', 'an.k.actualSub': 'Actual ROI {r}', 'an.k.accuracy': 'Prediction accuracy', 'an.k.accuracySub': '{n} collaborations · {p} accepted', 'an.k.noData': 'no results recorded yet', 'an.vsLast': 'vs last month', 'an.empty': 'No campaigns yet — run the optimizer and save a campaign to see analytics here.', 'an.noRows': 'Nothing to show yet.', 'an.th.creator': 'Creator', 'an.th.campaigns': 'Campaigns', 'an.th.spend': 'Planned cost', 'an.th.predicted': 'Predicted', 'an.th.actual': 'Actual', 'an.th.category': 'Category', 'pl.title': 'Collaborations', 'pl.sub': 'Every creator in your saved campaigns, from first invitation to payment.', 'pl.list': 'List', 'pl.board': 'Kanban', 'pl.csv': 'Export CSV', 'pl.fStatus': 'Status', 'pl.fCampaign': 'Campaign', 'pl.fSearch': 'Search creator, contact or campaign', 'pl.phSearch': 'Filter…', 'pl.allStatus': 'All statuses', 'pl.allCampaigns': 'All campaigns', 'pl.s.shortlisted': 'Shortlisted', 'pl.s.invited': 'Invited', 'pl.s.negotiating': 'Negotiating', 'pl.s.contracted': 'Contracted', 'pl.s.submitted': 'Content submitted', 'pl.s.live': 'Live', 'pl.s.paid': 'Paid', 'pl.s.declined': 'Declined', 'pl.th.creator': 'Creator', 'pl.th.campaign': 'Campaign', 'pl.th.status': 'Status', 'pl.th.fee': 'Fee', 'pl.th.planned': 'Planned', 'pl.th.contact': 'Contact', 'pl.th.updated': 'Updated', 'pl.empty': 'No collaborations match your filters.', 'pl.emptyAll': 'No collaborations yet — run the optimizer and save a campaign; its creators appear here.', 'pl.showing': 'Showing {n} of {t}', 'pl.details': 'Details', 'pl.fee': 'Agreed fee (USD)', 'pl.contact': 'Contact', 'pl.phContact': 'WhatsApp, email or agency', 'pl.link': 'Content link', 'pl.note': 'Notes', 'pl.save': 'Save', 'pl.saved': 'Saved', 'pl.moved': 'Moved to {s}', 'pl.dragHint': 'Drag a card to another column to change its stage.', 'pl.open': 'Open content', 'stu.title': 'AI Studio', 'sc.sub': 'Sales videos, AI video clips, scripts and everyday operations copy. Text tools use one copilot message per run; AI video has its own monthly allowance.', 'sc.tabGen': 'Script', 'sc.tabChk': 'Check', 'sc.product': 'Product *', 'sc.phProduct': 'e.g. Vitamin C brightening serum 30ml', 'sc.points': 'Selling points', 'sc.phPoints': 'One per line: key ingredient, who it is for, what makes it different, current offer…', 'sc.format': 'Format', 'sc.video': 'Short video', 'sc.live': 'Livestream segment', 'sc.length': 'Length', 'sc.spoken': 'Spoken language', 'sc.tone': 'Tone', 'sc.phTone': 'e.g. playful, honest review', 'sc.genBtn': 'Generate script', 'sc.draft': 'Script to check *', 'sc.phDraft': 'Paste the script the creator plans to film…', 'sc.chkBtn': 'Check script', 'sc.disclaimer': 'Editorial guidance only — not legal advice. Check the platform\'s ad rules for your market.', 'sc.result': 'Result', 'sc.resultScript': 'Script', 'sc.resultReview': 'Review', 'sc.sendCheck': 'Check this script', 'sc.copy': 'Copy', 'sc.empty': 'Your video, script or copy will appear here.', 'sc.busy': 'Writing…', 'sc.needProduct': 'Tell us what the product is.', 'sc.needDraft': 'Paste a script of at least a couple of sentences.', 'side.nav.dashboard': 'Optimizer', 'side.nav.creators': 'Creators', 'side.nav.campaigns': 'Campaigns', 'side.nav.guide': 'Seller Academy', 'side.nav.billing': 'Plan & Billing',
                 'g.heroH': 'From store setup to breakout sales — the official playbooks, distilled',
                 'g.heroP': 'Store setup, product selection, market insights, mega-sale tactics and real merchant case studies — distilled from official platform guidance for SEA sellers. The AI copilot (bottom-right) knows this entire library, so you can also just ask it.',
                 'side.tag': 'tiko · AI-powered KOL optimization',
@@ -3349,7 +3505,7 @@
                 'auth.no': 'No account yet?', 'auth.have': 'Already have an account?', 'auth.createOne': 'Create one', 'auth.toSignin': 'Sign in',
                 'auth.phEmail': 'you@company.com', 'auth.phPass': 'Password (min 8 chars)',
                 'auth.errEmpty': 'Enter your email and password.', 'auth.errNet': 'Cannot reach the server.',
-                pageTitles: { dashboard: 'Optimizer Dashboard', creators: 'Creator Management', campaigns: 'Campaign Attribution', guide: 'Seller Academy', billing: 'Plan & Billing', analytics: 'Analytics', pipeline: 'Collaborations', scripts: 'AI Scripts', settings: 'Settings', start: 'Getting started', templates: 'Templates', contracts: 'Contracts', messages: 'Message log', activity: 'Activity' }
+                pageTitles: { dashboard: 'Optimizer Dashboard', creators: 'Creator Management', campaigns: 'Campaign Attribution', guide: 'Seller Academy', billing: 'Plan & Billing', analytics: 'Analytics', pipeline: 'Collaborations', scripts: 'AI Studio', settings: 'Settings', start: 'Getting started', templates: 'Templates', contracts: 'Contracts', messages: 'Message log', activity: 'Activity', explore: 'Explore' }
             },
             zh: {
                 'nav.cap': '功能', 'nav.copilot': 'AI 助手', 'nav.how': '工作原理', 'nav.results': '成效', 'nav.pricing': '价格', 'nav.launch': '进入控制台',
@@ -3363,7 +3519,7 @@
                 'trust.d1': 'AI 投放助手全天候待命', 'trust.d2': '对比人工选择的平均 GMV 提升', 'trust.d3': '个东南亚市场开箱即用', 'trust.d4': '单次优化平均求解时间',
                 'cw.f1': '粉丝 48.2 万', 'cw.f2': '粉丝 120 万', 'cw.f3': '粉丝 35.6 万', 'cw.f4': '粉丝 9.1 万', 'cw.f5': '粉丝 2.8 万', 'cw.f6': '粉丝 64 万',
                 'cw.note': '以上为虚拟达人示例，并非真实账号——tiko 用同一套引擎为你达人库中的每位达人排序打分。',
-                'sec2.num': '02 / 核心能力', 'sec2.h': '一台<em>为卖货而生</em>的<br>决策引擎',
+                'sec2.num': '01 / 核心能力', 'sec2.h': '一台<em>为卖货而生</em>的<br>决策引擎',
                 'feat.sub': '不止是一份达人名单——而是能预测结果、解释理由、随时复盘的投放大脑。',
                 'f1.h': '智能预算分配', 'f1.p': '输入预算、品类与目标市场，算法在数千位达人中求解最优阵容，在预算约束内最大化预测 GMV。',
                 'f2.h': 'GMV 预测引擎', 'f2.p': '基于粉丝量、互动率、契合度与受众重叠估算每位达人的销售贡献，并给出清晰可解释的"为什么选 TA"。',
@@ -3371,7 +3527,7 @@
                 'f4.h': '激进 / 均衡 / 稳健三套方案', 'f4.p': '一键生成三种风险偏好的方案，按预算上限自动缩放——放量或求稳，都选得安心。',
                 'f5.h': '预测 vs 实际复盘', 'f5.p': '保存投放后录入真实 GMV，系统自动计算预测准确率，让每次投放都成为可优化的资产。',
                 'f6.h': '灵活的达人数据源', 'f6.p': '支持手动录入与 CSV 批量导入，并为达人广场、店铺平台等预留 API 接口。',
-                'seccp.num': '03 / AI 投放助手', 'seccp.h': '下一次投放<br><em>一句话搞定</em>',
+                'seccp.num': '02 / AI 投放助手', 'seccp.h': '下一次投放<br><em>一句话搞定</em>',
                 'cp.lead': '认识你的 <b>AI 投放助手</b>——一位常驻控制台的投放分析师，熟悉你的达人库，说你的语言。不用学任何报表：告诉它你想卖什么就行。',
                 'cp.b1': '<b>聊天即可运行真实优化</b>——「$3,000 投印尼美妆」，直接返回可执行阵容与预测 GMV、ROI。',
                 'cp.b2': '<b>熟悉你的达人库</b>——在你真实合作的达人中筛选、对比、给出推荐。',
@@ -3382,30 +3538,30 @@
                 'cp.t1': 'run_optimization — 预算 $3,000 · 印尼 · 美妆',
                 'cp.a1': '<b>搞定——已选出 7 位达人。</b><br>预测 GMV <b>$11,400</b> · ROI <b>3.8×</b><br>首选：Aisyah R.——89 万粉丝，互动率 7.2%。<br>要看稳健版还是激进版方案？',
                 'cp.u2': '预算砍到 $2,000 会怎样？',
-                'sec3.num': '04 / 流程', 'sec3.h': '从预算到阵容<br><em>只需三步</em>',
+                'sec3.num': '03 / 流程', 'sec3.h': '从预算到阵容<br><em>只需三步</em>',
                 's1.h': '配置投放', 's1.p': '拖动滑杆设定预算，选择目标国家与商品品类——无需任何专家参数。',
                 's2.h': '一键运行优化', 's2.p': '点击运行优化，或直接问 AI 助手——数秒内返回最优达人阵容与预期回报。',
                 's3.h': '对比、保存、复盘', 's3.p': '对比三套方案并保存为投放，事后录入真实 GMV，持续校准你的预测模型。',
-                'sec4.num': '05 / 价格', 'sec4.h': '免费起步<br><em>见效再升级</em>',
+                'sec4.num': '04 / 价格', 'sec4.h': '免费起步<br><em>见效再升级</em>',
                 'price.sub': '所有版本都包含完整 AI 引擎、AI 投放助手与无限达人库。只为真正驱动增长的部分付费——优化次数与助手对话。',
                 'p1.tag': '免费版', 'p2.tag': '专业版 — 最受欢迎', 'p3.tag': '团队版', 'per.month': ' / 月',
-                'p1.l1': '✓ 每月 <b>10 次优化</b>', 'p1.copilot': '✓ <b>AI 投放助手</b> — 每月 20 次对话', 'p1.l2': '✓ 智能选人 + 「为什么选 TA」', 'p1.l3': '✓ 无限达人库', 'p1.l4': '✓ CSV / Excel 导入导出',
+                'p1.l1': '✓ 每月 <b>10 次优化</b>', 'p1.vid': '✓ <b>AI 视频</b> — 每月 1 条', 'p2.vid': '✓ <b>AI 视频</b> — 每月 20 条', 'p3.vid': '✓ <b>AI 视频</b> — 每月 60 条', 'p1.copilot': '✓ <b>AI 投放助手</b> — 每月 20 次对话', 'p1.l2': '✓ 智能选人 + 「为什么选 TA」', 'p1.l3': '✓ 无限达人库', 'p1.l4': '✓ CSV / Excel 导入导出',
                 'p2.l1': '✓ 每月 <b>300 次优化</b>', 'p2.copilot': '✓ <b>AI 投放助手</b> — 每月 500 次对话', 'p2.l2': '✓ 自校准 GMV 预测', 'p2.l3': '✓ 投放归因与准确率', 'p2.l4': '✓ 无限达人库', 'p2.l5': '✓ 3 个团队席位',
-                'p3.l1': '✓ <b>不限优化次数</b>', 'p3.copilot': '✓ <b>不限 AI 投放助手</b>', 'p3.l2': '✓ 10 个席位 & 多店铺支持', 'p3.l3': '✓ API 访问', 'p3.l4': '✓ 无限达人库', 'p3.l5': '✓ 优先支持',
+                'p3.l1': '✓ <b>不限优化次数</b>', 'p3.copilot': '✓ <b>不限 AI 投放助手</b>', 'p3.l2': '✓ 10 个团队席位', 'p3.l4': '✓ 无限达人库', 'p3.l5': '✓ 优先支持',
                 'p.start': '免费开始', 'p.upgrade': '在控制台升级',
                 'final.h': '把下一次投放<br><em>交给数据</em>', 'final.btn': '进入控制台 — 免费优化',
                 'footer.tag': 'AI 驱动的达人投放优化。把每一分预算，都投给真正能卖货的达人。', 'footer.h1': '产品', 'footer.h2': '开始使用', 'footer.h3': '法律', 'footer.r': '© 2026 tiko · 保留所有权利',
                 'footer.legal': 'tiko 是独立的数据分析工具，与任何电商或社交平台均无隶属、赞助或认可关系，所提及的商标归其各自所有者所有。预测 GMV 与 ROI 为统计估算，不构成对实际销售额的保证。',
                 'side.brand': 'KOL 优化器', 'side.settings': '投放设置', 'side.budget': '营销预算', 'side.countries': '目标国家', 'side.category': '商品品类',
                 'c.ALL': '🌏 全部国家', 'c.MY': '🇲🇾 马来西亚', 'c.ID': '🇮🇩 印度尼西亚', 'c.TH': '🇹🇭 泰国', 'c.PH': '🇵🇭 菲律宾', 'c.SG': '🇸🇬 新加坡', 'c.VN': '🇻🇳 越南',
-                'cat.beauty': '💄 美妆', 'cat.fashion': '👗 服饰', 'cat.home': '🏠 家居生活', 'cat.fmcg': '🛒 快消品',
+                'cat.personal_care': '🧴 个护清洁', 'cat.womenswear': '👚 女装', 'cat.menswear': '👔 男装', 'cat.kids_fashion': '🧒 童装', 'cat.shoes': '👟 鞋靴', 'cat.bags': '🎒 箱包', 'cat.jewelry': '💍 珠宝腕表', 'cat.computers': '💻 电脑办公', 'cat.furniture': '🛋️ 家具', 'cat.textiles': '🛏️ 家纺布艺', 'cat.tools': '🔧 五金工具', 'cat.food': '🍜 食品饮料', 'cat.stationery': '📚 图书文具', 'catg.beauty': '美妆个护', 'catg.fashion': '服饰鞋包', 'catg.electronics': '数码家电', 'catg.home': '家居生活', 'catg.family': '母婴玩具', 'catg.food_health': '食品健康', 'catg.leisure': '运动 · 宠物 · 汽车', 'cat.beauty': '💄 美妆', 'cat.fashion': '👗 服饰（综合）', 'cat.home': '🏠 家居生活', 'cat.fmcg': '🛒 日用百货',
                 'cat.accessories': '👜 时尚配件', 'cat.muslim_fashion': '🧕 穆斯林时尚', 'cat.kitchen': '🍳 厨房用品', 'cat.appliances': '🔌 家用电器', 'cat.electronics': '📱 手机数码', 'cat.mother_baby': '🍼 母婴用品', 'cat.health': '💊 保健健康', 'cat.sports_outdoor': '⛺ 运动户外', 'cat.pet': '🐾 宠物用品', 'cat.toys': '🧸 玩具爱好', 'cat.automotive': '🚗 汽车配件',
                 'side.ctype': '投放形式', 'ct.any': '⚡ 不限形式', 'ct.liveSide': '🔴 直播带货', 'ct.videoSide': '🎬 短视频种草',
                 'ct.all': '全部形式', 'ct.live': '🔴 直播带货', 'ct.video': '🎬 短视频', 'ct.both': '⚡ 直播 + 短视频',
                 'ct.badgeLive': '直播', 'ct.badgeVideo': '短视频', 'ct.badgeBoth': '双栖', 'm.ctype': '带货方式',
                 'side.run': '运行优化', 'side.adv': '高级设置', 'side.seed': '随机种子', 'side.rand': '随机',
                 'side.seedHelp': '固定该数字可在多次运行间获得完全一致的结果；保持默认则每次结果略有不同。',
-                'side.g.workspace': '工作区', 'side.nav.contracts': '合同', 'side.nav.start': '新手引导', 'side.nav.templates': '模板', 'side.nav.messages': '消息记录', 'side.nav.activity': '操作日志', 'ob.title': '新手引导', 'ob.sub': '从空白工作区到第一次有数据复盘的投放，需要走完这几步。', 'ob.progress': '已完成 {d} / {t}', 'ob.allDone': '全部完成——你已经跑通了整个流程。', 'ob.go': '前往', 'ob.creators': '建立达人库', 'ob.creators.d': '导入 CSV / Excel，或手动添加达人。', 'ob.optimize': '运行第一次优化', 'ob.optimize.d': '设置预算、市场和品类，让引擎选出阵容。', 'ob.campaign': '保存一次投放', 'ob.campaign.d': '保存阵容后，入选的达人就开始被跟踪。', 'ob.outreach': '联系一位达人', 'ob.outreach.d': '在「合作管理」里发出邀约，并推进合作阶段。', 'ob.contract': '生成一份合同', 'ob.contract.d': '条件谈定后，用模板生成合作协议。', 'ob.results': '录入投放结果', 'ob.results.d': '录入实际 GMV，预测会按你店铺的情况自动校准。', 'ob.team': '邀请同事', 'ob.team.d': '和团队共用工作区——Pro 和 Team 套餐可用。', 'tp.title': '模板', 'tp.sub': '可复用的邀约消息和合同。花括号里的变量会按每位达人自动填入。', 'tp.kMessage': '消息', 'tp.kContract': '合同', 'tp.new': '新建模板', 'tp.name': '名称', 'tp.body': '内容', 'tp.vars': '插入变量', 'tp.delete': '删除', 'tp.deleteConfirm': '确定删除这个模板吗？', 'tp.deleted': '已删除', 'tp.untitled': '未命名模板', 'tp.empty': '还没有模板——新建一个吧。', 'tp.need': '请填写模板名称和内容。', 'ct.title': '合同', 'ct.sub': '用模板生成的合作协议。在「合作管理」里打开某位达人即可创建。', 'ct.empty': '还没有合同。在「合作管理」里打开一位达人，点「合同」即可生成。', 'ct.th.no': '编号', 'ct.th.creator': '达人', 'ct.th.campaign': '投放', 'ct.th.fee': '费用', 'ct.th.status': '状态', 'ct.th.updated': '更新时间', 'ct.view': '打开', 'ct.s.draft': '草稿', 'ct.s.sent': '已发送', 'ct.s.signed': '已签署', 'ct.s.cancelled': '已取消', 'ct.new': '合同', 'ct.newFor': '为 {n} 生成合同', 'ct.deliverables': '交付内容', 'ct.phDeliverables': '例如：2 条短视频（30–60 秒）+ 1 次直播口播', 'ct.start': '开始日期', 'ct.end': '结束日期', 'ct.create': '生成合同', 'ct.created': '合同 {n} 已生成', 'ct.close': '关闭', 'ct.print': '打印 / PDF', 'ct.deleteConfirm': '确定删除这份合同吗？', 'ct.signedLock': '已签署的合同不能修改。', 'ct.noTemplate': '请先创建一个合同模板（工作区 → 模板）。', 'ml.title': '消息记录', 'ml.sub': '团队在「合作管理」里发出的每一条邀约消息：谁发的、什么时候、发了什么。', 'ml.empty': '还没有消息记录。', 'ml.th.when': '发送时间', 'ml.th.creator': '达人', 'ml.th.channel': '渠道', 'ml.th.message': '内容', 'ml.th.by': '发送人', 'ml.ch.whatsapp': 'WhatsApp', 'ml.ch.email': '邮件', 'ml.ch.copy': '已复制', 'ac.title': '操作日志', 'ac.sub': '工作区里每个人做过的操作，最新的在前。', 'ac.empty': '还没有任何操作记录。', 'act.campaign.save': '保存了投放', 'act.campaign.results': '录入了投放结果：', 'act.collab.stage': '推进了', 'act.collab.assign': '指派了', 'act.message.send': '联系了', 'act.contract.create': '生成了合同：', 'act.contract.status': '更新了合同状态：', 'act.contract.delete': '删除了合同：', 'act.team.invite': '邀请了', 'act.team.remove': '移除了', 'msg.open': '发消息', 'msg.titleFor': '联系 {n}', 'msg.sub': '确认内容后，用你自己的 WhatsApp 或邮箱发送。我们会为团队记录这条消息。', 'msg.template': '模板', 'msg.body': '消息内容', 'msg.copy': '复制', 'msg.email': '邮件', 'msg.whatsapp': '打开 WhatsApp', 'msg.logged': '已记录', 'msg.loggedInvited': '已记录——达人已标记为「已邀约」', 'msg.blank': '空白消息', 'msg.empty': '请先填写消息内容。', 'pl.assignee': '负责人', 'pl.unassigned': '未指派', 'pl.mine': '只看我负责的（{n}）', 'side.g.account': '账号', 'side.nav.settings': '设置', 'st.title': '设置', 'st.sub': '外观、团队、登录与数据。', 'st.appearance': '外观', 'st.theme': '颜色主题', 'st.themeNote': '只对这台设备上的控制台生效。', 'st.light': '浅色', 'st.dark': '深色', 'st.system': '跟随系统', 'st.lang': '语言', 'st.langNote': '我们发给你的邮件也会使用这个语言。', 'side.g.overview': '概览', 'side.g.talent': '达人', 'side.g.campaigns': '投放', 'side.g.more': '资源', 'side.nav.analytics': '数据分析', 'side.nav.pipeline': '合作管理', 'side.nav.scripts': 'AI 脚本', 'c.refresh': '刷新', 'c.cancel': '取消', 'an.title': '数据分析', 'an.sub': '投放、花费与达人邀约的整体表现。', 'an.export': '导出报告', 'an.aiTitle': 'AI 投放洞察', 'an.aiSub': '根据本页的数据，总结哪些有效、瓶颈在哪、下一步做什么。每次消耗 1 次 AI 助手对话额度。', 'an.aiBtn': '生成 AI 洞察', 'an.aiBusy': '分析中…', 'an.trend': '预测 GMV 与实际 GMV', 'an.trendSub': '按投放保存的月份统计，最近 6 个月。', 'an.predicted': '预测', 'an.actual': '实际', 'an.funnel': '邀约漏斗', 'an.funnelSub': '所有投放中的达人目前各处于哪个阶段。', 'an.top': '表现最好的达人', 'an.topActual': '按你录入的实际 GMV 排序。', 'an.topPredicted': '按预测 GMV 排序——录入投放结果后会改按真实销售排序。', 'an.cats': '按品类', 'an.catsSub': '各商品品类的投放数与 GMV。', 'an.k.campaigns': '投放数', 'an.k.campaignsSub': '进行中 {a} · 已完成 {c}', 'an.k.predicted': '预测 GMV', 'an.k.predictedSub': '预测 ROI {r}', 'an.k.actual': '实际 GMV', 'an.k.actualSub': '实际 ROI {r}', 'an.k.accuracy': '预测准确率', 'an.k.accuracySub': '{n} 次合作 · 接受率 {p}', 'an.k.noData': '还没有录入结果', 'an.vsLast': '较上月', 'an.empty': '还没有投放——先在优化器里运行并保存一次投放，这里就会有数据。', 'an.noRows': '暂无数据。', 'an.th.creator': '达人', 'an.th.campaigns': '投放数', 'an.th.spend': '计划成本', 'an.th.predicted': '预测', 'an.th.actual': '实际', 'an.th.category': '品类', 'pl.title': '合作管理', 'pl.sub': '已保存投放中的每一位达人，从首次邀约到结算的全过程。', 'pl.list': '列表', 'pl.board': '看板', 'pl.csv': '导出 CSV', 'pl.fStatus': '状态', 'pl.fCampaign': '投放', 'pl.fSearch': '搜索达人、联系方式或投放', 'pl.phSearch': '输入关键词…', 'pl.allStatus': '全部状态', 'pl.allCampaigns': '全部投放', 'pl.s.shortlisted': '待邀约', 'pl.s.invited': '已邀约', 'pl.s.negotiating': '洽谈中', 'pl.s.contracted': '已签约', 'pl.s.submitted': '内容已提交', 'pl.s.live': '已发布', 'pl.s.paid': '已结算', 'pl.s.declined': '已拒绝', 'pl.th.creator': '达人', 'pl.th.campaign': '投放', 'pl.th.status': '状态', 'pl.th.fee': '费用', 'pl.th.planned': '计划', 'pl.th.contact': '联系方式', 'pl.th.updated': '更新时间', 'pl.empty': '没有符合筛选条件的合作记录。', 'pl.emptyAll': '还没有合作记录——在优化器里运行并保存一次投放，入选的达人就会出现在这里。', 'pl.showing': '显示 {n} / 共 {t} 条', 'pl.details': '详情', 'pl.fee': '谈定费用（美元）', 'pl.contact': '联系方式', 'pl.phContact': 'WhatsApp、邮箱或经纪公司', 'pl.link': '内容链接', 'pl.note': '备注', 'pl.save': '保存', 'pl.saved': '已保存', 'pl.moved': '已移到「{s}」', 'pl.dragHint': '把卡片拖到另一列即可更改阶段。', 'pl.open': '打开内容', 'sc.title': 'AI 脚本', 'sc.sub': '为达人生成可直接拍摄的带货脚本，或在开拍前检查脚本。每次消耗 1 次 AI 助手对话额度。', 'sc.tabGen': '生成脚本', 'sc.tabChk': '检查脚本', 'sc.product': '商品 *', 'sc.phProduct': '例如：维 C 亮肤精华 30ml', 'sc.points': '卖点', 'sc.phPoints': '每行一条：核心成分、适合人群、差异点、当前优惠…', 'sc.format': '形式', 'sc.video': '短视频', 'sc.live': '直播片段', 'sc.length': '时长', 'sc.spoken': '口播语言', 'sc.tone': '语气', 'sc.phTone': '例如：活泼、真实测评', 'sc.genBtn': '生成脚本', 'sc.draft': '待检查的脚本 *', 'sc.phDraft': '粘贴达人准备拍摄的脚本…', 'sc.chkBtn': '检查脚本', 'sc.disclaimer': '仅为内容建议，不构成法律意见。请以所在市场的平台广告规范为准。', 'sc.result': '结果', 'sc.resultScript': '脚本', 'sc.resultReview': '检查结果', 'sc.sendCheck': '检查这份脚本', 'sc.copy': '复制', 'sc.empty': '生成的脚本或检查结果会显示在这里。', 'sc.busy': '撰写中…', 'sc.needProduct': '请填写商品名称。', 'sc.needDraft': '请粘贴至少几句话的脚本。', 'side.nav.dashboard': '优化器', 'side.nav.creators': '达人库', 'side.nav.campaigns': '投放记录', 'side.nav.guide': '商家学院', 'side.nav.billing': '套餐与计费',
+                'side.g.workspace': '工作区', 'side.nav.contracts': '合同', 'side.nav.start': '新手引导', 'side.nav.templates': '模板', 'side.nav.messages': '消息记录', 'side.nav.activity': '操作日志', 'ob.title': '新手引导', 'ob.sub': '从空白工作区到第一次有数据复盘的投放，需要走完这几步。', 'ob.progress': '已完成 {d} / {t}', 'ob.allDone': '全部完成——你已经跑通了整个流程。', 'ob.go': '前往', 'ob.creators': '建立达人库', 'ob.creators.d': '导入 CSV / Excel，或手动添加达人。', 'ob.optimize': '运行第一次优化', 'ob.optimize.d': '设置预算、市场和品类，让引擎选出阵容。', 'ob.campaign': '保存一次投放', 'ob.campaign.d': '保存阵容后，入选的达人就开始被跟踪。', 'ob.outreach': '联系一位达人', 'ob.outreach.d': '在「合作管理」里发出邀约，并推进合作阶段。', 'ob.contract': '生成一份合同', 'ob.contract.d': '条件谈定后，用模板生成合作协议。', 'ob.results': '录入投放结果', 'ob.results.d': '录入实际 GMV，预测会按你店铺的情况自动校准。', 'ob.team': '邀请同事', 'ob.team.d': '和团队共用工作区——Pro 和 Team 套餐可用。', 'tp.title': '模板', 'tp.sub': '可复用的邀约消息和合同。花括号里的变量会按每位达人自动填入。', 'tp.kMessage': '消息', 'tp.kContract': '合同', 'tp.new': '新建模板', 'tp.name': '名称', 'tp.body': '内容', 'tp.vars': '插入变量', 'tp.delete': '删除', 'tp.deleteConfirm': '确定删除这个模板吗？', 'tp.deleted': '已删除', 'tp.untitled': '未命名模板', 'tp.empty': '还没有模板——新建一个吧。', 'tp.need': '请填写模板名称和内容。', 'ct.title': '合同', 'ct.sub': '用模板生成的合作协议。在「合作管理」里打开某位达人即可创建。', 'ct.empty': '还没有合同。在「合作管理」里打开一位达人，点「合同」即可生成。', 'ct.th.no': '编号', 'ct.th.creator': '达人', 'ct.th.campaign': '投放', 'ct.th.fee': '费用', 'ct.th.status': '状态', 'ct.th.updated': '更新时间', 'ct.view': '打开', 'ct.s.draft': '草稿', 'ct.s.sent': '已发送', 'ct.s.signed': '已签署', 'ct.s.cancelled': '已取消', 'ct.new': '合同', 'ct.newFor': '为 {n} 生成合同', 'ct.deliverables': '交付内容', 'ct.phDeliverables': '例如：2 条短视频（30–60 秒）+ 1 次直播口播', 'ct.start': '开始日期', 'ct.end': '结束日期', 'ct.create': '生成合同', 'ct.created': '合同 {n} 已生成', 'ct.close': '关闭', 'ct.print': '打印 / PDF', 'ct.deleteConfirm': '确定删除这份合同吗？', 'ct.signedLock': '已签署的合同不能修改。', 'ct.noTemplate': '请先创建一个合同模板（工作区 → 模板）。', 'ml.title': '消息记录', 'ml.sub': '团队在「合作管理」里发出的每一条邀约消息：谁发的、什么时候、发了什么。', 'ml.empty': '还没有消息记录。', 'ml.th.when': '发送时间', 'ml.th.creator': '达人', 'ml.th.channel': '渠道', 'ml.th.message': '内容', 'ml.th.by': '发送人', 'ml.ch.whatsapp': 'WhatsApp', 'ml.ch.email': '邮件', 'ml.ch.copy': '已复制', 'ac.title': '操作日志', 'ac.sub': '工作区里每个人做过的操作，最新的在前。', 'ac.empty': '还没有任何操作记录。', 'act.campaign.save': '保存了投放', 'act.campaign.results': '录入了投放结果：', 'act.collab.stage': '推进了', 'act.collab.assign': '指派了', 'act.message.send': '联系了', 'act.contract.create': '生成了合同：', 'act.contract.status': '更新了合同状态：', 'act.contract.delete': '删除了合同：', 'act.team.invite': '邀请了', 'act.team.remove': '移除了', 'msg.open': '发消息', 'msg.titleFor': '联系 {n}', 'msg.sub': '确认内容后，用你自己的 WhatsApp 或邮箱发送。我们会为团队记录这条消息。', 'msg.template': '模板', 'msg.body': '消息内容', 'msg.copy': '复制', 'msg.email': '邮件', 'msg.whatsapp': '打开 WhatsApp', 'msg.logged': '已记录', 'msg.loggedInvited': '已记录——达人已标记为「已邀约」', 'msg.blank': '空白消息', 'msg.empty': '请先填写消息内容。', 'pl.assignee': '负责人', 'pl.unassigned': '未指派', 'pl.mine': '只看我负责的（{n}）', 'cr.est': '估算', 'pl.meta': '达人投放优化', 'mq.1': '优化', 'mq.2': '预测', 'mq.3': '分配', 'mq.4': '复盘', 'mq.5': '循环 —', 'tier.Mega': '超头部', 'tier.Macro': '头部', 'tier.Micro': '腰部', 'tier.Nano': '尾部', 'tierf.Mega': '🟣 超头部', 'tierf.Macro': '🔵 头部', 'tierf.Micro': '🟢 腰部', 'tierf.Nano': '🟡 尾部', 'd.cap': '预算的 {p}%', 'tt.home': '返回首页', 'tt.plan': '查看套餐与用量', 'tt.logout': '退出登录', 'tt.xlsxTpl': '下载带标准列名的 Excel 模板', 'tt.csvTpl': '下载 CSV 模板', 'tt.clear': '清空对话', 'tt.view': '查看', 'tt.record': '录入实际结果', 'tt.delete': '删除', 'ph.target': '例如 150000', 'ph.creator': '例如 Lisa Beauty', 'ph.auto': '自动', 'ph.campaign': '例如：美妆 马来西亚 2026 年 6 月', 'ph.actual': '例如 48500', 'ph.notes': '投放观察、背景说明…', 't.accountCreated': '账号已创建', 't.signedIn': '已登录', 't.sessionExpired': '登录已过期，请重新登录', 't.copilotLimit': 'AI 助手额度已用完——升级后可继续使用', 'side.nav.explore': '发现达人', 'ex.title': '发现达人', 'ex.sub': '一个超出你自己达人库的共享达人池。看到合适的，一键加入你的达人库。', 'ex.extBtn': '浏览器扩展', 'ex.poolSize': '达人池共 {n} 位达人', 'ex.fSearch': '搜索名称、账号或简介', 'ex.phSearch': '例如：护肤、@账号', 'ex.fCountry': '国家', 'ex.anyCountry': '不限国家', 'ex.fSize': '粉丝规模', 'ex.anySize': '不限规模', 'ex.size1': '1 万以下', 'ex.size2': '1 万 – 10 万', 'ex.size3': '10 万 – 100 万', 'ex.size4': '100 万以上', 'ex.fSort': '排序', 'ex.sortFollowers': '粉丝最多', 'ex.sortRecent': '最近采集', 'ex.sortLikes': '获赞最多', 'ex.prev': '上一页', 'ex.next': '下一页', 'ex.range': '第 {a}–{b} 位，共 {t} 位', 'ex.followers': '粉丝', 'ex.likes': '获赞', 'ex.videos': '视频', 'ex.seen': '采集于 {d}', 'ex.add': '加入达人库', 'ex.inLibrary': '已在达人库', 'ex.unknownCountry': '国家未知', 'ex.emptyTitle': '还没有符合条件的达人。', 'ex.emptyBody': '达人池靠浏览器扩展采集而增长。只要你的团队在安装了扩展的浏览器里打开过某位达人的主页，TA 就会出现在这里。', 'ex.emptyPoolTitle': '达人池现在还是空的。', 'ex.addTitle': '把 {n} 加入达人库', 'ex.addNote': '达人池只有公开的数量信息。报价会按粉丝规模估算并标记为“估算”，拿到真实报价后请替换。', 'ex.addBtn': '加入我的达人库', 'ex.added': '{n} 已加入达人库', 'ext.title': '用浏览器扩展扩充达人池', 'ext.sub': '安装扩展后，你和团队打开的每一个达人主页都会自动进入达人池。扩展只读取达人主页上公开显示的信息。', 'ext.s1': '下载并解压', 'ext.s1d': '一个很小的 Chrome / Edge 扩展。', 'ext.download': '下载扩展', 'ext.s2': '在浏览器里加载', 'ext.s2d': '打开 <code>chrome://extensions</code>，开启<b>开发者模式</b>，点击<b>加载已解压的扩展程序</b>，选择解压出的 <code>tiko-capture</code> 文件夹。', 'ext.s3': '连接到你的账号', 'ext.s3d': '生成一个连接码，粘贴到扩展的弹窗里。连接码只能用来提交达人，无法打开你的工作区。', 'ext.gen': '生成连接码', 'ext.copied': '连接码已复制——请粘贴到扩展里', 'ext.s4': '照常浏览', 'ext.s4d': '打开达人主页，几秒内就会出现在这里。修改密码会断开扩展的连接。', 'act.creator.explore_add': '从发现页添加了', 'sc.tabVideo': '带货视频', 'sc.tabOps': '运营文案', 'sc.tabSaved': '已保存', 'sc.savedOk': '已保存', 'sc.savedEmpty': '还没有保存的内容。生成后点「保存」即可。', 'sc.t.storyboard': '视频', 'sc.t.ops': '文案', 'sc.t.script': '脚本', 'sc.t.review': '检查', 'sv.offer': '优惠信息（选填）', 'sv.phOffer': '例如：RM39，本周包邮', 'sv.capLang': '字幕语言', 'sv.photos': '商品图片（选填，最多 8 张）', 'sv.photosNote': '图片只留在这台设备上，用来在你的浏览器里合成视频，不会上传。', 'sv.photosN': '已选 {n} 张图片', 'sv.genBtn': '生成视频', 'sv.busy': '正在策划视频…', 'sv.play': '预览', 'sv.export': '导出视频', 'sv.scenes': '分镜——可以修改字幕，改完再预览', 'sv.recording': '正在录制… {p}%', 'sv.done': '视频已下载', 'sv.noRecorder': '当前浏览器不支持导出视频，请使用最新版 Chrome 或 Edge。', 'sv.result': '带货视频', 'sv.voice': '口播', 'sv.show': '画面', 'sv.cta': '行动号召', 'sv.tags': '话题标签', 'sv.music': '配乐', 'sv.hint': '{d} 秒 · {n} 个分镜 · 9:16 竖屏。导出后可在剪辑软件里加口播和配乐。', 'op.kind': '需要什么内容？', 'op.live_script': '直播流程与话术', 'op.listing': '商品标题与卖点', 'op.caption': '发布文案与话题标签', 'op.outreach': '达人邀约私信', 'op.faq': '客服常见问答', 'op.calendar': '一周内容排期', 'op.audience': '目标人群', 'op.phAudience': '例如：学生、新手妈妈', 'op.lang': '输出语言', 'op.btn': '生成文案', 'op.result': '运营文案', 'av.tab': 'AI 视频', 'av.off': '服务器还没有开启 AI 视频。需要运营者配置视频生成服务的 API 密钥。', 'av.prompt': '描述画面 *', 'av.phPrompt': '例如：湿润石面上的玻璃精华瓶，柔和晨光，镜头缓慢推近，瓶身挂着水珠', 'av.image': '商品图片（选填）', 'av.imageNote': '上传图片后，视频会让这张图动起来并保持商品外观。图片会发送给视频生成服务用于制作这条视频。', 'av.aspect': '画面比例', 'av.portrait': '9:16 竖屏', 'av.square': '1:1 方形', 'av.landscape': '16:9 横屏', 'av.btn': '生成 AI 视频', 'av.quota': '本月已用 {u} / {l} 条 AI 视频，生成失败的不计入。', 'av.result': 'AI 视频', 'av.empty': '生成的 AI 视频会显示在这里，每条大约需要 1–3 分钟。', 'av.s.ready': '已完成', 'av.s.failed': '失败', 'av.s.running': '生成中…', 'av.withImage': '基于图片', 'av.download': '下载', 'av.needPrompt': '请先描述画面。', 'av.started': '已开始生成——一两分钟后会出现在这里', 'av.deleteConfirm': '确定删除这条视频吗？', 'av.fromScene': '用 AI 生成这一镜', 'av.productIs': '商品是 {p}。', 'av.style': '竖屏社交电商商品视频，干净的布光，平稳的运镜。', 'side.g.account': '账号', 'side.nav.settings': '设置', 'st.title': '设置', 'st.sub': '外观、团队、登录与数据。', 'st.appearance': '外观', 'st.theme': '颜色主题', 'st.themeNote': '只对这台设备上的控制台生效。', 'st.light': '浅色', 'st.dark': '深色', 'st.system': '跟随系统', 'st.lang': '语言', 'st.langNote': '我们发给你的邮件也会使用这个语言。', 'side.g.overview': '概览', 'side.g.talent': '达人', 'side.g.campaigns': '投放', 'side.g.more': '资源', 'side.nav.analytics': '数据分析', 'side.nav.pipeline': '合作管理', 'side.nav.scripts': 'AI 工作室', 'c.refresh': '刷新', 'c.cancel': '取消', 'an.title': '数据分析', 'an.sub': '投放、花费与达人邀约的整体表现。', 'an.export': '导出报告', 'an.aiTitle': 'AI 投放洞察', 'an.aiSub': '根据本页的数据，总结哪些有效、瓶颈在哪、下一步做什么。每次消耗 1 次 AI 助手对话额度。', 'an.aiBtn': '生成 AI 洞察', 'an.aiBusy': '分析中…', 'an.trend': '预测 GMV 与实际 GMV', 'an.trendSub': '按投放保存的月份统计，最近 6 个月。', 'an.predicted': '预测', 'an.actual': '实际', 'an.funnel': '邀约漏斗', 'an.funnelSub': '所有投放中的达人目前各处于哪个阶段。', 'an.top': '表现最好的达人', 'an.topActual': '按你录入的实际 GMV 排序。', 'an.topPredicted': '按预测 GMV 排序——录入投放结果后会改按真实销售排序。', 'an.cats': '按品类', 'an.catsSub': '各商品品类的投放数与 GMV。', 'an.k.campaigns': '投放数', 'an.k.campaignsSub': '进行中 {a} · 已完成 {c}', 'an.k.predicted': '预测 GMV', 'an.k.predictedSub': '预测 ROI {r}', 'an.k.actual': '实际 GMV', 'an.k.actualSub': '实际 ROI {r}', 'an.k.accuracy': '预测准确率', 'an.k.accuracySub': '{n} 次合作 · 接受率 {p}', 'an.k.noData': '还没有录入结果', 'an.vsLast': '较上月', 'an.empty': '还没有投放——先在优化器里运行并保存一次投放，这里就会有数据。', 'an.noRows': '暂无数据。', 'an.th.creator': '达人', 'an.th.campaigns': '投放数', 'an.th.spend': '计划成本', 'an.th.predicted': '预测', 'an.th.actual': '实际', 'an.th.category': '品类', 'pl.title': '合作管理', 'pl.sub': '已保存投放中的每一位达人，从首次邀约到结算的全过程。', 'pl.list': '列表', 'pl.board': '看板', 'pl.csv': '导出 CSV', 'pl.fStatus': '状态', 'pl.fCampaign': '投放', 'pl.fSearch': '搜索达人、联系方式或投放', 'pl.phSearch': '输入关键词…', 'pl.allStatus': '全部状态', 'pl.allCampaigns': '全部投放', 'pl.s.shortlisted': '待邀约', 'pl.s.invited': '已邀约', 'pl.s.negotiating': '洽谈中', 'pl.s.contracted': '已签约', 'pl.s.submitted': '内容已提交', 'pl.s.live': '已发布', 'pl.s.paid': '已结算', 'pl.s.declined': '已拒绝', 'pl.th.creator': '达人', 'pl.th.campaign': '投放', 'pl.th.status': '状态', 'pl.th.fee': '费用', 'pl.th.planned': '计划', 'pl.th.contact': '联系方式', 'pl.th.updated': '更新时间', 'pl.empty': '没有符合筛选条件的合作记录。', 'pl.emptyAll': '还没有合作记录——在优化器里运行并保存一次投放，入选的达人就会出现在这里。', 'pl.showing': '显示 {n} / 共 {t} 条', 'pl.details': '详情', 'pl.fee': '谈定费用（美元）', 'pl.contact': '联系方式', 'pl.phContact': 'WhatsApp、邮箱或经纪公司', 'pl.link': '内容链接', 'pl.note': '备注', 'pl.save': '保存', 'pl.saved': '已保存', 'pl.moved': '已移到「{s}」', 'pl.dragHint': '把卡片拖到另一列即可更改阶段。', 'pl.open': '打开内容', 'stu.title': 'AI 工作室', 'sc.sub': '带货视频、AI 视频、拍摄脚本和日常运营文案。文字类每次消耗 1 次 AI 助手额度，AI 视频单独按月计算。', 'sc.tabGen': '拍摄脚本', 'sc.tabChk': '脚本检查', 'sc.product': '商品 *', 'sc.phProduct': '例如：维 C 亮肤精华 30ml', 'sc.points': '卖点', 'sc.phPoints': '每行一条：核心成分、适合人群、差异点、当前优惠…', 'sc.format': '形式', 'sc.video': '短视频', 'sc.live': '直播片段', 'sc.length': '时长', 'sc.spoken': '口播语言', 'sc.tone': '语气', 'sc.phTone': '例如：活泼、真实测评', 'sc.genBtn': '生成脚本', 'sc.draft': '待检查的脚本 *', 'sc.phDraft': '粘贴达人准备拍摄的脚本…', 'sc.chkBtn': '检查脚本', 'sc.disclaimer': '仅为内容建议，不构成法律意见。请以所在市场的平台广告规范为准。', 'sc.result': '结果', 'sc.resultScript': '脚本', 'sc.resultReview': '检查结果', 'sc.sendCheck': '检查这份脚本', 'sc.copy': '复制', 'sc.empty': '生成的视频、脚本或文案会显示在这里。', 'sc.busy': '撰写中…', 'sc.needProduct': '请填写商品名称。', 'sc.needDraft': '请粘贴至少几句话的脚本。', 'side.nav.dashboard': '优化器', 'side.nav.creators': '达人库', 'side.nav.campaigns': '投放记录', 'side.nav.guide': '商家学院', 'side.nav.billing': '套餐与计费',
                 'g.heroH': '从开店到爆单——官方打法一站看全',
                 'g.heroP': '开店流程、选品思路、五国市场洞察、大促打法与真实商家案例，全部提炼自平台面向东南亚商家的官方内容。AI 投放助手也学习了整套知识库，点击右下角的助手图标即可直接提问。',
                 'side.tag': 'tiko · AI 驱动的 KOL 投放优化',
@@ -3416,7 +3572,7 @@
                 'auth.no': '还没有账户？', 'auth.have': '已有账户？', 'auth.createOne': '立即创建', 'auth.toSignin': '去登录',
                 'auth.phEmail': 'you@company.com', 'auth.phPass': '密码（至少 8 位）',
                 'auth.errEmpty': '请输入邮箱和密码。', 'auth.errNet': '无法连接服务器。',
-                pageTitles: { dashboard: '优化看板', creators: '达人管理', campaigns: '投放归因', guide: '商家学院', billing: '套餐与计费', analytics: '数据分析', pipeline: '合作管理', scripts: 'AI 脚本', settings: '设置', start: '新手引导', templates: '模板', contracts: '合同', messages: '消息记录', activity: '操作日志' }
+                pageTitles: { dashboard: '优化看板', creators: '达人管理', campaigns: '投放归因', guide: '商家学院', billing: '套餐与计费', analytics: '数据分析', pipeline: '合作管理', scripts: 'AI 工作室', settings: '设置', start: '新手引导', templates: '模板', contracts: '合同', messages: '消息记录', activity: '操作日志', explore: '发现达人' }
             }
         };
         // ── Console dynamic-content dictionary ──
@@ -3575,7 +3731,7 @@
             'cr.dataSources': '数据源', 'cr.pulled': 'KOL 数据来自所有已连接的数据源', 'cr.manual': '手动导入', 'cr.activeBadge': '● 已启用',
             'cr.manualDesc': '逐个添加达人，或从 CSV / Excel 批量导入（支持 FastMoss 导出格式）。可随时导出你的达人名单。',
             'cr.add': '添加', 'cr.import': '导入 CSV / Excel', 'cr.backfill': '回填报价', 'cr.tplXlsx': 'Excel 模板', 'cr.export': '导出', 'cr.reset': '重置',
-            'cr.marketplace': 'Creator Marketplace', 'cr.shopApi': 'Shop API', 'cr.anaPlatforms': '分析平台', 'cr.comingSoon': '即将上线', 'cr.connectApi': '连接 API',
+            'cr.marketplace': '达人广场', 'cr.shopApi': '店铺 API', 'cr.anaPlatforms': '分析平台', 'cr.comingSoon': '即将上线', 'cr.connectApi': '连接 API',
             'cr.cmDesc': '直接从达人广场同步 KOL 档案、粉丝数、互动数据和受众画像。',
             'cr.shopDesc': '从你的店铺联盟投放拉取真实 GMV 与佣金数据，自动同步实际销售归因。',
             'cr.anaDesc': '对接 AsiaKOL、Cube Asia、Nox Influencer 等东南亚分析平台，丰富 KOL 档案。',
@@ -3587,7 +3743,7 @@
             'm.name': '达人名称 *', 'm.url': '主页链接', 'm.country': '国家 *', 'm.category': '品类 *', 'm.followers': '粉丝数 *',
             'm.eng': '互动率 *（0~1）', 'm.cost': '成本（USD）*', 'm.fit': '契合度（0~1）', 'm.views': '平均播放量', 'm.likes': '平均点赞数', 'm.gender': '女性占比（0~1）', 'm.age': '年龄段',
             'api.title': '连接集成', 'api.coming': '将于后续版本推出',
-            'api.t.tiktok_creator': 'Creator Marketplace API', 'api.t.tiktok_shop': '店铺合作伙伴 API', 'api.t.third_party': '第三方数据分析平台',
+            'api.t.tiktok_creator': '达人广场 API', 'api.t.tiktok_shop': '店铺合作伙伴 API', 'api.t.third_party': '第三方数据分析平台',
             'api.d.tiktok_creator': '连接你的开发者应用凭证，自动从 Creator Marketplace 同步达人资料、粉丝量、互动率与受众画像。',
             'api.d.tiktok_shop': '同步店铺联盟投放的真实 GMV 与佣金数据，自动用实际销售校验优化器的预测。',
             'api.d.third_party': '连接 AsiaKOL、Cube Asia、Nox Influencer 等东南亚数据平台，为达人档案补充跨平台数据。',
@@ -3671,11 +3827,17 @@
                 const v = d[el.dataset.i18nHtml];
                 if (v != null) el.innerHTML = v;
             });
+            document.querySelectorAll('[data-i18n-title]').forEach(el => {
+                const v = d[el.dataset.i18nTitle];
+                if (v != null) el.title = v;
+            });
             document.querySelectorAll('[data-i18n-ph]').forEach(el => {
                 const v = d[el.dataset.i18nPh];
                 if (v != null) el.placeholder = v;
             });
             document.documentElement.lang = LANG === 'zh' ? 'zh-CN' : 'en';
+            try { showNotice(); } catch (_) { /* config not loaded yet on the very first call */ }
+            try { fillCategorySelects(); } catch (_) { /* list not defined yet on the very first call */ }
             // page titles (used by showPage)
             Object.assign(PAGE_TITLES, d.pageTitles);
             const active = document.querySelector('.nav-item.active');
@@ -3683,7 +3845,7 @@
             if (active && pt && PAGE_TITLES[active.dataset.page]) pt.textContent = PAGE_TITLES[active.dataset.page];
             // pages rendered from data re-draw in the new language
             document.querySelectorAll('#st-lang button').forEach(b => b.classList.toggle('on', b.dataset.v === LANG));
-            if (active && typeof loadAnalytics === 'function' && AUTH_TOKEN) { const pg = active.dataset.page; if (pg === 'analytics') loadAnalytics(); if (pg === 'pipeline') loadPipeline(); if (pg === 'start') loadOnboarding(); if (pg === 'templates') loadTemplates(); if (pg === 'contracts') loadContracts(); if (pg === 'messages') loadMessages(); if (pg === 'activity') loadActivity(); }
+            if (active && typeof loadAnalytics === 'function' && AUTH_TOKEN) { const pg = active.dataset.page; if (pg === 'analytics') loadAnalytics(); if (pg === 'pipeline') loadPipeline(); if (pg === 'start') loadOnboarding(); if (pg === 'templates') loadTemplates(); if (pg === 'contracts') loadContracts(); if (pg === 'messages') loadMessages(); if (pg === 'activity') loadActivity(); if (pg === 'explore') loadExplore(EX_OFFSET); }
             // toggle buttons show the language you would switch TO
             const label = LANG === 'zh' ? 'EN' : '中文';
             const b1 = document.getElementById('lp-lang-btn'); if (b1) b1.textContent = label;
@@ -3823,8 +3985,8 @@
             '3 team seats': '3 个团队席位',
             'Unlimited optimization runs': '不限优化次数',
             'Unlimited AI Copilot': '不限 AI 投放助手',
-            '10 team seats & multi-store support': '10 个席位 & 多店铺支持',
-            'API access': 'API 访问',
+            '1 AI video clip / month': '每月 1 条 AI 视频', '20 AI video clips / month': '每月 20 条 AI 视频', '60 AI video clips / month': '每月 60 条 AI 视频',
+            '10 team seats': '10 个团队席位',
             'Priority support': '优先支持',
         };
 
@@ -3867,36 +4029,18 @@
             const current = id === info.plan;
             const popular = id === 'pro';
             const upgrade = PLAN_ORDER.indexOf(id) > PLAN_ORDER.indexOf(info.plan);
-            const accent = PLAN_ACCENT[id];
-            const features = p.features.map(f =>
-                `<li class="flex items-start gap-xs text-[12.5px] text-on-surface-variant leading-relaxed">
-                    <span class="material-symbols-outlined text-[15px] flex-shrink-0 mt-0.5" style="color:var(--good)">check</span>${
-                        LANG === 'zh' && FEAT_ZH[f] ? FEAT_ZH[f] : f}</li>`).join('');
             const planName = T('plan.' + id);
+            const features = p.features.map(f => `<li><span class="material-symbols-outlined">check</span><span>${
+                LANG === 'zh' && FEAT_ZH[f] ? FEAT_ZH[f] : f}</span></li>`).join('');
             const btnLabel = T(upgrade ? 'b.upgradeTo' : (popular ? 'b.switchTo' : 'b.downgradeTo'), { n: planName });
             const btn = current
-                ? `<button class="w-full py-sm rounded-lg text-sm font-bold border cursor-default" style="border-color:var(--line);color:#8a8a83" disabled>${T('b.currentBtn')}</button>`
-                : popular
-                    ? `<button class="w-full py-sm rounded-lg text-sm font-bold primary-gradient text-white hover:scale-[0.98] transition-all" onclick="changePlan('${id}')">${btnLabel}</button>`
-                    : `<button class="w-full py-sm rounded-lg text-sm font-bold border transition-colors" style="border-color:var(--line);color:var(--ink)"
-                        onmouseover="this.style.borderColor='${accent}';this.style.color='${accent}'"
-                        onmouseout="this.style.borderColor='#26262B';this.style.color='#e5e2da'"
-                        onclick="changePlan('${id}')">${btnLabel}</button>`;
-            const border = current
-                ? 'box-shadow:0 0 0 1px rgba(var(--good-rgb),0.4), 0 18px 40px -24px rgba(0,0,0,.7)'
-                : popular
-                    ? 'border:1px solid rgba(var(--accent-rgb),0.4);box-shadow:0 0 44px -18px rgba(var(--accent-rgb),0.35), 0 18px 40px -24px rgba(0,0,0,.7)'
-                    : '';
-            return `<div class="glass-card bp-card space-y-md ${current || popular ? '' : 'hover:border-outline'}" style="${border}">
-                <span class="bp-accent" style="background:linear-gradient(90deg,${accent},transparent)"></span>
-                ${popular ? `<span class="text-[9px] font-extrabold tracking-widest" style="position:absolute;top:-10px;left:20px;padding:3px 10px;border-radius:99px;background:linear-gradient(90deg,var(--accent),var(--good));color:#052e2c;width:max-content">${T('b.mostPop')}</span>` : ''}
-                <div class="flex items-center justify-between">
-                    <p class="flex items-center gap-xs text-[11px] font-bold tracking-widest uppercase" style="color:${accent}">
-                        <span class="material-symbols-outlined text-[16px]">${PLAN_ICON[id]}</span>${planName}</p>
-                    ${current ? `<span class="text-[9px] font-bold px-2 py-0.5 rounded-full uppercase" style="background:rgba(var(--good-rgb),0.12);color:var(--good);border:1px solid rgba(var(--good-rgb),0.3)">${T('b.active')}</span>` : ''}
-                </div>
+                ? `<button class="bp-btn" disabled>${T('b.currentBtn')}</button>`
+                : `<button class="bp-btn ${upgrade ? 'solid' : ''}" onclick="changePlan('${id}')">${btnLabel}</button>`;
+            return `<div class="glass-card bp-card ${popular ? 'is-popular' : ''}">
+                <div class="bp-head"><span class="bp-name">${planName}</span>
+                    ${current ? `<span class="bp-tag quiet">${T('b.active')}</span>` : popular ? `<span class="bp-tag">${T('b.mostPop')}</span>` : ''}</div>
                 <p class="bp-price">$${p.price_usd}<small>${T('per.month')}</small></p>
-                <ul class="space-y-xs flex-1 pt-xs">${features}</ul>
+                <ul class="bp-feats">${features}</ul>
                 ${btn}
             </div>`;
         }
@@ -4234,7 +4378,22 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
         function esc(v) { return String(v == null ? '' : v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
         let APP_CONFIG = { email_enabled: false };
         let RESET_TOKEN = null;
-        fetch(`${API}/app-config`).then(r => r.ok ? r.json() : null).then(c => { if (c) APP_CONFIG = c; }).catch(() => {});
+        fetch(`${API}/app-config`).then(r => r.ok ? r.json() : null).then(c => { if (c) { APP_CONFIG = c; showNotice(); } }).catch(() => {});
+        // Operator's site-wide notice; dismissing it hides that notice only, a new one shows again.
+        function showNotice() {
+            const n = APP_CONFIG.announcement, bar = document.getElementById('notice-bar');
+            let seen = '';
+            try { seen = localStorage.getItem('tiko_notice_seen') || ''; } catch (_) {}
+            const text = n && ((LANG === 'zh' ? n.text_zh : n.text) || n.text || n.text_zh);
+            if (!bar || !text || seen === n.id) { if (bar) bar.style.display = 'none'; return; }
+            bar.className = n.level === 'warn' ? 'warn' : '';
+            document.getElementById('notice-text').textContent = text;
+            bar.style.display = 'flex';
+        }
+        function dismissNotice() {
+            try { localStorage.setItem('tiko_notice_seen', APP_CONFIG.announcement.id); } catch (_) {}
+            document.getElementById('notice-bar').style.display = 'none';
+        }
 
         function authNote(html, ok) {
             const e = document.getElementById('auth-error');
@@ -4392,7 +4551,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
 
         // ══════════ NAVIGATION ══════════
         function showPage(name) {
-            ['dashboard', 'creators', 'campaigns', 'guide', 'billing', 'analytics', 'pipeline', 'scripts', 'settings', 'start', 'templates', 'contracts', 'messages', 'activity'].forEach(p => document.getElementById('page-' + p).classList.toggle('hidden', p !== name));
+            ['dashboard', 'creators', 'campaigns', 'guide', 'billing', 'analytics', 'pipeline', 'scripts', 'settings', 'start', 'templates', 'contracts', 'messages', 'activity', 'explore'].forEach(p => document.getElementById('page-' + p).classList.toggle('hidden', p !== name));
             document.getElementById('page-title').textContent = PAGE_TITLES[name] || 'Dashboard';
             document.querySelectorAll('.nav-item').forEach(el => el.classList.toggle('active', el.dataset.page === name));
             // Reset scroll position so top of each page is always visible
@@ -4409,6 +4568,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
             if (name === 'contracts') loadContracts();
             if (name === 'messages') loadMessages();
             if (name === 'activity') loadActivity();
+            if (name === 'explore') loadExplore(0);
         }
         document.querySelectorAll('.nav-item').forEach(el => el.addEventListener('click', () => showPage(el.dataset.page)));
 
@@ -4478,7 +4638,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
                 d.top_creators.map(c => `<tr><td>${esc(c.name)}<span class="sub">${esc(c.country)}</span></td><td class="r">${c.campaigns}</td><td class="r">${fmt(c.spend)}</td><td class="r">${fmt(c.predicted_gmv)}</td><td class="r">${c.actual_gmv ? fmt(c.actual_gmv) : '—'}</td></tr>`).join('') + '</tbody></table>'
                 : `<div class="empty-note">${T('an.noRows')}</div>`;
             document.getElementById('an-cats').innerHTML = d.categories.length ? `<table class="tbl"><thead><tr><th>${T('an.th.category')}</th><th class="r">${T('an.th.campaigns')}</th><th class="r">${T('an.th.predicted')}</th><th class="r">${T('an.th.actual')}</th></tr></thead><tbody>` +
-                d.categories.map(c => `<tr><td>${esc(c.category)}</td><td class="r">${c.campaigns}</td><td class="r">${fmt(c.predicted_gmv)}</td><td class="r">${c.actual_gmv ? fmt(c.actual_gmv) : '—'}</td></tr>`).join('') + '</tbody></table>'
+                d.categories.map(c => `<tr><td>${esc(catName(c.category))}</td><td class="r">${c.campaigns}</td><td class="r">${fmt(c.predicted_gmv)}</td><td class="r">${c.actual_gmv ? fmt(c.actual_gmv) : '—'}</td></tr>`).join('') + '</tbody></table>'
                 : `<div class="empty-note">${T('an.noRows')}</div>`;
         }
         async function aiRun(btn, labelKey, busyKey, path, body) {
@@ -4534,7 +4694,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
                 document.getElementById('pl-list').innerHTML = !d.items.length ? empty :
                     `<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>${T('pl.th.creator')}</th><th>${T('pl.th.campaign')}</th><th>${T('pl.th.status')}</th><th class="r">${T('pl.th.planned')}</th><th class="r">${T('pl.th.fee')}</th><th>${T('pl.th.contact')}</th><th>${T('pl.th.updated')}</th><th></th></tr></thead><tbody>` +
                     d.items.map((r, i) => `<tr>
-                        <td>${esc(r.name)}<span class="sub">${esc(r.country)}${r.tier ? ' · ' + esc(r.tier) : ''} · ${fmtF(r.followers)}</span></td>
+                        <td>${esc(r.name)}<span class="sub">${esc(r.country)}${r.tier ? ' · ' + esc(tierName(r.tier)) : ''} · ${fmtF(r.followers)}</span></td>
                         <td>${esc(r.campaign_name)}${r.assignee ? `<span class="sub">${esc(r.assignee)}</span>` : ''}</td>
                         <td><select class="st-select" style="color:${PL_COLOR[r.status]}" onchange="movePipeline(${i}, this.value)">${PL_STAGES.map(s => `<option value="${s}" ${s === r.status ? 'selected' : ''}>${T('pl.s.' + s)}</option>`).join('')}</select></td>
                         <td class="r">${fmt(r.planned_cost)}</td>
@@ -4597,18 +4757,371 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
         function exportPipeline() { downloadFile('/pipeline/export.csv' + pipelineQuery(), 'tiko-collaborations.csv'); }
 
         // ── AI scripts ──
+        // ── AI Studio (backend/studio.py) ──
+        let SC_CURRENT = null;          // { type, title, body, id? } — what the result panel shows
         function setScriptTab(t) {
-            document.getElementById('sc-t-gen').classList.toggle('on', t === 'gen');
-            document.getElementById('sc-t-chk').classList.toggle('on', t === 'chk');
-            document.getElementById('sc-gen').style.display = t === 'gen' ? '' : 'none';
-            document.getElementById('sc-chk').style.display = t === 'chk' ? '' : 'none';
+            ['video', 'aivid', 'gen', 'ops', 'chk', 'saved'].forEach(k => {
+                document.getElementById('sc-t-' + k).classList.toggle('on', k === t);
+                document.getElementById({ video: 'sc-video', aivid: 'sc-aivid', gen: 'sc-gen', ops: 'sc-ops', chk: 'sc-chk', saved: 'sc-saved' }[k]).style.display = k === t ? '' : 'none';
+            });
+            if (t === 'saved') loadSaved();
+            const ai = t === 'aivid';
+            document.getElementById('av-out').style.display = ai ? '' : 'none';
+            if (ai) {
+                stopVideo();
+                ['sc-out', 'sv-out', 'sc-empty', 'sc-copy', 'sc-save', 'sc-del', 'sc-to-check'].forEach(id => document.getElementById(id).style.display = 'none');
+                document.getElementById('sc-out-title').textContent = T('av.result');
+                loadAiVideos();
+            } else {
+                clearTimeout(AV.timer);
+                if (SC_CURRENT) studioShow(SC_CURRENT);
+                else { document.getElementById('sc-empty').style.display = ''; document.getElementById('sc-out-title').textContent = T('sc.result'); }
+            }
+        }
+        function studioShow(cur) {
+            SC_CURRENT = cur;
+            stopVideo();
+            const video = cur.type === 'storyboard';
+            document.getElementById('sc-empty').style.display = 'none';
+            document.getElementById('sc-out').style.display = video ? 'none' : '';
+            document.getElementById('sv-out').style.display = video ? '' : 'none';
+            document.getElementById('sc-copy').style.display = '';
+            document.getElementById('sc-save').style.display = cur.id ? 'none' : '';
+            document.getElementById('sc-del').style.display = cur.id ? '' : 'none';
+            document.getElementById('sc-to-check').style.display = cur.type === 'script' ? '' : 'none';
+            document.getElementById('sc-out-title').textContent = T({ storyboard: 'sv.result', ops: 'op.result', script: 'sc.resultScript', review: 'sc.resultReview' }[cur.type]);
+            if (video) renderStoryboard(); else document.getElementById('sc-out').textContent = cur.body;
         }
         function showScriptOut(text, isScript) {
-            document.getElementById('sc-out').textContent = text;
-            document.getElementById('sc-empty').style.display = 'none';
-            document.getElementById('sc-copy').style.display = '';
-            document.getElementById('sc-to-check').style.display = isScript ? '' : 'none';
-            document.getElementById('sc-out-title').textContent = T(isScript ? 'sc.resultScript' : 'sc.resultReview');
+            const product = document.getElementById(isScript ? 'sc-product' : 'sc-chk-product').value.trim();
+            studioShow({ type: isScript ? 'script' : 'review', title: product || T(isScript ? 'sc.resultScript' : 'sc.resultReview'), body: text });
+        }
+        function studioText() {
+            if (!SC_CURRENT) return '';
+            if (SC_CURRENT.type !== 'storyboard') return SC_CURRENT.body;
+            const b = VID.board;
+            return [b.title, ''].concat(b.scenes.map((sc, i) => `${i + 1}. [${sc.seconds}s] ${sc.caption}\n   ${T('sv.voice')}: ${sc.voiceover}\n   ${T('sv.show')}: ${sc.visual}`))
+                .concat(['', `${T('sv.cta')}: ${b.cta}`, `${T('sv.tags')}: ${b.hashtags.map(h => '#' + h).join(' ')}`, `${T('sv.music')}: ${b.music}`]).join('\n');
+        }
+        async function saveStudio() {
+            const c = SC_CURRENT; if (!c) return;
+            const body = c.type === 'storyboard' ? JSON.stringify(VID.board) : c.body;
+            const d = await postJson('/studio/saved', { type: c.type, title: (c.title || '').slice(0, 120) || 'Untitled', body });
+            if (!d) return;
+            toast(T('sc.savedOk'));
+            c.id = d.id;
+            document.getElementById('sc-save').style.display = 'none';
+            document.getElementById('sc-del').style.display = '';
+        }
+        let SC_SAVED = [];
+        async function loadSaved() {
+            const d = await apiJson('/studio/saved');
+            if (!d) return;
+            SC_SAVED = d.items;
+            document.getElementById('sc-saved').innerHTML = d.items.length
+                ? d.items.map((it, i) => `<div class="tp-item ${SC_CURRENT && SC_CURRENT.id === it.id ? 'on' : ''}" onclick="openSaved(${i})" title="${esc(it.title)}"><span style="color:var(--mut);font-weight:500">${T('sc.t.' + it.type)} · </span>${esc(it.title)}<span style="display:block;font-size:11.5px;font-weight:400;color:var(--mut)">${esc(fmtWhen(it.created_at))}</span></div>`).join('')
+                : `<div class="empty-note" style="padding:26px 12px">${T('sc.savedEmpty')}</div>`;
+        }
+        function openSaved(i) {
+            const it = SC_SAVED[i]; if (!it) return;
+            if (it.type === 'storyboard') {
+                try { VID.board = JSON.parse(it.body); } catch (_) { toast(T('acct.fail'), 'err'); return; }
+            }
+            studioShow({ type: it.type, title: it.title, body: it.body, id: it.id });
+            loadSaved();
+        }
+        async function deleteSaved() {
+            const c = SC_CURRENT; if (!c || !c.id || !confirm(T('tp.deleteConfirm'))) return;
+            if (!await apiJson(`/studio/saved/${c.id}`, { method: 'DELETE' })) return;
+            toast(T('tp.deleted'));
+            delete c.id;
+            document.getElementById('sc-save').style.display = '';
+            document.getElementById('sc-del').style.display = 'none';
+            loadSaved();
+        }
+        async function genOps() {
+            const product = document.getElementById('op-product').value.trim();
+            if (product.length < 2) { toast(T('sc.needProduct'), 'err'); return; }
+            const kind = document.getElementById('op-kind');
+            const d = await aiRun(document.getElementById('op-btn'), 'op.btn', 'sc.busy', '/studio/ops', {
+                kind: kind.value, product, selling_points: document.getElementById('op-points').value,
+                audience: document.getElementById('op-audience').value, out_lang: document.getElementById('op-lang').value });
+            if (d) studioShow({ type: 'ops', title: `${kind.options[kind.selectedIndex].textContent} · ${product}`, body: d.text });
+        }
+
+
+        // ── AI video clips from a hosted model (backend/aivideo.py) ──
+        const AV = { cfg: null, image: null, timer: 0, urls: {} };
+        // Shrink the photo so it fits the provider's inline-image limit (~256 KB).
+        function loadAvImage(input) {
+            AV.image = null;
+            const prev = document.getElementById('av-preview');
+            const file = input.files && input.files[0];
+            if (!file) { prev.style.display = 'none'; return; }
+            const img = new Image();
+            img.onload = () => {
+                let side = 1024, q = 0.86, url = '';
+                for (let n = 0; n < 8; n++) {
+                    const r = Math.min(1, side / Math.max(img.width, img.height));
+                    const c = document.createElement('canvas');
+                    c.width = Math.round(img.width * r); c.height = Math.round(img.height * r);
+                    c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+                    url = c.toDataURL('image/jpeg', q);
+                    if (url.length <= 330000) break;
+                    side = Math.round(side * 0.82); q = Math.max(0.6, q - 0.06);
+                }
+                URL.revokeObjectURL(img.src);
+                AV.image = url;
+                prev.src = url; prev.style.display = '';
+            };
+            img.src = URL.createObjectURL(file);
+        }
+        // Failure reasons are stored in English by the server; show them in the interface language.
+        const AV_ERR_ZH = {
+            'The video service did not accept the job.': '视频服务没有接受这个任务。',
+            'The video service did not respond in time.': '视频服务没有及时响应。',
+            'The video took too long to generate.': '视频生成超时。',
+            'The video service returned no video.': '视频服务没有返回视频。',
+            'The finished video could not be downloaded.': '视频已生成，但下载失败。',
+            'The video service could not generate this clip. Try a different description or image.': '视频服务无法生成这条视频，请换一种描述或图片再试。',
+            'The video service rejected the request.': '视频服务拒绝了这个请求。',
+            'The video service could not be reached.': '无法连接视频服务。',
+        };
+        const avError = e => (LANG === 'zh' && AV_ERR_ZH[e]) || e;
+        async function loadAiVideos() {
+            clearTimeout(AV.timer);
+            const [cfg, list] = await Promise.all([apiJson('/studio/videos/config'), apiJson('/studio/videos')]);
+            if (!cfg || !list) return;
+            AV.cfg = cfg;
+            document.getElementById('av-off').style.display = cfg.enabled ? 'none' : '';
+            document.getElementById('av-form').style.display = cfg.enabled ? '' : 'none';
+            document.getElementById('av-quota').textContent = cfg.limit == null ? '' : T('av.quota', { u: cfg.used, l: cfg.limit });
+            renderAiVideos(list.items);
+            if (list.items.some(j => !j.ready && j.status !== 'failed')) AV.timer = setTimeout(pollAiVideos, 6000);
+        }
+        async function pollAiVideos() {
+            if (!document.getElementById('sc-t-aivid').classList.contains('on') || document.getElementById('page-scripts').classList.contains('hidden')) return;
+            const list = await apiJson('/studio/videos');
+            if (!list) return;
+            const running = list.items.filter(j => !j.ready && j.status !== 'failed');
+            // asking for a running job is what makes the server check on it with the provider
+            await Promise.all(running.map(j => apiJson('/studio/videos/' + j.id)));
+            loadAiVideos();
+        }
+        async function aiVideoUrl(id) {
+            if (AV.urls[id]) return AV.urls[id];
+            const r = await fetch(`${API}/studio/videos/${id}/file`);
+            if (!r.ok) return null;
+            AV.urls[id] = URL.createObjectURL(await r.blob());
+            return AV.urls[id];
+        }
+        function renderAiVideos(items) {
+            const box = document.getElementById('av-out');
+            if (!items.length) { box.innerHTML = `<div class="empty-note">${T('av.empty')}</div>`; return; }
+            const label = j => j.ready ? T('av.s.ready') : j.status === 'failed' ? T('av.s.failed') : T('av.s.running');
+            box.innerHTML = items.map(j => `<div class="av-job">
+                <div class="av-media ${j.aspect === '1:1' ? 'a11' : j.aspect === '16:9' ? 'a169' : ''}" id="av-m-${j.id}">${
+                    j.ready ? '' : j.status === 'failed' ? '<span class="material-symbols-outlined">error</span>' : '<span class="material-symbols-outlined av-spin">progress_activity</span>'}</div>
+                <div><p>${esc(j.prompt)}</p>
+                    <small>${label(j)} · ${j.duration}s · ${esc(j.aspect)}${j.has_image ? ' · ' + T('av.withImage') : ''} · ${esc(fmtWhen(j.created_at))}${j.status === 'failed' && j.error ? '<br>' + esc(avError(j.error)) : ''}</small>
+                    <div class="pg-actions">${j.ready ? `<button class="btn btn-quiet" onclick="downloadFile('/studio/videos/${j.id}/file','tiko-ai-video-${j.id}.mp4')"><span class="material-symbols-outlined">download</span>${T('av.download')}</button>` : ''}
+                        <button class="btn btn-quiet" style="color:#ef4444" onclick="deleteAiVideo(${j.id})"><span class="material-symbols-outlined">delete</span>${T('tp.delete')}</button></div></div>
+            </div>`).join('');
+            items.filter(j => j.ready).forEach(async j => {
+                const url = await aiVideoUrl(j.id), slot = document.getElementById('av-m-' + j.id);
+                if (url && slot) slot.innerHTML = `<video src="${url}" controls playsinline loop muted></video>`;
+            });
+        }
+        async function startAiVideo() {
+            const prompt = document.getElementById('av-prompt').value.trim();
+            if (prompt.length < 4) { toast(T('av.needPrompt'), 'err'); return; }
+            const btn = document.getElementById('av-btn'); btn.disabled = true;
+            const d = await postJson('/studio/videos', { prompt, image: AV.image || null,
+                duration: Number(document.getElementById('av-duration').value), aspect: document.getElementById('av-aspect').value });
+            btn.disabled = false;
+            if (!d) return;
+            toast(T('av.started'));
+            loadAiVideos();
+        }
+        async function deleteAiVideo(id) {
+            if (!confirm(T('av.deleteConfirm'))) return;
+            if (!await apiJson(`/studio/videos/${id}`, { method: 'DELETE' })) return;
+            if (AV.urls[id]) { URL.revokeObjectURL(AV.urls[id]); delete AV.urls[id]; }
+            loadAiVideos();
+        }
+        // From a storyboard scene: describe the shot, and reuse that scene's photo if there is one.
+        function sceneToAi(i) {
+            const sc = VID.board && VID.board.scenes[i]; if (!sc) return;
+            const product = document.getElementById('sv-product').value.trim();
+            document.getElementById('av-prompt').value = [sc.visual, product && T('av.productIs', { p: product }), T('av.style')].filter(Boolean).join(' ');
+            document.getElementById('av-duration').value = sc.seconds > 6 ? '10' : '5';
+            document.getElementById('av-aspect').value = '9:16';
+            const photo = VID.photos.length ? VID.photos[i % VID.photos.length] : null;
+            AV.image = null; document.getElementById('av-preview').style.display = 'none'; document.getElementById('av-image').value = '';
+            if (photo) {
+                const r = Math.min(1, 900 / Math.max(photo.width, photo.height)), c = document.createElement('canvas');
+                c.width = Math.round(photo.width * r); c.height = Math.round(photo.height * r);
+                c.getContext('2d').drawImage(photo, 0, 0, c.width, c.height);
+                let q = 0.84, url = c.toDataURL('image/jpeg', q);
+                while (url.length > 330000 && q > 0.5) { q -= 0.08; url = c.toDataURL('image/jpeg', q); }
+                AV.image = url;
+                const prev = document.getElementById('av-preview'); prev.src = url; prev.style.display = '';
+            }
+            setScriptTab('aivid');
+            document.getElementById('av-prompt').focus();
+        }
+
+        // ── Sales video: storyboard from the server, rendered here on a canvas ──
+        const VID = { W: 720, H: 1280, board: null, photos: [], raf: 0, playing: false };
+        const VID_BG = [['#0B3B3A', '#06090B'], ['#3A1024', '#0A0608'], ['#1B1F4A', '#07080F'], ['#3D2A0B', '#0A0806']];
+        function loadVideoPhotos(input) {
+            VID.photos.forEach(p => URL.revokeObjectURL(p.src));
+            VID.photos = [];
+            const files = [...input.files].filter(f => f.type.startsWith('image/')).slice(0, 8);
+            let pending = files.length;
+            const done = () => {
+                document.getElementById('sv-photos-note').textContent = VID.photos.length ? T('sv.photosN', { n: VID.photos.length }) : T('sv.photosNote');
+                if (VID.board) drawVideoFrame(0);
+            };
+            if (!pending) return done();
+            files.forEach((f, i) => {
+                const img = new Image();
+                img.onload = () => { VID.photos[i] = img; if (--pending === 0) { VID.photos = VID.photos.filter(Boolean); done(); } };
+                img.onerror = () => { if (--pending === 0) { VID.photos = VID.photos.filter(Boolean); done(); } };
+                img.src = URL.createObjectURL(f);
+            });
+        }
+        async function genStoryboard() {
+            const product = document.getElementById('sv-product').value.trim();
+            if (product.length < 2) { toast(T('sc.needProduct'), 'err'); return; }
+            const d = await aiRun(document.getElementById('sv-gen-btn'), 'sv.genBtn', 'sv.busy', '/studio/storyboard', {
+                product, selling_points: document.getElementById('sv-points').value, offer: document.getElementById('sv-offer').value,
+                duration_sec: Number(document.getElementById('sv-length').value), script_lang: document.getElementById('sv-lang').value });
+            if (!d) return;
+            VID.board = d;
+            studioShow({ type: 'storyboard', title: d.title || product, body: '' });
+            playVideo();
+        }
+        function renderStoryboard() {
+            const b = VID.board; if (!b) return;
+            let t = 0;
+            document.getElementById('sv-scenes').innerHTML = b.scenes.map((sc, i) => {
+                const at = t; t += sc.seconds;
+                return `<div class="sv-scene"><time>${at.toFixed(1)}s</time><div>
+                    <input class="form-input" maxlength="90" value="${esc(sc.caption)}" oninput="VID.board.scenes[${i}].caption=this.value;if(!VID.playing)drawVideoFrame(${at + 0.6})" />
+                    <small><b>${T('sv.voice')}:</b> ${esc(sc.voiceover)}<br><b>${T('sv.show')}:</b> ${esc(sc.visual)}</small>
+                    <button class="btn btn-quiet" style="margin-top:6px;padding:4px 10px;font-size:12px" onclick="sceneToAi(${i})"><span class="material-symbols-outlined" style="font-size:15px">auto_videocam</span>${T('av.fromScene')}</button></div></div>`;
+            }).join('');
+            document.getElementById('sv-meta').innerHTML =
+                `<b>${T('sv.cta')}:</b> ${esc(b.cta)}<br><b>${T('sv.tags')}:</b> ${b.hashtags.map(h => '#' + esc(h)).join(' ')}<br><b>${T('sv.music')}:</b> ${esc(b.music)}`;
+            document.getElementById('sv-status').textContent = T('sv.hint', { d: Math.round(videoLength()), n: b.scenes.length });
+            drawVideoFrame(0.6);
+        }
+        const videoLength = () => VID.board.scenes.reduce((a, sc) => a + Number(sc.seconds || 0), 0);
+        function wrapCaption(ctx, text, maxW) {
+            // Latin text wraps on spaces; CJK has none, so it may break between any two characters.
+            const tokens = String(text).match(/[　-鿿＀-￯]|[^\s　-鿿＀-￯]+|\s+/g) || [];
+            const lines = []; let line = '';
+            tokens.forEach(tok => {
+                if (/^\s+$/.test(tok)) { if (line) line += ' '; return; }
+                if (ctx.measureText(line + tok).width > maxW && line.trim()) { lines.push(line.trim()); line = tok; }
+                else line += tok;
+            });
+            if (line.trim()) lines.push(line.trim());
+            return lines.slice(0, 4);
+        }
+        function drawVideoScene(ctx, i, local, alpha) {
+            const { W, H, board, photos } = VID, sc = board.scenes[i], dur = Number(sc.seconds) || 3;
+            ctx.save(); ctx.globalAlpha = alpha;
+            const img = photos.length ? photos[i % photos.length] : null;
+            if (img) {                                    // cover-fit with a slow push-in
+                const zoom = 1 + 0.08 * Math.min(1, local / dur), r = Math.max(W / img.width, H / img.height) * zoom;
+                ctx.drawImage(img, (W - img.width * r) / 2, (H - img.height * r) / 2, img.width * r, img.height * r);
+            } else {
+                const [c1, c2] = VID_BG[i % VID_BG.length], g = ctx.createLinearGradient(0, 0, W, H);
+                g.addColorStop(0, c1); g.addColorStop(1, c2);
+                ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+                ctx.fillStyle = 'rgba(255,255,255,.05)';
+                ctx.font = '800 300px Manrope, sans-serif'; ctx.textAlign = 'right'; ctx.textBaseline = 'alphabetic';
+                ctx.fillText(String(i + 1).padStart(2, '0'), W - 40, 420);
+            }
+            const shade = ctx.createLinearGradient(0, H * 0.42, 0, H);
+            shade.addColorStop(0, 'rgba(0,0,0,0)'); shade.addColorStop(1, 'rgba(0,0,0,.82)');
+            ctx.fillStyle = shade; ctx.fillRect(0, H * 0.42, W, H * 0.58);
+            // caption slides up as the scene starts
+            const k = Math.min(1, local / 0.4), ease = 1 - Math.pow(1 - k, 3);
+            ctx.globalAlpha = alpha * ease;
+            ctx.font = '800 66px Manrope, "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif';
+            ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+            const lines = wrapCaption(ctx, sc.caption, W - 120), lh = 84, last = i === board.scenes.length - 1;
+            let y = H - 250 - (lines.length - 1) * lh + (1 - ease) * 40;
+            ctx.shadowColor = 'rgba(0,0,0,.55)'; ctx.shadowBlur = 18; ctx.fillStyle = '#fff';
+            lines.forEach(l => { ctx.fillText(l, 60, y); y += lh; });
+            ctx.shadowBlur = 0;
+            if (last && board.cta) {                      // call-to-action pill on the closing scene
+                ctx.font = '700 34px Manrope, "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif';
+                const cta = wrapCaption(ctx, board.cta, W - 200)[0] || '', w = ctx.measureText(cta).width + 64;
+                ctx.fillStyle = '#25F4EE'; ctx.beginPath(); ctx.roundRect ? ctx.roundRect(60, y - 30, w, 72, 36) : ctx.rect(60, y - 30, w, 72); ctx.fill();
+                ctx.fillStyle = '#06090B'; ctx.fillText(cta, 92, y + 18);
+            }
+            ctx.restore();
+        }
+        function drawVideoFrame(t) {
+            const cv = document.getElementById('sv-canvas'), ctx = cv.getContext('2d'), b = VID.board;
+            if (!b) return;
+            let i = 0, start = 0;
+            while (i < b.scenes.length - 1 && t >= start + Number(b.scenes[i].seconds)) { start += Number(b.scenes[i].seconds); i++; }
+            const local = Math.max(0, t - start);
+            ctx.fillStyle = '#000'; ctx.fillRect(0, 0, VID.W, VID.H);
+            if (i > 0 && local < 0.3) drawVideoScene(ctx, i - 1, Number(b.scenes[i - 1].seconds), 1);     // cross-fade
+            drawVideoScene(ctx, i, local, i > 0 && local < 0.3 ? local / 0.3 : 1);
+            // story-style progress segments
+            const gap = 8, segW = (VID.W - 80 - gap * (b.scenes.length - 1)) / b.scenes.length;
+            b.scenes.forEach((sc, n) => {
+                const x = 40 + n * (segW + gap), f = n < i ? 1 : n > i ? 0 : Math.min(1, local / Number(sc.seconds));
+                ctx.fillStyle = 'rgba(255,255,255,.3)'; ctx.fillRect(x, 44, segW, 6);
+                ctx.fillStyle = '#fff'; ctx.fillRect(x, 44, segW * f, 6);
+            });
+        }
+        function stopVideo() { cancelAnimationFrame(VID.raf); VID.playing = false; }
+        // Plays the storyboard in real time; resolves when it reaches the end.
+        function playVideo(onProgress) {
+            stopVideo();
+            if (!VID.board) return Promise.resolve();
+            const total = videoLength(), t0 = performance.now();
+            VID.playing = true;
+            return new Promise(resolve => {
+                const step = now => {
+                    const t = (now - t0) / 1000;
+                    drawVideoFrame(Math.min(t, total - 0.001));
+                    if (onProgress) onProgress(Math.min(1, t / total));
+                    if (t >= total || !VID.playing) { VID.playing = false; resolve(); return; }
+                    VID.raf = requestAnimationFrame(step);
+                };
+                VID.raf = requestAnimationFrame(step);
+            });
+        }
+        async function exportVideo() {
+            const cv = document.getElementById('sv-canvas'), status = document.getElementById('sv-status');
+            const mime = ['video/mp4;codecs=avc1', 'video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm'].find(m => window.MediaRecorder && MediaRecorder.isTypeSupported(m));
+            if (!mime || !cv.captureStream) { toast(T('sv.noRecorder'), 'err'); return; }
+            const btn = document.getElementById('sv-export'); btn.disabled = true;
+            try { await document.fonts.load('800 66px Manrope'); } catch (_) {}
+            const rec = new MediaRecorder(cv.captureStream(30), { mimeType: mime, videoBitsPerSecond: 5_000_000 });
+            const chunks = [];
+            rec.ondataavailable = e => { if (e.data.size) chunks.push(e.data); };
+            const stopped = new Promise(r => { rec.onstop = r; });
+            rec.start();
+            await playVideo(p => { status.textContent = T('sv.recording', { p: Math.round(p * 100) }); });
+            rec.stop(); await stopped;
+            btn.disabled = false;
+            const url = URL.createObjectURL(new Blob(chunks, { type: mime.split(';')[0] }));
+            const a = document.createElement('a');
+            a.href = url; a.download = `tiko-video-${new Date().toISOString().slice(0, 10)}.${mime.startsWith('video/mp4') ? 'mp4' : 'webm'}`;
+            document.body.appendChild(a); a.click(); a.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 8000);
+            status.textContent = T('sv.hint', { d: Math.round(videoLength()), n: VID.board.scenes.length });
+            toast(T('sv.done'));
         }
         async function genScript() {
             const product = document.getElementById('sc-product').value.trim();
@@ -4826,12 +5339,123 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
         }
 
         // ── Activity ──
+        // The server writes details in English ("shortlisted -> invited", "2 creators");
+        // put them in the interface language.
+        function actDetail(text) {
+            if (LANG !== 'zh') return text;
+            const stage = w => (I18N.zh['pl.s.' + w] || I18N.zh['ct.s.' + w] || I18N.zh['ml.ch.' + w] || w);
+            return String(text)
+                .replace(/\b([a-z]+) -> ([a-z]+)\b/g, (_, a, b) => `${stage(a)} → ${stage(b)}`)
+                .replace(/^(whatsapp|email|copy)\b/, (_, c) => stage(c))
+                .replace(/(\d+) creators?/, '$1 位达人')
+                .replace(/actual GMV ([\d,]+)/, '实际 GMV $1')
+                .replace(/^unassigned$/, '未指派');
+        }
         async function loadActivity() {
             const d = await apiJson('/activity');
             if (!d) return;
             document.getElementById('ac-list').innerHTML = !d.entries.length ? `<div class="empty-note">${T('ac.empty')}</div>` :
                 d.entries.map(e => `<div class="act-row"><time>${esc(fmtWhen(e.created_at))}</time>
-                    <div><span>${esc(e.actor || '—')}</span> ${T('act.' + e.action)} <b>${esc(e.target)}</b>${e.detail ? ` <span>· ${esc(e.detail)}</span>` : ''}</div></div>`).join('');
+                    <div><span>${esc(e.actor || '—')}</span> ${T('act.' + e.action)} <b>${esc(e.target)}</b>${e.detail ? ` <span>· ${esc(actDetail(e.detail))}</span>` : ''}</div></div>`).join('');
+        }
+
+
+        // ══════════ PRODUCT CATEGORIES — mirrors backend/categories.py ══════════
+        const CATEGORY_GROUPS = [
+            ['beauty', ['beauty', 'personal_care']],
+            ['fashion', ['fashion', 'womenswear', 'menswear', 'kids_fashion', 'muslim_fashion', 'accessories', 'shoes', 'bags', 'jewelry']],
+            ['electronics', ['electronics', 'computers', 'appliances']],
+            ['home', ['home', 'furniture', 'textiles', 'kitchen', 'tools']],
+            ['family', ['mother_baby', 'toys', 'stationery']],
+            ['food_health', ['food', 'fmcg', 'health']],
+            ['leisure', ['sports_outdoor', 'pet', 'automotive']],
+        ];
+        // "💄 Beauty" for pickers; catName() drops the emoji for running text and tables.
+        const catLabel = id => (I18N[LANG] && I18N[LANG]['cat.' + id]) || String(id || '').replace(/_/g, ' ');
+        const catName = id => catLabel(id).replace(/^[^\p{L}\p{N}]+/u, '');
+        const tierName = t => t ? ((I18N[LANG] && I18N[LANG]['tier.' + t]) || t) : '';
+        const ALGO_ZH = { 'Simulated Annealing': '模拟退火', 'Hill Climber': '爬山算法', 'Random Search': '随机搜索', 'Genetic Algorithm': '遗传算法', 'Tabu Search': '禁忌搜索', 'Greedy Ranking': '贪心排序' };
+        const algoName = a => (LANG === 'zh' && ALGO_ZH[a]) || a || '';
+        function fillCategorySelects() {
+            const groups = CATEGORY_GROUPS.map(([g, ids]) => `<optgroup label="${T('catg.' + g)}">` +
+                ids.map(id => `<option value="${id}">${catLabel(id)}</option>`).join('') + '</optgroup>').join('');
+            [['category-select', 'beauty', ''], ['f-m-cat', 'beauty', ''], ['exadd-cat', 'beauty', ''], ['f-category', '', `<option value="">${T('cr.allCats')}</option>`]].forEach(([id, dflt, head]) => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                const keep = el.options.length ? el.value : dflt;
+                el.innerHTML = head + groups;
+                el.value = keep;
+                if (el.value !== keep) el.value = dflt;
+            });
+        }
+
+        fillCategorySelects();
+
+
+        // ══════════ EXPLORE — shared creator pool + browser extension (backend/pool.py) ══════════
+        const EX_PAGE = 24;
+        let EX_OFFSET = 0, EX_ITEMS = [], EX_ADD = null;
+        async function loadExplore(offset) {
+            EX_OFFSET = Math.max(0, offset || 0);
+            const p = new URLSearchParams({ limit: EX_PAGE, offset: EX_OFFSET, sort: document.getElementById('ex-sort').value });
+            const q = document.getElementById('ex-q').value.trim(), c = document.getElementById('ex-country').value;
+            const [lo, hi] = document.getElementById('ex-size').value.split('-');
+            if (q) p.set('q', q); if (c) p.set('country', c);
+            if (lo) p.set('min_followers', lo); if (hi) p.set('max_followers', hi);
+            const d = await apiJson('/pool/search?' + p);
+            if (!d) return;
+            EX_ITEMS = d.items;
+            document.getElementById('ex-pool-size').textContent = T('ex.poolSize', { n: d.pool_size.toLocaleString('en-US') });
+            const flag = { MY: '🇲🇾', ID: '🇮🇩', TH: '🇹🇭', PH: '🇵🇭', SG: '🇸🇬', VN: '🇻🇳' };
+            document.getElementById('ex-results').innerHTML = d.items.map((r, i) => `<div class="glass-card ex-card">
+                <div><h4 title="${esc(r.name)}">${esc(r.name)}${r.verified ? ' <span class="material-symbols-outlined" style="font-size:15px;color:var(--accent);vertical-align:-2px">verified</span>' : ''}</h4>
+                    <a class="h" href="${esc(r.profile_url)}" target="_blank" rel="noopener noreferrer">@${esc(r.handle)} ↗</a></div>
+                <p>${esc(r.bio) || '—'}</p>
+                <div class="ex-stats"><div><b>${fmtF(r.followers)}</b><span>${T('ex.followers')}</span></div><div><b>${r.likes == null ? '—' : fmtF(r.likes)}</b><span>${T('ex.likes')}</span></div><div><b>${r.videos == null ? '—' : fmtF(r.videos)}</b><span>${T('ex.videos')}</span></div></div>
+                <div class="ex-foot"><span>${r.country ? (flag[r.country] || '') + ' ' + esc(r.country) : T('ex.unknownCountry')} · ${T('ex.seen', { d: esc((r.last_seen || '').slice(0, 10)) })}</span>
+                    ${r.in_library ? `<span style="color:var(--good);font-weight:600">✓ ${T('ex.inLibrary')}</span>` : `<button class="btn btn-quiet" onclick="openExploreAdd(${i})">${T('ex.add')}</button>`}</div>
+            </div>`).join('');
+            const empty = !d.items.length;
+            document.getElementById('ex-empty').style.display = empty ? '' : 'none';
+            document.getElementById('ex-empty-title').textContent = T(d.pool_size ? 'ex.emptyTitle' : 'ex.emptyPoolTitle');
+            document.getElementById('ex-empty-body').textContent = T('ex.emptyBody');
+            const pager = document.getElementById('ex-pager');
+            pager.style.display = d.total > EX_PAGE ? 'flex' : 'none';
+            document.getElementById('ex-range').textContent = T('ex.range', { a: EX_OFFSET + 1, b: EX_OFFSET + d.items.length, t: d.total });
+            document.getElementById('ex-prev').disabled = EX_OFFSET <= 0;
+            document.getElementById('ex-next').disabled = EX_OFFSET + EX_PAGE >= d.total;
+        }
+        function openExploreAdd(i) {
+            const r = EX_ITEMS[i]; if (!r) return;
+            EX_ADD = r;
+            document.getElementById('exadd-title').textContent = T('ex.addTitle', { n: r.name });
+            if (r.country) document.getElementById('exadd-country').value = r.country;
+            document.getElementById('exadd-modal').classList.remove('hidden');
+        }
+        async function confirmExploreAdd() {
+            const r = EX_ADD, btn = document.getElementById('exadd-save');
+            btn.disabled = true;
+            const d = await postJson(`/pool/${r.id}/add`, { country: document.getElementById('exadd-country').value, category: document.getElementById('exadd-cat').value });
+            btn.disabled = false;
+            if (!d) return;
+            toast(T('ex.added', { n: r.name }));
+            hideDialog('exadd-modal'); loadExplore(EX_OFFSET); loadOnboarding(true);
+        }
+        function openExtensionModal() {
+            document.getElementById('ext-code').style.display = 'none';
+            document.getElementById('ext-modal').classList.remove('hidden');
+        }
+        // The code the extension asks for: this site's address and a capture-only token.
+        async function makeExtensionCode() {
+            const btn = document.getElementById('ext-gen'); btn.disabled = true;
+            const d = await postJson('/extension/token', {});
+            btn.disabled = false;
+            if (!d) return;
+            const code = btoa(location.origin + '|' + d.token);
+            const box = document.getElementById('ext-code');
+            box.value = code; box.style.display = '';
+            if (navigator.clipboard) navigator.clipboard.writeText(code).then(() => toast(T('ext.copied')), () => box.select());
+            else box.select();
         }
 
         // ══════════ SIDEBAR ══════════
@@ -4980,7 +5604,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
             }
             const rankText = rank !== '—' ? T('card.costEff', { r: rank }) : '';
             return `<div class="kol-card glass-card rounded-xl p-lg flex flex-col space-y-md cursor-pointer" onclick="openKolDetail(${kol.id})">
-    <div class="flex justify-between items-start"><div class="flex items-center gap-md"><div class="w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center"><span class="material-symbols-outlined text-on-surface-variant text-[28px]">person</span></div><div><h4 class="font-title-md text-title-md text-on-surface">${kol.name}</h4><p class="text-[10px] text-on-surface-variant font-data-mono uppercase">${kol.category} · ${kol.country}</p></div></div><span class="${TIER_BADGE[tier] || 'tier-micro'} tier-chip">${TIER_EMOJI[tier] || ''} ${tier}</span></div>
+    <div class="flex justify-between items-start"><div class="flex items-center gap-md"><div class="w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center"><span class="material-symbols-outlined text-on-surface-variant text-[28px]">person</span></div><div><h4 class="font-title-md text-title-md text-on-surface">${kol.name}</h4><p class="text-[10px] text-on-surface-variant font-data-mono uppercase">${catName(kol.category)} · ${kol.country}</p></div></div><span class="${TIER_BADGE[tier] || 'tier-micro'} tier-chip">${TIER_EMOJI[tier] || ''} ${tierName(tier)}</span></div>
     <div class="grid grid-cols-3 gap-sm py-md border-y border-outline-variant/30"><div><p class="text-[10px] text-on-surface-variant uppercase">${T('card.followers')}</p><p class="font-title-md text-on-surface font-data-mono">${fmtF(kol.followers)}</p></div><div class="text-center"><p class="text-[10px] text-on-surface-variant uppercase">${T('card.cost')}</p><p class="font-title-md text-on-surface font-data-mono">${fmt(kol.cost)}</p><p class="text-[10px] text-on-surface-variant">${((kol.commission_rate || 0) * 100).toFixed(1)}${T('card.comm')}</p></div><div class="text-right"><p class="text-[10px] text-on-surface-variant uppercase">${T('card.estGmv')}</p><p class="font-title-md text-secondary font-data-mono font-bold">${fmt(kol.expected_gmv)}</p></div></div>
     <div><div class="flex justify-between text-[10px] mb-1"><span class="text-on-surface-variant uppercase">${T('card.contrib')}</span><span class="text-secondary font-bold">${contrib}%</span></div><div class="contrib-bar"><div class="contrib-fill" style="width:${contrib}%"></div></div></div>
     <div class="flex items-center gap-md text-[11px]">
@@ -5005,7 +5629,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
             }
             const rankText = rank !== '—' ? `<span class="text-on-surface-variant">${T('card.costEff', { r: rank })}</span>` : '';
             return `<div class="kol-card glass-card rounded-xl p-lg flex flex-col space-y-md cursor-pointer" onclick="openKolDetail(${kol.id})">
-    <div class="flex justify-between items-start"><div class="flex items-center gap-md"><div class="w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center"><span class="material-symbols-outlined text-on-surface-variant text-[28px]">person</span></div><div><h4 class="font-title-md text-title-md text-on-surface">${kol.name}</h4><p class="text-[10px] text-on-surface-variant font-data-mono uppercase">${kol.category} · ${kol.country}</p></div></div><span class="${TIER_BADGE[tier] || 'tier-micro'} tier-chip">${TIER_EMOJI[tier] || ''} ${tier}</span></div>
+    <div class="flex justify-between items-start"><div class="flex items-center gap-md"><div class="w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center"><span class="material-symbols-outlined text-on-surface-variant text-[28px]">person</span></div><div><h4 class="font-title-md text-title-md text-on-surface">${kol.name}</h4><p class="text-[10px] text-on-surface-variant font-data-mono uppercase">${catName(kol.category)} · ${kol.country}</p></div></div><span class="${TIER_BADGE[tier] || 'tier-micro'} tier-chip">${TIER_EMOJI[tier] || ''} ${tierName(tier)}</span></div>
     <div class="grid grid-cols-2 gap-sm py-md border-y border-outline-variant/30"><div><p class="text-[10px] text-on-surface-variant uppercase">${T('card.followers')}</p><p class="font-title-md text-on-surface font-data-mono">${fmtF(kol.followers)}</p></div><div class="text-right"><p class="text-[10px] text-on-surface-variant uppercase">${T('card.cost')}</p><p class="font-title-md text-on-surface font-data-mono">${fmt(kol.cost)}</p><p class="text-[10px] text-on-surface-variant">${((kol.commission_rate || 0) * 100).toFixed(1)}${T('card.comm')}</p></div></div>
     <div class="space-y-xs"><div class="flex justify-between items-center text-[10px]"><span class="text-on-surface-variant uppercase">${T('card.fit')}</span><span class="text-secondary font-bold">${(kol.fit_score * 100).toFixed(0)}%</span></div><div class="h-1.5 w-full bg-surface-container-highest rounded-full overflow-hidden"><div class="h-full bg-secondary rounded-full" style="width:${(kol.fit_score * 100).toFixed(0)}%"></div></div></div>
     ${riskBadge || rankText ? `<div class="flex items-center gap-md text-[11px]">${riskBadge}${rankText}</div>` : ''}
@@ -5022,7 +5646,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
                     fetch(API + '/optimize', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }),
                     fetch(API + '/optimize-plans', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
                 ]);
-                if (!optRes.ok) { const err = await optRes.json(); throw new Error(err.detail || 'Request failed'); }
+                if (!optRes.ok) { const err = await optRes.json(); throw new Error(err.detail || T('acct.fail')); }
                 const data = await optRes.json();
                 if (plansRes.ok) { const plansData = await plansRes.json(); renderPlans(plansData.plans, data); }
                 else { allPlansData = null; }
@@ -5132,7 +5756,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
             document.getElementById('biz-cost').textContent = fmt(plan.total_cost);
             // Fix: update biz-util to reflect THIS plan's budget limit (not the original budget)
             const utilPct = (plan.total_cost / plan.budget_limit * 100).toFixed(1);
-            const budgetLabels = { Aggressive: '120% cap', Balanced: '100% cap', Safe: '80% cap' };
+            const budgetLabels = { Aggressive: T('d.cap', { p: 120 }), Balanced: T('d.cap', { p: 100 }), Safe: T('d.cap', { p: 80 }) };
             document.getElementById('biz-util').textContent =
                 utilPct + '% / ' + fmt(plan.budget_limit) + ' (' + (budgetLabels[name] || '') + ')';
             const srcEl = document.getElementById('biz-gmv-source');
@@ -5142,7 +5766,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
 
         // Build the business-view subtitle in the current language.
         function bizSubtitle(payload, count) {
-            const cat = T('catn.' + payload.category);
+            const cat = catName(payload.category);
             const countryDisplay = (payload.countries && payload.countries.length > 0)
                 ? payload.countries.map(c => T('con.' + c)).join(' · ')
                 : T('cr.allCountries').replace('🌏 ', '');
@@ -5341,10 +5965,10 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
 
         function renderKolDetail(d) {
             document.getElementById('kd-name').textContent = d.name;
-            document.getElementById('kd-meta').textContent = T('k.meta', { cat: d.category, co: d.country, f: fmtF(d.followers) });
+            document.getElementById('kd-meta').textContent = T('k.meta', { cat: catName(d.category), co: d.country, f: fmtF(d.followers) });
             const tier = d.tier || 'Micro';
             const tierSpan = document.getElementById('kd-tier');
-            tierSpan.textContent = `${TIER_EMOJI[tier] || ''} ${tier}`;
+            tierSpan.textContent = `${TIER_EMOJI[tier] || ''} ${tierName(tier)}`;
             tierSpan.className = `tier-chip ${TIER_BADGE[tier] || 'tier-micro'}`;
 
             // Stats
@@ -5445,7 +6069,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
                 category: document.getElementById('category-select').value,
                 content_type: document.getElementById('content-type-select').value,
             };
-            document.getElementById('ba-sub').textContent = T('ba.sub', { b: fmt(payload.budget), cat: T('catn.' + payload.category) });
+            document.getElementById('ba-sub').textContent = T('ba.sub', { b: fmt(payload.budget), cat: catName(payload.category) });
             try {
                 const r = await fetch(`${API}/budget-advisor`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
                 const d = await r.json();
@@ -5469,7 +6093,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
                     <div class="flex items-center justify-between mb-1">
                         <span class="flex items-center gap-xs text-[12.5px] font-bold" style="color:${meta.color}">
                             <span class="material-symbols-outlined text-[16px]">${meta.icon}</span>${T('ba.role.' + b.role)}
-                            <span class="text-[10px] font-normal text-on-surface-variant">· ${TIER_EMOJI[b.tier] || ''} ${b.tier}</span>
+                            <span class="text-[10px] font-normal text-on-surface-variant">· ${TIER_EMOJI[b.tier] || ''} ${tierName(b.tier)}</span>
                         </span>
                         <span class="font-data-mono text-[13px] text-on-surface font-bold">${fmt(b.amount)} <span class="text-on-surface-variant font-normal text-[10px]">(${b.pct}%)</span></span>
                     </div>
@@ -5523,7 +6147,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
         // ══════════ CREATORS: CRUD ══════════
         let currentPage = 0; const PG = 20; let editingId = null;
         async function loadTable() { const country = document.getElementById('f-country').value, category = document.getElementById('f-category').value, tier = document.getElementById('f-tier').value, ctype = document.getElementById('f-ctype').value, params = new URLSearchParams({ limit: PG, offset: currentPage * PG }); if (country) params.set('country', country); if (category) params.set('category', category); if (tier) params.set('tier', tier); if (ctype) params.set('content_type', ctype); try { const r = await fetch(`${API}/kols?${params}`); const d = await r.json(); renderTable(d.kols, d.total); } catch (e) { toast(T('t.backend'), 'err'); } }
-        function renderTable(kols, total) { document.getElementById('count-badge').textContent = T('cr.count', { n: total }); document.getElementById('page-info').textContent = total ? T('cr.pageInfo', { a: currentPage * PG + 1, b: Math.min((currentPage + 1) * PG, total), t: total }) : ''; document.getElementById('prev-btn').disabled = currentPage === 0; document.getElementById('next-btn').disabled = (currentPage + 1) * PG >= total; const tbody = document.getElementById('kol-tbody'); if (!kols.length) { tbody.innerHTML = '<tr><td colspan="9" class="text-center py-12 text-outline">' + T('cr.noCreators') + '</td></tr>'; return; } tbody.innerHTML = kols.map(k => { const tier = k.tier || 'Micro'; const demoBadge = k.source === 'synthetic' ? ` <span title="${T('cr.demoTip')}" style="padding:1px 6px;border-radius:99px;font-size:9px;font-weight:700;background:rgba(168,85,247,.16);color:#c4b5fd;vertical-align:middle">DEMO</span>` : ''; const estBadge = k.cost_estimated ? ` <span title="${T('cr.estTip')}" style="padding:1px 5px;border-radius:99px;font-size:9px;font-weight:700;background:rgba(245,158,11,.16);color:var(--warn);vertical-align:middle">est.</span>` : ''; const ct = k.content_type || 'both'; const ctBadge = ct === 'live' ? `<span style="padding:1px 6px;border-radius:99px;font-size:9px;font-weight:700;background:rgba(255,0,80,.14);color:#ff7ba3">🔴 ${T('ct.badgeLive')}</span>` : ct === 'video' ? `<span style="padding:1px 6px;border-radius:99px;font-size:9px;font-weight:700;background:rgba(var(--accent-rgb),.12);color:#7df5f0">🎬 ${T('ct.badgeVideo')}</span>` : `<span style="padding:1px 6px;border-radius:99px;font-size:9px;font-weight:700;background:rgba(var(--mut-rgb),.12);color:var(--mut)">${T('ct.badgeBoth')}</span>`; const rateBadge = k.rating ? `<span title="${T('cr.rateTip')}" style="padding:1px 6px;border-radius:99px;font-size:9px;font-weight:700;background:rgba(255,194,77,.12);color:#FFC24D">★ ${k.rating}</span>` : ''; return `<tr class="row-hover border-t border-[#26262B]"><td class="px-4 py-3"><div class="font-semibold text-white">${k.name}${demoBadge}</div><div class="text-[11px] text-outline font-mono" style="display:flex;align-items:center;gap:6px">${k.category} · #${k.id} ${ctBadge}${rateBadge}</div></td><td class="px-4 py-3">${k.country}</td><td class="px-4 py-3 capitalize">${k.category}</td><td class="px-4 py-3 text-right font-mono">${fmtF(k.followers)}</td><td class="px-4 py-3 text-right font-mono">${(k.engagement_rate * 100).toFixed(1)}%</td><td class="px-4 py-3 text-right font-mono">${fmt(k.cost)}${estBadge}</td><td class="px-4 py-3 text-center"><span class="${TIER_BADGE[tier]}" style="padding:2px 8px;border-radius:99px;font-size:11px;font-weight:700">${tier}</span></td><td class="px-4 py-3 text-right font-mono text-secondary">${fmt(k.expected_gmv)}</td><td class="px-4 py-3 text-center"><button onclick="openEditModal(${k.id})" class="text-outline hover:text-secondary transition-colors"><span class="material-symbols-outlined text-[18px]">edit</span></button><button onclick="deleteKol(${k.id},'${k.name.replace(/'/g, "\\'")}' )" class="text-outline hover:text-error transition-colors ml-1"><span class="material-symbols-outlined text-[18px]">delete</span></button></td></tr>`; }).join(''); }
+        function renderTable(kols, total) { document.getElementById('count-badge').textContent = T('cr.count', { n: total }); document.getElementById('page-info').textContent = total ? T('cr.pageInfo', { a: currentPage * PG + 1, b: Math.min((currentPage + 1) * PG, total), t: total }) : ''; document.getElementById('prev-btn').disabled = currentPage === 0; document.getElementById('next-btn').disabled = (currentPage + 1) * PG >= total; const tbody = document.getElementById('kol-tbody'); if (!kols.length) { tbody.innerHTML = '<tr><td colspan="9" class="text-center py-12 text-outline">' + T('cr.noCreators') + '</td></tr>'; return; } tbody.innerHTML = kols.map(k => { const tier = k.tier || 'Micro'; const demoBadge = k.source === 'synthetic' ? ` <span title="${T('cr.demoTip')}" style="padding:1px 6px;border-radius:99px;font-size:9px;font-weight:700;background:rgba(168,85,247,.16);color:#c4b5fd;vertical-align:middle">DEMO</span>` : ''; const estBadge = k.cost_estimated ? ` <span title="${T('cr.estTip')}" style="padding:1px 5px;border-radius:99px;font-size:9px;font-weight:700;background:rgba(245,158,11,.16);color:var(--warn);vertical-align:middle">${T('cr.est')}</span>` : ''; const ct = k.content_type || 'both'; const ctBadge = ct === 'live' ? `<span style="padding:1px 6px;border-radius:99px;font-size:9px;font-weight:700;background:rgba(255,0,80,.14);color:#ff7ba3">🔴 ${T('ct.badgeLive')}</span>` : ct === 'video' ? `<span style="padding:1px 6px;border-radius:99px;font-size:9px;font-weight:700;background:rgba(var(--accent-rgb),.12);color:#7df5f0">🎬 ${T('ct.badgeVideo')}</span>` : `<span style="padding:1px 6px;border-radius:99px;font-size:9px;font-weight:700;background:rgba(var(--mut-rgb),.12);color:var(--mut)">${T('ct.badgeBoth')}</span>`; const rateBadge = k.rating ? `<span title="${T('cr.rateTip')}" style="padding:1px 6px;border-radius:99px;font-size:9px;font-weight:700;background:rgba(255,194,77,.12);color:#FFC24D">★ ${k.rating}</span>` : ''; return `<tr class="row-hover border-t border-[#26262B]"><td class="px-4 py-3"><div class="font-semibold text-white">${k.name}${demoBadge}</div><div class="text-[11px] text-outline font-mono" style="display:flex;align-items:center;gap:6px">${catName(k.category)} · #${k.id} ${ctBadge}${rateBadge}</div></td><td class="px-4 py-3">${k.country}</td><td class="px-4 py-3">${catName(k.category)}</td><td class="px-4 py-3 text-right font-mono">${fmtF(k.followers)}</td><td class="px-4 py-3 text-right font-mono">${(k.engagement_rate * 100).toFixed(1)}%</td><td class="px-4 py-3 text-right font-mono">${fmt(k.cost)}${estBadge}</td><td class="px-4 py-3 text-center"><span class="${TIER_BADGE[tier]}" style="padding:2px 8px;border-radius:99px;font-size:11px;font-weight:700">${tierName(tier)}</span></td><td class="px-4 py-3 text-right font-mono text-secondary">${fmt(k.expected_gmv)}</td><td class="px-4 py-3 text-center"><button onclick="openEditModal(${k.id})" class="text-outline hover:text-secondary transition-colors"><span class="material-symbols-outlined text-[18px]">edit</span></button><button onclick="deleteKol(${k.id},'${k.name.replace(/'/g, "\\'")}' )" class="text-outline hover:text-error transition-colors ml-1"><span class="material-symbols-outlined text-[18px]">delete</span></button></td></tr>`; }).join(''); }
         function changePage(d) { currentPage = Math.max(0, currentPage + d); loadTable(); }
         function openAddModal() { editingId = null; document.getElementById('modal-title').textContent = T('m.addTitle'); document.getElementById('modal-submit').textContent = T('m.saveCreator'); document.getElementById('modal-submit').onclick = submitAdd; clearForm(); document.getElementById('modal').classList.remove('hidden'); }
         async function openEditModal(id) { editingId = id; document.getElementById('modal-title').textContent = T('m.editTitle'); document.getElementById('modal-submit').textContent = T('m.update'); document.getElementById('modal-submit').onclick = submitEdit; try { const r = await fetch(`${API}/kol/${id}`); const k = await r.json(); document.getElementById('f-name').value = k.name || ''; document.getElementById('f-url').value = k.tiktok_url || ''; document.getElementById('f-m-country').value = k.country || 'MY'; document.getElementById('f-m-cat').value = k.category || 'beauty'; document.getElementById('f-followers').value = k.followers || ''; document.getElementById('f-eng').value = k.engagement_rate || ''; document.getElementById('f-cost').value = k.cost || ''; document.getElementById('f-fit').value = k.fit_score || ''; document.getElementById('f-views').value = k.avg_views || ''; document.getElementById('f-likes').value = k.avg_likes || ''; document.getElementById('f-gender').value = k.gender_ratio || ''; document.getElementById('f-age').value = k.age_group || '18-24'; document.getElementById('f-ctype-modal').value = k.content_type || 'both'; document.getElementById('modal').classList.remove('hidden'); } catch (e) { toast(T('t.loadFail'), 'err'); } }
@@ -5601,7 +6225,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
                 if (!r.ok) { toast((d.detail || T('t.importFail')), 'err'); input.value = ''; return; }
                 let msg = T('t.imported', { n: d.added });
                 const ad = d.applied_defaults || {};
-                if (ad.category || ad.country) msg += ` (${[ad.category, ad.country].filter(Boolean).join(' / ')})`;
+                if (ad.category || ad.country) msg += ` (${[ad.category && catName(ad.category), ad.country].filter(Boolean).join(' / ')})`;
                 if (d.estimated_cost) msg += T('t.pricesEst', { n: d.estimated_cost });
                 toast(msg + (d.errors && d.errors.length ? T('t.skipped', { n: d.errors.length }) : ''), d.added ? 'ok' : 'err');
                 if (d.errors && d.errors.length) console.warn('Import row issues:', d.errors);
@@ -5638,7 +6262,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
             const catNames = { beauty: 'Beauty', fashion: 'Fashion', home: 'Home', fmcg: 'FMCG' };
             const countryLabel = (lastPayload.countries && lastPayload.countries.length > 0)
                 ? lastPayload.countries.join('/') : 'All';
-            document.getElementById('sc-name').value = `${catNames[lastPayload.category] || lastPayload.category} ${countryLabel} ${d.toLocaleDateString('en-US', {month:'short', year:'numeric'})}`;
+            document.getElementById('sc-name').value = `${catName(lastPayload.category)} ${countryLabel} ${d.toLocaleDateString(LANG === 'zh' ? 'zh-CN' : 'en-US', {month:'short', year:'numeric'})}`;
             document.getElementById('sc-pred-gmv').textContent = fmt(totalGmv);
             document.getElementById('sc-cost').textContent = fmt(totalCost);
             document.getElementById('sc-algo').textContent = lastOptimizeData.best_algorithm;
@@ -5662,7 +6286,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
             };
             try {
                 const r = await fetch(`${API}/campaigns`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                if (!r.ok) { const e = await r.json(); throw new Error(e.detail || 'Save failed'); }
+                if (!r.ok) { const e = await r.json(); throw new Error(e.detail || T('acct.fail')); }
                 toast(T('t.campSaved'));
                 closeSaveCampaignModal();
             } catch (e) { toast(e.message, 'err'); }
@@ -5725,10 +6349,10 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
                     ? `<span class="font-data-mono font-bold" style="color:${c.accuracy_pct>=90?'#00C853':c.accuracy_pct>=70?'#F59E0B':'#FF0050'}">${c.accuracy_pct}%</span>`
                     : '<span class="text-on-surface-variant">—</span>';
                 const actualGmv = c.actual_total_gmv != null ? `<span class="font-data-mono text-secondary">${fmt(c.actual_total_gmv)}</span>` : '<span class="text-on-surface-variant">—</span>';
-                const date = new Date(c.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+                const date = new Date(c.created_at).toLocaleDateString(LANG === 'zh' ? 'zh-CN' : 'en-US',{month:'short',day:'numeric',year:'numeric'});
                 return `<tr class="row-hover border-t border-[#26262B]">
-                    <td class="px-4 py-3"><div class="font-semibold text-white">${c.name}</div><div class="text-[11px] text-outline font-mono">${date} · ${c.best_algorithm}</div></td>
-                    <td class="px-4 py-3 text-[12px]">${formatCampaignCountries(c)} · ${c.category}</td>
+                    <td class="px-4 py-3"><div class="font-semibold text-white">${c.name}</div><div class="text-[11px] text-outline font-mono">${date} · ${algoName(c.best_algorithm)}</div></td>
+                    <td class="px-4 py-3 text-[12px]">${formatCampaignCountries(c)} · ${catName(c.category)}</td>
                     <td class="px-4 py-3 text-right font-mono">${fmt(c.budget)}</td>
                     <td class="px-4 py-3 text-right font-mono text-primary">${fmt(c.predicted_gmv)}</td>
                     <td class="px-4 py-3 text-right">${actualGmv}</td>
@@ -5736,9 +6360,9 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
                     <td class="px-4 py-3 text-center">${statusBadge}</td>
                     <td class="px-4 py-3 text-center">
                         <div class="flex gap-2 justify-center">
-                            <button onclick="openCampaignDetail(${c.id})" class="text-outline hover:text-primary transition-colors" title="View"><span class="material-symbols-outlined text-[18px]">visibility</span></button>
-                            ${c.status==='active'?`<button onclick="openActualModal(${c.id},${c.predicted_gmv})" class="text-outline hover:text-secondary transition-colors" title="Record Actual"><span class="material-symbols-outlined text-[18px]">edit_note</span></button>`:''}
-                            <button onclick="deleteCampaign(${c.id})" class="text-outline hover:text-error transition-colors" title="Delete"><span class="material-symbols-outlined text-[18px]">delete</span></button>
+                            <button onclick="openCampaignDetail(${c.id})" class="text-outline hover:text-primary transition-colors" title="${T('tt.view')}"><span class="material-symbols-outlined text-[18px]">visibility</span></button>
+                            ${c.status==='active'?`<button onclick="openActualModal(${c.id},${c.predicted_gmv})" class="text-outline hover:text-secondary transition-colors" title="${T('tt.record')}"><span class="material-symbols-outlined text-[18px]">edit_note</span></button>`:''}
+                            <button onclick="deleteCampaign(${c.id})" class="text-outline hover:text-error transition-colors" title="${T('tt.delete')}"><span class="material-symbols-outlined text-[18px]">delete</span></button>
                         </div>
                     </td>
                 </tr>`;
@@ -5759,7 +6383,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
 
         function renderCampaignDetail(c) {
             document.getElementById('cd-name').textContent = c.name;
-            document.getElementById('cd-meta').textContent = `${formatCampaignCountries(c)} · ${c.category} · ${c.best_algorithm} · ${new Date(c.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}`;
+            document.getElementById('cd-meta').textContent = `${formatCampaignCountries(c)} · ${catName(c.category)} · ${algoName(c.best_algorithm)} · ${new Date(c.created_at).toLocaleDateString(LANG === 'zh' ? 'zh-CN' : 'en-US',{month:'short',day:'numeric',year:'numeric'})}`;
             document.getElementById('cd-pred').textContent = fmt(c.predicted_gmv);
             document.getElementById('cd-actual').textContent = c.actual_total_gmv != null ? fmt(c.actual_total_gmv) : '—';
             const accEl = document.getElementById('cd-accuracy');
@@ -5781,7 +6405,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
             // KOL table
             document.getElementById('cd-kol-body').innerHTML = (c.selected_kols||[]).map(k => {
                 const kActual = (c.kol_actuals||[]).find(a=>a.id===k.id);
-                return `<tr class="border-t border-[#26262B]"><td class="px-4 py-2 text-[12px]">${k.name}<span class="text-outline text-[11px] ml-2">${k.tier||''}</span></td><td class="px-4 py-2 text-right font-mono text-[12px] text-primary">${fmt(k.predicted_gmv)}</td><td class="px-4 py-2 text-right font-mono text-[12px]">${kActual?`<span class="text-secondary">${fmt(kActual.actual_gmv)}</span>`:'—'}</td></tr>`;
+                return `<tr class="border-t border-[#26262B]"><td class="px-4 py-2 text-[12px]">${k.name}<span class="text-outline text-[11px] ml-2">${tierName(k.tier)}</span></td><td class="px-4 py-2 text-right font-mono text-[12px] text-primary">${fmt(k.predicted_gmv)}</td><td class="px-4 py-2 text-right font-mono text-[12px]">${kActual?`<span class="text-secondary">${fmt(kActual.actual_gmv)}</span>`:'—'}</td></tr>`;
             }).join('');
             // Notes
             const notesSection = document.getElementById('cd-notes-section');
@@ -5967,7 +6591,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
                     AG_HISTORY.pop();   // keep history clean for a retry
                     // Copilot quota spent → surface the upgrade path like other 402s.
                     if (r.status === 402) {
-                        toast(d.detail || 'Copilot limit reached — upgrade to continue', 'err');
+                        toast(d.detail || T('t.copilotLimit'), 'err');
                         showPage('billing');
                     }
                     return;

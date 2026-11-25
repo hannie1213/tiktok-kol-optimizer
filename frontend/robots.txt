@@ -9,6 +9,8 @@ Disallow: /admin/
 Disallow: /auth/
 Disallow: /billing/
 Disallow: /pay/
+Disallow: /pool/
+Disallow: /extension/
 Disallow: /docs
 Disallow: /redoc
 Disallow: /openapi.json

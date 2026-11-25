@@ -90,6 +90,9 @@ _SEATS_DETAIL = ("This workspace's plan no longer covers its team seats — "
                  "ask the workspace owner to renew the plan.")
 
 
+_SUSPENDED_DETAIL = "This account has been suspended — contact us if you think this is a mistake."
+
+
 def _pw_fingerprint(password_hash: str) -> str:
     return hashlib.sha256(password_hash.encode()).hexdigest()[:16]
 
@@ -282,6 +285,8 @@ def login(req: Credentials, request: Request):
         raise HTTPException(status_code=401, detail="Invalid email or password")
     if not _pwd.verify(password, user["password_hash"]):
         raise HTTPException(status_code=401, detail="Invalid email or password")
+    if user.get("disabled"):
+        raise HTTPException(status_code=403, detail=_SUSPENDED_DETAIL)
     # Heal any tenant that was never provisioned (or predates the database).
     if not tenancy.tenant_exists(user["tenant_id"]):
         tenancy.provision_tenant(user["tenant_id"])
@@ -312,7 +317,9 @@ async def require_tenant(authorization: Optional[str] = Header(None)) -> str:
         raise HTTPException(status_code=401, detail="Invalid or expired token")
 
     tenant_id = payload.get("sub")
-    if not tenant_id:
+    # Emailed links and the extension's connection code are signed with the same
+    # key but carry a `purpose`; none of them is a session.
+    if not tenant_id or payload.get("purpose"):
         raise HTTPException(status_code=401, detail="Invalid token")
 
     # The account must still exist and the password must be the one the token
@@ -323,6 +330,8 @@ async def require_tenant(authorization: Optional[str] = Header(None)) -> str:
     if (not user or user["tenant_id"] != tenant_id
             or payload.get("pv") != _pw_fingerprint(user["password_hash"])):
         raise HTTPException(status_code=401, detail="Invalid or expired token")
+    if user.get("disabled"):
+        raise HTTPException(status_code=403, detail=_SUSPENDED_DETAIL)
     if user["role"] == "member" and seats_exceeded(tenant_id):
         raise HTTPException(status_code=403, detail=_SEATS_DETAIL)
 

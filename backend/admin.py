@@ -28,7 +28,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Optional
 
 from fastapi import APIRouter, BackgroundTasks, Depends, Header, HTTPException, Request
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from backend import mailer, ratelimit, repo, settings, tenancy
 from backend.auth import DEMO_SUFFIX as _DEMO_SUFFIX, _pwd
@@ -104,6 +104,7 @@ def _user_rows(month: str) -> list:
             "demo": u["email"].endswith(_DEMO_SUFFIX),
             "email_verified": bool(u.get("email_verified")),
             "role": u.get("role", "owner"),
+            "disabled": bool(u.get("disabled")),
         })
     # How many accounts share each workspace, and when it was last used.
     seats: dict = {}
@@ -329,6 +330,82 @@ def workspace(email: str):
     }
 
 
+class Suspend(BaseModel):
+    email: str
+    suspended: bool = True
+
+
+@router.post("/admin/suspend")
+def suspend_user(req: Suspend, request: Request):
+    """Lock an account out (or let it back in) without touching its data.
+    A suspended account cannot sign in, use an existing session, or capture
+    creators with the extension."""
+    user = repo.user_find(req.email.strip().lower())
+    if not user:
+        raise HTTPException(status_code=404, detail="No account with that email")
+    repo.user_update(user["email"], disabled=bool(req.suspended))
+    _audit(request, "user.suspend" if req.suspended else "user.unsuspend", user["email"])
+    return {"status": "ok", "email": user["email"], "disabled": bool(req.suspended)}
+
+
+class Announcement(BaseModel):
+    text: str = Field("", max_length=300)
+    text_zh: str = Field("", max_length=300)
+    level: str = Field("info", max_length=8)
+
+
+@router.get("/admin/announcement")
+def get_announcement():
+    return {"announcement": repo.system_get("announcement")}
+
+
+@router.post("/admin/announcement")
+def set_announcement(req: Announcement, request: Request):
+    """Site-wide notice shown at the top of every merchant's console. Empty
+    text in both languages removes it."""
+    if req.level not in ("info", "warn"):
+        raise HTTPException(status_code=422, detail="level must be info or warn")
+    text, text_zh = req.text.strip(), req.text_zh.strip()
+    if not text and not text_zh:
+        repo.system_set("announcement", None)
+        _audit(request, "announcement.clear")
+        return {"status": "ok", "announcement": None}
+    repo.system_set("announcement", {"text": text, "text_zh": text_zh, "level": req.level},
+                    datetime.now(timezone.utc).isoformat())
+    _audit(request, "announcement.set", "", (text or text_zh)[:120])
+    return {"status": "ok", "announcement": repo.system_get("announcement")}
+
+
+@router.get("/admin/pool")
+def pool_list(q: str = "", limit: int = 100):
+    """The shared Explore pool, newest capture first — every workspace can
+    write to it, so the operator needs to be able to look and prune."""
+    from sqlalchemy import func, or_, select
+    from backend.db import PoolCreator, SessionLocal
+    from backend.pool import _to_dict
+    stmt = select(PoolCreator)
+    if q.strip():
+        like = "%" + q.strip().lower().lstrip("@") + "%"
+        stmt = stmt.where(or_(PoolCreator.handle_key.like(like), func.lower(PoolCreator.name).like(like)))
+    with SessionLocal() as s:
+        total = s.scalar(select(func.count()).select_from(PoolCreator)) or 0
+        rows = s.scalars(stmt.order_by(PoolCreator.last_seen.desc()).limit(max(1, min(500, limit)))).all()
+        return {"total": total, "items": [_to_dict(r) for r in rows]}
+
+
+@router.delete("/admin/pool/{creator_id}")
+def pool_delete(creator_id: int, request: Request):
+    from backend.db import PoolCreator, SessionLocal
+    with SessionLocal.begin() as s:
+        row = s.get(PoolCreator, creator_id)
+        if not row:
+            raise HTTPException(status_code=404, detail="Creator not found")
+        handle = row.handle
+        s.delete(row)
+    _audit(request, "pool.delete", "@" + handle)
+    return {"status": "ok"}
+
+
 @router.post("/admin/jobs/run")
 def run_jobs(request: Request):
     """Run the hourly housekeeping now (renewal reminders, stale orders, demo sweep)."""
@@ -347,7 +424,7 @@ def audit(limit: int = 100):
 def status():
     """What is switched on, and what still blocks a public launch. Shows
     whether each secret is SET, never its value."""
-    from backend import jobs, payments    # deferred: payments imports this module
+    from backend import aivideo, jobs, payments    # deferred: payments imports this module
     from backend.db import engine
     copilot_key = bool(os.environ.get("DEEPSEEK_API_KEY") or os.environ.get("AGENT_API_KEY"))
     return {
@@ -374,6 +451,8 @@ def status():
                     "model": os.environ.get("AGENT_MODEL", "deepseek-chat")},
         "rate_limiting": settings.RATE_LIMIT_ENABLED,
         "jobs": jobs.status(),
+        "ai_video": {"enabled": aivideo.enabled(), "model": aivideo.MODEL if aivideo.enabled() else None,
+                     "resolution": aivideo.RESOLUTION},
         "billing_self_serve": settings.BILLING_SELF_SERVE,
     }
 
