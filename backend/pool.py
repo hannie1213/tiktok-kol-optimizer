@@ -28,6 +28,7 @@ Endpoints
   POST /pool/{id}/add        Copy a pool creator into this workspace's library
 """
 import io
+import json
 import os
 import re
 import zipfile
@@ -114,12 +115,32 @@ def extension_download():
         raise HTTPException(status_code=404, detail="The extension is not bundled with this server.")
     buf = io.BytesIO()
     with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as z:
-        for name in sorted(os.listdir(_EXT_DIR)):
-            path = os.path.join(_EXT_DIR, name)
-            if os.path.isfile(path) and not name.startswith("."):
-                z.write(path, "lumio-capture/" + name)
+        for folder, dirs, files in os.walk(_EXT_DIR):
+            dirs[:] = sorted(d for d in dirs if not d.startswith((".", "__")))
+            for name in sorted(files):
+                if name.startswith("."):
+                    continue
+                path = os.path.join(folder, name)
+                rel = os.path.relpath(path, _EXT_DIR).replace(os.sep, "/")
+                z.write(path, "lumio-capture/" + rel)
     return Response(buf.getvalue(), media_type="application/zip",
                     headers={"Content-Disposition": 'attachment; filename="lumio-capture.zip"'})
+
+
+def extension_version() -> str:
+    """Version in the bundled manifest — the extension compares its own to this."""
+    try:
+        with open(os.path.join(_EXT_DIR, "manifest.json"), encoding="utf-8") as f:
+            return str(json.load(f).get("version", ""))
+    except (OSError, ValueError):
+        return ""
+
+
+@router.get("/extension/ping")
+def extension_ping(user: dict = Depends(capture_user)):
+    """Lets the extension check its connection code when it connects, show
+    which account it sends to, and notice when a newer build is available."""
+    return {"ok": True, "email": user["email"], "latest_version": extension_version()}
 
 
 # ── Capture ───────────────────────────────────────────────────────

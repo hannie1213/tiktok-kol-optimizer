@@ -3,47 +3,91 @@
 <head>
 <meta charset="utf-8">
 <style>
-    body { width: 320px; margin: 0; padding: 16px; font: 13px/1.5 system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; color: #12141A; background: #fff; }
-    h1 { margin: 0 0 2px; font-size: 16px; letter-spacing: -.01em; }
-    h1 sup { color: #0A8F8A; font-size: 9px; }
-    p { margin: 0 0 10px; color: #5A6170; }
-    label { display: block; margin: 10px 0 4px; font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: #5A6170; }
-    textarea, input[type=text] { width: 100%; box-sizing: border-box; padding: 8px 10px; border: 1px solid #DDE1E8; border-radius: 8px; font: inherit; resize: none; }
-    button { width: 100%; margin-top: 10px; padding: 9px 12px; border: 0; border-radius: 8px; background: #12141A; color: #fff; font: 600 13px inherit; cursor: pointer; }
-    button.quiet { background: #F1F3F6; color: #12141A; }
+    :root { --ink:#0E1424; --sub:#5B6478; --line:#E3E7EF; --soft:#F3F5F9; --navy:#1B2B5C; --navy2:#2C4590; --red:#B42318; }
+    * { box-sizing: border-box; }
+    body { width: 340px; margin: 0; font: 13px/1.5 system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; color: var(--ink); background: #fff; }
+    header { position: relative; overflow: hidden; display: flex; align-items: center; gap: 10px; padding: 14px 16px; color: #fff;
+             background: radial-gradient(120% 140% at 85% -20%, #3B5BB5 0%, #1B2B5C 45%, #090D1A 100%); }
+    header::after { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .8;
+             background-image: radial-gradient(1px 1px at 20% 30%, #fff 50%, transparent 51%), radial-gradient(1px 1px at 70% 20%, #DCE3F5 50%, transparent 51%),
+             radial-gradient(1.5px 1.5px at 88% 70%, #fff 50%, transparent 51%), radial-gradient(1px 1px at 45% 80%, #C9D2EA 50%, transparent 51%),
+             radial-gradient(1px 1px at 60% 55%, #fff 50%, transparent 51%); }
+    header img { width: 28px; height: 28px; border-radius: 7px; }
+    header h1 { margin: 0; font-size: 15px; letter-spacing: .02em; font-weight: 650; }
+    header h1 span { display: block; font-size: 11px; font-weight: 500; color: #C9D2EA; letter-spacing: .04em; }
+    main { padding: 14px 16px 16px; }
+    p { margin: 0 0 10px; color: var(--sub); }
+    label.cap { display: block; margin: 10px 0 4px; font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--sub); }
+    textarea { width: 100%; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; font: 12px/1.4 ui-monospace, Menlo, Consolas, monospace; resize: none; }
+    textarea:focus { outline: 2px solid #9FB1E0; border-color: transparent; }
+    button { width: 100%; margin-top: 10px; padding: 9px 12px; border: 0; border-radius: 8px; background: linear-gradient(180deg, var(--navy2), var(--navy)); color: #fff; font: 600 13px system-ui, sans-serif; cursor: pointer; }
+    button.quiet { background: var(--soft); color: var(--ink); }
+    button.link { width: auto; margin: 0; padding: 0; background: none; color: var(--navy2); font-weight: 600; text-decoration: underline; }
     button:disabled { opacity: .5; cursor: default; }
-    .row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 0; border-top: 1px solid #EEF0F4; }
-    .ok { color: #0A9548; } .bad { color: #C92A2A; }
-    .card { padding: 10px 12px; border-radius: 8px; background: #F4F5F8; margin-top: 10px; }
+    .row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 0; border-top: 1px solid var(--line); }
+    .ok { color: var(--navy2); } .bad { color: var(--red); }
+    .card { padding: 10px 12px; border-radius: 10px; background: var(--soft); margin-top: 10px; }
     .card b { display: block; }
-    .hidden { display: none; }
+    .banner { padding: 9px 12px; border-radius: 10px; margin-bottom: 10px; font-size: 12px; }
+    .banner.warn { background: #FDECEA; color: var(--red); }
+    .banner.info { background: #E9EEFA; color: var(--navy); }
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 10px 0 0; }
+    .stats div { padding: 8px; border-radius: 10px; background: var(--soft); text-align: center; }
+    .stats b { display: block; font-size: 17px; color: var(--navy); }
+    .stats small { font-size: 11px; }
+    .status { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--navy2); box-shadow: 0 0 0 3px #DCE3F5; }
+    .dot.bad { background: var(--red); box-shadow: 0 0 0 3px #F8D5D1; }
+    .hidden { display: none !important; }
     small { color: #7C8493; }
+    footer { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; font-size: 12px; }
+    a { color: var(--navy2); font-weight: 600; }
+    input[type=checkbox] { width: 16px; height: 16px; accent-color: var(--navy); }
 </style>
 </head>
 <body>
-    <h1>Lumio<sup>™</sup> Creator Capture</h1>
-
-    <div id="setup">
-        <p id="t-intro"></p>
-        <label id="t-code-label" for="code"></label>
-        <textarea id="code" rows="3" spellcheck="false"></textarea>
-        <button id="connect"></button>
-        <p id="setup-msg" class="bad" style="margin-top:8px"></p>
-    </div>
-
-    <div id="main" class="hidden">
-        <p><span class="ok">●</span> <span id="t-connected"></span> <b id="server"></b></p>
-        <div id="page" class="card"></div>
-        <button id="capture"></button>
-        <p id="capture-msg" style="margin-top:8px"></p>
-        <div class="row">
-            <span id="t-auto"></span>
-            <input id="auto" type="checkbox">
+    <header>
+        <img src="icons/icon48.png" alt="">
+        <h1>Lumio <span id="t-sub"></span></h1>
+    </header>
+    <main>
+        <div id="setup">
+            <p id="t-intro"></p>
+            <label class="cap" id="t-code-label" for="code"></label>
+            <textarea id="code" rows="3" spellcheck="false"></textarea>
+            <button id="connect"></button>
+            <p id="setup-msg" style="margin-top:8px"></p>
+            <small id="t-where"></small>
         </div>
-        <small id="t-auto-note"></small>
-        <div id="last" class="card hidden"></div>
-        <button id="disconnect" class="quiet"></button>
-    </div>
+
+        <div id="main" class="hidden">
+            <div id="auth-banner" class="banner warn hidden"><span id="t-expired"></span> <button class="link" id="reconnect"></button></div>
+            <div id="update-banner" class="banner info hidden"></div>
+            <div class="status"><span class="dot" id="dot"></span><span id="t-connected"></span></div>
+            <div><b id="account"></b> <small id="server"></small></div>
+
+            <div class="stats">
+                <div><b id="s-today">0</b><small id="t-today"></small></div>
+                <div><b id="s-total">0</b><small id="t-total"></small></div>
+                <div><b id="s-queue">0</b><small id="t-queue"></small></div>
+            </div>
+            <button id="flush" class="quiet hidden"></button>
+
+            <div id="page" class="card"></div>
+            <button id="capture"></button>
+            <p id="capture-msg" style="margin-top:8px"></p>
+
+            <div class="row"><span id="t-auto"></span><input id="auto" type="checkbox"></div>
+            <div class="row"><span id="t-toast"></span><input id="toast" type="checkbox"></div>
+            <small id="t-auto-note"></small>
+            <div id="last" class="card hidden"></div>
+
+            <footer>
+                <a id="open-site" href="#" target="_blank" rel="noopener"></a>
+                <button id="disconnect" class="link"></button>
+            </footer>
+        </div>
+    </main>
     <script src="popup.js"></script>
 </body>
 </html>
