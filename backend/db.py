@@ -54,6 +54,11 @@ VIDEO_DIR = os.environ.get("VIDEO_DIR") or os.path.join(_SQLITE_DIR, "videos")
 def _database_url() -> str:
     url = os.environ.get("DATABASE_URL")
     if url:
+        # Hosts such as Render and Heroku hand out "postgres://" / "postgresql://"
+        # URLs; point them at the installed psycopg (v3) driver.
+        for prefix in ("postgres://", "postgresql://"):
+            if url.startswith(prefix):
+                return "postgresql+psycopg://" + url[len(prefix):]
         return url
     return "sqlite:///" + os.path.join(_SQLITE_DIR, "kol_saas.db").replace("\\", "/")
 
