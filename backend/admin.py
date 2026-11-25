@@ -1,5 +1,5 @@
 """
-Operator console API — user management for the tiko team.
+Operator console API — user management for the Lumio team.
 
 Every endpoint requires the X-Admin-Key header matching the ADMIN_KEY
 environment variable (BILLING_ADMIN_KEY is a legacy alias). With no key

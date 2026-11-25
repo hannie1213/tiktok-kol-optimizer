@@ -1,5 +1,5 @@
 """
-tiko KOL Matrix Optimizer — FastAPI backend.
+Lumio KOL Matrix Optimizer — FastAPI backend.
 
 Endpoints
 ---------
@@ -79,7 +79,7 @@ async def _lifespan(_app):
 
 app = FastAPI(
     lifespan=_lifespan,
-    title="tiko KOL Optimizer API",
+    title="Lumio KOL Optimizer API",
     description="Local search optimizer for selecting a KOL portfolio under a marketing budget.",
     version="2.0",
 )

@@ -1,4 +1,4 @@
-// Service worker: the only part that talks to the tiko server. It sends one
+// Service worker: the only part that talks to the Lumio server. It sends one
 // captured profile at a time to POST /pool/capture using the connection code
 // the user pasted into the popup.
 'use strict';

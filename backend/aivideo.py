@@ -282,7 +282,7 @@ def video_file(job_id: int, tenant_id: str = Depends(require_tenant)):
     path = _path(tenant_id, job["id"])
     if job.get("status") != "succeeded" or not os.path.isfile(path):
         raise HTTPException(status_code=404, detail="Video not found")
-    return FileResponse(path, media_type="video/mp4", filename=f"tiko-ai-video-{job['id']}.mp4")
+    return FileResponse(path, media_type="video/mp4", filename=f"lumio-ai-video-{job['id']}.mp4")
 
 
 @router.delete("/studio/videos/{job_id}")

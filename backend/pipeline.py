@@ -194,7 +194,7 @@ def export_pipeline(status: Optional[str] = Query(None), campaign_id: Optional[i
     for r in rows:
         w.writerow([_csv_cell(r[c]) for c in cols])
     return Response("﻿" + buf.getvalue(), media_type="text/csv; charset=utf-8",
-                    headers={"Content-Disposition": 'attachment; filename="tiko-collaborations.csv"'})
+                    headers={"Content-Disposition": 'attachment; filename="lumio-collaborations.csv"'})
 
 
 # ── Analytics ─────────────────────────────────────────────────────

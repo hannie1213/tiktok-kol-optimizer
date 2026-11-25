@@ -1,6 +1,6 @@
 # 上线部署手册
 
-面向运营者：把 tiko 部署到一台公网服务器并安全地对外提供服务。架构背景见
+面向运营者：把 Lumio 部署到一台公网服务器并安全地对外提供服务。架构背景见
 [saas-architecture.md](saas-architecture.md)。
 
 ## 1. 准备
@@ -50,7 +50,7 @@ SMTP_HOST=smtp.resend.com
 SMTP_PORT=587
 SMTP_USER=resend
 SMTP_PASSWORD=你的密钥
-SMTP_FROM=tiko <no-reply@你的域名>
+SMTP_FROM=Lumio <no-reply@你的域名>
 APP_BASE_URL=https://你的域名
 ```
 

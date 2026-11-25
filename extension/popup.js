@@ -1,22 +1,22 @@
 'use strict';
 const zh = (navigator.language || '').toLowerCase().startsWith('zh');
 const TEXT = zh ? {
-    intro: '打开达人主页时，把页面上公开显示的账号、粉丝数、获赞数发送到 tiko 的「发现达人」，方便团队查找和筛选。',
+    intro: '打开达人主页时，把页面上公开显示的账号、粉丝数、获赞数发送到 Lumio 的「发现达人」，方便团队查找和筛选。',
     codeLabel: '连接码', connect: '连接', connected: '已连接到', capture: '采集当前页面',
     auto: '打开达人主页时自动采集', autoNote: '只读取达人主页上公开显示的信息，不读取其他页面，也不读取你的账号。',
-    disconnect: '断开连接', badCode: '连接码无效。请在 tiko 的「发现达人」页面重新生成并完整粘贴。',
-    denied: '需要允许访问你的 tiko 网址才能连接。', notProfile: '当前页面不是达人主页。打开一位达人的主页后再试。',
+    disconnect: '断开连接', badCode: '连接码无效。请在 Lumio 的「发现达人」页面重新生成并完整粘贴。',
+    denied: '需要允许访问你的 Lumio 网址才能连接。', notProfile: '当前页面不是达人主页。打开一位达人的主页后再试。',
     onPage: '当前页面', followers: '粉丝', sent: '已发送到达人池', updated: '已更新达人池里的记录',
-    network: '连不上 tiko 服务器，请检查网络或网址。', expired: '连接码已失效，请重新连接。', failed: '采集失败。',
+    network: '连不上 Lumio 服务器，请检查网络或网址。', expired: '连接码已失效，请重新连接。', failed: '采集失败。',
     last: '上次采集', reload: '请刷新这个页面后再试。',
 } : {
-    intro: 'When you open a creator\'s profile, sends the handle, follower and like counts shown on that page to tiko\'s Explore pool, so your team can find and shortlist them.',
+    intro: 'When you open a creator\'s profile, sends the handle, follower and like counts shown on that page to Lumio\'s Explore pool, so your team can find and shortlist them.',
     codeLabel: 'Connection code', connect: 'Connect', connected: 'Connected to', capture: 'Capture this page',
     auto: 'Capture automatically when I open a profile', autoNote: 'Only reads what a public creator profile shows. It does not read other pages or your own account.',
-    disconnect: 'Disconnect', badCode: 'That code is not valid. Create a new one on tiko\'s Explore page and paste all of it.',
-    denied: 'Permission to reach your tiko address is needed to connect.', notProfile: 'This page is not a creator profile. Open a creator\'s profile and try again.',
+    disconnect: 'Disconnect', badCode: 'That code is not valid. Create a new one on Lumio\'s Explore page and paste all of it.',
+    denied: 'Permission to reach your Lumio address is needed to connect.', notProfile: 'This page is not a creator profile. Open a creator\'s profile and try again.',
     onPage: 'On this page', followers: 'followers', sent: 'Sent to the pool', updated: 'Pool record updated',
-    network: 'Could not reach the tiko server. Check your connection or the address.', expired: 'The connection code has expired — connect again.', failed: 'Capture failed.',
+    network: 'Could not reach the Lumio server. Check your connection or the address.', expired: 'The connection code has expired — connect again.', failed: 'Capture failed.',
     last: 'Last capture', reload: 'Reload this page and try again.',
 };
 const $ = id => document.getElementById(id);

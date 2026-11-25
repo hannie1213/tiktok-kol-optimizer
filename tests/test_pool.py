@@ -164,4 +164,4 @@ def test_extension_zip_contains_a_loadable_extension():
     assert r.status_code == 200 and r.headers["content-type"] == "application/zip"
     names = zipfile.ZipFile(io.BytesIO(r.content)).namelist()
     for f in ("manifest.json", "background.js", "content.js", "extract.js", "popup.html", "popup.js"):
-        assert f"tiko-capture/{f}" in names
+        assert f"lumio-capture/{f}" in names
