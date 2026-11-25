@@ -17,7 +17,6 @@ KOL metric history persists to data/kol_history.json.
 """
 import csv
 import io
-import json
 import os
 import random
 import re
@@ -27,7 +26,7 @@ from typing import List, Optional
 from fastapi import APIRouter, HTTPException, UploadFile, File, Form, Depends
 from pydantic import BaseModel, field_validator
 
-from backend import tenancy
+from backend import db, tenancy
 from backend.auth import require_tenant
 
 router = APIRouter()
@@ -40,16 +39,11 @@ _SNAPSHOT_FIELDS = ("engagement_rate", "fit_score", "followers", "commission_rat
 
 
 def _load_history() -> List[dict]:
-    path = tenancy.history_path()
-    if not os.path.exists(path):
-        return []
-    with open(path, encoding="utf-8") as f:
-        return json.load(f)
+    return db.read_doc(tenancy.HISTORY, [])
 
 
 def _save_history(data: List[dict]):
-    with open(tenancy.history_path(), "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2, ensure_ascii=False)
+    db.write_doc(tenancy.HISTORY, data)
 
 
 def _record_snapshot(kol_record: dict):
@@ -162,16 +156,11 @@ class KOLUpdate(BaseModel):
 #  Helpers
 # ════════════════════════════════════════════════════════════════
 def _load() -> List[dict]:
-    path = tenancy.data_path()
-    if not os.path.exists(path):
-        return []
-    with open(path, encoding="utf-8") as f:
-        return json.load(f)
+    return db.read_doc(tenancy.LIBRARY, [])
 
 
 def _save(data: List[dict]):
-    with open(tenancy.data_path(), "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2, ensure_ascii=False)
+    db.write_doc(tenancy.LIBRARY, data)
 
 
 def _next_id(data: List[dict]) -> int:
@@ -733,10 +722,8 @@ def reset_database(_t: str = Depends(require_tenant)):
     Also clears metric history so reset state is clean (snapshots that
     referenced edited/removed creators do not linger).
     """
-    seed_p = tenancy.seed_path()
-    if os.path.exists(seed_p):
-        with open(seed_p, encoding="utf-8") as f:
-            seed = json.load(f)
+    seed = db.read_doc(tenancy.SEED)
+    if seed is not None:
         _save(seed)
         _save_history([])
         return {"message": "Library restored to seed baseline", "total": len(seed)}

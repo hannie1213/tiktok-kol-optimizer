@@ -9,15 +9,13 @@ Endpoints
   PUT    /campaigns/{id}/actual       Record actual GMV after campaign ends
   DELETE /campaigns/{id}              Delete a campaign
 """
-import json
-import os
 from datetime import datetime
 from typing import List, Optional
 
 from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
 
-from backend import tenancy
+from backend import db, tenancy
 from backend import calibration
 from backend.auth import require_tenant
 
@@ -30,16 +28,11 @@ router = APIRouter()
 #  Helpers
 # ════════════════════════════════════════════════════════════════
 def _load() -> List[dict]:
-    path = tenancy.campaigns_path()
-    if not os.path.exists(path):
-        return []
-    with open(path, encoding="utf-8") as f:
-        return json.load(f)
+    return db.read_doc(tenancy.CAMPAIGNS, [])
 
 
 def _save(data: List[dict]):
-    with open(tenancy.campaigns_path(), "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2, ensure_ascii=False)
+    db.write_doc(tenancy.CAMPAIGNS, data)
 
 
 def _next_id(data: List[dict]) -> int:

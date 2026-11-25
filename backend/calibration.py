@@ -14,10 +14,8 @@ so every factor defaults to 1.0 (predictions unchanged — zero behaviour change
 until real outcomes arrive).
 """
 import contextvars
-import json
-import os
 
-from backend import tenancy
+from backend import db, tenancy
 
 # How fast a new observation moves the factor, how much a thin segment / creator
 # is pulled toward its prior, and clamps on absurd single-campaign ratios.
@@ -30,23 +28,13 @@ _MIN_RATIO, _MAX_RATIO = 0.2, 5.0
 _CACHE: contextvars.ContextVar = contextvars.ContextVar("cal_cache", default=None)
 
 
-def _path() -> str:
-    return os.path.join(tenancy.tenant_dir(), "calibration.json")
-
-
 def _default() -> dict:
     return {"global": {"factor": 1.0, "n": 0}, "segments": {}, "creators": {}}
 
 
 def load() -> dict:
-    p = _path()
-    if not os.path.exists(p):
-        return _default()
-    try:
-        with open(p, encoding="utf-8") as f:
-            return json.load(f)
-    except (json.JSONDecodeError, OSError):
-        return _default()
+    data = db.read_doc(tenancy.CALIBRATION)
+    return data if isinstance(data, dict) else _default()
 
 
 def _cached() -> dict:
@@ -58,8 +46,7 @@ def _cached() -> dict:
 
 
 def _save(data: dict):
-    with open(_path(), "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2, ensure_ascii=False)
+    db.write_doc(tenancy.CALIBRATION, data)
 
 
 def _seg_key(category: str, country: str) -> str:

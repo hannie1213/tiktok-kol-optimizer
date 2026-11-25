@@ -40,5 +40,6 @@ shutil.copyfile(_DATA, os.path.join(_TMP, "seed_kols.json"))
 # Must be set BEFORE backend.tenancy / backend.main are imported by test modules.
 os.environ["KOL_DATA_DIR"] = _TMP
 os.environ["DEFAULT_TENANT"] = _TEST_TENANT
+os.environ["AUTH_RATE_LIMIT"] = "0/60"  # off by default; tests/test_security.py enables it explicitly
 
 atexit.register(lambda: shutil.rmtree(_TMP, ignore_errors=True))
