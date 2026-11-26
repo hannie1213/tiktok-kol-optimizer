@@ -11,7 +11,7 @@ Endpoints
 
 Campaigns persist to the `campaigns` table, scoped per-tenant (backend/repo.py).
 """
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Optional
 
 from fastapi import APIRouter, HTTPException, Depends
@@ -67,7 +67,7 @@ def save_campaign(req: CampaignCreate, _t: str = Depends(require_tenant)):
     """Persist an optimization result as a trackable campaign."""
     campaign = {
         "name":           req.name,
-        "created_at":     datetime.utcnow().isoformat(),
+        "created_at":     datetime.now(timezone.utc).replace(tzinfo=None).isoformat(),
         "countries":      req.countries,
         "category":       req.category,
         "budget":         req.budget,
@@ -123,7 +123,7 @@ def record_actual(campaign_id: int, req: ActualResultsUpdate, _t: str = Depends(
     if c["predicted_gmv"] > 0:
         c["accuracy_pct"] = round(req.actual_total_gmv / c["predicted_gmv"] * 100, 1)
     c["status"] = "completed"
-    c["completed_at"] = datetime.utcnow().isoformat()
+    c["completed_at"] = datetime.now(timezone.utc).replace(tzinfo=None).isoformat()
 
     repo.campaigns_put(tenant, campaign_id, c)
     activity.record(tenant, "campaign.results", c.get("name", ""), f"actual GMV {req.actual_total_gmv:,.0f}")

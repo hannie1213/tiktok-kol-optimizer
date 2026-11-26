@@ -50,9 +50,5 @@ services:
         sync: false
       - key: PAY_PAYEE_NAME         # name shown next to the payment QR
         sync: false
-      - key: PAY_CURRENCY
-        value: MYR
-      - key: PAY_FX_RATE            # USD plan price × this = amount charged in MYR
-        value: "4.4"
       - key: DEEPSEEK_API_KEY       # optional: turns on the AI copilot
         sync: false

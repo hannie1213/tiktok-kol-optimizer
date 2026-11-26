@@ -26,7 +26,7 @@ import contextvars
 from typing import Dict, List, Optional
 from fastapi import FastAPI, HTTPException, Query, Depends, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from pydantic import BaseModel, Field
@@ -74,6 +74,15 @@ from backend import jobs
 
 @contextlib.asynccontextmanager
 async def _lifespan(_app):
+    # Merchants only see real creators: drop generated placeholders left over
+    # from older seed libraries. (Skipped for the test suite's fixture tenant.)
+    if not tenancy.DEFAULT_TENANT:
+        try:
+            n = repo.purge_synthetic_creators()
+            if n:
+                logging.getLogger("kol").info("removed %d synthetic placeholder creators", n)
+        except Exception:                      # never block startup on hygiene
+            logging.getLogger("kol").exception("synthetic-creator purge failed")
     jobs.start()            # renewal reminders + cleanup (backend/jobs.py)
     yield
 
@@ -83,6 +92,10 @@ app = FastAPI(
     title="Lumio KOL Optimizer API",
     description="Local search optimizer for selecting a KOL portfolio under a marketing budget.",
     version="2.0",
+    # The interactive API docs are a developer tool; keep them off the public site.
+    docs_url=None if settings.IS_PRODUCTION else "/docs",
+    redoc_url=None if settings.IS_PRODUCTION else "/redoc",
+    openapi_url=None if settings.IS_PRODUCTION else "/openapi.json",
 )
 
 # The bundled frontend is served from this same origin, so production needs no
@@ -1303,4 +1316,17 @@ def simulate_scale(req: SimulateScaleRequest, _t: str = Depends(_throttle_comput
 
 # ── Serve frontend as static files (after all API routes) ──────────
 FRONTEND_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "frontend")
+
+
+@app.get("/", include_in_schema=False)
+@app.get("/index.html", include_in_schema=False)
+def index_page(request: Request):
+    """The landing page / console, with the share-preview tags (og:image, og:url)
+    pointing at this site's absolute origin — WhatsApp and Facebook need full URLs."""
+    with open(os.path.join(FRONTEND_DIR, "index.html"), encoding="utf-8") as f:
+        html = f.read()
+    return HTMLResponse(html.replace("__SITE__", mailer.base_url(request)),
+                        headers={"Cache-Control": "no-cache"})
+
+
 app.mount("/", StaticFiles(directory=FRONTEND_DIR, html=True), name="frontend")

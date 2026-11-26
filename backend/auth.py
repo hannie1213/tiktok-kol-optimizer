@@ -53,7 +53,7 @@ _JWT_ALG = "HS256"
 _TOKEN_TTL = timedelta(days=7)
 _DEMO_TOKEN_TTL = timedelta(hours=24)
 _DEMO_RETENTION = timedelta(hours=48)     # demo accounts are swept after this
-DEMO_SUFFIX = "@demo.tiko"
+DEMO_SUFFIX = "@demo.lumio"
 
 # Deliberately conservative: the address is rendered in the operator console
 # and pasted into payment messages, so markup characters are never accepted.

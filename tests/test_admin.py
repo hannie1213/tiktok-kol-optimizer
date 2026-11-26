@@ -77,7 +77,7 @@ def test_plan_change_reflects_in_users_and_mrr():
     assert row["plan"] == "pro"
     after = client.get("/admin/overview", headers=H).json()
     assert after["paid_users"] == before["paid_users"] + 1
-    assert after["mrr_usd"] == before["mrr_usd"] + billing.PLANS["pro"]["price_usd"]
+    assert after["mrr_myr"] == before["mrr_myr"] + billing.PLANS["pro"]["price_myr"]
 
 
 def test_plan_change_rejects_unknown_plan_and_user():

@@ -88,22 +88,22 @@
   }
 
   .tier-mega {
-    background: #4A148C;
+    background: #0E1428;
     color: #fff;
   }
 
   .tier-macro {
-    background: #0D47A1;
+    background: #24335C;
     color: #fff;
   }
 
   .tier-micro {
-    background: #1B5E20;
+    background: #4A5163;
     color: #fff;
   }
 
   .tier-nano {
-    background: #E65100;
+    background: #80879A;
     color: #fff;
   }
 
@@ -124,7 +124,7 @@
   }
 
   .toast.ok {
-    background: #1B5E20;
+    background: #4A5163;
     color: #fff;
   }
 
@@ -239,7 +239,7 @@
 
   .contrib-fill {
     height: 100%;
-    background: linear-gradient(90deg, #EDEEF0, #00a344);
+    background: linear-gradient(90deg, #24335C, #9AA0AA);
     border-radius: 99px;
     transition: width 0.5s ease;
   }

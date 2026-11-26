@@ -54,9 +54,8 @@ MAX_UPLOAD_BYTES = int(float(os.environ.get("MAX_UPLOAD_MB", "10")) * 1024 * 102
 # file exists; delete the file (or point this at nothing) to switch it off.
 PAY_QR_IMAGE = (os.environ.get("PAY_QR_IMAGE") or "pay/duitnow-qr.png").strip().lstrip("/")
 PAY_PAYEE_NAME = (os.environ.get("PAY_PAYEE_NAME") or "").strip()
-PAY_CURRENCY = (os.environ.get("PAY_CURRENCY") or "MYR").strip().upper()
-# How many units of PAY_CURRENCY one USD of list price costs.
-PAY_FX_RATE = float(os.environ.get("PAY_FX_RATE") or 4.4)
+# Plan prices in backend/billing.py are set in ringgit, so orders are always MYR.
+PAY_CURRENCY = "MYR"
 # Where "a merchant says they paid" notices go (needs SMTP).
 OPERATOR_EMAIL = (os.environ.get("OPERATOR_EMAIL") or "").strip()
 

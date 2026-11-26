@@ -127,7 +127,7 @@ def test_operator_password_reset(monkeypatch):
 
 
 def test_register_rejects_markup_and_reserved_addresses():
-    for bad in ("<svg/onload=alert(1)>@x.io", "a@b", "who@demo.tiko", "x" * 250 + "@example.com"):
+    for bad in ("<svg/onload=alert(1)>@x.io", "a@b", "who@demo.lumio", "x" * 250 + "@example.com"):
         r = client.post("/auth/register", json={"email": bad, "password": "secret123"})
         assert r.status_code == 422, bad
     too_long = client.post("/auth/register", json={"email": _email(), "password": "p" * 200})

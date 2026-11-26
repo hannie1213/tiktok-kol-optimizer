@@ -74,8 +74,7 @@ APP_BASE_URL=https://你的域名
 - **收款码图片**：`frontend/pay/duitnow-qr.png`。换码时直接替换这个文件；删除它则关闭扫码
   收款，升级按钮退回到 WhatsApp / 微信联系方式
 - **`PAY_PAYEE_NAME`**：显示在二维码旁的收款人姓名，方便付款人核对
-- **`PAY_FX_RATE`**：套餐标价是美元，订单按此汇率折算成 `PAY_CURRENCY`（默认 MYR，汇率默认 4.4，
-  **请按你想收的价格自行设定**）
+- **价格**：套餐直接以马币定价（Pro RM29 / 月、Team RM99 / 月），在 `backend/billing.py` 的 `PLANS` 里修改
 - **`OPERATOR_EMAIL`**：用户提交付款后通知你的邮箱（需已配置 SMTP）
 
 为什么金额带零头：静态收款码无法通知服务器到账，所以每笔订单会在标价基础上减去 1–49 分，

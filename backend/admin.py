@@ -17,7 +17,7 @@ Endpoints
   GET  /admin/audit          Trail of operator actions
   POST /admin/reset-password Issue a one-time temporary password (forgot-password support)
   POST /admin/delete-user    Delete one account + wipe its tenant data
-  POST /admin/cleanup-demos  Delete all @demo.tiko throwaway accounts
+  POST /admin/cleanup-demos  Delete all @demo.lumio throwaway accounts
   GET  /admin/interests      Early-access interest registrations
 """
 import json
@@ -125,7 +125,7 @@ def overview():
     demo = sum(r["demo"] for r in rows)
     # One paying customer per workspace: invited members share the owner's plan.
     paying = [r for r in rows if not r["demo"] and r["plan"] != "free" and r["role"] != "member"]
-    mrr = sum(PLANS.get(r["plan"], PLANS["free"])["price_usd"] for r in paying)
+    mrr = sum(PLANS.get(r["plan"], PLANS["free"])["price_myr"] for r in paying)
     now = datetime.now(timezone.utc)
     soon = (now + timedelta(days=7)).isoformat()
     month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0).isoformat()
@@ -143,7 +143,7 @@ def overview():
         "real_users": len(rows) - demo,
         "paid_users": len(paying),
         "demo_users": demo,
-        "mrr_usd": mrr,
+        "mrr_myr": mrr,
         "optimize_runs_month": sum(r["optimize_runs"] for r in rows),
         "agent_messages_month": sum(r["agent_messages"] for r in rows),
     }
@@ -169,7 +169,7 @@ def set_plan(req: PlanChange, request: Request, background: BackgroundTasks):
         raise HTTPException(status_code=404, detail="No account with that email")
 
     before = repo.plan_info(user["tenant_id"])
-    paid = PLANS[req.plan]["price_usd"] > 0
+    paid = PLANS[req.plan]["price_myr"] > 0
     expires_at = None
     if paid and req.months:
         # A renewal of a permanent grant is the one case term_end keeps
@@ -377,30 +377,64 @@ def set_announcement(req: Announcement, request: Request):
 
 
 @router.get("/admin/pool")
-def pool_list(q: str = "", limit: int = 100):
+def pool_list(q: str = "", status: str = "", limit: int = 100):
     """The shared Explore pool, newest capture first — every workspace can
-    write to it, so the operator needs to be able to look and prune."""
+    write to it, so the operator needs to be able to look, approve and prune.
+    `status` filters to pending | public | hidden."""
     from sqlalchemy import func, or_, select
     from backend.db import PoolCreator, SessionLocal
     from backend.pool import _to_dict
     stmt = select(PoolCreator)
+    if status in _POOL_STATUSES:
+        stmt = stmt.where(PoolCreator.status == status)
     if q.strip():
         like = "%" + q.strip().lower().lstrip("@") + "%"
         stmt = stmt.where(or_(PoolCreator.handle_key.like(like), func.lower(PoolCreator.name).like(like)))
     with SessionLocal() as s:
         total = s.scalar(select(func.count()).select_from(PoolCreator)) or 0
+        counts = dict(s.execute(select(PoolCreator.status, func.count()).group_by(PoolCreator.status)).all())
         rows = s.scalars(stmt.order_by(PoolCreator.last_seen.desc()).limit(max(1, min(500, limit)))).all()
-        return {"total": total, "items": [_to_dict(r) for r in rows]}
+        items = []
+        for r in rows:
+            d = _to_dict(r)
+            d["confirmations"] = r.confirmations or 0
+            items.append(d)
+        return {"total": total, "counts": {k: counts.get(k, 0) for k in _POOL_STATUSES}, "items": items}
+
+
+_POOL_STATUSES = ("pending", "public", "hidden")
+
+
+class PoolStatus(BaseModel):
+    status: str
+
+
+@router.post("/admin/pool/{creator_id}/status")
+def pool_set_status(creator_id: int, req: PoolStatus, request: Request):
+    """Approve (public), hide, or send a pool creator back to pending."""
+    from backend.db import PoolCreator, SessionLocal
+    if req.status not in _POOL_STATUSES:
+        raise HTTPException(status_code=422, detail="status must be pending, public or hidden")
+    with SessionLocal.begin() as s:
+        row = s.get(PoolCreator, creator_id)
+        if not row:
+            raise HTTPException(status_code=404, detail="Creator not found")
+        row.status = req.status
+        handle = row.handle
+    _audit(request, "pool." + req.status, "@" + handle)
+    return {"status": "ok"}
 
 
 @router.delete("/admin/pool/{creator_id}")
 def pool_delete(creator_id: int, request: Request):
-    from backend.db import PoolCreator, SessionLocal
+    from sqlalchemy import delete
+    from backend.db import PoolCapture, PoolCreator, SessionLocal
     with SessionLocal.begin() as s:
         row = s.get(PoolCreator, creator_id)
         if not row:
             raise HTTPException(status_code=404, detail="Creator not found")
         handle = row.handle
+        s.execute(delete(PoolCapture).where(PoolCapture.creator_id == creator_id))
         s.delete(row)
     _audit(request, "pool.delete", "@" + handle)
     return {"status": "ok"}
@@ -443,9 +477,8 @@ def status():
             "enabled": payments.enabled(),
             "payee": settings.PAY_PAYEE_NAME or None,
             "currency": settings.PAY_CURRENCY,
-            "fx_rate": settings.PAY_FX_RATE,
             "prices": {pid: payments.list_price(pid, 1)
-                       for pid, p in PLANS.items() if p["price_usd"] > 0},
+                       for pid, p in PLANS.items() if p["price_myr"] > 0},
         },
         "copilot": {"enabled": copilot_key,
                     "model": os.environ.get("AGENT_MODEL", "deepseek-chat")},
