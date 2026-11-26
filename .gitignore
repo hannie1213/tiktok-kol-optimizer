@@ -36,3 +36,9 @@ _docx_render/
 cookies.txt
 allchunks.js
 shell.html
+
+# Payment QR codes are uploaded in /admin.html and kept in the database —
+# never commit one (the repository may be public).
+frontend/pay/
+*qr*.png
+*qr*.jpg

@@ -54,3 +54,18 @@ from backend import repo  # noqa: E402
 repo.plan_set(_TEST_TENANT, "team")
 
 atexit.register(lambda: shutil.rmtree(_TMP, ignore_errors=True))
+
+
+# Scan-to-pay is on only once the operator has uploaded a receiving QR (it lives
+# in the database, never in the repository). Give the suite one up front.
+import pytest  # noqa: E402
+
+TEST_QR_PNG = bytes.fromhex("89504e470d0a1a0a0000000d4948445200000001000000010806000000"
+                            "1f15c4890000000d49444154789c6360000002000154a24f5d0000000049454e44ae426082")
+
+
+@pytest.fixture(autouse=True, scope="session")
+def _payment_qr():
+    from backend import payments
+    if not payments.enabled():
+        payments.store_qr(TEST_QR_PNG)

@@ -1,6 +1,6 @@
 """
 QR-payment orders: create → pay → submit reference → operator confirms,
-plus plan expiry. Uses the QR image that ships in frontend/pay/.
+plus plan expiry. The receiving QR is uploaded through the admin console.
 """
 import os
 import sys
@@ -24,7 +24,13 @@ def _config(monkeypatch):
     monkeypatch.setattr(settings, "ADMIN_KEY", "operator-key-for-tests")
     monkeypatch.setattr(settings, "BILLING_SELF_SERVE", False)
     monkeypatch.setattr(settings, "PAY_CURRENCY", "MYR")
-    assert payments.enabled(), "frontend/pay/duitnow-qr.png should ship with the repo"
+    if not payments.enabled():
+        payments.store_qr(PNG)
+
+
+# A minimal valid PNG (1×1) standing in for the receiving QR code.
+PNG = bytes.fromhex("89504e470d0a1a0a0000000d4948445200000001000000010806000000"
+                    "1f15c4890000000d49444154789c6360000002000154a24f5d0000000049454e44ae426082")
 
 
 def _register():
@@ -50,11 +56,14 @@ def test_pay_config_lists_prices_in_local_currency():
     _, headers, _ = _register()
     c = client.get("/billing/pay-config", headers=headers).json()
     assert c["enabled"] is True and c["currency"] == "MYR"
-    assert c["qr_image"] == "/pay/duitnow-qr.png"
+    assert c["qr_image"] == "/billing/pay-qr"
     assert c["prices"]["pro"]["1"] == 29.0                          # RM29 / month
     assert c["prices"]["team"]["1"] == 99.0                         # RM99 / month
     assert c["prices"]["team"]["12"] == 99.0 * 12
-    assert client.get("/pay/duitnow-qr.png").status_code == 200       # the image is served
+    img = client.get("/billing/pay-qr", headers=headers)             # signed-in accounts only
+    assert img.status_code == 200 and img.headers["content-type"] == "image/png"
+    assert "no-store" in img.headers["cache-control"]
+    assert client.get("/pay/duitnow-qr.png").status_code == 404       # nothing public
 
 
 def test_full_payment_flow_activates_plan_with_expiry():
@@ -209,8 +218,26 @@ def test_emails_operator_on_submit_and_merchant_on_confirm(monkeypatch):
     assert sent[-1]["To"] == email and "Pro" in sent[-1]["Subject"]
 
 
-def test_disabled_when_qr_image_missing(monkeypatch):
-    monkeypatch.setattr(settings, "PAY_QR_IMAGE", "pay/nope.png")
+def test_disabled_until_a_qr_is_uploaded():
+    assert client.delete("/admin/pay-qr", headers=ADMIN).status_code == 200
     _, headers, _ = _register()
     assert client.get("/billing/pay-config", headers=headers).json()["enabled"] is False
     assert client.post("/billing/orders", json={"plan": "pro"}, headers=headers).status_code == 503
+    assert client.get("/billing/pay-qr", headers=headers).status_code == 404
+    assert client.get("/admin/pay-qr", headers=ADMIN).json() == {"uploaded": False}
+
+    up = client.post("/admin/pay-qr", headers=ADMIN, files={"file": ("qr.png", PNG, "image/png")})
+    assert up.status_code == 200 and up.json()["mime"] == "image/png"
+    assert client.get("/billing/pay-config", headers=headers).json()["enabled"] is True
+    info = client.get("/admin/pay-qr", headers=ADMIN).json()
+    assert info["uploaded"] and info["data_url"].startswith("data:image/png;base64,")
+
+
+def test_qr_upload_rejects_non_images_and_needs_the_admin_key():
+    bad = client.post("/admin/pay-qr", headers=ADMIN, files={"file": ("x.png", b"<svg onload=alert(1)>", "image/png")})
+    assert bad.status_code == 422
+    big = client.post("/admin/pay-qr", headers=ADMIN,
+                      files={"file": ("x.png", PNG[:8] + b"0" * (2 * 1024 * 1024 + 10), "image/png")})
+    assert big.status_code == 413
+    assert client.post("/admin/pay-qr", files={"file": ("qr.png", PNG, "image/png")}).status_code == 403
+    assert client.delete("/admin/pay-qr").status_code == 403

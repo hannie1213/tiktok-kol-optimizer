@@ -29,7 +29,7 @@
 
 ## 三、收款设置（扫码付款）
 
-- 收款码图片在仓库的 `frontend/pay/duitnow-qr.png`，换成你自己的 DuitNow / TNG 收款码后合并到 `master` 即可。
+- 收款码**不放在代码仓库里**：部署后打开 `/admin.html`，在「付款订单」上方的「收款码」处上传你的 DuitNow / TNG 收款码图片（PNG / JPG，2 MB 以内）。图片保存在数据库里，重新部署不会丢，也只有已登录的商家在付款弹窗里才能看到。
 - 在 Environment 里填 `PAY_PAYEE_NAME`（显示在收款码旁边的收款人名字）。
 - 套餐直接以马币定价：Pro RM29 / 月、Team RM99 / 月（在 `backend/billing.py` 的 `PLANS` 里改）。
 - 想在商家点“我已付款”时收到邮件，先完成第四部分，再填 `OPERATOR_EMAIL`。
