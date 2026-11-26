@@ -1005,3 +1005,20 @@ def calibration_put(tenant_id: str, doc: dict):
             s.add(Calibration(tenant_id=tenant_id, doc=doc))
         else:
             row.doc = doc
+
+
+# ════════════════════════════════════════════════════════════════
+#  Data hygiene
+# ════════════════════════════════════════════════════════════════
+def purge_synthetic_creators() -> int:
+    """Remove generated placeholder creators (source='synthetic') from every
+    library and from each tenant's reset baseline, so merchants only ever see
+    real creators. Idempotent; returns how many library rows were removed."""
+    with _write_lock, _session() as s:
+        removed = s.execute(delete(Kol).where(Kol.source == "synthetic")).rowcount or 0
+        for t in s.scalars(select(Tenant)):
+            seed = t.seed or []
+            kept = [r for r in seed if (r or {}).get("source") != "synthetic"]
+            if len(kept) != len(seed):
+                t.seed = kept
+    return removed

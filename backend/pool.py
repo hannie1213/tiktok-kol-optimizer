@@ -11,9 +11,20 @@ that creator under Explore and copy them into their own library.
 What is and is not shared
 -------------------------
 Only what the public profile page displays is stored, plus when it was last
-seen and how many times it was captured. Nothing about who captured it, and
-nothing from any workspace's library (fees, ratings, notes, campaigns) ever
-enters the pool.
+seen and how many times it was captured. Nothing from any workspace's library
+(fees, ratings, notes, campaigns) ever enters the pool, and no workspace ever
+sees who captured a creator.
+
+Keeping fake creators out
+-------------------------
+Anyone with an account can call the capture endpoint, so a single submission
+is never trusted. A new creator starts "pending" and is shown only to the
+workspace that captured it. It turns "public" once POOL_MIN_WORKSPACES
+different workspaces (default 2) have captured the same profile on their own,
+or when the operator approves it in the admin console; the operator can also
+hide any entry. Once a creator is public, a capture whose follower count
+disagrees wildly with what is stored (more than 3× either way) is ignored, so
+one account cannot rewrite a confirmed profile.
 
 The extension authenticates with a "connection code": a long-lived token that
 can do exactly one thing — submit captures. It cannot read a workspace, and
@@ -44,7 +55,7 @@ from sqlalchemy import func, or_, select
 from backend import activity, billing, crud, ratelimit, repo, settings
 from backend.auth import DEMO_SUFFIX, _JWT_ALG, _pw_fingerprint, current_user, require_tenant
 from backend.categories import VALID_CATEGORIES
-from backend.db import PoolCreator, SessionLocal
+from backend.db import PoolCapture, PoolCreator, SessionLocal
 
 router = APIRouter()
 
@@ -52,6 +63,10 @@ PLATFORMS = ("tiktok", "instagram", "youtube")
 VALID_COUNTRIES = crud.VALID_COUNTRIES
 _EXT_TTL = timedelta(days=365)
 _HANDLE_RE = re.compile(r"^[A-Za-z0-9._\-]{2,64}$")
+# Independent workspaces that must capture a profile before everyone sees it.
+POOL_MIN_WORKSPACES = max(1, int(os.environ.get("POOL_MIN_WORKSPACES") or 2))
+_MAX_FOLLOWERS = 400_000_000          # above the largest real accounts
+_DRIFT = 3.0                          # public rows ignore captures off by more than this factor
 _EXT_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "extension")
 _PROFILE_URL = {
     "tiktok": "https://www.tiktok.com/@{h}",
@@ -69,7 +84,8 @@ def _to_dict(r: PoolCreator) -> dict:
             "profile_url": r.profile_url, "followers": r.followers, "likes": r.likes,
             "videos": r.videos, "bio": r.bio, "verified": bool(r.verified),
             "country": r.country, "category": r.category,
-            "first_seen": r.first_seen, "last_seen": r.last_seen, "captures": r.captures}
+            "first_seen": r.first_seen, "last_seen": r.last_seen, "captures": r.captures,
+            "status": r.status or "pending"}
 
 
 # ── Connection code for the extension ─────────────────────────────
@@ -148,7 +164,7 @@ class Capture(BaseModel):
     platform: str = Field("tiktok", max_length=16)
     handle: str = Field(..., max_length=80)
     name: str = Field("", max_length=120)
-    followers: int = Field(..., ge=0, le=2_000_000_000)
+    followers: int = Field(..., ge=0, le=_MAX_FOLLOWERS)
     likes: Optional[int] = Field(None, ge=0, le=200_000_000_000)
     videos: Optional[int] = Field(None, ge=0, le=10_000_000)
     bio: str = Field("", max_length=600)
@@ -173,27 +189,49 @@ def capture(req: Capture, user: dict = Depends(capture_user)):
     key = handle.lower()
     name = " ".join(req.name.split())[:120] or handle
     bio = " ".join(req.bio.split())[:300]
+    if req.likes is not None and req.videos == 0 and req.likes > 0:
+        raise HTTPException(status_code=422, detail="Those profile numbers don't add up.")
+    tenant_id = user["tenant_id"]
+    now = _now()
     with SessionLocal.begin() as s:
         row = s.scalar(select(PoolCreator).where(PoolCreator.platform == platform,
                                                  PoolCreator.handle_key == key))
         created = row is None
         if created:
-            row = PoolCreator(platform=platform, handle=handle, handle_key=key, first_seen=_now(), captures=0)
+            row = PoolCreator(platform=platform, handle=handle, handle_key=key, first_seen=now,
+                              captures=0, status="pending", confirmations=0)
             s.add(row)
-        row.name, row.bio, row.verified = name, bio, bool(req.verified)
+            s.flush()
+        # A confirmed profile is not rewritten by a capture that disagrees wildly.
+        stored = row.followers or 0
+        drifted = (row.status == "public" and stored > 0
+                   and not (stored / _DRIFT <= req.followers <= stored * _DRIFT))
+        if not drifted:
+            row.name, row.bio, row.verified = name, bio, bool(req.verified)
+            row.followers = req.followers
+            if req.likes is not None:
+                row.likes = req.likes
+            if req.videos is not None:
+                row.videos = req.videos
+            if country:
+                row.country = country
         row.profile_url = _PROFILE_URL[platform].format(h=handle)
-        row.followers = req.followers
-        if req.likes is not None:
-            row.likes = req.likes
-        if req.videos is not None:
-            row.videos = req.videos
-        if country:
-            row.country = country
-        row.last_seen = _now()
+        row.last_seen = now
         row.captures = (row.captures or 0) + 1
+        seen = s.scalar(select(PoolCapture).where(PoolCapture.creator_id == row.id,
+                                                  PoolCapture.tenant_id == tenant_id))
+        if seen:
+            seen.last_at = now
+        else:
+            s.add(PoolCapture(creator_id=row.id, tenant_id=tenant_id, first_at=now, last_at=now))
+            s.flush()
+        row.confirmations = s.scalar(select(func.count()).select_from(PoolCapture)
+                                     .where(PoolCapture.creator_id == row.id)) or 0
+        if row.status == "pending" and row.confirmations >= POOL_MIN_WORKSPACES:
+            row.status = "public"
         s.flush()
         out = _to_dict(row)
-    return {"status": "created" if created else "updated", "creator": out}
+    return {"status": "created" if created else "updated", "creator": out, "ignored": drifted}
 
 
 # ── Explore ───────────────────────────────────────────────────────
@@ -210,7 +248,11 @@ def search(q: Optional[str] = Query(None, max_length=80), country: Optional[str]
     country = (country or "").upper() or None
     if country and country not in VALID_COUNTRIES:
         raise HTTPException(status_code=422, detail=f"country must be one of: {', '.join(VALID_COUNTRIES)}")
-    stmt = select(PoolCreator)
+    # Everyone sees confirmed creators; a pending one only by the workspace that captured it.
+    mine_ids = select(PoolCapture.creator_id).where(PoolCapture.tenant_id == tenant_id)
+    visible = or_(PoolCreator.status == "public",
+                  (PoolCreator.status == "pending") & PoolCreator.id.in_(mine_ids))
+    stmt = select(PoolCreator).where(visible)
     if q and q.strip():
         like = "%" + q.strip().lower().lstrip("@").replace("%", "").replace("_", r"\_") + "%"
         stmt = stmt.where(or_(PoolCreator.handle_key.like(like, escape="\\"),
@@ -226,7 +268,7 @@ def search(q: Optional[str] = Query(None, max_length=80), country: Optional[str]
              "likes": PoolCreator.likes.desc()}.get(sort, PoolCreator.followers.desc())
     with SessionLocal() as s:
         total = s.scalar(select(func.count()).select_from(stmt.subquery())) or 0
-        pool_size = s.scalar(select(func.count()).select_from(PoolCreator)) or 0
+        pool_size = s.scalar(select(func.count()).select_from(PoolCreator).where(visible)) or 0
         rows = s.scalars(stmt.order_by(order, PoolCreator.id).limit(limit).offset(offset)).all()
         items = [_to_dict(r) for r in rows]
     mine = _library_urls(tenant_id)
@@ -252,7 +294,10 @@ def add_to_library(creator_id: int, req: AddToLibrary, tenant_id: str = Depends(
         raise HTTPException(status_code=422, detail=f"category must be one of: {', '.join(VALID_CATEGORIES)}")
     with SessionLocal() as s:
         row = s.get(PoolCreator, creator_id)
-        pc = _to_dict(row) if row else None
+        ok = row is not None and (row.status == "public" or (row.status == "pending" and s.scalar(
+            select(PoolCapture.id).where(PoolCapture.creator_id == row.id,
+                                         PoolCapture.tenant_id == tenant_id)) is not None))
+        pc = _to_dict(row) if ok else None
     if not pc:
         raise HTTPException(status_code=404, detail="Creator not found")
     if pc["profile_url"].lower().rstrip("/") in _library_urls(tenant_id):

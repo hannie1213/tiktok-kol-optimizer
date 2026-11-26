@@ -150,6 +150,8 @@ def test_add_to_library_estimates_what_the_page_did_not_show():
                        json={"country": "MY", "category": "beauty"}).status_code == 409
     # another workspace's library is untouched, and it can add the same creator itself
     other, other_tenant = _account()
+    assert client.get(f"/pool/search?q={handle}", headers=other).json()["items"] == []   # still unconfirmed
+    _capture(_ext(other), handle)                                   # a second workspace confirms it
     assert client.get(f"/pool/search?q={handle}", headers=other).json()["items"][0]["in_library"] is False
     assert client.post(f"/pool/{cid}/add", headers=other,
                        json={"country": "SG", "category": "personal_care"}).status_code == 200
@@ -177,3 +179,74 @@ def test_extension_zip_includes_icons_and_ping_reports_account():
     assert d["ok"] and d["email"] == email and d["latest_version"]
     # a normal sign-in token is not an extension code
     assert client.get("/extension/ping", headers=h).status_code == 401
+
+
+# ── Keeping fake creators out of the shared pool ──────────────────
+ADMIN = {"X-Admin-Key": "pool-admin-key-for-tests"}
+
+
+def _admin(monkeypatch):
+    from backend import settings
+    monkeypatch.setattr(settings, "ADMIN_KEY", ADMIN["X-Admin-Key"])
+
+
+def test_one_workspace_alone_cannot_publish_a_creator():
+    a, _ = _account()
+    b, _ = _account()
+    handle = _handle()
+    c = _capture(_ext(a), handle, name="Totally Real", followers=9_000_000).json()["creator"]
+    assert c["status"] == "pending"
+    # the capturing workspace sees it (marked pending); nobody else does, and nobody else can add it
+    mine = client.get(f"/pool/search?q={handle}", headers=a).json()
+    assert mine["items"][0]["status"] == "pending"
+    theirs = client.get(f"/pool/search?q={handle}", headers=b).json()
+    assert theirs["items"] == [] and theirs["total"] == 0
+    assert client.post(f"/pool/{c['id']}/add", headers=b,
+                       json={"country": "MY", "category": "beauty"}).status_code == 404
+    # capturing again from the same workspace does not count as a confirmation
+    assert _capture(_ext(a), handle, followers=9_000_000).json()["creator"]["status"] == "pending"
+    # an independent capture from another workspace confirms it
+    assert _capture(_ext(b), handle, followers=9_100_000).json()["creator"]["status"] == "public"
+    other, _ = _account()
+    assert client.get(f"/pool/search?q={handle}", headers=other).json()["items"][0]["status"] == "public"
+
+
+def test_a_confirmed_profile_ignores_wildly_different_numbers():
+    a, _ = _account()
+    b, _ = _account()
+    handle = _handle()
+    _capture(_ext(a), handle, followers=200_000)
+    _capture(_ext(b), handle, followers=210_000)
+    r = _capture(_ext(a), handle, followers=150_000_000, bio="DM me: scam.example").json()
+    assert r["ignored"] is True
+    assert r["creator"]["followers"] == 210_000 and "scam" not in r["creator"]["bio"]
+    # ordinary growth is still accepted
+    assert _capture(_ext(a), handle, followers=260_000).json()["creator"]["followers"] == 260_000
+
+
+def test_implausible_profiles_are_rejected():
+    h, _ = _account()
+    ext = _ext(h)
+    assert _capture(ext, followers=900_000_000).status_code == 422
+    assert _capture(ext, likes=5000, videos=0).status_code == 422
+
+
+def test_operator_can_approve_and_hide(monkeypatch):
+    _admin(monkeypatch)
+    a, _ = _account()
+    b, _ = _account()
+    handle = _handle()
+    cid = _capture(_ext(a), handle).json()["creator"]["id"]
+    pending = client.get("/admin/pool?status=pending&q=" + handle, headers=ADMIN).json()
+    assert [i["handle"] for i in pending["items"]] == [handle] and pending["counts"]["pending"] >= 1
+
+    assert client.post(f"/admin/pool/{cid}/status", headers=ADMIN, json={"status": "public"}).status_code == 200
+    assert client.get(f"/pool/search?q={handle}", headers=b).json()["total"] == 1
+    assert client.post(f"/admin/pool/{cid}/status", headers=ADMIN, json={"status": "hidden"}).status_code == 200
+    assert client.get(f"/pool/search?q={handle}", headers=b).json()["total"] == 0
+    assert client.get(f"/pool/search?q={handle}", headers=a).json()["total"] == 0    # hidden for everyone
+    # more captures never bring a hidden creator back
+    _capture(_ext(b), handle)
+    assert client.get(f"/pool/search?q={handle}", headers=b).json()["total"] == 0
+    assert client.post(f"/admin/pool/{cid}/status", headers=ADMIN, json={"status": "nope"}).status_code == 422
+    assert client.post(f"/admin/pool/{cid}/status", json={"status": "public"}).status_code == 403

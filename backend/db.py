@@ -315,6 +315,24 @@ class PoolCreator(Base):
     first_seen: Mapped[str] = mapped_column(String(40), default="")
     last_seen: Mapped[str] = mapped_column(String(40), default="", index=True)
     captures: Mapped[int] = mapped_column(Integer, default=0)
+    # pending → seen by one workspace only, shown to that workspace alone;
+    # public  → confirmed by POOL_MIN_WORKSPACES workspaces or by the operator;
+    # hidden  → removed from Explore by the operator.
+    status: Mapped[str] = mapped_column(String(16), default="pending", index=True)
+    confirmations: Mapped[int] = mapped_column(Integer, default=0)
+
+
+class PoolCapture(Base):
+    """Which workspaces have captured a pool creator — used only to confirm a
+    profile independently before it is shown to everyone. Never exposed by the API."""
+    __tablename__ = "pool_captures"
+    __table_args__ = (UniqueConstraint("creator_id", "tenant_id", name="uq_pool_capture_tenant"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    creator_id: Mapped[int] = mapped_column(Integer, index=True)
+    tenant_id: Mapped[str] = mapped_column(String(64), index=True)
+    first_at: Mapped[str] = mapped_column(String(40), default="")
+    last_at: Mapped[str] = mapped_column(String(40), default="")
 
 
 class ApiInterest(Base):
@@ -340,6 +358,9 @@ _ADDED_COLUMNS = [
     ("tenant_plans", "reminded", "VARCHAR(64)"),
     ("users", "role", "VARCHAR(16) NOT NULL DEFAULT 'owner'"),
     ("users", "disabled", "BOOLEAN NOT NULL DEFAULT FALSE"),
+    # Rows captured before verification existed start unconfirmed.
+    ("pool_creators", "status", "VARCHAR(16) NOT NULL DEFAULT 'pending'"),
+    ("pool_creators", "confirmations", "INTEGER NOT NULL DEFAULT 0"),
 ]
 
 

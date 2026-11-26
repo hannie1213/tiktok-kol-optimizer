@@ -74,6 +74,15 @@ from backend import jobs
 
 @contextlib.asynccontextmanager
 async def _lifespan(_app):
+    # Merchants only see real creators: drop generated placeholders left over
+    # from older seed libraries. (Skipped for the test suite's fixture tenant.)
+    if not tenancy.DEFAULT_TENANT:
+        try:
+            n = repo.purge_synthetic_creators()
+            if n:
+                logging.getLogger("kol").info("removed %d synthetic placeholder creators", n)
+        except Exception:                      # never block startup on hygiene
+            logging.getLogger("kol").exception("synthetic-creator purge failed")
     jobs.start()            # renewal reminders + cleanup (backend/jobs.py)
     yield
 

@@ -260,8 +260,7 @@ tiktok-kol-optimizer/
 ├── data/
 │   ├── generator.py         # Synthetic KOL generator + per-slice fill helper
 │   ├── build_seed.py        # Build the seed library from real CSV/Excel exports
-│   ├── fill_slices.py       # Top up thin market×category slices with synthetic fill
-│   ├── sample_kols.json     # Active KOL database (real FastMoss seed + synthetic fill)
+│   ├── sample_kols.json     # Active KOL database (real creators only — no synthetic fill)
 │   ├── seed_kols.json       # Restore baseline that /kols/reset returns to
 │   ├── kol_history.json     # KOL metric snapshots over time
 │   ├── campaigns.json       # Saved campaign attribution records

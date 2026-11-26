@@ -318,12 +318,19 @@
         <h2 class="sec"><span class="n">POOL</span>共享达人池
             <span id="pool-total" style="font-size:12px;color:var(--mut);font-weight:400"></span>
             <span class="spacer"></span>
+            <select id="pool-status" onchange="loadPool()" style="width:auto">
+                <option value="pending">待核实</option>
+                <option value="">全部</option>
+                <option value="public">已公开</option>
+                <option value="hidden">已隐藏</option>
+            </select>
             <input id="pool-q" type="search" placeholder="搜索账号 / 名称…" oninput="clearTimeout(window._poolT);window._poolT=setTimeout(loadPool,300)" style="width:230px" />
         </h2>
+        <p style="font-size:12px;color:var(--mut);margin:-6px 0 10px">新采集的达人先是「待核实」，只有采集它的商家能看到；被 2 个不同工作区各自采集到，或由你点「公开」后，所有商家才能在「发现达人」里看到。可疑的点「隐藏」。</p>
         <div class="card" style="overflow-x:auto">
             <table>
-                <thead><tr><th>达人</th><th style="text-align:right">粉丝</th><th style="text-align:right">获赞</th><th>国家</th><th style="text-align:right">采集次数</th><th>最近采集</th><th></th></tr></thead>
-                <tbody id="pool-body"><tr><td colspan="7" class="empty">加载中…</td></tr></tbody>
+                <thead><tr><th>达人</th><th style="text-align:right">粉丝</th><th style="text-align:right">获赞</th><th>国家</th><th style="text-align:right">采集次数</th><th>状态</th><th>最近采集</th><th></th></tr></thead>
+                <tbody id="pool-body"><tr><td colspan="8" class="empty">加载中…</td></tr></tbody>
             </table>
         </div>
 
@@ -640,19 +647,28 @@
         async function loadPool() {
             try {
                 const q = document.getElementById('pool-q').value.trim();
-                const d = await req('/admin/pool?limit=100' + (q ? '&q=' + encodeURIComponent(q) : ''));
+                const st = document.getElementById('pool-status').value;
+                const d = await req('/admin/pool?limit=100' + (st ? '&status=' + st : '') + (q ? '&q=' + encodeURIComponent(q) : ''));
                 POOL = d.items;
-                document.getElementById('pool-total').textContent = `共 ${d.total} 位` + (d.items.length < d.total ? `，显示最近 ${d.items.length} 位` : '');
+                const c = d.counts || {};
+                document.getElementById('pool-total').textContent = `共 ${d.total} 位 · 待核实 ${c.pending || 0} · 已公开 ${c.public || 0} · 已隐藏 ${c.hidden || 0}`;
                 document.getElementById('pool-body').innerHTML = d.items.length ? d.items.map((r, i) => `<tr>
                     <td class="email">${esc(r.name)}<small><a href="${esc(r.profile_url)}" target="_blank" rel="noopener noreferrer" style="color:inherit">@${esc(r.handle)} ↗</a></small></td>
                     <td class="num" style="text-align:right">${fmtCount(r.followers)}</td>
                     <td class="num" style="text-align:right">${fmtCount(r.likes)}</td>
                     <td>${esc(r.country || '—')}</td>
-                    <td class="num" style="text-align:right">${r.captures}</td>
+                    <td class="num" style="text-align:right">${r.captures}<small style="display:block;color:var(--mut)">${r.confirmations || 0} 个工作区</small></td>
+                    <td>${POOL_STATUS[r.status] || esc(r.status)}</td>
                     <td class="num" style="font-size:11.5px;color:var(--mut)">${fmtDate(r.last_seen)}</td>
-                    <td><div class="row-actions"><button class="btn danger" onclick="removePool(${i})">删除</button></div></td></tr>`).join('')
-                    : '<tr><td colspan="7" class="empty">达人池里还没有达人。商家安装浏览器扩展并浏览达人主页后，这里会出现记录。</td></tr>';
+                    <td><div class="row-actions">${r.status !== 'public' ? `<button class="btn" onclick="setPool(${i},'public')">公开</button>` : ''}${r.status !== 'hidden' ? `<button class="btn" onclick="setPool(${i},'hidden')">隐藏</button>` : ''}<button class="btn danger" onclick="removePool(${i})">删除</button></div></td></tr>`).join('')
+                    : '<tr><td colspan="8" class="empty">达人池里还没有达人。商家安装浏览器扩展并浏览达人主页后，这里会出现记录。</td></tr>';
             } catch (_) { /* shown on next refresh */ }
+        }
+        const POOL_STATUS = { pending: '待核实', public: '已公开', hidden: '已隐藏' };
+        async function setPool(i, status) {
+            const r = POOL[i]; if (!r) return;
+            try { await req('/admin/pool/' + r.id + '/status', { method: 'POST', body: JSON.stringify({ status }) }); toast(`@${r.handle} → ${POOL_STATUS[status]}`); loadPool(); }
+            catch (e) { toast('操作失败：' + e.message, 'err'); }
         }
         async function removePool(i) {
             const r = POOL[i]; if (!r) return;
@@ -769,7 +785,7 @@
         // ── Audit trail ──
         const AUDIT_LABELS = {
             'jobs.run': '手动运行定时任务', 'user.suspend': '停用账号', 'user.unsuspend': '恢复账号',
-            'announcement.set': '发布公告', 'announcement.clear': '撤下公告', 'pool.delete': '删除达人池记录',
+            'announcement.set': '发布公告', 'announcement.clear': '撤下公告', 'pool.delete': '删除达人池记录', 'pool.public': '公开达人池记录', 'pool.hidden': '隐藏达人池记录', 'pool.pending': '达人池记录改回待核实',
             'plan.set': '设置套餐', 'plan.grant': '接口开通套餐', 'order.confirm': '确认到账', 'order.reject': '驳回付款',
             'user.delete': '删除账号', 'user.reset_password': '重置密码', 'demo.cleanup': '清理 Demo'
         };
