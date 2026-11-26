@@ -15,7 +15,7 @@
     <script>
         (function () {
             var p = 'light';
-            try { p = localStorage.getItem('tiko_theme') || 'light'; } catch (e) {}
+            try { p = (localStorage.getItem('lumio_theme') || localStorage.getItem('tiko_theme')) || 'light'; } catch (e) {}
             var light = p === 'light' || (p === 'system' && window.matchMedia('(prefers-color-scheme: light)').matches);
             document.documentElement.dataset.theme = light ? 'light' : 'dark';
         })();
@@ -399,7 +399,7 @@
         // Same-origin when served by the backend's static mount; explicit
         // localhost only when the file is opened directly from disk.
         const API = location.protocol === 'file:' ? 'http://localhost:8000' : '';
-        let KEY = sessionStorage.getItem('tiko_admin_key') || '';
+        let KEY = sessionStorage.getItem('lumio_admin_key') || '';
         let USERS = [];   // full list from the server
         let VIEW = [];    // currently rendered (filtered + sorted) rows
         let SORT = { key: null, dir: 1 };
@@ -435,7 +435,7 @@
             if (!KEY) return;
             try {
                 await req('/admin/overview');
-                sessionStorage.setItem('tiko_admin_key', KEY);
+                sessionStorage.setItem('lumio_admin_key', KEY);
                 document.getElementById('gate').style.display = 'none';
                 document.getElementById('app').style.display = '';
                 loadAll();
@@ -450,7 +450,7 @@
             }
         }
         function logout() {
-            sessionStorage.removeItem('tiko_admin_key'); KEY = '';
+            sessionStorage.removeItem('lumio_admin_key'); KEY = '';
             document.getElementById('app').style.display = 'none';
             document.getElementById('gate').style.display = 'flex';
             document.getElementById('key-input').value = '';
@@ -525,7 +525,7 @@
         function toggleTheme() {
             const next = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
             document.documentElement.dataset.theme = next;
-            try { localStorage.setItem('tiko_theme', next); } catch (_) {}
+            try { localStorage.setItem('lumio_theme', next); } catch (_) {}
             applyThemeLabel();
         }
         applyThemeLabel();
@@ -1037,7 +1037,7 @@
         async function cleanupDemos() {
             const n = USERS.filter(u => u.demo).length;
             if (!n) { toast('当前没有 Demo 账号'); return; }
-            if (!confirm(`清理全部 ${n} 个 Demo 账号（@demo.tiko）及其数据？`)) return;
+            if (!confirm(`清理全部 ${n} 个 Demo 账号（@demo.lumio）及其数据？`)) return;
             try {
                 const d = await req('/admin/cleanup-demos', { method: 'POST' });
                 toast(`已清理 ${d.removed} 个 Demo 账号`);

@@ -86,7 +86,7 @@ def _unique_amount(plan: str, months: int) -> float:
 
 
 def _order_no() -> str:
-    return "TK" + "".join(secrets.choice(_ORDER_ALPHABET) for _ in range(6))
+    return "LM" + "".join(secrets.choice(_ORDER_ALPHABET) for _ in range(6))
 
 
 def _expire_stale():

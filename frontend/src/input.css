@@ -239,7 +239,7 @@
 
   .contrib-fill {
     height: 100%;
-    background: linear-gradient(90deg, #EDEEF0, #00a344);
+    background: linear-gradient(90deg, #24335C, #9AA0AA);
     border-radius: 99px;
     transition: width 0.5s ease;
   }

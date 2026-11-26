@@ -21,7 +21,7 @@ import io
 import os
 import random
 import re
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Optional
 
 from fastapi import APIRouter, HTTPException, UploadFile, File, Form, Depends
@@ -56,7 +56,7 @@ def _record_snapshot(kol_record: dict):
     metrics = {f: kol_record[f] for f in _SNAPSHOT_FIELDS
                if f in kol_record and kol_record[f] is not None}
     repo.history_append(tenancy.current_tenant(), kol_record["id"],
-                        datetime.utcnow().isoformat(), metrics)
+                        datetime.now(timezone.utc).replace(tzinfo=None).isoformat(), metrics)
 
 VALID_COUNTRIES = ["MY", "ID", "TH", "PH", "SG", "VN"]
 from backend.categories import VALID_CATEGORIES      # noqa: E402 — the single category list
@@ -554,7 +554,7 @@ def rate_kol(kol_id: int, body: RatingIn, _t: str = Depends(require_tenant)):
     log.append({
         "score": body.score,
         "note": (body.note or "").strip() or None,
-        "at": datetime.utcnow().isoformat(),
+        "at": datetime.now(timezone.utc).replace(tzinfo=None).isoformat(),
     })
     repo.kols_update(tenant, kol_id, {
         "rating": body.score,

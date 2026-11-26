@@ -4,16 +4,22 @@
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>Lumio — AI KOL Optimizer</title>
+    <title>Lumio — AI 达人投放优化 · AI KOL Optimizer</title>
     <meta name="description" content="Lumio picks the creator lineup with the highest predicted GMV for your budget, then helps you run the campaign: outreach, contracts, results and AI insights. Built for social-commerce sellers in Southeast Asia." />
     <meta name="theme-color" content="#08080A" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Lumio" />
     <meta property="og:title" content="Lumio — put every dollar behind the creators who actually sell" />
     <meta property="og:description" content="AI creator selection and campaign management for social-commerce sellers in Southeast Asia. Free to start." />
-    <meta name="twitter:card" content="summary" />
+    <!-- __SITE__ is replaced with the site's origin when the page is served (backend/main.py). -->
+    <meta property="og:url" content="__SITE__/" />
+    <meta property="og:image" content="__SITE__/og.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="__SITE__/og.jpg" />
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'><defs><linearGradient id='s' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%23FFFFFF'/><stop offset='.45' stop-color='%23BFC3CA'/><stop offset='.7' stop-color='%237E838C'/><stop offset='1' stop-color='%23E6E8EB'/></linearGradient></defs><rect width='40' height='40' rx='10' fill='%230A0A0B'/><circle cx='20' cy='20' r='10' fill='none' stroke='url(%23s)' stroke-width='1.8'/><path d='M27.07 8.6Q27.07 12.93 31.4 12.93Q27.07 12.93 27.07 17.26Q27.07 12.93 22.74 12.93Q27.07 12.93 27.07 8.6Z' fill='%23FFFFFF'/></svg>" />
-    <link href="./dist/output.css?v=refine1" rel="stylesheet" />
+    <link href="./dist/output.css?v=mono2" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
         rel="stylesheet" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -854,7 +860,7 @@
         // before first paint, so there is no flash of the wrong theme
         (function () {
             var p = 'light';
-            try { p = localStorage.getItem('tiko_theme') || 'light'; } catch (e) {}
+            try { p = (localStorage.getItem('lumio_theme') || localStorage.getItem('tiko_theme')) || 'light'; } catch (e) {}
             var light = p === 'light' || (p === 'system' && window.matchMedia('(prefers-color-scheme: light)').matches);
             document.documentElement.dataset.theme = light ? 'light' : 'dark';
         })();
@@ -3412,7 +3418,10 @@
             const num = document.getElementById('pl-num');
             if (!lp) return;
             const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-            if (!pl || !num || reduced) {
+            // The counter plays once per browser session, not on every visit.
+            let seen = false;
+            try { seen = sessionStorage.getItem('lumio_intro') === '1'; sessionStorage.setItem('lumio_intro', '1'); } catch (_) {}
+            if (!pl || !num || reduced || seen) {
                 if (pl) pl.remove();
                 lp.classList.add('lp-loaded');
                 return;
@@ -3889,7 +3898,7 @@
             'b.payNote': 'Upgrade by scanning our QR code: pick a plan, pay the exact amount shown, and submit your transaction reference. We confirm it against our account and activate your plan — usually within a few hours — and email you when it is done.',
             'd.recTeam': 'Your Recommended KOL Team', 'd.aiOpt': 'AI Optimized', 'd.budgetUsed': 'Budget Used', 'd.predGmv': 'Predicted GMV', 'd.gmvFull': 'Gross Merchandise Value',
             'd.roi': 'Return on Investment', 'd.gmvCost': 'GMV / Cost', 'd.algoCompare': 'AI cross-check — 6 strategies verified your lineup', 'd.fullAnalysis': 'Full analysis',
-            'd.stratPlans': 'Strategy Plans', 'd.clickPlan': 'Click a plan to view its creators', 'd.creatorsSel': 'Creators selected', 'd.usedOfCap': '{p}% of the {b} cap', 'd.sortedByGmv': 'Sorted by GMV contribution',
+            'd.stratPlans': 'Strategy Plans', 'd.clickPlan': 'Click a plan to view its creators', 'd.creatorsSel': 'creators selected', 'd.planKols': 'Creators selected', 'd.usedOfCap': '{p}% of the {b} cap', 'd.sortedByGmv': 'Sorted by GMV contribution',
             'd.readyLaunch': 'Ready to Launch', 'd.saveCampaign': 'Save Campaign', 'd.recAlgo': 'Recommended Algo', 'd.kolsSel': 'KOLs Selected', 'd.cands': 'Candidates',
             'd.effConv': 'Efficiency Convergence', 'd.algoBench': 'Algorithm Benchmark', 'd.benchCands': 'Benchmarking Candidates', 'd.strategy': 'Strategy',
             'd.start': 'Start', 'd.end': 'End', 'd.util': '% Utilization', 'd.poolSim': 'Creator Pool Simulator',
@@ -3992,7 +4001,7 @@
             'b.payNote': '扫码即可升级：选择套餐，按页面显示的金额准确付款，再提交交易参考号。我们核对到账后为你开通（通常几小时内），并邮件通知你。',
             'd.recTeam': '为你推荐的 KOL 阵容', 'd.aiOpt': 'AI 已优化', 'd.budgetUsed': '已用预算', 'd.predGmv': '预测 GMV', 'd.gmvFull': '商品交易总额',
             'd.roi': '投资回报率', 'd.gmvCost': 'GMV / 成本', 'd.algoCompare': 'AI 交叉验证 — 6 套策略共同确认了你的阵容', 'd.fullAnalysis': '完整分析',
-            'd.stratPlans': '策略方案', 'd.clickPlan': '点击方案查看其达人阵容', 'd.creatorsSel': '入选达人', 'd.usedOfCap': '占上限 {b} 的 {p}%', 'd.sortedByGmv': '按 GMV 贡献排序',
+            'd.stratPlans': '策略方案', 'd.clickPlan': '点击方案查看其达人阵容', 'd.creatorsSel': '位达人入选', 'd.planKols': '入选达人', 'd.usedOfCap': '占上限 {b} 的 {p}%', 'd.sortedByGmv': '按 GMV 贡献排序',
             'd.readyLaunch': '准备投放', 'd.saveCampaign': '保存投放', 'd.recAlgo': '推荐算法', 'd.kolsSel': '选中 KOL', 'd.cands': '候选达人',
             'd.effConv': '效率收敛曲线', 'd.algoBench': '算法基准测试', 'd.benchCands': '基准测试候选', 'd.strategy': '策略',
             'd.start': '起始', 'd.end': '结束', 'd.util': '% 预算利用率', 'd.poolSim': '达人池模拟器',
@@ -4467,14 +4476,14 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
         }
 
         // ── Settings page: appearance, team, sign-in, data ──
-        function themePref() { try { return localStorage.getItem('tiko_theme') || 'light'; } catch (_) { return 'light'; } }
+        function themePref() { try { return (localStorage.getItem('lumio_theme') || localStorage.getItem('tiko_theme')) || 'light'; } catch (_) { return 'light'; } }
         function applyTheme() {
             const pref = themePref();
             const light = pref === 'light' || (pref === 'system' && window.matchMedia('(prefers-color-scheme: light)').matches);
             document.documentElement.dataset.theme = light ? 'light' : 'dark';
             document.querySelectorAll('#st-theme button').forEach(b => b.classList.toggle('on', b.dataset.v === pref));
         }
-        function setTheme(pref) { try { localStorage.setItem('tiko_theme', pref); } catch (_) {} applyTheme(); }
+        function setTheme(pref) { try { localStorage.setItem('lumio_theme', pref); } catch (_) {} applyTheme(); }
         window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', applyTheme);
         function loadSettings() {
             applyTheme();
@@ -4674,7 +4683,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
         function showNotice() {
             const n = APP_CONFIG.announcement, bar = document.getElementById('notice-bar');
             let seen = '';
-            try { seen = localStorage.getItem('tiko_notice_seen') || ''; } catch (_) {}
+            try { seen = localStorage.getItem('lumio_notice_seen') || ''; } catch (_) {}
             const text = n && ((LANG === 'zh' ? n.text_zh : n.text) || n.text || n.text_zh);
             if (!bar || !text || seen === n.id) { if (bar) bar.style.display = 'none'; return; }
             bar.className = n.level === 'warn' ? 'warn' : '';
@@ -4682,7 +4691,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
             bar.style.display = 'flex';
         }
         function dismissNotice() {
-            try { localStorage.setItem('tiko_notice_seen', APP_CONFIG.announcement.id); } catch (_) {}
+            try { localStorage.setItem('lumio_notice_seen', APP_CONFIG.announcement.id); } catch (_) {}
             document.getElementById('notice-bar').style.display = 'none';
         }
 
@@ -6033,7 +6042,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
             <div class="grid grid-cols-2 gap-sm">
                 <div><p class="text-[10px] text-on-surface-variant uppercase">GMV</p><p class="font-title-md text-secondary font-bold font-data-mono">${fmt(p.total_gmv)}</p></div>
                 <div><p class="text-[10px] text-on-surface-variant uppercase">ROI</p><p class="font-title-md text-on-surface font-data-mono">${p.roi.toFixed(2)}x</p></div>
-                <div><p class="text-[10px] text-on-surface-variant uppercase">${T('d.creatorsSel')}</p><p class="font-title-md text-on-surface font-data-mono">${p.selected_kols.length}</p></div>
+                <div><p class="text-[10px] text-on-surface-variant uppercase">${T('d.planKols')}</p><p class="font-title-md text-on-surface font-data-mono">${p.selected_kols.length}</p></div>
                 <div><p class="text-[10px] text-on-surface-variant uppercase">${T('d.budgetUse')}</p><p class="font-title-md text-on-surface font-data-mono ${util > 100 ? 'text-error' : ''}">${util}%</p></div>
             </div>
             <div class="flex flex-wrap gap-1">

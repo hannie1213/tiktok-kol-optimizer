@@ -17,7 +17,7 @@ Endpoints
   GET  /admin/audit          Trail of operator actions
   POST /admin/reset-password Issue a one-time temporary password (forgot-password support)
   POST /admin/delete-user    Delete one account + wipe its tenant data
-  POST /admin/cleanup-demos  Delete all @demo.tiko throwaway accounts
+  POST /admin/cleanup-demos  Delete all @demo.lumio throwaway accounts
   GET  /admin/interests      Early-access interest registrations
 """
 import json
