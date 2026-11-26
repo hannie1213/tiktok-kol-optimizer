@@ -1517,7 +1517,7 @@
                         <ul>
                             <li data-i18n-html="p1.l1">✓ <b>10 optimization runs</b> / month</li>
                             <li data-i18n-html="p1.copilot">✓ <b>AI Copilot</b> — 20 chats / month</li>
-                            <li data-i18n-html="p1.vid">✓ <b>AI video</b> — 1 / month</li>
+                            <li data-i18n-html="p1.vid">✓ <b>AI video</b> — 1 clip / month</li>
                             <li data-i18n="p1.l2">✓ Smart lineup picks + "why this creator"</li>
                             <li data-i18n="p1.l3">✓ Unlimited creator library</li>
                             <li data-i18n="p1.l4">✓ CSV / Excel import &amp; export</li>
@@ -1531,7 +1531,7 @@
                         <ul>
                             <li data-i18n-html="p2.l1">✓ <b>300 optimization runs</b> / month</li>
                             <li data-i18n-html="p2.copilot">✓ <b>AI Copilot</b> — 500 chats / month</li>
-                            <li data-i18n-html="p2.vid">✓ <b>AI video</b> — 20 / month</li>
+                            <li data-i18n-html="p2.vid">✓ <b>AI video</b> — 10 clips / month</li>
                             <li data-i18n="p2.l2">✓ Self-calibrating GMV predictions</li>
                             <li data-i18n="p2.l3">✓ Campaign attribution &amp; accuracy</li>
                             <li data-i18n="p2.l4">✓ Unlimited creator library</li>
@@ -1545,7 +1545,7 @@
                         <ul>
                             <li data-i18n-html="p3.l1">✓ <b>Unlimited optimization runs</b></li>
                             <li data-i18n-html="p3.copilot">✓ <b>Unlimited AI Copilot</b></li>
-                            <li data-i18n-html="p3.vid">✓ <b>AI video</b> — 60 / month</li>
+                            <li data-i18n-html="p3.vid">✓ <b>AI video</b> — 40 clips / month</li>
                             <li data-i18n="p3.l2">✓ 10 team seats</li>
                             <li data-i18n="p3.l4">✓ Unlimited creator library</li>
                             <li data-i18n="p3.l5">✓ Priority support</li>
@@ -1553,6 +1553,7 @@
                         <button class="lp-btn lp-btn-ghost" style="width:100%;justify-content:center" onclick="enterApp()" data-i18n="p.upgrade">upgrade in console</button>
                     </div>
                 </div>
+                <p class="lp-section-sub lp-reveal" style="margin:28px auto 0;text-align:center" data-i18n="price.extra">Pay yearly and get two months free · Try Pro free for 7 days · Invite a seller and you both get a month</p>
             </section>
 
             <!-- Final CTA -->
@@ -1678,6 +1679,7 @@
 
         <!-- ════ PAGE: DASHBOARD ════ -->
         <div id="page-dashboard" class="p-margin-desktop space-y-xl">
+            <div class="sale-slot" style="display:none"></div>
             <!-- Campaign settings: the first thing on the optimizer page -->
             <section id="launch-bar" class="glass-card rounded-xl">
             <div class="space-y-sm">
@@ -1829,6 +1831,8 @@
                                 <p id="biz-roi-sub" class="text-[11px] text-on-surface-variant mt-1">GMV / Cost</p>
                             </div>
                         </div>
+                        <!-- How far to trust this forecast: range, estimated quotes, concentration -->
+                        <div id="biz-notes" class="mt-md flex flex-col gap-2"></div>
                     </section>
 
 
@@ -2280,6 +2284,7 @@
         <!-- ════ PAGE: PLAN & BILLING ════ -->
         <!-- ════ PAGE: SELLER ACADEMY (merchant guide) ════ -->
         <div id="page-news" class="hidden p-margin-desktop space-y-xl">
+            <div class="sale-slot" style="display:none"></div>
             <div class="glass-card rounded-xl p-lg flex flex-wrap items-center gap-md">
                 <span class="material-symbols-outlined text-[30px] text-primary flex-shrink-0">newspaper</span>
                 <div class="flex-1 min-w-[220px]">
@@ -2684,6 +2689,7 @@
                     <button class="btn btn-primary" onclick="openExtensionModal()"><span class="material-symbols-outlined">extension</span><span data-i18n="ex.extBtn">Browser extension</span></button>
                 </div>
             </div>
+            <div id="ex-share" class="glass-card rounded-xl p-md flex flex-wrap items-center gap-md text-[12.5px]"></div>
             <div class="glass-card ex-flt">
                 <div><label class="form-label" data-i18n="ex.fSearch">Search name, handle or bio</label><input id="ex-q" class="form-input" data-i18n-ph="ex.phSearch" placeholder="e.g. skincare, @handle" oninput="clearTimeout(window._exT);window._exT=setTimeout(()=>loadExplore(0),300)" /></div>
                 <div><label class="form-label" data-i18n="ex.fCountry">Country</label><select id="ex-country" class="form-input" onchange="loadExplore(0)">
@@ -2893,6 +2899,9 @@
             </div>
 
             <div id="pay-status" class="glass-card rounded-xl p-md items-center gap-3 text-[12.5px]" style="display:none"></div>
+
+            <!-- Free trial + referral -->
+            <div id="growth-cards" class="grid gap-lg" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr))"></div>
 
             <!-- Plan catalog -->
             <div class="space-y-sm">
@@ -3336,7 +3345,6 @@
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
         // ══════════ LANDING PAGE ══════════
         // Enter the console: fade the landing out, then take it out of the layout.
@@ -3344,6 +3352,8 @@
             if (!AUTH_TOKEN) { showAuth(); return; }
             setAccountEmail();
             refreshBilling();
+            refreshCalUsed();          // forecast range width (see renderBizNotes)
+            renderSales();             // mega-sale countdown on the optimizer and news pages
             loadOnboarding(true);      // badge: steps still to do
             const lp = document.getElementById('landing-page');
             if (!lp) return;
@@ -3444,7 +3454,9 @@
         })();
 
         // ══════════ PARTICLE POINT CLOUD — interactive wave field (Three.js) ══════════
-        (function () {
+        // three.js (~600 KB) is fetched after the page has loaded, and only when
+        // the landing page is on screen, so it never delays the first paint.
+        function initParticles() {
             const lp = document.getElementById('landing-page');
             const canvas = document.getElementById('lp-particles');
             if (!lp || !canvas || !window.THREE) { if (canvas) canvas.style.display = 'none'; return; }
@@ -3558,6 +3570,21 @@
                 renderer.render(scene, camera);
             }
             frame();
+        }
+        (function () {
+            const lp = document.getElementById('landing-page'), canvas = document.getElementById('lp-particles');
+            if (!lp || !canvas) return;
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { canvas.style.display = 'none'; return; }
+            const go = () => setTimeout(() => {
+                if (lp.style.display === 'none') return;                // already in the console
+                const sc = document.createElement('script');
+                sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
+                sc.async = true;
+                sc.onload = initParticles;
+                sc.onerror = () => { canvas.style.display = 'none'; };
+                document.head.appendChild(sc);
+            }, 200);
+            if (document.readyState === 'complete') go(); else window.addEventListener('load', go, { once: true });
         })();
 
         // ══════════ NAV — turns to frosted glass once you scroll ══════════
@@ -3623,6 +3650,11 @@
         let AUTH_TOKEN = localStorage.getItem('kol_token') || null;
         let AUTH_EMAIL = localStorage.getItem('kol_email') || null;
         let authMode = 'login';   // 'login' | 'register'
+        try {
+            const rf = new URLSearchParams(location.search).get('ref');
+            if (rf && /^[A-Za-z2-9]{4,12}$/.test(rf)) { localStorage.setItem('lumio_ref', rf.toUpperCase()); if (authMode) authMode = 'register'; }
+        } catch (_) { /* storage blocked: the link still opens the site */ }
+        function refCode() { try { return localStorage.getItem('lumio_ref') || ''; } catch (_) { return ''; } }
 
         // Inject the bearer token into every API call; auto-logout on a 401 (except auth calls).
         (function () {
@@ -3689,10 +3721,11 @@
             try {
                 const r = await fetch(`${API}/auth/${authMode}`, {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password })
+                    body: JSON.stringify(authMode === 'register' && refCode() ? { email, password, ref: refCode() } : { email, password })
                 });
                 const d = await r.json();
                 if (!r.ok) { errEl.textContent = d.detail || T('acct.fail'); errEl.style.display = 'block'; return; }
+                if (authMode === 'register') { try { localStorage.removeItem('lumio_ref'); } catch (_) {} }
                 AUTH_TOKEN = d.token; AUTH_EMAIL = d.email;
                 localStorage.setItem('kol_token', AUTH_TOKEN); localStorage.setItem('kol_email', AUTH_EMAIL);
                 setAccountEmail();
@@ -3777,7 +3810,7 @@
                 'sec4.num': '04 / pricing', 'sec4.h': 'Start free, scale<br><em>when it pays off</em>',
                 'price.sub': 'Every plan includes the full AI engine, the AI copilot and an unlimited creator library. Pay only for what powers your growth — optimization runs and copilot chats.',
                 'p1.tag': 'free', 'p2.tag': 'pro — most popular', 'p3.tag': 'team', 'per.month': ' / month',
-                'p1.l1': '✓ <b>10 optimization runs</b> / month', 'p1.vid': '✓ <b>AI video</b> — 1 clip / month', 'p2.vid': '✓ <b>AI video</b> — 20 clips / month', 'p3.vid': '✓ <b>AI video</b> — 60 clips / month', 'p1.copilot': '✓ <b>AI Copilot</b> — 20 chats / month', 'p1.l2': '✓ Smart lineup picks + "why this creator"', 'p1.l3': '✓ Unlimited creator library', 'p1.l4': '✓ CSV / Excel import & export',
+                'p1.l1': '✓ <b>10 optimization runs</b> / month', 'p1.vid': '✓ <b>AI video</b> — 1 clip / month', 'p2.vid': '✓ <b>AI video</b> — 10 clips / month', 'p3.vid': '✓ <b>AI video</b> — 40 clips / month', 'p1.copilot': '✓ <b>AI Copilot</b> — 20 chats / month', 'p1.l2': '✓ Smart lineup picks + "why this creator"', 'p1.l3': '✓ Unlimited creator library', 'p1.l4': '✓ CSV / Excel import & export',
                 'p2.l1': '✓ <b>300 optimization runs</b> / month', 'p2.copilot': '✓ <b>AI Copilot</b> — 500 chats / month', 'p2.l2': '✓ Self-calibrating GMV predictions', 'p2.l3': '✓ Campaign attribution & accuracy', 'p2.l4': '✓ Unlimited creator library', 'p2.l5': '✓ 3 team seats',
                 'p3.l1': '✓ <b>Unlimited optimization runs</b>', 'p3.copilot': '✓ <b>Unlimited AI Copilot</b>', 'p3.l2': '✓ 10 team seats', 'p3.l4': '✓ Unlimited creator library', 'p3.l5': '✓ Priority support',
                 'p.start': 'start free', 'p.upgrade': 'upgrade in console',
@@ -3844,7 +3877,7 @@
                 'sec4.num': '04 / 价格', 'sec4.h': '免费起步<br><em>见效再升级</em>',
                 'price.sub': '所有版本都包含完整 AI 引擎、AI 投放助手与无限达人库。只为真正驱动增长的部分付费——优化次数与助手对话。',
                 'p1.tag': '免费版', 'p2.tag': '专业版 — 最受欢迎', 'p3.tag': '团队版', 'per.month': ' / 月',
-                'p1.l1': '✓ 每月 <b>10 次优化</b>', 'p1.vid': '✓ <b>AI 视频</b> — 每月 1 条', 'p2.vid': '✓ <b>AI 视频</b> — 每月 20 条', 'p3.vid': '✓ <b>AI 视频</b> — 每月 60 条', 'p1.copilot': '✓ <b>AI 投放助手</b> — 每月 20 次对话', 'p1.l2': '✓ 智能选人 + 「为什么选 TA」', 'p1.l3': '✓ 无限达人库', 'p1.l4': '✓ CSV / Excel 导入导出',
+                'p1.l1': '✓ 每月 <b>10 次优化</b>', 'p1.vid': '✓ <b>AI 视频</b> — 每月 1 条', 'p2.vid': '✓ <b>AI 视频</b> — 每月 10 条', 'p3.vid': '✓ <b>AI 视频</b> — 每月 40 条', 'p1.copilot': '✓ <b>AI 投放助手</b> — 每月 20 次对话', 'p1.l2': '✓ 智能选人 + 「为什么选 TA」', 'p1.l3': '✓ 无限达人库', 'p1.l4': '✓ CSV / Excel 导入导出',
                 'p2.l1': '✓ 每月 <b>300 次优化</b>', 'p2.copilot': '✓ <b>AI 投放助手</b> — 每月 500 次对话', 'p2.l2': '✓ 自校准 GMV 预测', 'p2.l3': '✓ 投放归因与准确率', 'p2.l4': '✓ 无限达人库', 'p2.l5': '✓ 3 个团队席位',
                 'p3.l1': '✓ <b>不限优化次数</b>', 'p3.copilot': '✓ <b>不限 AI 投放助手</b>', 'p3.l2': '✓ 10 个团队席位', 'p3.l4': '✓ 无限达人库', 'p3.l5': '✓ 优先支持',
                 'p.start': '免费开始', 'p.upgrade': '在控制台升级',
@@ -3876,7 +3909,7 @@
         };
         // ── Console dynamic-content dictionary ──
         Object.assign(I18N.en, {
-            'toast.demo': 'Welcome to the live demo — running your first optimization…', 'toast.demoFail': 'Demo unavailable — is the backend running?', 'toast.dlFail': 'Download failed', 't.copied': 'Copied', 'b.until': 'active until {d}', 'qr.term': '{m} mo', 'qr.payExactly': 'Pay exactly', 'qr.copyAmount': 'Copy amount', 'qr.payee': 'Payee:', 'qr.order': 'Order:', 'qr.s1': 'Scan the QR with any DuitNow-enabled banking app or e-wallet (Touch \'n Go, GrabPay, Boost, MAE …).', 'qr.s2': 'Pay exactly <b>{a}</b> — the amount identifies your order, so please do not round it.', 'qr.s3': 'Paste the transaction reference from your receipt below and submit.', 'qr.phRef': 'Transaction reference / receipt no.', 'qr.paid': 'I have paid — submit', 'qr.needRef': 'Enter the transaction reference from your receipt.', 'qr.submitted': 'Submitted — we will activate your plan once the payment is confirmed', 'qr.waitTitle': 'Payment submitted — awaiting confirmation', 'qr.waitBody': 'Order {n} · {a} · reference {r}. We check it against our account and activate your plan, usually within a few hours. You will get an email when it is done.', 'qr.rejected': 'We could not find this payment', 'qr.help': 'Problem with a payment?', 'qr.banner.pending': 'You have an unfinished payment for {p} ({a}).', 'qr.banner.submitted': 'Payment {n} ({a}) is awaiting confirmation.', 'qr.banner.rejected': 'We could not confirm payment {n} ({a}) — please check and resubmit.', 'qr.continue': 'Continue', 'qr.view': 'View', 'auth.phNewPass': 'New password (min 8 chars)', 'auth.resetTitle': 'Choose a new password', 'auth.resetBtn': 'Save and sign in', 'auth.forgotNeedEmail': 'Type your account email above first, then click again.', 'auth.forgotSent': 'If an account exists for <b>{e}</b>, a reset link is on its way. It is valid for 30 minutes — check your spam folder too.', 'auth.verifySent': 'Account created — we emailed you a link to verify your address', 'auth.verified': 'Email verified — thank you', 'acct.verified': '{e} is verified.', 'acct.unverified': '{e} is not verified yet — password resets and payment notices are sent to this address.', 'acct.resend': 'Resend link', 'auth.forgot': 'Forgot your password?', 'auth.forgotHelp': 'Message us on <a href="{wa}" target="_blank" rel="noopener" style="color:var(--teal)">WhatsApp</a> or WeChat (<b>{wc}</b>) from the contact you signed up with — we verify it is you and send a temporary password.', 'auth.legal': 'By continuing you agree to our <a href="./legal.html#terms" target="_blank" rel="noopener" style="color:var(--teal)">Terms</a> and <a href="./legal.html#privacy" target="_blank" rel="noopener" style="color:var(--teal)">Privacy Policy</a>.', 'footer.terms': 'Terms', 'footer.privacy': 'Privacy', 'team.title': 'Team', 'team.seats': '{u} of {s} seats used', 'team.phEmail': 'teammate@company.com', 'team.invite': 'Invite', 'team.owner': 'Owner', 'team.member': 'Member', 'team.pending': 'Invited', 'team.you': 'you', 'team.remove': 'Remove', 'team.revoke': 'Withdraw', 'team.copy': 'Copy link', 'team.sent': 'Invitation emailed to {e}', 'team.linkReady': 'Invitation link copied — send it to {e}', 'team.removeConfirm': 'Remove {e} from this workspace? They will be signed out and lose access. The data stays.', 'team.removed': 'Member removed', 'team.revoked': 'Invitation withdrawn', 'team.hint': 'Teammates share this creator library, campaigns and monthly allowance. Only you can manage billing and the team.', 'team.full': 'All {s} seats are in use — upgrade your plan to invite more people.', 'team.fullFree': 'The Free plan is for one person. Upgrade to Pro (3 seats) or Team (10 seats) to invite teammates.', 'team.memberNote': 'You are a member of <b>{e}</b>\'s workspace. Billing and the team are managed by the owner.', 'team.joinTitle': 'Join the workspace', 'team.joinBtn': 'Join', 'team.joinNote': '<b>{o}</b> invited you. You will join as <b>{e}</b> — choose a password.', 'team.joined': 'Welcome — you have joined the workspace', 'acct.delNoteMember': 'Removes your own sign-in from this workspace. The workspace and its data stay with the owner.', 'ord.title': 'Payment history', 'ord.receipt': 'Receipt', 'ord.months': '{m} mo', 'ord.pending': 'Awaiting payment', 'ord.submitted': 'Under review', 'ord.paid': 'Paid', 'ord.rejected': 'Not confirmed', 'ord.expired': 'Expired', 'ord.cancelled': 'Cancelled', 'ord.popup': 'Allow pop-ups for this site to open the receipt.', 'rc.title': 'Payment receipt', 'rc.no': 'Receipt no.', 'rc.date': 'Date paid', 'rc.to': 'Billed to', 'rc.item': 'Description', 'rc.amount': 'Amount paid', 'rc.method': 'Payment method', 'rc.ref': 'Transaction reference', 'rc.payee': 'Received by', 'rc.line': 'Lumio {p} plan — {m} month(s)', 'rc.foot': 'This is a receipt for a payment received. It is not a tax invoice.', 'rc.print': 'Print / save as PDF', 'exp.title': 'Your data', 'exp.note': 'Download everything in this workspace — creators, campaigns, calibration and payment history — as one JSON file.', 'exp.btn': 'Export data', 'acct.title': 'Account', 'acct.pwTitle': 'Change password', 'acct.pwNote': 'Changing it signs out every other device.', 'acct.phCurrent': 'Current password', 'acct.phNew': 'New password (min 8 chars)', 'acct.pwBtn': 'Update password', 'acct.delTitle': 'Delete account', 'acct.delNote': 'Permanently removes your account, creator library, campaigns and usage history. This cannot be undone.', 'acct.phConfirm': 'Confirm with your password', 'acct.delBtn': 'Delete my account', 'acct.fill': 'Please fill in the password fields.', 'acct.fail': 'Could not complete the request.', 'acct.pwOk': 'Password updated', 'acct.delConfirm': 'Delete your account and ALL of its data permanently? This cannot be undone.', 'acct.delOk': 'Your account has been deleted',
+            'toast.demo': 'Welcome to the live demo — running your first optimization…', 'toast.demoFail': 'Demo unavailable — is the backend running?', 'toast.dlFail': 'Download failed', 't.copied': 'Copied', 'b.until': 'active until {d}', 'qr.term': '{m} mo', 'qr.payExactly': 'Pay exactly', 'qr.copyAmount': 'Copy amount', 'qr.payee': 'Payee:', 'qr.order': 'Order:', 'qr.s1': 'Scan the QR with any DuitNow-enabled banking app or e-wallet (Touch \'n Go, GrabPay, Boost, MAE …).', 'qr.s2': 'Pay exactly <b>{a}</b> — the amount identifies your order, so please do not round it.', 'qr.s3': 'Paste the transaction reference below, or upload a screenshot of the receipt, then submit.', 'qr.phRef': 'Transaction reference (or upload a screenshot)', 'qr.paid': 'I have paid — submit', 'qr.needRef': 'Enter the transaction reference, or upload a screenshot of the receipt.', 'qr.submitted': 'Submitted — we will activate your plan once the payment is confirmed', 'qr.waitTitle': 'Payment submitted — awaiting confirmation', 'qr.waitBody': 'Order {n} · {a} · reference {r}. We check it against our account and activate your plan, usually within a few hours. You will get an email when it is done.', 'qr.rejected': 'We could not find this payment', 'qr.help': 'Problem with a payment?', 'qr.banner.pending': 'You have an unfinished payment for {p} ({a}).', 'qr.banner.submitted': 'Payment {n} ({a}) is awaiting confirmation.', 'qr.banner.rejected': 'We could not confirm payment {n} ({a}) — please check and resubmit.', 'qr.continue': 'Continue', 'qr.view': 'View', 'auth.phNewPass': 'New password (min 8 chars)', 'auth.resetTitle': 'Choose a new password', 'auth.resetBtn': 'Save and sign in', 'auth.forgotNeedEmail': 'Type your account email above first, then click again.', 'auth.forgotSent': 'If an account exists for <b>{e}</b>, a reset link is on its way. It is valid for 30 minutes — check your spam folder too.', 'auth.verifySent': 'Account created — we emailed you a link to verify your address', 'auth.verified': 'Email verified — thank you', 'acct.verified': '{e} is verified.', 'acct.unverified': '{e} is not verified yet — password resets and payment notices are sent to this address.', 'acct.resend': 'Resend link', 'auth.forgot': 'Forgot your password?', 'auth.forgotHelp': 'Message us on <a href="{wa}" target="_blank" rel="noopener" style="color:var(--teal)">WhatsApp</a> or WeChat (<b>{wc}</b>) from the contact you signed up with — we verify it is you and send a temporary password.', 'auth.legal': 'By continuing you agree to our <a href="./legal.html#terms" target="_blank" rel="noopener" style="color:var(--teal)">Terms</a> and <a href="./legal.html#privacy" target="_blank" rel="noopener" style="color:var(--teal)">Privacy Policy</a>.', 'footer.terms': 'Terms', 'footer.privacy': 'Privacy', 'team.title': 'Team', 'team.seats': '{u} of {s} seats used', 'team.phEmail': 'teammate@company.com', 'team.invite': 'Invite', 'team.owner': 'Owner', 'team.member': 'Member', 'team.pending': 'Invited', 'team.you': 'you', 'team.remove': 'Remove', 'team.revoke': 'Withdraw', 'team.copy': 'Copy link', 'team.sent': 'Invitation emailed to {e}', 'team.linkReady': 'Invitation link copied — send it to {e}', 'team.removeConfirm': 'Remove {e} from this workspace? They will be signed out and lose access. The data stays.', 'team.removed': 'Member removed', 'team.revoked': 'Invitation withdrawn', 'team.hint': 'Teammates share this creator library, campaigns and monthly allowance. Only you can manage billing and the team.', 'team.full': 'All {s} seats are in use — upgrade your plan to invite more people.', 'team.fullFree': 'The Free plan is for one person. Upgrade to Pro (3 seats) or Team (10 seats) to invite teammates.', 'team.memberNote': 'You are a member of <b>{e}</b>\'s workspace. Billing and the team are managed by the owner.', 'team.joinTitle': 'Join the workspace', 'team.joinBtn': 'Join', 'team.joinNote': '<b>{o}</b> invited you. You will join as <b>{e}</b> — choose a password.', 'team.joined': 'Welcome — you have joined the workspace', 'acct.delNoteMember': 'Removes your own sign-in from this workspace. The workspace and its data stay with the owner.', 'ord.title': 'Payment history', 'ord.receipt': 'Receipt', 'ord.months': '{m} mo', 'ord.pending': 'Awaiting payment', 'ord.submitted': 'Under review', 'ord.paid': 'Paid', 'ord.rejected': 'Not confirmed', 'ord.expired': 'Expired', 'ord.cancelled': 'Cancelled', 'ord.popup': 'Allow pop-ups for this site to open the receipt.', 'rc.title': 'Payment receipt', 'rc.no': 'Receipt no.', 'rc.date': 'Date paid', 'rc.to': 'Billed to', 'rc.item': 'Description', 'rc.amount': 'Amount paid', 'rc.method': 'Payment method', 'rc.ref': 'Transaction reference', 'rc.payee': 'Received by', 'rc.line': 'Lumio {p} plan — {m} month(s)', 'rc.foot': 'This is a receipt for a payment received. It is not a tax invoice.', 'rc.print': 'Print / save as PDF', 'exp.title': 'Your data', 'exp.note': 'Download everything in this workspace — creators, campaigns, calibration and payment history — as one JSON file.', 'exp.btn': 'Export data', 'acct.title': 'Account', 'acct.pwTitle': 'Change password', 'acct.pwNote': 'Changing it signs out every other device.', 'acct.phCurrent': 'Current password', 'acct.phNew': 'New password (min 8 chars)', 'acct.pwBtn': 'Update password', 'acct.delTitle': 'Delete account', 'acct.delNote': 'Permanently removes your account, creator library, campaigns and usage history. This cannot be undone.', 'acct.phConfirm': 'Confirm with your password', 'acct.delBtn': 'Delete my account', 'acct.fill': 'Please fill in the password fields.', 'acct.fail': 'Could not complete the request.', 'acct.pwOk': 'Password updated', 'acct.delConfirm': 'Delete your account and ALL of its data permanently? This cannot be undone.', 'acct.delOk': 'Your account has been deleted',
             't.backend': 'Backend unavailable', 't.failed': 'Failed', 't.loadFail': 'Failed to load', 't.netFail': 'Could not reach the server',
             't.planFail': 'Could not switch plan', 't.planOk': 'Plan updated', 'b.confirmFree': 'Switch to the Free plan?',
             't.runFirst': 'Run an optimization first', 't.campName': 'Enter a campaign name', 't.campSaved': 'Campaign saved! View it in the Campaigns tab.',
@@ -3898,7 +3931,7 @@
             'b.payNote': 'Upgrade by scanning our QR code: pick a plan, pay the exact amount shown, and submit your transaction reference. We confirm it against our account and activate your plan — usually within a few hours — and email you when it is done.',
             'd.recTeam': 'Your Recommended KOL Team', 'd.aiOpt': 'AI Optimized', 'd.budgetUsed': 'Budget Used', 'd.predGmv': 'Predicted GMV', 'd.gmvFull': 'Gross Merchandise Value',
             'd.roi': 'Return on Investment', 'd.gmvCost': 'GMV / Cost', 'd.algoCompare': 'AI cross-check — 6 strategies verified your lineup', 'd.fullAnalysis': 'Full analysis',
-            'd.stratPlans': 'Strategy Plans', 'd.clickPlan': 'Click a plan to view its creators', 'd.creatorsSel': 'creators selected', 'd.planKols': 'Creators selected', 'd.usedOfCap': '{p}% of the {b} cap', 'd.sortedByGmv': 'Sorted by GMV contribution',
+            'd.stratPlans': 'Strategy Plans', 'd.clickPlan': 'Click a plan to view its creators', 'd.creatorsSel': 'creators selected', 'd.range': 'Likely range <b>{lo} – {hi}</b> GMV (ROI {rlo}× – {rhi}×).', 'd.rangeUncal': 'This is the model\'s typical error before you record any results — record actual GMV on finished campaigns and the range narrows.', 'd.rangeCal': 'Calibrated on {n} of your finished campaigns.', 'd.estQuotes': '{n} of {t} creators have an <b>estimated</b> fee (from audience size). Real quotes make the lineup and ROI more reliable.', 'd.estAction': 'Add real quotes', 'd.concentrated': 'One creator brings <b>{p}%</b> of the predicted GMV — if they under-deliver, the whole campaign does. Consider the Safe plan or a wider market / category for a more spread-out lineup.', 'd.planKols': 'Creators selected', 'd.usedOfCap': '{p}% of the {b} cap', 'd.sortedByGmv': 'Sorted by GMV contribution',
             'd.readyLaunch': 'Ready to Launch', 'd.saveCampaign': 'Save Campaign', 'd.recAlgo': 'Recommended Algo', 'd.kolsSel': 'KOLs Selected', 'd.cands': 'Candidates',
             'd.effConv': 'Efficiency Convergence', 'd.algoBench': 'Algorithm Benchmark', 'd.benchCands': 'Benchmarking Candidates', 'd.strategy': 'Strategy',
             'd.start': 'Start', 'd.end': 'End', 'd.util': '% Utilization', 'd.poolSim': 'Creator Pool Simulator',
@@ -3979,7 +4012,7 @@
             'sim.target': 'Target', 'sim.targetMark': '← target'
         });
         Object.assign(I18N.zh, {
-            'toast.demo': '欢迎体验在线演示——正在为你运行第一次优化…', 'toast.demoFail': '演示暂不可用——请确认后端已启动', 'toast.dlFail': '下载失败', 't.copied': '已复制', 'b.until': '有效期至 {d}', 'qr.term': '{m} 个月', 'qr.payExactly': '请支付', 'qr.copyAmount': '复制金额', 'qr.payee': '收款人：', 'qr.order': '订单号：', 'qr.s1': '用任意支持 DuitNow 的银行 App 或电子钱包（Touch \'n Go、GrabPay、Boost、MAE 等）扫码。', 'qr.s2': '请准确支付 <b>{a}</b>——我们靠金额识别你的订单，请勿四舍五入。', 'qr.s3': '把付款凭证上的交易参考号填到下方并提交。', 'qr.phRef': '交易参考号 / 凭证编号', 'qr.paid': '我已付款，提交', 'qr.needRef': '请填写付款凭证上的交易参考号。', 'qr.submitted': '已提交——确认到账后我们会为你开通套餐', 'qr.waitTitle': '付款已提交，等待确认', 'qr.waitBody': '订单 {n} · {a} · 参考号 {r}。我们核对到账后会为你开通套餐，通常在几小时内完成，届时会邮件通知你。', 'qr.rejected': '我们没有找到这笔付款', 'qr.help': '付款遇到问题？', 'qr.banner.pending': '你有一笔未完成的 {p} 付款（{a}）。', 'qr.banner.submitted': '付款 {n}（{a}）正在等待确认。', 'qr.banner.rejected': '付款 {n}（{a}）未能确认——请核对后重新提交。', 'qr.continue': '继续', 'qr.view': '查看', 'auth.phNewPass': '新密码（至少 8 位）', 'auth.resetTitle': '设置新密码', 'auth.resetBtn': '保存并登录', 'auth.forgotNeedEmail': '请先在上方填写账号邮箱，再点一次。', 'auth.forgotSent': '如果 <b>{e}</b> 已注册，重置链接已发往该邮箱，30 分钟内有效——也请检查垃圾邮件。', 'auth.verifySent': '账号已创建——验证链接已发送到你的邮箱', 'auth.verified': '邮箱验证成功', 'acct.verified': '{e} 已验证。', 'acct.unverified': '{e} 尚未验证——找回密码和付款通知都会发到这个邮箱。', 'acct.resend': '重新发送', 'auth.forgot': '忘记密码？', 'auth.forgotHelp': '请用注册时的联系方式通过 <a href="{wa}" target="_blank" rel="noopener" style="color:var(--teal)">WhatsApp</a> 或微信（<b>{wc}</b>）联系我们，核实身份后我们会发给你一个临时密码。', 'auth.legal': '继续即表示你同意我们的<a href="./legal.html#terms" target="_blank" rel="noopener" style="color:var(--teal)">服务条款</a>和<a href="./legal.html#privacy" target="_blank" rel="noopener" style="color:var(--teal)">隐私政策</a>。', 'footer.terms': '服务条款', 'footer.privacy': '隐私政策', 'team.title': '团队', 'team.seats': '已用 {u} / {s} 个席位', 'team.phEmail': '同事的邮箱', 'team.invite': '邀请', 'team.owner': '所有者', 'team.member': '成员', 'team.pending': '已邀请', 'team.you': '你', 'team.remove': '移除', 'team.revoke': '撤回', 'team.copy': '复制链接', 'team.sent': '邀请邮件已发送给 {e}', 'team.linkReady': '邀请链接已复制——请发给 {e}', 'team.removeConfirm': '确定把 {e} 移出工作区吗？对方会立即退出登录并失去访问权限，数据不受影响。', 'team.removed': '成员已移除', 'team.revoked': '邀请已撤回', 'team.hint': '团队成员共用这个达人库、投放活动和每月额度。只有你能管理账单和团队。', 'team.full': '{s} 个席位已全部使用——升级套餐后可邀请更多人。', 'team.fullFree': '免费版仅限一人使用。升级到 Pro（3 个席位）或 Team（10 个席位）即可邀请同事。', 'team.memberNote': '你是 <b>{e}</b> 工作区的成员。账单和团队由所有者管理。', 'team.joinTitle': '加入工作区', 'team.joinBtn': '加入', 'team.joinNote': '<b>{o}</b> 邀请了你。你将以 <b>{e}</b> 加入——请设置一个密码。', 'team.joined': '欢迎——你已加入工作区', 'acct.delNoteMember': '只会移除你自己在这个工作区的登录账号，工作区和数据仍归所有者。', 'ord.title': '付款记录', 'ord.receipt': '收据', 'ord.months': '{m} 个月', 'ord.pending': '待付款', 'ord.submitted': '审核中', 'ord.paid': '已付款', 'ord.rejected': '未确认', 'ord.expired': '已过期', 'ord.cancelled': '已取消', 'ord.popup': '请允许本站弹出窗口以打开收据。', 'rc.title': '付款收据', 'rc.no': '收据编号', 'rc.date': '付款日期', 'rc.to': '付款方', 'rc.item': '项目', 'rc.amount': '实付金额', 'rc.method': '付款方式', 'rc.ref': '交易参考号', 'rc.payee': '收款方', 'rc.line': 'Lumio {p} 套餐 — {m} 个月', 'rc.foot': '本收据仅证明已收到款项，不是税务发票。', 'rc.print': '打印 / 另存为 PDF', 'exp.title': '你的数据', 'exp.note': '把这个工作区的全部内容——达人、投放活动、校准和付款记录——下载为一个 JSON 文件。', 'exp.btn': '导出数据', 'acct.title': '账号', 'acct.pwTitle': '修改密码', 'acct.pwNote': '修改后其他设备会自动退出登录。', 'acct.phCurrent': '当前密码', 'acct.phNew': '新密码（至少 8 位）', 'acct.pwBtn': '更新密码', 'acct.delTitle': '注销账号', 'acct.delNote': '将永久删除你的账号、达人库、投放活动和用量记录，且无法恢复。', 'acct.phConfirm': '输入密码以确认', 'acct.delBtn': '注销我的账号', 'acct.fill': '请填写密码。', 'acct.fail': '操作未能完成。', 'acct.pwOk': '密码已更新', 'acct.delConfirm': '确定要永久注销账号并删除全部数据吗？此操作无法撤销。', 'acct.delOk': '账号已注销',
+            'toast.demo': '欢迎体验在线演示——正在为你运行第一次优化…', 'toast.demoFail': '演示暂不可用——请确认后端已启动', 'toast.dlFail': '下载失败', 't.copied': '已复制', 'b.until': '有效期至 {d}', 'qr.term': '{m} 个月', 'qr.payExactly': '请支付', 'qr.copyAmount': '复制金额', 'qr.payee': '收款人：', 'qr.order': '订单号：', 'qr.s1': '用任意支持 DuitNow 的银行 App 或电子钱包（Touch \'n Go、GrabPay、Boost、MAE 等）扫码。', 'qr.s2': '请准确支付 <b>{a}</b>——我们靠金额识别你的订单，请勿四舍五入。', 'qr.s3': '把交易参考号填到下方，或上传付款截图，然后提交。', 'qr.phRef': '交易参考号（或上传付款截图）', 'qr.paid': '我已付款，提交', 'qr.needRef': '请填写交易参考号，或上传付款截图。', 'qr.submitted': '已提交——确认到账后我们会为你开通套餐', 'qr.waitTitle': '付款已提交，等待确认', 'qr.waitBody': '订单 {n} · {a} · 参考号 {r}。我们核对到账后会为你开通套餐，通常在几小时内完成，届时会邮件通知你。', 'qr.rejected': '我们没有找到这笔付款', 'qr.help': '付款遇到问题？', 'qr.banner.pending': '你有一笔未完成的 {p} 付款（{a}）。', 'qr.banner.submitted': '付款 {n}（{a}）正在等待确认。', 'qr.banner.rejected': '付款 {n}（{a}）未能确认——请核对后重新提交。', 'qr.continue': '继续', 'qr.view': '查看', 'auth.phNewPass': '新密码（至少 8 位）', 'auth.resetTitle': '设置新密码', 'auth.resetBtn': '保存并登录', 'auth.forgotNeedEmail': '请先在上方填写账号邮箱，再点一次。', 'auth.forgotSent': '如果 <b>{e}</b> 已注册，重置链接已发往该邮箱，30 分钟内有效——也请检查垃圾邮件。', 'auth.verifySent': '账号已创建——验证链接已发送到你的邮箱', 'auth.verified': '邮箱验证成功', 'acct.verified': '{e} 已验证。', 'acct.unverified': '{e} 尚未验证——找回密码和付款通知都会发到这个邮箱。', 'acct.resend': '重新发送', 'auth.forgot': '忘记密码？', 'auth.forgotHelp': '请用注册时的联系方式通过 <a href="{wa}" target="_blank" rel="noopener" style="color:var(--teal)">WhatsApp</a> 或微信（<b>{wc}</b>）联系我们，核实身份后我们会发给你一个临时密码。', 'auth.legal': '继续即表示你同意我们的<a href="./legal.html#terms" target="_blank" rel="noopener" style="color:var(--teal)">服务条款</a>和<a href="./legal.html#privacy" target="_blank" rel="noopener" style="color:var(--teal)">隐私政策</a>。', 'footer.terms': '服务条款', 'footer.privacy': '隐私政策', 'team.title': '团队', 'team.seats': '已用 {u} / {s} 个席位', 'team.phEmail': '同事的邮箱', 'team.invite': '邀请', 'team.owner': '所有者', 'team.member': '成员', 'team.pending': '已邀请', 'team.you': '你', 'team.remove': '移除', 'team.revoke': '撤回', 'team.copy': '复制链接', 'team.sent': '邀请邮件已发送给 {e}', 'team.linkReady': '邀请链接已复制——请发给 {e}', 'team.removeConfirm': '确定把 {e} 移出工作区吗？对方会立即退出登录并失去访问权限，数据不受影响。', 'team.removed': '成员已移除', 'team.revoked': '邀请已撤回', 'team.hint': '团队成员共用这个达人库、投放活动和每月额度。只有你能管理账单和团队。', 'team.full': '{s} 个席位已全部使用——升级套餐后可邀请更多人。', 'team.fullFree': '免费版仅限一人使用。升级到 Pro（3 个席位）或 Team（10 个席位）即可邀请同事。', 'team.memberNote': '你是 <b>{e}</b> 工作区的成员。账单和团队由所有者管理。', 'team.joinTitle': '加入工作区', 'team.joinBtn': '加入', 'team.joinNote': '<b>{o}</b> 邀请了你。你将以 <b>{e}</b> 加入——请设置一个密码。', 'team.joined': '欢迎——你已加入工作区', 'acct.delNoteMember': '只会移除你自己在这个工作区的登录账号，工作区和数据仍归所有者。', 'ord.title': '付款记录', 'ord.receipt': '收据', 'ord.months': '{m} 个月', 'ord.pending': '待付款', 'ord.submitted': '审核中', 'ord.paid': '已付款', 'ord.rejected': '未确认', 'ord.expired': '已过期', 'ord.cancelled': '已取消', 'ord.popup': '请允许本站弹出窗口以打开收据。', 'rc.title': '付款收据', 'rc.no': '收据编号', 'rc.date': '付款日期', 'rc.to': '付款方', 'rc.item': '项目', 'rc.amount': '实付金额', 'rc.method': '付款方式', 'rc.ref': '交易参考号', 'rc.payee': '收款方', 'rc.line': 'Lumio {p} 套餐 — {m} 个月', 'rc.foot': '本收据仅证明已收到款项，不是税务发票。', 'rc.print': '打印 / 另存为 PDF', 'exp.title': '你的数据', 'exp.note': '把这个工作区的全部内容——达人、投放活动、校准和付款记录——下载为一个 JSON 文件。', 'exp.btn': '导出数据', 'acct.title': '账号', 'acct.pwTitle': '修改密码', 'acct.pwNote': '修改后其他设备会自动退出登录。', 'acct.phCurrent': '当前密码', 'acct.phNew': '新密码（至少 8 位）', 'acct.pwBtn': '更新密码', 'acct.delTitle': '注销账号', 'acct.delNote': '将永久删除你的账号、达人库、投放活动和用量记录，且无法恢复。', 'acct.phConfirm': '输入密码以确认', 'acct.delBtn': '注销我的账号', 'acct.fill': '请填写密码。', 'acct.fail': '操作未能完成。', 'acct.pwOk': '密码已更新', 'acct.delConfirm': '确定要永久注销账号并删除全部数据吗？此操作无法撤销。', 'acct.delOk': '账号已注销',
             't.backend': '后端不可用', 't.failed': '操作失败', 't.loadFail': '加载失败', 't.netFail': '无法连接服务器',
             't.planFail': '切换套餐失败', 't.planOk': '套餐已更新', 'b.confirmFree': '确定切换到免费版？',
             't.runFirst': '请先运行一次优化', 't.campName': '请输入投放名称', 't.campSaved': '投放已保存！可在「投放记录」中查看。',
@@ -4001,7 +4034,7 @@
             'b.payNote': '扫码即可升级：选择套餐，按页面显示的金额准确付款，再提交交易参考号。我们核对到账后为你开通（通常几小时内），并邮件通知你。',
             'd.recTeam': '为你推荐的 KOL 阵容', 'd.aiOpt': 'AI 已优化', 'd.budgetUsed': '已用预算', 'd.predGmv': '预测 GMV', 'd.gmvFull': '商品交易总额',
             'd.roi': '投资回报率', 'd.gmvCost': 'GMV / 成本', 'd.algoCompare': 'AI 交叉验证 — 6 套策略共同确认了你的阵容', 'd.fullAnalysis': '完整分析',
-            'd.stratPlans': '策略方案', 'd.clickPlan': '点击方案查看其达人阵容', 'd.creatorsSel': '位达人入选', 'd.planKols': '入选达人', 'd.usedOfCap': '占上限 {b} 的 {p}%', 'd.sortedByGmv': '按 GMV 贡献排序',
+            'd.stratPlans': '策略方案', 'd.clickPlan': '点击方案查看其达人阵容', 'd.creatorsSel': '位达人入选', 'd.range': '更可能的区间：GMV <b>{lo} – {hi}</b>（ROI {rlo}× – {rhi}×）。', 'd.rangeUncal': '这是还没有录入任何投放结果时模型的常见误差；在已完成的投放上录入实际 GMV，区间会逐步收窄。', 'd.rangeCal': '已用你 {n} 次已完成投放的结果校准。', 'd.estQuotes': '{t} 位达人中有 {n} 位的报价是按粉丝量<b>估算</b>的，回填真实报价后阵容和 ROI 会更可靠。', 'd.estAction': '回填真实报价', 'd.concentrated': '一位达人贡献了预测 GMV 的 <b>{p}%</b>——TA 一旦表现不及预期，整场投放都会受影响。建议看看「稳健」方案，或放宽国家 / 品类，让阵容更分散。', 'd.planKols': '入选达人', 'd.usedOfCap': '占上限 {b} 的 {p}%', 'd.sortedByGmv': '按 GMV 贡献排序',
             'd.readyLaunch': '准备投放', 'd.saveCampaign': '保存投放', 'd.recAlgo': '推荐算法', 'd.kolsSel': '选中 KOL', 'd.cands': '候选达人',
             'd.effConv': '效率收敛曲线', 'd.algoBench': '算法基准测试', 'd.benchCands': '基准测试候选', 'd.strategy': '策略',
             'd.start': '起始', 'd.end': '结束', 'd.util': '% 预算利用率', 'd.poolSim': '达人池模拟器',
@@ -4092,7 +4125,25 @@
             'ag.title': 'Lumio Copilot', 'ag.send': 'Send', 'ag.thinking': 'thinking…',
             'ag.ph': 'Ask about budgets, lineups, campaigns…',
             'ag.hello': 'Hi! I\'m your campaign copilot. I can run optimizations, browse your creator library and review campaigns for you.\nTry: "How should I spend $5,000 on beauty in Malaysia?"',
-            'ag.err': 'Copilot unavailable — check the server and DEEPSEEK_API_KEY.'
+            'ag.err': 'The copilot could not answer just now. Please try again in a moment.',
+            'ag.off': 'The AI copilot is not switched on yet. Everything else — the optimizer, creators, campaigns and collaborations — works as usual.',
+            'ai.off': 'AI writing is not switched on yet. The rest of Lumio works as usual.',
+            'act.pool.sharing': 'set shared-pool sharing to',
+            'ex.shareOff': 'Your captures stay private to this workspace', 'ex.shareOn': 'This workspace shares captures with the pool',
+            'ex.shareBody': 'When you join, the public profile numbers your team captures with the extension help confirm creators for everyone. Nobody can see which workspace captured whom, and your own library, prices and campaigns are never shared.',
+            'ex.sharePolicy': 'Privacy policy', 'ex.shareJoin': 'Join the shared pool', 'ex.shareLeave': 'Stop sharing', 'ex.shareJoined': 'You joined the shared pool', 'ex.shareLeft': 'Captures now stay in this workspace',
+            'qr.save2': '2 months free', 'qr.proof': 'Upload receipt screenshot', 'qr.proofOk': 'Screenshot attached', 'qr.proofBig': 'The screenshot must be under 2 MB.',
+            'tr.title': 'Try Pro free for 7 days', 'tr.body': 'Every Pro feature, no payment. After a week you are back on Free automatically, so there is nothing to cancel. AI video stays at the Free allowance during the trial.',
+            'tr.btn': 'Start free trial', 'tr.active': 'Pro trial, ends {d}', 'tr.activeBody': 'Upgrade any time to keep Pro. The days left in your trial are added on top.', 'tr.started': 'Your Pro trial has started',
+            'rf.title': 'Invite a seller, you both get a month', 'rf.body': 'Share your link. When someone signs up with it and makes their first payment, you both get {d} extra days of Pro (or of your paid plan).',
+            'rf.copy': 'Copy link', 'rf.wa': 'Share on WhatsApp', 'rf.stats': '{i} signed up · {r} rewarded', 'rf.copied': 'Link copied',
+            'rf.msg': 'I use Lumio to pick TikTok creators for my shop. Sign up with my link and we both get a free month once you subscribe: {u}',
+            'price.extra': 'Pay yearly and get two months free · Try Pro free for 7 days · Invite a seller and you both get a month',
+            'k.rep': 'Track record', 'k.repDelivery': 'actual GMV {x}× the forecast over {n} campaign(s)', 'k.repRating': 'your rating {r}/5',
+            'k.repNote': 'The optimizer already adjusts this creator\'s forecast from the same data.', 'k.repNone': 'Record campaign results or rate this creator to build a track record.',
+            'pl.waTip': 'Send the invitation template on WhatsApp', 'pl.waDefault': 'Hi {n}! We would love to work with you on a TikTok campaign. Are you open to a collaboration?',
+            'sale.soon': '{e} in {d} days', 'sale.today': '{e} is today', 'sale.approx': 'date may shift', 'sale.plan': 'Plan a lineup',
+            'sale.tip': 'Lock in creator slots 2–3 weeks ahead and stock up. Rates rise as the date gets closer.'
         });
         Object.assign(I18N.zh, {
             'catn.beauty': '美妆个护', 'catn.fashion': '服饰生活', 'catn.home': '家居生活', 'catn.fmcg': '快消品',
@@ -4104,7 +4155,25 @@
             'ag.title': '投放助手', 'ag.send': '发送', 'ag.thinking': '思考中…',
             'ag.ph': '问我预算、阵容、投放复盘…',
             'ag.hello': '你好！我是你的投放助手，可以帮你跑优化、查达人库、复盘投放。\n试试："5000 美元在马来西亚投美妆，怎么组合最好？"',
-            'ag.err': '助手暂不可用——请检查服务端与 DEEPSEEK_API_KEY 配置。'
+            'ag.err': '助手暂时没有回应，请稍后再试。',
+            'ag.off': 'AI 投放助手还没有开通。优化器、达人库、投放和合作管理都可以正常使用。',
+            'ai.off': 'AI 写作功能还没有开通，其他功能可正常使用。',
+            'act.pool.sharing': '将共享达人池设为',
+            'ex.shareOff': '你采集的达人目前只有本工作区可见', 'ex.shareOn': '本工作区已加入共享达人池',
+            'ex.shareBody': '加入后，团队用插件采集的达人公开主页数据会帮助所有人确认达人。没有人能看到是哪个工作区采集的，你自己的达人库、报价和投放数据永远不会共享。',
+            'ex.sharePolicy': '隐私政策', 'ex.shareJoin': '加入共享达人池', 'ex.shareLeave': '停止共享', 'ex.shareJoined': '已加入共享达人池', 'ex.shareLeft': '采集的达人将只保留在本工作区',
+            'qr.save2': '省 2 个月', 'qr.proof': '上传付款截图', 'qr.proofOk': '已上传截图', 'qr.proofBig': '截图需小于 2 MB。',
+            'tr.title': '免费试用 Pro 7 天', 'tr.body': '无需付款即可使用 Pro 全部功能，7 天后自动回到免费版，不用手动取消。试用期间 AI 视频仍按免费版额度。',
+            'tr.btn': '开始免费试用', 'tr.active': 'Pro 试用中，{d} 结束', 'tr.activeBody': '随时可以升级保留 Pro，剩余的试用天数会累加上去。', 'tr.started': 'Pro 试用已开通',
+            'rf.title': '邀请卖家，双方各得 1 个月', 'rf.body': '分享你的专属链接。对方通过链接注册并完成首次付款后，你们各得 {d} 天 Pro（已付费的话延长当前套餐）。',
+            'rf.copy': '复制链接', 'rf.wa': '分享到 WhatsApp', 'rf.stats': '已注册 {i} 人 · 已奖励 {r} 次', 'rf.copied': '链接已复制',
+            'rf.msg': '我在用 Lumio 给店铺挑 TikTok 达人，用我的链接注册，付费后我们各得一个月免费：{u}',
+            'price.extra': '年付只需 10 个月价格 · Pro 可免费试用 7 天 · 邀请好友付费，双方各得 1 个月',
+            'k.rep': '信誉分', 'k.repDelivery': '{n} 次投放实际 GMV 为预测的 {x}×', 'k.repRating': '你的评分 {r}/5',
+            'k.repNote': '优化器已据此自动调整该达人的预测。', 'k.repNone': '记录投放结果或给达人评分后，这里会显示信誉分。',
+            'pl.waTip': '用邀约模板一键发 WhatsApp', 'pl.waDefault': 'Hi {n}！我们想邀请你合作一次 TikTok 推广，有兴趣聊聊吗？',
+            'sale.soon': '距 {e} 还有 {d} 天', 'sale.today': '今天就是 {e}', 'sale.approx': '日期以官方公布为准', 'sale.plan': '规划达人组合',
+            'sale.tip': '提前 2–3 周锁定达人档期并备货，越临近报价越高。'
         });
         // Translate a dynamic string with {placeholder} interpolation.
         function T(key, vars) {
@@ -4137,6 +4206,7 @@
             document.documentElement.lang = LANG === 'zh' ? 'zh-CN' : 'en';
             try { showNotice(); } catch (_) { /* config not loaded yet on the very first call */ }
             try { fillCategorySelects(); } catch (_) { /* list not defined yet on the very first call */ }
+            try { renderSales(); } catch (_) { /* defined later on the very first call */ }
             // page titles (used by showPage)
             Object.assign(PAGE_TITLES, d.pageTitles);
             const active = document.querySelector('.nav-item.active');
@@ -4272,6 +4342,52 @@
         const PLAN_ACCENT = { free: 'var(--mut)', pro: 'var(--accent)', team: 'var(--gold)' };
         const PLAN_ICON = { free: 'rocket_launch', pro: 'bolt', team: 'diamond' };
         // Server feature strings are English; translate known ones for the zh UI.
+        // ── Mega-sale calendar: a countdown on the optimizer and news pages for
+        // the next sale within 30 days. Double-day sales are fixed; festival
+        // dates move every year and are approximate (marked so).
+        const SALE_FIXED = [
+            { md: '01-01', en: '1.1 New Year Sale', zh: '1.1 新年大促' }, { md: '03-03', en: '3.3 Sale', zh: '3.3 大促' },
+            { md: '04-04', en: '4.4 Sale', zh: '4.4 大促' }, { md: '05-05', en: '5.5 Sale', zh: '5.5 大促' },
+            { md: '06-06', en: '6.6 Mid-year Sale', zh: '6.6 年中大促' }, { md: '07-07', en: '7.7 Sale', zh: '7.7 大促' },
+            { md: '08-08', en: '8.8 Sale', zh: '8.8 大促' }, { md: '09-09', en: '9.9 Super Shopping Day', zh: '9.9 超级购物日' },
+            { md: '10-10', en: '10.10 Sale', zh: '10.10 大促' }, { md: '11-11', en: '11.11 Singles\' Day', zh: '11.11 双十一' },
+            { md: '12-12', en: '12.12 Year-end Sale', zh: '12.12 年终大促' }];
+        const SALE_MOVING = [
+            { d: '2026-11-27', en: 'Black Friday', zh: '黑色星期五' }, { d: '2027-02-06', en: 'Chinese New Year', zh: '农历新年', approx: true },
+            { d: '2027-02-08', en: 'Ramadan begins', zh: '斋月开始', approx: true }, { d: '2027-03-10', en: 'Hari Raya Aidilfitri', zh: '开斋节', approx: true },
+            { d: '2027-11-26', en: 'Black Friday', zh: '黑色星期五' }, { d: '2028-01-26', en: 'Chinese New Year', zh: '农历新年', approx: true },
+            { d: '2028-01-28', en: 'Ramadan begins', zh: '斋月开始', approx: true }, { d: '2028-02-26', en: 'Hari Raya Aidilfitri', zh: '开斋节', approx: true }];
+        function upcomingSales(now) {
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const list = [];
+            [today.getFullYear(), today.getFullYear() + 1].forEach(y => SALE_FIXED.forEach(e => list.push({ ...e, d: `${y}-${e.md}` })));
+            SALE_MOVING.forEach(e => list.push(e));
+            return list.map(e => { const [y, m, d] = e.d.split('-').map(Number); return { ...e, days: Math.round((new Date(y, m - 1, d) - today) / 864e5) }; })
+                .filter(e => e.days >= 0 && e.days <= 30).sort((a, b) => a.days - b.days).slice(0, 2);
+        }
+        function renderSales() {
+            const ev = upcomingSales(new Date());
+            document.querySelectorAll('.sale-slot').forEach(slot => {
+                if (!ev.length) { slot.style.display = 'none'; return; }
+                slot.style.display = '';
+                slot.innerHTML = `<div class="glass-card rounded-xl p-md flex flex-wrap items-center gap-md" style="border-color:rgba(110,139,194,.45)">
+                    <span class="material-symbols-outlined text-[26px]" style="color:#6E8BC2">event_upcoming</span>
+                    <div style="flex:1;min-width:220px">
+                        <p class="text-[14px] font-bold text-on-surface">${ev.map(e => T(e.days ? 'sale.soon' : 'sale.today', { e: e[LANG === 'zh' ? 'zh' : 'en'], d: e.days }) + (e.approx ? ` <span class="text-[11px] font-normal text-on-surface-variant">(${T('sale.approx')})</span>` : '')).join(' · ')}</p>
+                        <p class="text-[12px] text-on-surface-variant">${T('sale.tip')}</p>
+                    </div>
+                    ${slot.closest('#page-dashboard') ? '' : `<button class="btn btn-outline" onclick="showPage('dashboard')">${T('sale.plan')}</button>`}
+                </div>`;
+            });
+        }
+        // Plan feature lines come from the server in English; numbers that the
+        // operator can change (AI clip quotas) are matched by pattern.
+        function featText(f) {
+            if (LANG !== 'zh') return f;
+            if (FEAT_ZH[f]) return FEAT_ZH[f];
+            const m = /^(\d+) AI video clips? \/ month$/.exec(f);
+            return m ? `每月 ${m[1]} 条 AI 视频` : f;
+        }
         const FEAT_ZH = {
             '10 optimization runs / month': '每月 10 次优化',
             'AI Copilot — 20 chats / month': 'AI 投放助手 — 每月 20 次对话',
@@ -4285,7 +4401,6 @@
             '3 team seats': '3 个团队席位',
             'Unlimited optimization runs': '不限优化次数',
             'Unlimited AI Copilot': '不限 AI 投放助手',
-            '1 AI video clip / month': '每月 1 条 AI 视频', '20 AI video clips / month': '每月 20 条 AI 视频', '60 AI video clips / month': '每月 60 条 AI 视频',
             '10 team seats': '10 个团队席位',
             'Priority support': '优先支持',
         };
@@ -4331,7 +4446,7 @@
             const upgrade = PLAN_ORDER.indexOf(id) > PLAN_ORDER.indexOf(info.plan);
             const planName = T('plan.' + id);
             const features = p.features.map(f => `<li><span class="material-symbols-outlined">check</span><span>${
-                LANG === 'zh' && FEAT_ZH[f] ? FEAT_ZH[f] : f}</span></li>`).join('');
+                featText(f)}</span></li>`).join('');
             const btnLabel = T(upgrade ? 'b.upgradeTo' : (popular ? 'b.switchTo' : 'b.downgradeTo'), { n: planName });
             const btn = current
                 ? `<button class="bp-btn" disabled>${T('b.currentBtn')}</button>`
@@ -4508,6 +4623,45 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
                 usageMeter('smart_toy', `${T('b.copilot')} · ${info.usage.month}`, info.usage.agent_messages, info.limits.monthly_agent_messages) +
                 usageMeter('group', T('b.library'), info.usage.creators, info.limits.max_creators);
             document.getElementById('billing-plans').innerHTML = PLAN_ORDER.map(id => planCard(id, info)).join('');
+            renderGrowth(info);
+        }
+        async function renderGrowth(info) {
+            const box = document.getElementById('growth-cards');
+            if (!box) return;
+            const tr = info.trial || {};
+            let trial = '';
+            if (tr.available) trial = `<div class="glass-card rounded-xl p-lg space-y-sm">
+                    <p class="text-[15px] font-bold text-on-surface flex items-center gap-2"><span class="material-symbols-outlined text-[20px]">bolt</span>${T('tr.title')}</p>
+                    <p class="text-[12.5px] text-on-surface-variant leading-relaxed">${T('tr.body')}</p>
+                    <button id="trial-btn" class="btn btn-primary" onclick="startTrial()">${T('tr.btn')}</button></div>`;
+            else if (tr.active) trial = `<div class="glass-card rounded-xl p-lg space-y-sm">
+                    <p class="text-[15px] font-bold text-on-surface flex items-center gap-2"><span class="material-symbols-outlined text-[20px]">bolt</span>${T('tr.active', { d: esc((tr.ends_at || '').slice(0, 10)) })}</p>
+                    <p class="text-[12.5px] text-on-surface-variant leading-relaxed">${T('tr.activeBody')}</p></div>`;
+            box.innerHTML = trial;
+            let rf = null;
+            try { const r = await fetch(`${API}/billing/referral`); if (r.ok) rf = await r.json(); } catch (_) {}
+            if (!rf || !rf.code) return;
+            const link = location.origin + rf.path;
+            const wa = 'https://wa.me/?text=' + encodeURIComponent(T('rf.msg', { u: link }));
+            box.insertAdjacentHTML('beforeend', `<div class="glass-card rounded-xl p-lg space-y-sm">
+                    <p class="text-[15px] font-bold text-on-surface flex items-center gap-2"><span class="material-symbols-outlined text-[20px]">group_add</span>${T('rf.title')}</p>
+                    <p class="text-[12.5px] text-on-surface-variant leading-relaxed">${T('rf.body', { d: rf.reward_days })}</p>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <code class="font-data-mono text-[12px] px-2 py-1 rounded" style="background:rgba(128,128,128,.12);word-break:break-all">${esc(link)}</code>
+                        <button class="btn btn-outline text-[12px] py-1 px-3" onclick="copyText('${esc(link)}');toast(T('rf.copied'))">${T('rf.copy')}</button>
+                        <a class="btn btn-outline text-[12px] py-1 px-3" href="${wa}" target="_blank" rel="noopener">${T('rf.wa')}</a>
+                    </div>
+                    <p class="text-[11.5px] text-on-surface-variant">${T('rf.stats', { i: rf.invited, r: rf.rewarded })}</p></div>`);
+        }
+        async function startTrial() {
+            const b = document.getElementById('trial-btn'); if (b) b.disabled = true;
+            try {
+                const r = await fetch(`${API}/billing/trial`, { method: 'POST' });
+                const d = await r.json().catch(() => ({}));
+                if (!r.ok) { toast(d.detail || T('acct.fail'), 'err'); if (b) b.disabled = false; return; }
+                toast(T('tr.started'));
+                loadBilling();
+            } catch (_) { toast(T('t.netFail'), 'err'); if (b) b.disabled = false; }
         }
 
         // ── Offline payment (WhatsApp / WeChat) — replace with your real handles ──
@@ -4596,13 +4750,13 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
                     </div>${help}`;
                 return;
             }
-            const terms = cfg.terms.map(m => `<button onclick="payChangeTerm(${m})" class="btn ${m === o.months ? 'btn-primary' : 'btn-outline'} text-[12px] py-1 px-3">${T('qr.term', { m })}</button>`).join('');
+            const terms = cfg.terms.map(m => `<button onclick="payChangeTerm(${m})" class="btn ${m === o.months ? 'btn-primary' : 'btn-outline'} text-[12px] py-1 px-3">${T('qr.term', { m })}${m === 12 ? ` · <b>${T('qr.save2')}</b>` : ''}</button>`).join('');
             const rejected = o.status === 'rejected'
                 ? `<div class="rounded-lg p-2 mb-3 text-[12px]" style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.35);color:#fca5a5">${T('qr.rejected')}${o.note ? ' — ' + esc(o.note) : ''}</div>` : '';
             setTimeout(() => loadPayQr(cfg.qr_image), 0);
             qr.innerHTML = `
                 ${rejected}
-                <div class="flex items-center gap-2 mb-3">${terms}</div>
+                <div class="flex flex-wrap items-center gap-2 mb-3">${terms}</div>
                 <div class="flex gap-4 items-start mb-3">
                     <img id="pay-qr-img" alt="Payment QR" style="width:168px;min-height:168px;border-radius:10px;background:#fff;flex-shrink:0" />
                     <div class="space-y-xs" style="min-width:0">
@@ -4617,12 +4771,17 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
                     <li>${T('qr.s1')}</li><li>${T('qr.s2', { a: payMoney(o) })}</li><li>${T('qr.s3')}</li>
                 </ol>
                 <input id="pay-ref" class="form-input" style="width:100%" maxlength="64" placeholder="${T('qr.phRef')}" value="" />
+                <div class="flex items-center gap-2 mt-2 text-[12px]">
+                    <label class="btn btn-outline text-[12px] py-1 px-3" style="cursor:pointer"><span class="material-symbols-outlined text-[16px]">add_photo_alternate</span>${T('qr.proof')}
+                        <input type="file" accept="image/png,image/jpeg,image/webp" style="display:none" onchange="payProof(this)" /></label>
+                    <span id="pay-proof-state" class="text-on-surface-variant">${o.has_proof ? '✓ ' + T('qr.proofOk') : ''}</span>
+                </div>
                 <button id="pay-submit-btn" onclick="paySubmit()" class="btn btn-primary w-full mt-2" style="justify-content:center">${T('qr.paid')}</button>
                 ${help}`;
         }
         async function paySubmit() {
             const ref = document.getElementById('pay-ref').value.trim();
-            if (ref.length < 4) { toast(T('qr.needRef'), 'err'); return; }
+            if (ref.length < 4 && !(PAY_ORDER.has_proof && !ref)) { toast(T('qr.needRef'), 'err'); return; }
             const btn = document.getElementById('pay-submit-btn'); btn.disabled = true;
             try {
                 const r = await fetch(`${API}/billing/orders/${PAY_ORDER.order_no}/submit`, {
@@ -4634,6 +4793,21 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
                 PAY_ORDER = d; renderQrPay(); loadPayStatus();
                 toast(T('qr.submitted'));
             } catch (_) { toast(T('t.netFail'), 'err'); btn.disabled = false; }
+        }
+        async function payProof(input) {
+            const f = input.files && input.files[0];
+            if (!f) return;
+            if (f.size > 2 * 1024 * 1024) { toast(T('qr.proofBig'), 'err'); input.value = ''; return; }
+            const fd = new FormData(); fd.append('file', f);
+            const st = document.getElementById('pay-proof-state'); if (st) st.textContent = '…';
+            try {
+                const r = await fetch(`${API}/billing/orders/${PAY_ORDER.order_no}/proof`, { method: 'POST', body: fd });
+                const d = await r.json().catch(() => ({}));
+                if (!r.ok) { toast(d.detail || T('acct.fail'), 'err'); if (st) st.textContent = ''; return; }
+                PAY_ORDER.has_proof = true;
+                if (st) st.textContent = '✓ ' + T('qr.proofOk');
+            } catch (_) { toast(T('t.netFail'), 'err'); if (st) st.textContent = ''; }
+            input.value = '';
         }
         // Banner on the billing page for a payment that is unfinished or under review.
         async function loadPayStatus() {
@@ -4693,7 +4867,26 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
         function esc(v) { return String(v == null ? '' : v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
         let APP_CONFIG = { email_enabled: false };
         let RESET_TOKEN = null;
-        fetch(`${API}/app-config`).then(r => r.ok ? r.json() : null).then(c => { if (c) { APP_CONFIG = c; showNotice(); } }).catch(() => {});
+        fetch(`${API}/app-config`).then(r => r.ok ? r.json() : null).then(c => { if (c) { APP_CONFIG = c; showNotice(); markAiOff(); } }).catch(() => {});
+        // Without an LLM key the AI buttons would only answer with an error, so
+        // they are disabled up front with a plain note instead.
+        function markAiOff() {
+            if (APP_CONFIG.ai_enabled !== false) return;
+            ['an-ai-btn', 'sv-gen-btn', 'sc-gen-btn', 'op-btn', 'sc-chk-btn'].forEach(id => {
+                const b = document.getElementById(id);
+                if (!b || b.dataset.aiOff) return;
+                b.dataset.aiOff = '1';
+                b.disabled = true;
+                b.style.opacity = '.5';
+                b.style.cursor = 'not-allowed';
+                const n = document.createElement('div');
+                n.className = 'empty-note';
+                n.style.cssText = 'padding:6px 2px;text-align:left;font-size:12px';
+                n.setAttribute('data-i18n', 'ai.off');
+                n.textContent = T('ai.off');
+                b.insertAdjacentElement('afterend', n);
+            });
+        }
         // Operator's site-wide notice; dismissing it hides that notice only, a new one shows again.
         function showNotice() {
             const n = APP_CONFIG.announcement, bar = document.getElementById('notice-bar');
@@ -5060,7 +5253,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
                         <td class="r">${r.fee == null ? '—' : fmt(r.fee)}</td>
                         <td>${esc(r.contact) || '—'}${r.content_url ? `<a class="sub" href="${esc(r.content_url)}" target="_blank" rel="noopener noreferrer" style="color:var(--accent)">${T('pl.open')} ↗</a>` : ''}</td>
                         <td style="color:var(--mut);white-space:nowrap">${esc((r.updated_at || '').slice(0, 10))}</td>
-                        <td class="r"><button class="btn btn-quiet" onclick="openPipelineModal(${i})">${T('pl.details')}</button></td>
+                        <td class="r" style="white-space:nowrap"><button class="btn btn-quiet" title="${T('pl.waTip')}" onclick="quickWhatsApp(${i})"><span class="material-symbols-outlined">chat</span></button><button class="btn btn-quiet" onclick="openPipelineModal(${i})">${T('pl.details')}</button></td>
                     </tr>`).join('') + `</tbody></table></div>
                     <div style="padding:12px 16px;border-top:1px solid rgba(128,128,128,.14);font-size:12.5px;color:var(--mut)">${T('pl.showing', { n: d.items.length, t: d.total })}</div>`;
                 return;
@@ -5076,6 +5269,26 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
                 return `<div class="kb-col" data-st="${st}" ondragover="event.preventDefault();this.classList.add('over')" ondragleave="this.classList.remove('over')" ondrop="kbDrop(event, this)">
                     <header><i style="background:${PL_COLOR[st]}"></i>${T('pl.s.' + st)}<span>${n}</span></header><div class="kb-list">${cards}</div></div>`;
             }).join('');
+        }
+        // Open WhatsApp with the first invitation template filled in for this
+        // creator (their number when the contact has one), and log the message.
+        async function quickWhatsApp(i) {
+            const r = PL_DATA.items[i]; if (!r) return;
+            const w = window.open('about:blank', '_blank');      // opened inside the click, so it isn't blocked
+            let body = T('pl.waDefault', { n: r.name }), tplName = '';
+            try {
+                const d = await apiJson('/templates?kind=message');
+                const t = d && d.templates && d.templates[0];
+                if (t) {
+                    const out = await postJson(`/templates/${t.id}/render`, { kind: 'message', campaign_id: r.campaign_id, kol_id: r.kol_id });
+                    if (out && out.text) { body = out.text; tplName = t.name; }
+                }
+            } catch (_) { /* fall back to the short default */ }
+            const digits = String(r.contact || '').replace(/\D/g, '');
+            const url = `https://wa.me/${digits.length >= 8 ? digits : ''}?text=${encodeURIComponent(body)}`;
+            if (w) { try { w.opener = null; } catch (_) {} w.location.href = url; } else window.open(url, '_blank', 'noopener');
+            const d = await postJson('/messages', { campaign_id: r.campaign_id, kol_id: r.kol_id, channel: 'whatsapp', body, template_name: tplName });
+            if (d) { toast(T(d.advanced_to_invited ? 'msg.loggedInvited' : 'msg.logged')); loadPipeline(); loadOnboarding(true); }
         }
         function kbDrag(e) { e.dataTransfer.setData('text/plain', e.currentTarget.dataset.i); e.dataTransfer.effectAllowed = 'move'; e.currentTarget.classList.add('drag'); }
         function kbDrop(e, col) {
@@ -5754,7 +5967,22 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
         // ══════════ EXPLORE — shared creator pool + browser extension (backend/pool.py) ══════════
         const EX_PAGE = 24;
         let EX_OFFSET = 0, EX_ITEMS = [], EX_ADD = null;
+        // Joining the shared pool is opt-in (see the privacy policy).
+        async function loadShare() {
+            const box = document.getElementById('ex-share');
+            const d = await apiJson('/pool/sharing');
+            if (!box || !d) return;
+            box.innerHTML = `<span class="material-symbols-outlined text-[22px]" style="color:${d.on ? '#6E8BC2' : 'var(--mut)'}">${d.on ? 'group' : 'lock'}</span>
+                <div style="flex:1;min-width:240px"><p class="font-bold text-on-surface">${T(d.on ? 'ex.shareOn' : 'ex.shareOff')}</p>
+                <p class="text-on-surface-variant">${T('ex.shareBody')} <a href="/legal.html#privacy" target="_blank" rel="noopener" style="color:var(--accent)">${T('ex.sharePolicy')}</a></p></div>
+                <button class="btn ${d.on ? 'btn-outline' : 'btn-primary'}" onclick="setShare(${!d.on})">${T(d.on ? 'ex.shareLeave' : 'ex.shareJoin')}</button>`;
+        }
+        async function setShare(on) {
+            const d = await postJson('/pool/sharing', { on }, 'PUT');
+            if (d) { toast(T(on ? 'ex.shareJoined' : 'ex.shareLeft')); loadShare(); loadExplore(EX_OFFSET); }
+        }
         async function loadExplore(offset) {
+            if (!offset) loadShare();
             EX_OFFSET = Math.max(0, offset || 0);
             const p = new URLSearchParams({ limit: EX_PAGE, offset: EX_OFFSET, sort: document.getElementById('ex-sort').value });
             const q = document.getElementById('ex-q').value.trim(), c = document.getElementById('ex-country').value;
@@ -6070,6 +6298,27 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
             selectPlan(selectedPlanName);
         }
 
+        // ── Forecast honesty: a range instead of one number, plus what makes it uncertain ──
+        function renderBizNotes(kols, totalGmv, totalCost, candidates) {
+            const el = document.getElementById('biz-notes');
+            if (!el) return;
+            const notes = [];
+            if (kols.length && totalGmv > 0) {
+                // Uncalibrated forecasts carry wide error bars; each recorded campaign narrows them.
+                const spread = CAL_USED >= 3 ? 0.2 : CAL_USED >= 1 ? 0.28 : 0.35;
+                const lo = totalGmv * (1 - spread), hi = totalGmv * (1 + spread);
+                notes.push(['query_stats', T('d.range', { lo: fmt(lo), hi: fmt(hi), rlo: (lo / totalCost).toFixed(1), rhi: (hi / totalCost).toFixed(1) })
+                    + ' ' + T(CAL_USED ? 'd.rangeCal' : 'd.rangeUncal', { n: CAL_USED })]);
+                const est = kols.filter(k => k.cost_estimated).length;
+                if (est) notes.push(['price_check', T('d.estQuotes', { n: est, t: kols.length })
+                    + ` <button class="underline font-semibold" onclick="showPage('creators')">${T('d.estAction')}</button>`]);
+                const top = Math.max(...kols.map(k => k.expected_gmv || 0));
+                const share = top / totalGmv;
+                if (kols.length >= 1 && share > 0.6) notes.push(['warning', T('d.concentrated', { p: Math.round(share * 100) })]);
+            }
+            el.innerHTML = notes.map(([icon, html]) => `<div class="flex items-start gap-2 rounded-lg px-3 py-2 text-[12px] text-on-surface-variant bg-surface-container-low"><span class="material-symbols-outlined text-[16px]" style="margin-top:1px">${icon}</span><span>${html}</span></div>`).join('');
+        }
+
         function selectPlan(name) {
             selectedPlanName = name;
             const col = PLAN_COLORS[name] || '#D9DCE1';
@@ -6111,6 +6360,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
             const plan = allPlansData.find(p => p.plan_name === name);
             if (!plan) return;
             const sorted = [...plan.selected_kols].sort((a, b) => b.expected_gmv - a.expected_gmv);
+            renderBizNotes(sorted, plan.total_gmv, plan.total_cost);
             document.getElementById('biz-count').textContent = sorted.length;
             document.getElementById('biz-kol-grid').innerHTML = sorted.map(k => bizKolCard(k, plan.total_gmv)).join('');
             document.getElementById('biz-gmv').textContent = fmt(plan.total_gmv);
@@ -6153,6 +6403,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
             }
 
             const sorted = [...data.selected_kols].sort((a, b) => b.expected_gmv - a.expected_gmv);
+            renderBizNotes(sorted, data.total_gmv, data.total_cost, data.candidates);
 
             // ── Business view ──
             document.getElementById('biz-subtitle').textContent = bizSubtitle(payload, sorted.length);
@@ -6488,8 +6739,15 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
                     `<button onclick="rateKol(${i})" title="${i}★" style="background:none;border:none;cursor:pointer;font-size:19px;line-height:1;padding:0 1px;color:${i <= cur ? 'var(--gold)' : 'var(--dim)'};transition:color .15s">★</button>`).join('') +
                 `<span class="text-[10px] text-on-surface-variant ml-1">${cur ? cur + '/5' : T('k.rateHint')}</span>`;
             const list = document.getElementById('kd-collabs');
-            if (!c.collab_count) { list.innerHTML = `<p class="text-[11px] text-on-surface-variant">${T('k.noCollabs')}</p>`; return; }
-            list.innerHTML = `<p class="text-[10px] text-on-surface-variant uppercase tracking-wider">${T('k.collabCount', { n: c.collab_count })}</p>` +
+            const rp = c.reputation, repBits = rp ? [
+                rp.delivery != null ? T('k.repDelivery', { x: rp.delivery.toFixed(2), n: rp.campaigns_measured }) : '',
+                rp.rating ? T('k.repRating', { r: rp.rating }) : ''].filter(Boolean).join(' · ') : '';
+            const rep = `<div class="flex items-center gap-sm pb-2">
+                    <span class="font-data-mono font-bold text-[20px] text-on-surface">${rp ? rp.score : '—'}</span>
+                    <div style="min-width:0"><p class="text-[10px] text-on-surface-variant uppercase tracking-wider">${T('k.rep')}</p>
+                    <p class="text-[11px] text-on-surface-variant">${rp ? esc(repBits) + '. ' + T('k.repNote') : T('k.repNone')}</p></div></div>`;
+            if (!c.collab_count) { list.innerHTML = rep + `<p class="text-[11px] text-on-surface-variant">${T('k.noCollabs')}</p>`; return; }
+            list.innerHTML = rep + `<p class="text-[10px] text-on-surface-variant uppercase tracking-wider">${T('k.collabCount', { n: c.collab_count })}</p>` +
                 c.collabs.map(x => `<div class="flex items-center justify-between gap-sm text-[12px] py-1.5 border-t border-outline-variant/30">
                     <span class="text-on-surface truncate" style="max-width:50%">${esc(x.name || '—')}</span>
                     <span class="text-on-surface-variant font-data-mono text-[10.5px]">${(x.created_at || '').slice(0, 10)}</span>
@@ -6665,6 +6923,10 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
             } catch (e) { toast(T('t.campLoadFail'), 'err'); }
         }
 
+        let CAL_USED = 0;          // completed campaigns feeding the self-calibration
+        async function refreshCalUsed() {
+            try { const r = await fetch(`${API}/calibration`); if (r.ok) CAL_USED = (await r.json()).campaigns_used || 0; } catch (_) {}
+        }
         async function loadCalibration() {
             const banner = document.getElementById('calibration-banner');
             const text = document.getElementById('calibration-text');
@@ -6673,6 +6935,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
                 const r = await fetch(`${API}/calibration`);
                 if (!r.ok) { banner.classList.add('hidden'); return; }
                 const d = await r.json();
+                CAL_USED = d.campaigns_used || 0;
                 if (!d.campaigns_used) {
                     text.innerHTML = T('cm.calNone');
                 } else {
@@ -6897,7 +7160,10 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
             const p = document.getElementById('agent-panel');
             p.classList.toggle('hidden');
             if (!p.classList.contains('hidden')) {
-                if (!AG_HISTORY.length && !document.getElementById('ag-body').childElementCount) agAppend('bot', T('ag.hello'));
+                const off = APP_CONFIG.ai_enabled === false;
+                document.getElementById('ag-input').disabled = off;
+                document.getElementById('ag-send').disabled = off;
+                if (!AG_HISTORY.length && !document.getElementById('ag-body').childElementCount) agAppend('bot', T(off ? 'ag.off' : 'ag.hello'));
                 document.getElementById('ag-input').focus();
             }
         }

@@ -59,7 +59,8 @@ def test_pay_config_lists_prices_in_local_currency():
     assert c["qr_image"] == "/billing/pay-qr"
     assert c["prices"]["pro"]["1"] == 29.0                          # RM29 / month
     assert c["prices"]["team"]["1"] == 99.0                         # RM99 / month
-    assert c["prices"]["team"]["12"] == 99.0 * 12
+    assert c["prices"]["team"]["12"] == 99.0 * 10                    # a year is billed as 10 months
+    assert c["prices"]["pro"]["3"] == 29.0 * 3
     img = client.get("/billing/pay-qr", headers=headers)             # signed-in accounts only
     assert img.status_code == 200 and img.headers["content-type"] == "image/png"
     assert "no-store" in img.headers["cache-control"]

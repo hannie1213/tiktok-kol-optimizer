@@ -326,7 +326,10 @@ def workspace(email: str):
         "orders": [{k: o[k] for k in ("order_no", "plan", "months", "amount", "currency", "status",
                                       "reference", "created_at", "decided_at")}
                    for o in repo.orders_for_tenant(tid, limit=10)],
-        "activity": repo.docs_list(tid, "activity", limit=25),
+        # Who did what kind of thing, and when; never names of creators,
+        # campaigns or contracts, nor message text (that is merchant data).
+        "activity": [{"actor": a.get("actor", ""), "action": a.get("action", ""), "created_at": a.get("created_at")}
+                     for a in repo.docs_list(tid, "activity", limit=25)],
     }
 
 

@@ -38,6 +38,8 @@ Endpoints
   GET  /pool/search          Find creators in the pool
   POST /pool/{id}/add        Copy a pool creator into this workspace's library
 """
+import hashlib
+import hmac
 import io
 import json
 import os
@@ -53,7 +55,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy import func, or_, select
 
 from backend import activity, billing, crud, ratelimit, repo, settings
-from backend.auth import DEMO_SUFFIX, _JWT_ALG, _pw_fingerprint, current_user, require_tenant
+from backend.auth import DEMO_SUFFIX, _JWT_ALG, _pw_fingerprint, current_user, require_owner, require_tenant
 from backend.categories import VALID_CATEGORIES
 from backend.db import PoolCapture, PoolCreator, SessionLocal
 
@@ -73,6 +75,45 @@ _PROFILE_URL = {
     "instagram": "https://www.instagram.com/{h}/",
     "youtube": "https://www.youtube.com/@{h}",
 }
+
+
+def tenant_tag(tenant_id: str) -> str:
+    """Keyed hash standing in for a workspace id in pool_captures (40 hex
+    characters, so it can't be mistaken for a raw 32-character id)."""
+    return hmac.new(settings.JWT_SECRET.encode(), b"pool:" + tenant_id.encode(), hashlib.sha256).hexdigest()[:40]
+
+
+_SHARE = "pool_share"
+
+
+def sharing(tenant_id: str) -> bool:
+    """Has this workspace joined the shared creator pool? Off until it opts in."""
+    rows = repo.docs_list(tenant_id, _SHARE, limit=1)
+    return bool(rows and rows[0].get("on"))
+
+
+def migrate_capture_tags() -> int:
+    """One-off: replace raw workspace ids left in pool_captures by older
+    versions with their hash. Idempotent."""
+    changed = 0
+    with SessionLocal.begin() as s:
+        for row in s.scalars(select(PoolCapture).where(func.length(PoolCapture.tenant_id) != 40)).all():
+            tag = tenant_tag(row.tenant_id)
+            dup = s.scalar(select(PoolCapture).where(PoolCapture.creator_id == row.creator_id,
+                                                     PoolCapture.tenant_id == tag))
+            if dup:
+                s.delete(row)
+            else:
+                row.tenant_id = tag
+            changed += 1
+    return changed
+
+
+def forget_tenant(tenant_id: str) -> None:
+    """Workspace deleted: drop its capture records (by hash) too."""
+    from sqlalchemy import delete as _delete
+    with SessionLocal.begin() as s:
+        s.execute(_delete(PoolCapture).where(PoolCapture.tenant_id == tenant_tag(tenant_id)))
 
 
 def _now() -> str:
@@ -191,7 +232,8 @@ def capture(req: Capture, user: dict = Depends(capture_user)):
     bio = " ".join(req.bio.split())[:300]
     if req.likes is not None and req.videos == 0 and req.likes > 0:
         raise HTTPException(status_code=422, detail="Those profile numbers don't add up.")
-    tenant_id = user["tenant_id"]
+    tag = tenant_tag(user["tenant_id"])
+    shared = sharing(user["tenant_id"])
     now = _now()
     with SessionLocal.begin() as s:
         row = s.scalar(select(PoolCreator).where(PoolCreator.platform == platform,
@@ -206,6 +248,8 @@ def capture(req: Capture, user: dict = Depends(capture_user)):
         stored = row.followers or 0
         drifted = (row.status == "public" and stored > 0
                    and not (stored / _DRIFT <= req.followers <= stored * _DRIFT))
+        # A workspace outside the shared pool never edits what others see.
+        drifted = drifted or (row.status == "public" and not shared)
         if not drifted:
             row.name, row.bio, row.verified = name, bio, bool(req.verified)
             row.followers = req.followers
@@ -219,19 +263,90 @@ def capture(req: Capture, user: dict = Depends(capture_user)):
         row.last_seen = now
         row.captures = (row.captures or 0) + 1
         seen = s.scalar(select(PoolCapture).where(PoolCapture.creator_id == row.id,
-                                                  PoolCapture.tenant_id == tenant_id))
+                                                  PoolCapture.tenant_id == tag))
         if seen:
-            seen.last_at = now
+            seen.last_at, seen.shared = now, shared
         else:
-            s.add(PoolCapture(creator_id=row.id, tenant_id=tenant_id, first_at=now, last_at=now))
+            s.add(PoolCapture(creator_id=row.id, tenant_id=tag, first_at=now, last_at=now, shared=shared))
             s.flush()
         row.confirmations = s.scalar(select(func.count()).select_from(PoolCapture)
-                                     .where(PoolCapture.creator_id == row.id)) or 0
+                                     .where(PoolCapture.creator_id == row.id,
+                                            PoolCapture.shared.is_(True))) or 0
         if row.status == "pending" and row.confirmations >= POOL_MIN_WORKSPACES:
             row.status = "public"
         s.flush()
         out = _to_dict(row)
-    return {"status": "created" if created else "updated", "creator": out, "ignored": drifted}
+    return {"status": "created" if created else "updated", "creator": out, "ignored": drifted, "shared": shared}
+
+
+class Sharing(BaseModel):
+    on: bool
+
+
+@router.get("/pool/sharing")
+def get_sharing(tenant_id: str = Depends(require_tenant)):
+    return {"on": sharing(tenant_id)}
+
+
+@router.put("/pool/sharing")
+def set_sharing(req: Sharing, tenant_id: str = Depends(require_owner)):
+    """Join or leave the shared creator pool. Only public profile numbers are
+    ever shared, never which workspace captured them."""
+    now = datetime.now(timezone.utc).isoformat()
+    rows = repo.docs_list(tenant_id, _SHARE, limit=5)
+    for r in rows:
+        repo.doc_delete(tenant_id, _SHARE, r["id"])
+    repo.doc_add(tenant_id, _SHARE, {"on": bool(req.on)}, now)
+    with SessionLocal.begin() as s:
+        caps = s.scalars(select(PoolCapture).where(PoolCapture.tenant_id == tenant_tag(tenant_id))).all()
+        for c in caps:
+            c.shared = bool(req.on)
+        s.flush()
+        for cid in {c.creator_id for c in caps}:
+            row = s.get(PoolCreator, cid)
+            if row is None:
+                continue
+            row.confirmations = s.scalar(select(func.count()).select_from(PoolCapture)
+                                         .where(PoolCapture.creator_id == cid, PoolCapture.shared.is_(True))) or 0
+            if row.status == "pending" and row.confirmations >= POOL_MIN_WORKSPACES:
+                row.status = "public"
+    activity.record(tenant_id, "pool.sharing", "on" if req.on else "off")
+    return {"on": bool(req.on)}
+
+
+# ── Starter catalogue ─────────────────────────────────────────────
+def seed_from_library(records=None) -> int:
+    """Put the curated real creators (the seed library every workspace starts
+    with) into the pool as confirmed entries, so Explore is not empty on day
+    one. Only creators with a TikTok profile link; existing pool rows are left
+    untouched. Idempotent; returns how many were added."""
+    from backend import tenancy
+    records = tenancy.load_template_seed() if records is None else records
+    added, now = 0, _now()
+    with SessionLocal.begin() as s:
+        for rec in records:
+            if rec.get("source") == "synthetic":
+                continue
+            m = re.match(r"^https?://(?:www\.)?tiktok\.com/@([A-Za-z0-9._\-]{2,64})/?$",
+                         (rec.get("tiktok_url") or "").strip())
+            if not m:
+                continue
+            handle = m.group(1)
+            key = handle.lower()
+            if s.scalar(select(PoolCreator.id).where(PoolCreator.platform == "tiktok",
+                                                     PoolCreator.handle_key == key)):
+                continue
+            country = (rec.get("country") or "").upper()
+            category = rec.get("category")
+            s.add(PoolCreator(
+                platform="tiktok", handle=handle, handle_key=key,
+                name=(rec.get("name") or handle)[:120], profile_url=_PROFILE_URL["tiktok"].format(h=handle),
+                followers=int(rec.get("followers") or 0), verified=False,
+                country=country if country in VALID_COUNTRIES else None,
+                category=category if category in VALID_CATEGORIES else None,
+                first_seen=now, last_seen=now, captures=0, status="public", confirmations=0))
+            added += 1
+    return added
 
 
 # ── Explore ───────────────────────────────────────────────────────
@@ -249,7 +364,7 @@ def search(q: Optional[str] = Query(None, max_length=80), country: Optional[str]
     if country and country not in VALID_COUNTRIES:
         raise HTTPException(status_code=422, detail=f"country must be one of: {', '.join(VALID_COUNTRIES)}")
     # Everyone sees confirmed creators; a pending one only by the workspace that captured it.
-    mine_ids = select(PoolCapture.creator_id).where(PoolCapture.tenant_id == tenant_id)
+    mine_ids = select(PoolCapture.creator_id).where(PoolCapture.tenant_id == tenant_tag(tenant_id))
     visible = or_(PoolCreator.status == "public",
                   (PoolCreator.status == "pending") & PoolCreator.id.in_(mine_ids))
     stmt = select(PoolCreator).where(visible)
@@ -296,7 +411,7 @@ def add_to_library(creator_id: int, req: AddToLibrary, tenant_id: str = Depends(
         row = s.get(PoolCreator, creator_id)
         ok = row is not None and (row.status == "public" or (row.status == "pending" and s.scalar(
             select(PoolCapture.id).where(PoolCapture.creator_id == row.id,
-                                         PoolCapture.tenant_id == tenant_id)) is not None))
+                                         PoolCapture.tenant_id == tenant_tag(tenant_id))) is not None))
         pc = _to_dict(row) if ok else None
     if not pc:
         raise HTTPException(status_code=404, detail="Creator not found")

@@ -37,7 +37,7 @@
         <h1>Terms &amp; Privacy</h1>
         <a href="./">← Back to Lumio</a>
     </header>
-    <p>Last updated: 12 November 2026 · 最后更新：2026 年 11 月 12 日</p>
+    <p>Last updated: 26 November 2026 · 最后更新：2026 年 11 月 26 日</p>
     <nav><a href="#terms">Terms of Service · 服务条款</a><a href="#privacy">Privacy Policy · 隐私政策</a></nav>
 
     <p class="note">The English text is the authoritative version; the Chinese summaries are provided for convenience. Questions about either document can be sent through the WhatsApp / WeChat contact shown under <b>Plan &amp; Billing</b> in the console.</p>
@@ -88,23 +88,35 @@
         <li><b>Workspace data:</b> the creator library, prices, ratings, saved campaigns and results you add, and your plan and monthly usage counts.</li>
         <li><b>AI Copilot messages:</b> what you type into the copilot, processed to answer you (see "Who else processes it").</li>
         <li><b>Technical logs:</b> request time, path, status and IP address, used for security, rate limiting and troubleshooting.</li>
-        <li><b>Payment records:</b> the plan, amount and transaction reference of each order you submit. We do not receive or store your bank or wallet credentials.</li>
+        <li><b>Payment records:</b> the plan, amount and transaction reference of each order you submit, and the receipt screenshot if you choose to upload one. We do not receive or store your bank or wallet credentials.</li>
+        <li><b>Shared creator pool (only if you join it):</b> public numbers from creator profiles captured with the browser extension (handle, name, follower, like and video counts, bio, country). See "The shared creator pool".</li>
+        <li><b>Referrals and trial:</b> which referral code you signed up with, and whether this workspace has used its free trial.</li>
         <li><b>Interest sign-ups:</b> the email you leave when registering interest in an upcoming integration.</li>
     </ul>
-    <p class="zh">我们收集：账号信息（邮箱及加盐哈希后的密码，不保存明文密码）；工作区数据（达人库、报价、评分、已保存的投放活动与结果、套餐及当月用量）；你发送给 AI 助手的消息；用于安全、限流与排障的技术日志（请求时间、路径、状态码、IP 地址）；以及你在"即将上线"集成中登记的邮箱。</p>
+    <p class="zh">我们收集：账号信息（邮箱及加盐哈希后的密码，不保存明文密码）；付款记录（套餐、金额、交易参考号，以及你自愿上传的付款截图）；加入共享达人池后通过浏览器插件采集的达人公开主页数据；注册时使用的推荐码及试用记录；工作区数据（达人库、报价、评分、已保存的投放活动与结果、套餐及当月用量）；你发送给 AI 助手的消息；用于安全、限流与排障的技术日志（请求时间、路径、状态码、IP 地址）；以及你在"即将上线"集成中登记的邮箱。</p>
 
     <h3>How we use it</h3>
     <p>To run the service for you, enforce plan quotas, keep the service secure, activate plans after payment, and contact you about your account. We do not sell your data and we do not use it for advertising. Each merchant's workspace is isolated from every other merchant's.</p>
     <p class="zh">用途仅限于：为你提供服务、执行套餐配额、保障安全、确认付款后开通套餐，以及就账号事宜与你联系。我们不出售你的数据，也不将其用于广告。各商家的工作区彼此隔离。</p>
 
+    <h3>What the operator can see</h3>
+    <p>Each workspace is private to its members. To support you and run billing, the Lumio operator can see your account email, team members, plan, payment orders (including any receipt screenshot), monthly usage, and counts of creators, campaigns, messages and contracts. The operator's view of your activity shows only who did what kind of action and when (for example "saved a campaign"), never the names of creators, campaigns or contracts, your notes, or the text of your messages. Operator actions are recorded in an audit log.</p>
+    <p class="zh">运营者能看到什么：每个工作区只对其成员开放。为提供支持和处理账单，Lumio 运营者能看到你的账号邮箱、团队成员、套餐、付款订单（含你上传的付款截图）、当月用量，以及达人、投放活动、消息、合同的数量。运营者看到的活动记录只有"谁在什么时间做了哪类操作"（例如"保存了投放活动"），看不到达人名、活动名、合同名、备注或消息内容。运营者的操作会记入审计日志。</p>
+
+    <h3>The shared creator pool</h3>
+    <p>Joining the shared creator pool is optional and off until a workspace owner switches it on (Explore → Share with the pool). When it is on, public profile numbers captured with the browser extension are added to the pool that every Lumio workspace can browse, and a creator becomes visible to everyone once two workspaces have captured the same profile independently or the operator has checked it. We record that a capture happened with a keyed hash of the workspace, not the workspace itself, so the pool never shows, and our records can't easily reveal, which merchant captured a creator. Nothing from your private library, prices, ratings or campaigns is ever shared. When the switch is off, your captures stay visible to your workspace only. You can switch it off at any time; deleting your workspace removes its capture records.</p>
+    <p class="zh">共享达人池：是否加入完全自愿，默认关闭，需要工作区所有者在「发现达人 → 加入共享达人池」中开启。开启后，通过浏览器插件采集的达人公开主页数据会进入所有 Lumio 工作区都能浏览的共享池；同一达人被两个工作区独立采集或经运营者核实后，才会对所有人显示。我们只用工作区的加密哈希来记录"有人采集过"，不记录是哪个工作区，因此共享池不会显示、我们的记录也难以反查是哪位商家采集的。你私有达人库中的名单、报价、评分和投放数据永远不会被共享。关闭时，你采集的达人只有你自己的工作区可见。你可以随时关闭；注销工作区会同时删除其采集记录。</p>
+
     <h3>Who else processes it</h3>
     <ul>
         <li><b>AI model provider:</b> copilot messages, together with the summaries of your library that are needed to answer them, are sent to our LLM provider (currently DeepSeek) to generate replies. Do not put sensitive personal information into the copilot.</li>
         <li><b>Hosting and infrastructure providers</b> that run our servers and database.</li>
+        <li><b>Video provider (Replicate)</b> receives the text and the optional product photo you submit for an AI video clip; finished clips may be stored with our object-storage provider (Cloudflare R2).</li>
+        <li><b>Telegram</b>, if the operator has turned on payment alerts, receives the order number, plan, amount, reference and account email of an order you submit.</li>
         <li><b>Email delivery provider</b> that sends account emails (address verification, password resets, security and plan notices) to your address.</li>
         <li><b>Font and script CDNs</b> (Google Fonts, Fontshare, cdnjs) that your browser contacts when loading the app, which exposes your IP address to them.</li>
     </ul>
-    <p class="zh">第三方处理方：AI 模型服务商（目前为 DeepSeek）——助手消息及回答所需的达人库摘要会发送给它以生成回复，请勿在助手中输入敏感个人信息；托管我们服务器与数据库的基础设施服务商；向你的邮箱发送账号邮件（邮箱验证、密码重置、安全与套餐通知）的邮件投递服务商；以及浏览器加载应用时访问的字体/脚本 CDN（Google Fonts、Fontshare、cdnjs），它们会获知你的 IP 地址。</p>
+    <p class="zh">第三方处理方：AI 模型服务商（目前为 DeepSeek）——助手消息及回答所需的达人库摘要会发送给它以生成回复，请勿在助手中输入敏感个人信息；托管我们服务器与数据库的基础设施服务商；向你的邮箱发送账号邮件（邮箱验证、密码重置、安全与套餐通知）的邮件投递服务商；AI 视频服务商（Replicate）——接收你提交的视频描述及可选商品图，生成的视频可能存放在对象存储服务商（Cloudflare R2）；若运营者开启了付款提醒，Telegram 会收到你提交订单的订单号、套餐、金额、参考号和账号邮箱；以及浏览器加载应用时访问的字体/脚本 CDN（Google Fonts、Fontshare、cdnjs），它们会获知你的 IP 地址。</p>
 
     <h3>Storage on your device</h3>
     <p>We use your browser's local storage to keep you signed in and remember your language. We do not use advertising or tracking cookies.</p>

@@ -16,10 +16,13 @@ from backend import repo
 client = TestClient(app)
 
 
-def _account():
+def _account(share=True):
+    """A workspace; by default one that has joined the shared pool."""
     email = f"pool_{uuid.uuid4().hex[:10]}@example.com"
     r = client.post("/auth/register", json={"email": email, "password": "secret123"})
     h = {"Authorization": f"Bearer {r.json()['token']}"}
+    if share:
+        assert client.put("/pool/sharing", headers=h, json={"on": True}).json() == {"on": True}
     return h, client.get("/auth/me", headers=h).json()["tenant_id"]
 
 
@@ -250,3 +253,64 @@ def test_operator_can_approve_and_hide(monkeypatch):
     assert client.get(f"/pool/search?q={handle}", headers=b).json()["total"] == 0
     assert client.post(f"/admin/pool/{cid}/status", headers=ADMIN, json={"status": "nope"}).status_code == 422
     assert client.post(f"/admin/pool/{cid}/status", json={"status": "public"}).status_code == 403
+
+
+def test_curated_library_seeds_the_pool_once():
+    from backend import pool
+    tag = uuid.uuid4().hex[:8]
+    recs = [{"name": "Real Shop", "tiktok_url": f"https://www.tiktok.com/@seed_{tag}", "country": "MY",
+             "category": "beauty", "followers": 120000, "source": "fastmoss"},
+            {"name": "Placeholder", "tiktok_url": f"https://www.tiktok.com/@fake_{tag}", "country": "MY",
+             "category": "beauty", "followers": 5000, "source": "synthetic"},
+            {"name": "No link", "country": "MY", "category": "beauty", "followers": 1}]
+    assert pool.seed_from_library(recs) == 1
+    assert pool.seed_from_library(recs) == 0                    # idempotent
+    h, _ = _account()
+    found = client.get(f"/pool/search?q={tag}", headers=h).json()["items"]
+    assert [i["handle"] for i in found] == [f"seed_{tag}"] and found[0]["status"] == "public"
+
+
+# ── Privacy: opt-in sharing and hashed capture records ───────────
+def test_sharing_is_off_until_the_workspace_opts_in():
+    a, _ = _account(share=False)
+    assert client.get("/pool/sharing", headers=a).json() == {"on": False}
+    b, _ = _account(share=False)
+    handle = _handle()
+    r = _capture(_ext(a), handle, followers=300_000).json()
+    assert r["shared"] is False and r["creator"]["status"] == "pending"
+    # a second workspace that has not opted in doesn't confirm it either
+    assert _capture(_ext(b), handle, followers=300_000).json()["creator"]["status"] == "pending"
+    assert client.get(f"/pool/search?q={handle}", headers=a).json()["items"][0]["status"] == "pending"
+    # once both opt in, their earlier captures count
+    client.put("/pool/sharing", headers=a, json={"on": True})
+    client.put("/pool/sharing", headers=b, json={"on": True})
+    other, _ = _account()
+    assert client.get(f"/pool/search?q={handle}", headers=other).json()["items"][0]["status"] == "public"
+
+
+def test_a_workspace_outside_the_pool_cannot_edit_public_numbers():
+    a, _ = _account()
+    b, _ = _account()
+    handle = _handle()
+    _capture(_ext(a), handle, followers=200_000)
+    _capture(_ext(b), handle, followers=200_000)
+    outsider, _ = _account(share=False)
+    r = _capture(_ext(outsider), handle, followers=250_000).json()
+    assert r["ignored"] is True and r["creator"]["followers"] == 200_000
+
+
+def test_capture_records_store_a_hash_not_the_workspace_id():
+    from sqlalchemy import select
+    from backend import pool
+    from backend.db import PoolCapture, SessionLocal
+    h, tenant = _account()
+    c = _capture(_ext(h), _handle()).json()["creator"]
+    with SessionLocal() as s:
+        ids = [r.tenant_id for r in s.scalars(select(PoolCapture).where(PoolCapture.creator_id == c["id"]))]
+    assert ids == [pool.tenant_tag(tenant)] and tenant not in ids and len(ids[0]) == 40
+    # rows written by older versions are converted in place
+    with SessionLocal.begin() as s:
+        s.add(PoolCapture(creator_id=c["id"] + 10_000_000, tenant_id=tenant, first_at="", last_at=""))
+    assert pool.migrate_capture_tags() >= 1
+    with SessionLocal() as s:
+        assert s.scalar(select(PoolCapture).where(PoolCapture.tenant_id == tenant)) is None

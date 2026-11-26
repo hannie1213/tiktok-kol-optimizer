@@ -53,6 +53,23 @@
 
 在 Environment 里填 `DEEPSEEK_API_KEY` 即可开启。不填时其他功能照常使用。
 
+## 5.1 AI 视频与视频存储（可选）
+
+- 填 `REPLICATE_API_TOKEN` 开启「AI 视频」。每条 5 秒 720p 约 0.18 美元，按套餐限量：免费 1 条 / 专业 10 条 / 团队 40 条每月。想改上限，填 `VIDEO_QUOTA_FREE`、`VIDEO_QUOTA_PRO`、`VIDEO_QUOTA_TEAM`。
+- Render 每次重新部署都会清空服务器硬盘，所以建议配一个 Cloudflare R2 存储桶（10 GB 内免费，下载不收流量费）：
+  1. Cloudflare 后台 → **R2** → **Create bucket**，名字如 `lumio-videos`，保持私有。
+  2. R2 → **Manage R2 API Tokens** → **Create API token**，权限选 *Object Read & Write*，只授权这个桶。
+  3. 把 `S3_ENDPOINT`（形如 `https://<账户ID>.r2.cloudflarestorage.com`）、`S3_BUCKET`、`S3_ACCESS_KEY_ID`、`S3_SECRET_ACCESS_KEY` 填进 Environment。
+  
+  配好后，生成完的视频会存进桶里，商家下载时拿到 10 分钟有效的私有链接；删除视频或注销工作区时桶里的文件一起删除。
+
+## 5.2 付款提醒发到 Telegram（可选）
+
+商家点「我已付款」或上传付款截图时，网站可以马上发 Telegram 消息给你：
+
+1. 在 Telegram 里找 **@BotFather**，发 `/newbot` 创建机器人，拿到 token，填到 `TELEGRAM_BOT_TOKEN`。
+2. 给你的机器人发一句话，然后打开 `https://api.telegram.org/bot<token>/getUpdates`，找到 `"chat":{"id":...}` 里的数字，填到 `TELEGRAM_CHAT_ID`。
+
 ## 六、绑定自己的域名
 
 在 `kol-optimizer` 服务 → **Settings → Custom Domains** 添加域名，按提示在域名商那里加一条 CNAME 记录，HTTPS 证书自动签发。
@@ -61,7 +78,7 @@
 ## 七、备份与注意事项
 
 - 付费的 PostgreSQL 自带每日备份，可在 `lumio-db` → **Backups** 恢复。
-- “AI 视频”生成的视频文件存在服务器临时目录，重新部署后会清空，需要的视频请及时下载。
+- 没配 R2 存储桶时，“AI 视频”生成的文件存在服务器临时目录，重新部署后会清空（见 5.1）。
 - Starter 方案是 0.5 核 CPU、512 MB 内存，适合起步阶段。用户多了以后，可在 Settings 里把网站升级到 Standard（25 美元/月）。
 
 ## 八、行业资讯（控制台「行业资讯」页）

@@ -991,18 +991,29 @@
                     <td class="email">${esc(o.email)}</td>
                     <td>${esc(PLAN_NAMES[o.plan] || o.plan)} × ${o.months} 个月</td>
                     <td class="num" style="text-align:right;font-weight:700;color:var(--cy)">${esc(o.currency)} ${Number(o.amount).toFixed(2)}</td>
-                    <td class="num">${esc(o.reference || '—')}</td>
+                    <td class="num">${esc(o.reference || '—')}${o.has_proof ? `<br><button class="btn" style="margin-top:4px" onclick="viewProof('${esc(o.order_no)}')">查看截图</button>` : ''}</td>
                     <td>${when}</td>
                     <td><div class="row-actions">${actions}</div></td>
                 </tr>`;
             }).join('');
+        }
+        // Payment screenshots need the admin key, so fetch them and open the image locally.
+        async function viewProof(no) {
+            try {
+                const r = await fetch(`${API}/admin/orders/${encodeURIComponent(no)}/proof`, { headers: { 'X-Admin-Key': KEY } });
+                if (!r.ok) { toast('截图读取失败', 'err'); return; }
+                const url = URL.createObjectURL(await r.blob());
+                const w = window.open(url, '_blank', 'noopener');
+                if (!w) location.href = url;
+                setTimeout(() => URL.revokeObjectURL(url), 60000);
+            } catch (_) { toast('截图读取失败', 'err'); }
         }
         async function confirmOrder(i) {
             const o = ORDERS[i];
             if (!confirm(`确认已在钱包收款记录中看到 ${o.currency} ${Number(o.amount).toFixed(2)}？\n确认后将为 ${o.email} 开通 ${o.plan} × ${o.months} 个月。`)) return;
             try {
                 const d = await req(`/admin/orders/${o.order_no}/confirm`, { method: 'POST' });
-                toast(`已开通 ${o.email} · ${o.plan}` + (d.expires_at ? ` · 至 ${d.expires_at.slice(0, 10)}` : ''));
+                toast(`已开通 ${o.email} · ${o.plan}` + (d.expires_at ? ` · 至 ${d.expires_at.slice(0, 10)}` : '') + (d.referral_reward ? ' · 推荐奖励已发放（双方各 +30 天）' : ''));
                 loadAll();
             } catch (e) {
                 if (e.message === 'AUTH') { logout(); return; }

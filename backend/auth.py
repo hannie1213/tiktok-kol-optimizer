@@ -185,6 +185,7 @@ def _sweep_expired_demos():
 class Credentials(BaseModel):
     email: str
     password: str
+    ref: Optional[str] = None          # referral code from a /?ref= link (sign-up only)
 
 
 class PasswordChange(BaseModel):
@@ -234,6 +235,9 @@ def register(req: Credentials, request: Request, background: BackgroundTasks):
     )
     tenancy.provision_tenant(tenant_id)
     log.info("registered account tenant=%s", tenant_id)
+    if req.ref:
+        from backend import growth
+        growth.record_signup(tenant_id, req.ref)
 
     verification_sent = mailer.enabled()
     if verification_sent:

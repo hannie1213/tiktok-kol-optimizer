@@ -143,7 +143,7 @@ _RULES = [
      "AI 返回的内容无法识别，请重试。"),
     (r"You're sending messages very quickly — give the copilot a moment\.|You're asking very quickly — give the AI a moment\.",
      "操作太频繁了，请稍等片刻。"),
-    (r"Agent not configured.*|AI features are not set up on this server yet\.", "服务器尚未开启 AI 功能。"),
+    (r"Agent not configured.*|AI features are not set up on this server yet\.", "AI 功能还没有开通，其他功能可正常使用。"),
     (r"Save at least one campaign first — there is nothing to analyse yet\.", "请先保存至少一次投放，目前还没有可分析的数据。"),
     (r"format must be video or live", "形式只能是短视频或直播。"),
     # ── generic ──

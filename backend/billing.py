@@ -28,6 +28,7 @@ Endpoints
   POST /billing/checkout   Downgrade to Free (paid plans -> 402, see above)
   POST /billing/grant      Operator: activate a plan after offline payment
 """
+import os
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
@@ -46,6 +47,24 @@ router = APIRouter()
 # chats — both of which carry a real marginal cost. The creator library is
 # unlimited on every plan (max_creators stays in the schema so a cap could
 # return, and check_creator_capacity below no-ops while it is None).
+def _video_quota(plan: str, default: int) -> int:
+    """Monthly AI clips per plan. Each clip is paid to the video provider
+    (about USD 0.2–0.4 for 5–10 s at 720p), so the defaults keep a plan's clip
+    cost well under its price; VIDEO_QUOTA_<PLAN> overrides one."""
+    raw = (os.environ.get(f"VIDEO_QUOTA_{plan.upper()}") or "").strip()
+    try:
+        return max(0, int(raw)) if raw else default
+    except ValueError:
+        return default
+
+
+_VQ = {"free": _video_quota("free", 1), "pro": _video_quota("pro", 10), "team": _video_quota("team", 40)}
+
+
+def _clips(n: int) -> str:
+    return f"{n} AI video clip{'' if n == 1 else 's'} / month"
+
+
 PLANS = {
     "free": {
         "name": "Free",
@@ -53,12 +72,12 @@ PLANS = {
         "max_creators": None,
         "monthly_optimizations": 10,
         "monthly_agent_messages": 20,
-        "monthly_ai_videos": 1,
+        "monthly_ai_videos": _VQ["free"],
         "seats": 1,
         "features": [
             "10 optimization runs / month",
             "AI Copilot — 20 chats / month",
-            "1 AI video clip / month",
+            _clips(_VQ["free"]),
             "Smart lineup picks + 'why this creator'",
             "Unlimited creator library",
             "CSV / Excel import & export",
@@ -70,12 +89,12 @@ PLANS = {
         "max_creators": None,
         "monthly_optimizations": 300,
         "monthly_agent_messages": 500,
-        "monthly_ai_videos": 20,
+        "monthly_ai_videos": _VQ["pro"],
         "seats": 3,
         "features": [
             "300 optimization runs / month",
             "AI Copilot — 500 chats / month",
-            "20 AI video clips / month",
+            _clips(_VQ["pro"]),
             "Self-calibrating GMV predictions",
             "Campaign attribution & accuracy tracking",
             "Unlimited creator library",
@@ -88,12 +107,12 @@ PLANS = {
         "max_creators": None,
         "monthly_optimizations": None,
         "monthly_agent_messages": None,
-        "monthly_ai_videos": 60,          # each clip costs real money, so never unlimited
+        "monthly_ai_videos": _VQ["team"],     # each clip costs real money, so never unlimited
         "seats": 10,
         "features": [
             "Unlimited optimization runs",
             "Unlimited AI Copilot",
-            "60 AI video clips / month",
+            _clips(_VQ["team"]),
             "10 team seats",
             "Priority support",
         ],
@@ -174,6 +193,7 @@ class CheckoutRequest(BaseModel):
 @router.get("/billing/info")
 def billing_info(tenant_id: str = Depends(require_tenant)):
     """Current plan + this month's usage against its limits, and the catalog."""
+    from backend import growth
     current = repo.plan_info(tenant_id)
     plan_id = current["plan"]
     limits = PLANS.get(plan_id, PLANS["free"])
@@ -195,6 +215,7 @@ def billing_info(tenant_id: str = Depends(require_tenant)):
             "month": _month(),
         },
         "plans": PLANS,
+        "trial": growth.trial_state(tenant_id),
         # False -> the UI must send paid upgrades to the offline-payment flow.
         "self_serve": settings.BILLING_SELF_SERVE,
     }
