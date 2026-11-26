@@ -61,6 +61,7 @@ from backend.crud import router as crud_router
 from backend.campaigns import router as campaigns_router
 from backend.admin import router as admin_router, record_interest
 from backend.agent import router as agent_router
+from backend.growth import router as growth_router
 from backend.guide import router as guide_router
 from backend.payments import router as payments_router
 from backend.workspace import router as workspace_router
@@ -83,6 +84,14 @@ async def _lifespan(_app):
                 logging.getLogger("kol").info("removed %d synthetic placeholder creators", n)
         except Exception:                      # never block startup on hygiene
             logging.getLogger("kol").exception("synthetic-creator purge failed")
+        try:
+            from backend import pool as _pool
+            n = _pool.seed_from_library()
+            _pool.migrate_capture_tags()       # raw workspace ids → keyed hashes
+            if n:
+                logging.getLogger("kol").info("added %d curated creators to the Explore pool", n)
+        except Exception:
+            logging.getLogger("kol").exception("Explore pool seeding failed")
     jobs.start()            # renewal reminders + cleanup (backend/jobs.py)
     yield
 
@@ -123,6 +132,7 @@ app.include_router(collab_router)
 app.include_router(pool_router)
 app.include_router(aivideo_router)
 app.include_router(studio_router)
+app.include_router(growth_router)
 app.include_router(news_router)
 app.include_router(news_admin_router)
 
@@ -754,7 +764,9 @@ def health():
 def app_config():
     """Public feature switches the frontend needs before anyone signs in."""
     notice = repo.system_get("announcement")
+    from backend import agent
     return {"email_enabled": mailer.enabled(),
+            "ai_enabled": bool(agent._API_KEY),
             "billing_self_serve": settings.BILLING_SELF_SERVE,
             # Operator's site-wide notice (maintenance, new features); null when none.
             "announcement": {"id": notice["created_at"], "text": notice.get("text", ""),

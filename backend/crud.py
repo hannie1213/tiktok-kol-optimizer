@@ -563,6 +563,34 @@ def rate_kol(kol_id: int, body: RatingIn, _t: str = Depends(require_tenant)):
     return {"message": f"Rated '{kol.get('name')}' {body.score}★", "kol_id": kol_id, "rating": body.score}
 
 
+def reputation(kol_id: int, rating) -> Optional[dict]:
+    """A 0–100 track-record score for one creator with THIS merchant.
+
+    Two sources, both already used by the optimizer: how the creator's actual
+    GMV compared with the prediction in completed campaigns (the per-creator
+    calibration factor, 1.0 = on target), and the merchant's own 1–5 rating.
+    Delivery maps 1.0× to 70 and 1.43× or better to 100; a rating maps to
+    rating × 20. With both, delivery weighs more as campaigns accumulate.
+    None until there is either."""
+    from backend import calibration
+    ce = (calibration.load().get("creators") or {}).get(str(kol_id)) or {}
+    n = int(ce.get("n") or 0)
+    parts = []
+    if n > 0:
+        parts.append((max(0, min(100, round(70 * float(ce["factor"])))), min(3, n)))
+    try:
+        r = int(rating or 0)
+    except (TypeError, ValueError):
+        r = 0
+    if 1 <= r <= 5:
+        parts.append((r * 20, 1))
+    if not parts:
+        return None
+    score = round(sum(v * w for v, w in parts) / sum(w for _, w in parts))
+    return {"score": score, "campaigns_measured": n,
+            "delivery": round(float(ce["factor"]), 2) if n > 0 else None, "rating": r or None}
+
+
 @router.get("/kols/{kol_id}/collabs")
 def kol_collabs(kol_id: int, _t: str = Depends(require_tenant)):
     """Collaboration history for one creator: every saved campaign that
@@ -592,6 +620,7 @@ def kol_collabs(kol_id: int, _t: str = Depends(require_tenant)):
     collabs.sort(key=lambda x: x.get("created_at") or "", reverse=True)
     return {
         "kol_id": kol_id,
+        "reputation": reputation(kol_id, kol.get("rating")),
         "rating": kol.get("rating"),
         "rating_log": list(reversed(kol.get("rating_log") or [])),
         "collab_count": len(collabs),

@@ -244,6 +244,10 @@ def test_workspace_detail_shows_counts_but_no_content():
     assert d["onboarding"]["total"] == 7
     assert [a["action"] for a in d["activity"]][:2] == ["collab.stage", "campaign.save"]
     assert "private note" not in r.text and "password" not in r.text
+    # the activity trail says who did what kind of thing, never on what
+    assert all(set(a) == {"actor", "action", "created_at"} for a in d["activity"])
+    campaign = client.get(f"/campaigns/{cid}", headers=h).json()
+    assert campaign["name"] not in r.text
     assert client.get("/admin/workspace", headers=H, params={"email": "nobody@example.com"}).status_code == 404
     assert client.get("/admin/workspace", params={"email": email}).status_code in (401, 403)
 

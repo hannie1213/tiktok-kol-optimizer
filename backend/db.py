@@ -324,7 +324,12 @@ class PoolCreator(Base):
 
 class PoolCapture(Base):
     """Which workspaces have captured a pool creator — used only to confirm a
-    profile independently before it is shown to everyone. Never exposed by the API."""
+    profile independently before it is shown to everyone. Never exposed by the API.
+
+    `tenant_id` holds a keyed hash of the workspace id (pool.tenant_tag), not
+    the id itself, so the table can't be joined back to an account. `shared`
+    is False for a workspace that has not joined the shared pool: its captures
+    stay visible to itself only and never count as a confirmation."""
     __tablename__ = "pool_captures"
     __table_args__ = (UniqueConstraint("creator_id", "tenant_id", name="uq_pool_capture_tenant"),)
 
@@ -333,6 +338,7 @@ class PoolCapture(Base):
     tenant_id: Mapped[str] = mapped_column(String(64), index=True)
     first_at: Mapped[str] = mapped_column(String(40), default="")
     last_at: Mapped[str] = mapped_column(String(40), default="")
+    shared: Mapped[bool] = mapped_column(Boolean, default=True)
 
 
 class ApiInterest(Base):
@@ -361,6 +367,7 @@ _ADDED_COLUMNS = [
     # Rows captured before verification existed start unconfirmed.
     ("pool_creators", "status", "VARCHAR(16) NOT NULL DEFAULT 'pending'"),
     ("pool_creators", "confirmations", "INTEGER NOT NULL DEFAULT 0"),
+    ("pool_captures", "shared", "BOOLEAN NOT NULL DEFAULT TRUE"),
 ]
 
 

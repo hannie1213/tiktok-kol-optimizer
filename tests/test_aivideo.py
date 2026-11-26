@@ -181,3 +181,42 @@ def test_deleting_the_workspace_removes_its_video_files(provider):
     assert os.path.isdir(folder)
     assert client.post("/auth/delete-account", headers=h, json={"password": "secret123"}).status_code == 200
     assert not os.path.exists(folder)
+
+
+def test_finished_clips_go_to_the_bucket_when_one_is_configured(provider, monkeypatch):
+    from backend import objstore
+    stored, deleted = {}, []
+
+    def put_file(key, path, content_type="application/octet-stream"):
+        with open(path, "rb") as f:
+            stored[key] = f.read()
+
+    monkeypatch.setattr(objstore, "enabled", lambda: True)
+    monkeypatch.setattr(objstore, "put_file", put_file)
+    monkeypatch.setattr(objstore, "delete", lambda key: deleted.append(key))
+    monkeypatch.setattr(objstore, "presigned_get",
+                        lambda key, expires=600, filename=None: f"https://bucket.example/{key}?sig=1")
+    h, tenant = _account("pro")
+    job = _start(h).json()
+    provider["state"] = {"status": "succeeded", "output": "https://replicate.delivery/b.mp4"}
+    assert client.get(f"/studio/videos/{job['id']}", headers=h).json()["ready"] is True
+    key = f"videos/{tenant}/{job['id']}.mp4"
+    assert b"ftyp" in stored[key]
+    assert not os.path.exists(aivideo._path(tenant, job["id"]))      # the local copy is not kept
+
+    f = client.get(f"/studio/videos/{job['id']}/file", headers=h, follow_redirects=False)
+    assert f.status_code == 307 and f.headers["location"].startswith("https://bucket.example/" + key)
+    assert client.delete(f"/studio/videos/{job['id']}", headers=h).status_code == 200
+    assert deleted == [key]
+
+
+def test_presigned_urls_are_well_formed(monkeypatch):
+    from backend import objstore
+    monkeypatch.setattr(objstore, "ENDPOINT", "https://acc.r2.cloudflarestorage.com")
+    monkeypatch.setattr(objstore, "BUCKET", "lumio")
+    monkeypatch.setattr(objstore, "ACCESS_KEY", "AKID")
+    monkeypatch.setattr(objstore, "SECRET_KEY", "secret")
+    url = objstore.presigned_get("videos/t1/5.mp4", expires=300, filename="clip.mp4")
+    assert url.startswith("https://acc.r2.cloudflarestorage.com/lumio/videos/t1/5.mp4?")
+    for part in ("X-Amz-Expires=300", "X-Amz-Credential=AKID%2F", "X-Amz-Signature=", "response-content-disposition="):
+        assert part in url

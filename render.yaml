@@ -52,3 +52,17 @@ services:
         sync: false
       - key: DEEPSEEK_API_KEY       # optional: turns on the AI copilot
         sync: false
+      - key: REPLICATE_API_TOKEN    # optional: turns on AI video clips
+        sync: false
+      - key: S3_ENDPOINT            # optional: Cloudflare R2 bucket so AI clips survive redeploys
+        sync: false
+      - key: S3_BUCKET
+        sync: false
+      - key: S3_ACCESS_KEY_ID
+        sync: false
+      - key: S3_SECRET_ACCESS_KEY
+        sync: false
+      - key: TELEGRAM_BOT_TOKEN     # optional: instant "merchant says they paid" alerts
+        sync: false
+      - key: TELEGRAM_CHAT_ID
+        sync: false

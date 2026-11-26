@@ -1,16 +1,25 @@
 {
   "version": "2026-07",
-  "source_note_zh": "内容提炼自平台官方面向东南亚商家的系列文章（官方资讯 / 五国市场洞察 / 大促季备战指南 / 出海航迹商家案例），2026 年 7 月整理。政策与数字以官方最新发布为准。",
-  "source_note_en": "Distilled from the platform's official article series for SEA sellers (official policies / five-country market insights / mega-sale playbooks / merchant case studies), compiled July 2026. Policies and figures are subject to the latest official releases.",
+  "source_note_zh": "内容提炼自平台官方面向东南亚商家的系列文章（官方资讯 / 五国市场洞察 / 大促季备战指南 / 出海航迹商家案例），2026 年 7 月整理，2026 年 11 月补充本地卖家入驻说明。政策与数字以官方最新发布为准。",
+  "source_note_en": "Distilled from the platform's official article series for SEA sellers (official policies / five-country market insights / mega-sale playbooks / merchant case studies), compiled July 2026; local-seller requirements added November 2026. Policies and figures are subject to the latest official releases.",
   "topics": [
     {
       "id": "store_setup",
       "icon": "storefront",
       "title": { "zh": "开店指南", "en": "Store Setup" },
-      "tagline": { "zh": "从入驻到出单的 30 天路线图", "en": "A 30-day roadmap from registration to first sale" },
+      "tagline": { "zh": "从入驻到出单的 30 天路线图（本地卖家与跨境卖家）", "en": "A 30-day roadmap from registration to first sale, for local and cross-border sellers" },
       "sections": [
         {
-          "title": { "zh": "入驻资质与材料", "en": "Eligibility & documents" },
+          "title": { "zh": "本地卖家入驻（马来西亚等东南亚本地）", "en": "Local sellers in Southeast Asia" },
+          "points": [
+            { "zh": "个人也能开店：以马来西亚为例，年满 18 岁的公民可凭 MyKad 以个人身份入驻；有 SSM 注册的个体户或公司可以商家身份入驻，后者可用的功能和类目通常更多。", "en": "Individuals can sell too. In Malaysia, for example, citizens aged 18+ can register as an individual with their MyKad; sole proprietors and companies registered with SSM register as a business, which usually unlocks more features and categories." },
+            { "zh": "其他国家同理：印尼用 KTP（企业加 NIB/NPWP），泰国用泰国身份证或公司注册文件，菲律宾用政府签发的身份证件或 DTI/SEC 注册，越南用 CCCD 或营业执照，新加坡用 Singpass 或 ACRA 注册。", "en": "Other markets work the same way: KTP in Indonesia (NIB/NPWP for a business), Thai ID or company documents in Thailand, a government ID or DTI/SEC registration in the Philippines, CCCD or a business licence in Vietnam, Singpass or ACRA registration in Singapore." },
+            { "zh": "还需要：本人或公司名下的当地银行账户（用于结算）、可接收验证码的当地手机号、发货地址；部分类目（美妆、食品、保健品等）需额外资质，如马来西亚 NPRA / KKM 相关备案。", "en": "You also need a local bank account in your own or the company's name for payouts, a local phone number for verification codes and a pickup address. Some categories (beauty, food, supplements) need extra approvals, such as NPRA / KKM notifications in Malaysia." },
+            { "zh": "审核一般几个工作日；本地卖家走当地物流揽收，不涉及跨境仓。保证金、佣金和新商优惠因国家和时期而变，以 Seller Center 当地页面为准。", "en": "Review usually takes a few working days. Local sellers ship through local pickup, with no cross-border warehouse. Deposits, commission and new-seller offers vary by country and over time, so check your country's Seller Center for current terms." }
+          ]
+        },
+        {
+          "title": { "zh": "跨境卖家入驻（中国内地 / 香港主体）", "en": "Cross-border sellers (mainland China / Hong Kong)" },
           "points": [
             { "zh": "主体要求：总部在中国内地或香港的企业实体、个体工商户、个人独资企业均可入驻；无经验个体户需走平台定邀通道。", "en": "Entities headquartered in mainland China or Hong Kong qualify — companies, sole proprietors and individual businesses; inexperienced sole proprietors need the platform's invitation channel." },
             { "zh": "材料：营业执照 + 法人身份证彩色扫描件（四角清晰）；有国内电商/跨境经验可备第三方经验证明截图，有助审核。", "en": "Documents: business licence + colour scan of the legal representative's ID (all four corners visible); screenshots proving prior e-commerce experience help the review." },
@@ -30,15 +39,15 @@
           "title": { "zh": "必吃透的三大政策红利", "en": "Three policy dividends to exploit" },
           "points": [
             { "zh": "0 元试运营：90 天保证金豁免。注意豁免期结算周期从 7 天延长到 30 天，补缴保证金后可恢复 7 天。", "en": "Zero-cost trial: 90-day deposit waiver. Note settlement stretches from 7 to 30 days during the waiver; paying the deposit restores 7-day settlement." },
-            { "zh": "一证多店：一张执照开多个店铺，适合同时测不同品类、不同国家。", "en": "One licence, multiple stores — ideal for testing several categories or countries in parallel." },
-            { "zh": "边境仓：做泰国/越南用广西凭祥边境仓，最快 2-4 天到河内，还享出口退税。", "en": "Border warehouse: for Thailand/Vietnam, ship via the Pingxiang (Guangxi) border warehouse — Hanoi in as fast as 2-4 days, plus export tax rebates." },
+            { "zh": "一证多店（跨境）：一张执照开多个店铺，适合同时测不同品类、不同国家。", "en": "One licence, multiple stores (cross-border): ideal for testing several categories or countries in parallel." },
+            { "zh": "边境仓（跨境）：做泰国/越南用广西凭祥边境仓，最快 2-4 天到河内，还享出口退税。", "en": "Border warehouse (cross-border): for Thailand/Vietnam, ship via the Pingxiang (Guangxi) border warehouse, reaching Hanoi in as fast as 2-4 days, plus export tax rebates." },
             { "zh": "新商激励：入驻享 30-120 天佣金豁免；入驻 30 天后在后台「任务中心」手动领取商品券（完成首单、GMV $50/$200 等任务）——名额有限、先到先得，设日历提醒别错过。", "en": "New-merchant incentives: 30-120 days commission waiver; from day 30, manually claim product coupons in Task Center (first order, $50/$200 GMV milestones) — limited quota, set a calendar reminder." }
           ]
         },
         {
           "title": { "zh": "开店后先做对这几件事", "en": "First things to configure" },
           "points": [
-            { "zh": "退货仓必填且国内 + 当地都要有——这是新手最常踩的坑。", "en": "Return warehouses are mandatory in BOTH China and the local market — the single most common rookie mistake." },
+            { "zh": "跨境卖家：退货仓必填且国内 + 当地都要有，这是新手最常踩的坑。本地卖家填好当地退货地址即可。", "en": "Cross-border sellers must set return warehouses in BOTH China and the local market, the most common rookie mistake. Local sellers just need a local return address." },
             { "zh": "开启货到付款（COD），符合东南亚主流消费习惯。", "en": "Enable cash-on-delivery (COD) — it's how Southeast Asia prefers to pay." },
             { "zh": "定价公式：售价 = 产品成本 + 利润 + 平台费用 + 退货损耗 + 达人佣金 + 广告费。漏掉后两项，卖一单亏一单。", "en": "Pricing formula: price = cost + margin + platform fees + returns loss + creator commission + ads. Skip the last two and every sale loses money." },
             { "zh": "商品图最多 9 张：高清白底主图（利于平台推荐抓取）+ 多场景图。", "en": "Up to 9 product images: a clean white-background hero (helps platform recommendation) plus lifestyle scenes." },

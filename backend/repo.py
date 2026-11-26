@@ -282,6 +282,16 @@ def user_delete(email: str) -> Optional[str]:
 def tenant_wipe(tenant_id: str) -> None:
     """Remove every row belonging to a tenant — its data, and every account
     in the workspace (owner and invited members alike)."""
+    try:                                   # clips kept in object storage go too
+        from backend import aivideo
+        aivideo.delete_bucket_files(tenant_id)
+    except Exception:
+        pass
+    try:                                   # and its (hashed) pool capture records
+        from backend import pool
+        pool.forget_tenant(tenant_id)
+    except Exception:
+        pass
     with _write_lock, _session() as s:
         for model in (Kol, KolSnapshot, Campaign, TenantPlan, UsageCounter, PaymentOrder,
                       TeamInvite, TenantDoc, User):

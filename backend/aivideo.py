@@ -12,7 +12,9 @@ Replicate's HTTP API (https://replicate.com/docs/reference/http):
   POST /v1/predictions        {"version": "<owner>/<model>", "input": {...}}
   GET  /v1/predictions/{id}   status: starting | processing | succeeded | failed | canceled
 Outputs are deleted by Replicate an hour after the run, so a finished clip is
-downloaded once and kept under VIDEO_DIR/<tenant>/<job>.mp4.
+downloaded once and kept under VIDEO_DIR/<tenant>/<job>.mp4 — or, when an
+S3-compatible bucket is configured (backend/objstore.py, e.g. Cloudflare R2),
+uploaded there so it survives redeploys, and served by a short-lived link.
 
 The default model is bytedance/seedance-1-lite (text-to-video and image-to-
 video, 4–12 s, 480p/720p; priced per second of output). Its input fields are
@@ -48,12 +50,13 @@ from datetime import datetime, timedelta, timezone
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, RedirectResponse
 from pydantic import BaseModel, Field
 
 from backend import activity, ratelimit, repo
 from backend.auth import current_user, require_tenant
-from backend.billing import plan_limits
+from backend.billing import PLANS, plan_limits
+from backend import objstore
 from backend.db import VIDEO_DIR
 
 router = APIRouter()
@@ -130,6 +133,22 @@ def _path(tenant_id: str, job_id: int) -> str:
     return os.path.join(VIDEO_DIR, re.sub(r"[^A-Za-z0-9_-]", "", tenant_id), f"{int(job_id)}.mp4")
 
 
+def _object_key(tenant_id: str, job_id: int) -> str:
+    return "videos/" + re.sub(r"[^A-Za-z0-9_-]", "", tenant_id) + f"/{int(job_id)}.mp4"
+
+
+def delete_bucket_files(tenant_id: str) -> None:
+    """Best effort: remove a workspace's clips from object storage."""
+    if not objstore.enabled():
+        return
+    for j in repo.docs_list(tenant_id, KIND, limit=1000):
+        if j.get("stored") == "bucket":
+            try:
+                objstore.delete(_object_key(tenant_id, j["id"]))
+            except Exception:
+                pass
+
+
 def _public(job: dict) -> dict:
     out = {k: job.get(k) for k in ("id", "created_at", "status", "prompt", "duration", "aspect",
                                     "has_image", "error", "size", "created_by", "finished_at")}
@@ -144,6 +163,9 @@ def _used_this_month(tenant_id: str) -> int:
 
 
 def _limit(tenant_id: str) -> Optional[int]:
+    from backend import growth
+    if growth.trial_active(tenant_id):          # clips cost real money: a trial keeps the Free allowance
+        return PLANS["free"]["monthly_ai_videos"]
     return plan_limits(tenant_id).get("monthly_ai_videos")
 
 
@@ -190,6 +212,14 @@ def _refresh(tenant_id: str, job: dict) -> dict:
             except (urllib.error.URLError, TimeoutError, OSError, ValueError) as e:
                 log.warning("video download failed job=%s: %s", job["id"], e)
                 return _fail(tenant_id, job, "The finished video could not be downloaded.")
+            if objstore.enabled():
+                try:
+                    objstore.put_file(_object_key(tenant_id, job["id"]), path, "video/mp4")
+                    job["stored"] = "bucket"
+                    os.remove(path)
+                except (urllib.error.URLError, TimeoutError, OSError) as e:
+                    # keep the local copy; it still works until the next redeploy
+                    log.warning("video upload to bucket failed job=%s: %s", job["id"], e)
             job.update(status="succeeded", size=size, error=None, finished_at=_now().isoformat())
             return repo.doc_put(tenant_id, KIND, job["id"], job) or job
         # failed / canceled: say so plainly; the provider's text can be long or technical
@@ -279,6 +309,10 @@ def get_video(job_id: int, tenant_id: str = Depends(require_tenant)):
 @router.get("/studio/videos/{job_id}/file")
 def video_file(job_id: int, tenant_id: str = Depends(require_tenant)):
     job = _own(tenant_id, job_id)
+    if job.get("status") == "succeeded" and job.get("stored") == "bucket" and objstore.enabled():
+        return RedirectResponse(objstore.presigned_get(_object_key(tenant_id, job["id"]), expires=600,
+                                                       filename=f"lumio-ai-video-{job['id']}.mp4"),
+                                status_code=307)
     path = _path(tenant_id, job["id"])
     if job.get("status") != "succeeded" or not os.path.isfile(path):
         raise HTTPException(status_code=404, detail="Video not found")
@@ -297,5 +331,10 @@ def delete_video(job_id: int, tenant_id: str = Depends(require_tenant)):
         os.remove(_path(tenant_id, job["id"]))
     except OSError:
         pass
+    if job.get("stored") == "bucket" and objstore.enabled():
+        try:
+            objstore.delete(_object_key(tenant_id, job["id"]))
+        except Exception:                                        # noqa: BLE001
+            log.warning("could not delete bucket copy of video job=%s", job["id"])
     repo.doc_delete(tenant_id, KIND, job["id"])
     return {"deleted": True}

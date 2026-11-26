@@ -31,6 +31,7 @@ Endpoints
   POST /billing/orders                   Create (or reuse) an order
   GET  /billing/orders                   My recent orders
   POST /billing/orders/{no}/submit       "I've paid" + transaction reference
+  POST /billing/orders/{no}/proof        Attach a payment screenshot (image, max 2 MB)
   POST /billing/orders/{no}/cancel       Withdraw an unpaid order
   GET  /billing/pay-qr                   The receiving QR image (signed-in accounts only)
   POST /admin/pay-qr                     Operator: upload / replace the QR image
@@ -38,6 +39,14 @@ Endpoints
   GET  /admin/orders                     Operator: orders (default: awaiting confirmation)
   POST /admin/orders/{no}/confirm        Operator: payment received → activate
   POST /admin/orders/{no}/reject         Operator: not received (with a note)
+  GET  /admin/orders/{no}/proof          Operator: the merchant's payment screenshot
+
+A 12-month term is priced at 10 months (two months free). Screenshots are
+for the operator's eyes only: reading the amount off an image automatically
+would need OCR that is unreliable across dozens of bank and e-wallet apps, so
+the operator still checks the wallet. When TELEGRAM_BOT_TOKEN and
+TELEGRAM_CHAT_ID are set, every submission also pings the operator on
+Telegram (backend/notify.py).
 """
 import base64
 import logging
@@ -51,7 +60,7 @@ from fastapi import APIRouter, BackgroundTasks, Depends, File, HTTPException, Qu
 from fastapi.responses import Response
 from pydantic import BaseModel, Field
 
-from backend import mailer, ratelimit, repo, settings
+from backend import growth, mailer, notify, ratelimit, repo, settings
 from backend.admin import _audit, _require_admin
 from backend.auth import DEMO_SUFFIX, require_owner, require_tenant
 from backend.billing import PLANS, TERMS, term_end
@@ -104,8 +113,9 @@ def store_qr(data: bytes) -> dict:
 
 
 def list_price(plan: str, months: int) -> float:
-    """Price of a term in the payment currency, before the uniqueness discount."""
-    return round(PLANS[plan]["price_myr"] * months, 2)
+    """Price of a term in the payment currency, before the uniqueness discount.
+    A year is billed as 10 months."""
+    return round(PLANS[plan]["price_myr"] * (10 if months == 12 else months), 2)
 
 
 def _unique_amount(plan: str, months: int) -> float:
@@ -149,7 +159,7 @@ class OrderRequest(BaseModel):
 
 
 class SubmitRequest(BaseModel):
-    reference: str = Field(..., max_length=64)
+    reference: str = Field("", max_length=64)     # may be blank when a screenshot is attached
 
 
 @router.get("/billing/pay-config")
@@ -212,7 +222,8 @@ def create_order(req: OrderRequest, tenant_id: str = Depends(require_owner)):
 @router.get("/billing/orders")
 def my_orders(tenant_id: str = Depends(require_tenant)):
     _expire_stale()
-    return {"orders": [_public(o) for o in repo.orders_for_tenant(tenant_id)]}
+    proofs = {d.get("order_no") for d in repo.docs_list(tenant_id, _PROOF, limit=50)}
+    return {"orders": [_public(o) | {"has_proof": o["order_no"] in proofs} for o in repo.orders_for_tenant(tenant_id)]}
 
 
 @router.post("/billing/orders/{order_no}/submit")
@@ -223,10 +234,13 @@ def submit_order(order_no: str, req: SubmitRequest, background: BackgroundTasks,
     order = _own_order(order_no, tenant_id)
     ratelimit.enforce("order-submit", tenant_id, limit=10, window=3600)
     reference = " ".join(req.reference.split())
-    if not _REFERENCE_RE.match(reference):
+    has_proof = _proof(tenant_id, order["order_no"]) is not None
+    if not reference and has_proof:
+        reference = None
+    elif not _REFERENCE_RE.match(reference):
         raise HTTPException(status_code=422,
                             detail="Enter the transaction reference from your payment receipt (4–64 letters or digits).")
-    if repo.order_reference_used(reference, order["order_no"]):
+    if reference and repo.order_reference_used(reference, order["order_no"]):
         raise HTTPException(status_code=409,
                             detail="This transaction reference was already used for another order.")
 
@@ -239,7 +253,39 @@ def submit_order(order_no: str, req: SubmitRequest, background: BackgroundTasks,
     if settings.OPERATOR_EMAIL:
         background.add_task(mailer.send_order_to_operator, settings.OPERATOR_EMAIL, updated,
                             mailer.base_url())
+    if notify.enabled():
+        background.add_task(notify.order_submitted, updated, mailer.base_url(), has_proof)
     return _public(updated)
+
+
+# ── Payment screenshots ───────────────────────────────────────────
+_PROOF = "pay_proof"
+
+
+def _proof(tenant_id: str, order_no: str) -> Optional[dict]:
+    return next((d for d in repo.docs_list(tenant_id, _PROOF, limit=50) if d.get("order_no") == order_no), None)
+
+
+@router.post("/billing/orders/{order_no}/proof")
+async def upload_proof(order_no: str, file: UploadFile = File(...), tenant_id: str = Depends(require_owner)):
+    """Attach a screenshot of the payment receipt. Replaces an earlier one."""
+    order = _own_order(order_no, tenant_id)
+    if order["status"] not in ("pending", "rejected", "submitted"):
+        raise HTTPException(status_code=409, detail=f"This order is already {order['status']}.")
+    ratelimit.enforce("order-proof", tenant_id, limit=20, window=3600)
+    data = await file.read(_QR_MAX_BYTES + 1)
+    if len(data) > _QR_MAX_BYTES:
+        raise HTTPException(status_code=413, detail="The screenshot is larger than 2 MB.")
+    mime = _sniff(data)
+    if not mime:
+        raise HTTPException(status_code=422, detail="Upload a PNG, JPEG or WebP image.")
+    old = _proof(tenant_id, order["order_no"])
+    if old:
+        repo.doc_delete(tenant_id, _PROOF, old["id"])
+    now = _now().isoformat()
+    repo.doc_add(tenant_id, _PROOF, {"order_no": order["order_no"], "mime": mime,
+                                     "data": base64.b64encode(data).decode("ascii"), "size": len(data)}, now)
+    return {"order_no": order["order_no"], "has_proof": True, "size": len(data)}
 
 
 @router.post("/billing/orders/{order_no}/cancel")
@@ -290,7 +336,20 @@ def admin_orders(status: str = Query("submitted")):
     status=all shows recent history."""
     _expire_stale()
     statuses = None if status == "all" else tuple(s for s in status.split(",") if s)
-    return {"orders": repo.orders_all(statuses)}
+    orders = repo.orders_all(statuses)
+    for o in orders:
+        o["has_proof"] = _proof(o["tenant_id"], o["order_no"]) is not None
+    return {"orders": orders}
+
+
+@router.get("/admin/orders/{order_no}/proof", dependencies=[Depends(_require_admin)])
+def admin_proof(order_no: str):
+    order = repo.order_get(order_no.strip().upper())
+    proof = _proof(order["tenant_id"], order["order_no"]) if order else None
+    if not proof:
+        raise HTTPException(status_code=404, detail="No screenshot for this order")
+    return Response(base64.b64decode(proof["data"]), media_type=proof.get("mime") or "image/png",
+                    headers={"Cache-Control": "private, no-store", "X-Content-Type-Options": "nosniff"})
 
 
 @router.post("/admin/orders/{order_no}/confirm", dependencies=[Depends(_require_admin)])
@@ -317,10 +376,17 @@ def admin_confirm(order_no: str, request: Request, background: BackgroundTasks):
                    f"{order['plan']}x{order['months']}mo ref={order.get('reference') or '-'}",
                    ratelimit.client_ip(request))
     log.info("order paid %s plan=%s until=%s", order["order_no"], order["plan"], expires_at)
+    reward = growth.reward_first_payment(order["tenant_id"])
+    if reward:
+        expires_at = reward["referred_until"] or expires_at
+        repo.audit_add("referral.reward", user["email"],
+                       f"+{growth.REWARD_DAYS}d both sides, referrer={reward['referrer']}",
+                       ratelimit.client_ip(request))
     background.add_task(mailer.send_plan_changed, user["email"], PLANS[order["plan"]]["name"],
                         mailer.base_url(), user.get("lang", "en"),
                         expires_at[:10] if expires_at else "")
-    return {"status": "ok", "order": claimed, "plan": order["plan"], "expires_at": expires_at}
+    return {"status": "ok", "order": claimed, "plan": order["plan"], "expires_at": expires_at,
+            "referral_reward": bool(reward)}
 
 
 @router.post("/admin/orders/{order_no}/reject", dependencies=[Depends(_require_admin)])
