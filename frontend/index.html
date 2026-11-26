@@ -1507,7 +1507,7 @@
                 <div class="lp-plans lp-reveal">
                     <div class="lp-plan">
                         <p class="tag" data-i18n="p1.tag">free</p>
-                        <p class="price">$0<small data-i18n="per.month"> / month</small></p>
+                        <p class="price">RM0<small data-i18n="per.month"> / month</small></p>
                         <ul>
                             <li data-i18n-html="p1.l1">✓ <b>10 optimization runs</b> / month</li>
                             <li data-i18n-html="p1.copilot">✓ <b>AI Copilot</b> — 20 chats / month</li>
@@ -1521,7 +1521,7 @@
                     <div class="lp-plan hot">
                         <span class="hotline"></span>
                         <p class="tag" data-i18n="p2.tag">pro — most popular</p>
-                        <p class="price">$5<small data-i18n="per.month"> / month</small></p>
+                        <p class="price">RM29<small data-i18n="per.month"> / month</small></p>
                         <ul>
                             <li data-i18n-html="p2.l1">✓ <b>300 optimization runs</b> / month</li>
                             <li data-i18n-html="p2.copilot">✓ <b>AI Copilot</b> — 500 chats / month</li>
@@ -1535,7 +1535,7 @@
                     </div>
                     <div class="lp-plan">
                         <p class="tag" data-i18n="p3.tag">team</p>
-                        <p class="price">$20<small data-i18n="per.month"> / month</small></p>
+                        <p class="price">RM99<small data-i18n="per.month"> / month</small></p>
                         <ul>
                             <li data-i18n-html="p3.l1">✓ <b>Unlimited optimization runs</b></li>
                             <li data-i18n-html="p3.copilot">✓ <b>Unlimited AI Copilot</b></li>
@@ -4330,7 +4330,7 @@
             return `<div class="glass-card bp-card ${popular ? 'is-popular' : ''}">
                 <div class="bp-head"><span class="bp-name">${planName}</span>
                     ${current ? `<span class="bp-tag quiet">${T('b.active')}</span>` : popular ? `<span class="bp-tag">${T('b.mostPop')}</span>` : ''}</div>
-                <p class="bp-price">$${p.price_usd}<small>${T('per.month')}</small></p>
+                <p class="bp-price">RM${p.price_myr}<small>${T('per.month')}</small></p>
                 <ul class="bp-feats">${features}</ul>
                 ${btn}
             </div>`;
@@ -4489,8 +4489,8 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
             const info = await refreshBilling();
             if (!info) return;
             document.getElementById('billing-plan-name').textContent = T('plan.' + info.plan);
-            const price = (info.plans[info.plan] || {}).price_usd || 0;
-            document.getElementById('billing-plan-price').textContent = (price > 0 ? `$${price}${T('per.month')}` : T('b.freeForever'))
+            const price = (info.plans[info.plan] || {}).price_myr || 0;
+            document.getElementById('billing-plan-price').textContent = (price > 0 ? `RM${price}${T('per.month')}` : T('b.freeForever'))
                 + (info.expires_at ? ' · ' + T('b.until', { d: info.expires_at.slice(0, 10) }) : '');
             loadPayStatus();
             // Optimization runs are the metered product value — show them first.
@@ -4507,10 +4507,10 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
             wechat: 'Hyh12130102'
         };
         function openPayModal(id, name, price) {
-            document.getElementById('pay-plan-name').textContent = `${T('plan.' + id)} — $${price}${T('per.month')}`;
+            document.getElementById('pay-plan-name').textContent = `${T('plan.' + id)} — RM${price}${T('per.month')}`;
             document.getElementById('pay-account-email').textContent = AUTH_EMAIL || '—';
             document.getElementById('pay-wc-id').textContent = PAY_CONTACT.wechat;
-            const msg = encodeURIComponent(`Hi Lumio! I'd like to upgrade to the ${name} plan ($${price}/mo). Account: ${AUTH_EMAIL || ''}`);
+            const msg = encodeURIComponent(`Hi Lumio! I'd like to upgrade to the ${name} plan (RM${price}/mo). Account: ${AUTH_EMAIL || ''}`);
             document.getElementById('pay-wa-link').href = `https://wa.me/${PAY_CONTACT.whatsapp}?text=${msg}`;
             document.getElementById('pay-modal').classList.remove('hidden');
             initQrPay(id);
@@ -4523,7 +4523,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
             try { const r = await fetch(`${API}/billing/pay-config`); if (r.ok) PAY_CFG = await r.json(); } catch (_) {}
             return PAY_CFG;
         }
-        function payMoney(o) { return `${esc(o.currency)} ${Number(o.amount).toFixed(2)}`; }
+        function payMoney(o) { return `${o.currency === 'MYR' ? 'RM' : esc(o.currency) + ' '}${Number(o.amount).toFixed(2)}`; }
         async function myOrders() {
             try { const r = await fetch(`${API}/billing/orders`); if (r.ok) return (await r.json()).orders || []; } catch (_) {}
             return [];
@@ -4627,7 +4627,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
         }
         function resumePay(planId) {
             const p = BILLING && BILLING.plans[planId];
-            if (p) openPayModal(planId, p.name, p.price_usd);
+            if (p) openPayModal(planId, p.name, p.price_myr);
         }
         // ── Account: password change, deletion, forgot-password help ──
         async function changePassword() {
@@ -4826,7 +4826,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
             const p = BILLING && BILLING.plans[id];
             if (!p) return;
             // Paid plans are fulfilled manually during early access.
-            if (p.price_usd > 0) { openPayModal(id, p.name, p.price_usd); return; }
+            if (p.price_myr > 0) { openPayModal(id, p.name, p.price_myr); return; }
             if (!confirm(T('b.confirmFree'))) return;
             try {
                 const r = await fetch(`${API}/billing/checkout`, {

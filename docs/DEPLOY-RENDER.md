@@ -31,7 +31,7 @@
 
 - 收款码图片在仓库的 `frontend/pay/duitnow-qr.png`，换成你自己的 DuitNow / TNG 收款码后合并到 `master` 即可。
 - 在 Environment 里填 `PAY_PAYEE_NAME`（显示在收款码旁边的收款人名字）。
-- 套餐以美元定价，付款时按 `PAY_FX_RATE`（默认 4.4）换算成马币。汇率变化时改这个值。
+- 套餐直接以马币定价：Pro RM29 / 月、Team RM99 / 月（在 `backend/billing.py` 的 `PLANS` 里改）。
 - 想在商家点“我已付款”时收到邮件，先完成第四部分，再填 `OPERATOR_EMAIL`。
 
 ## 四、开通邮件（推荐，用于验证邮箱、找回密码、续费提醒）

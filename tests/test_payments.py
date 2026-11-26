@@ -23,7 +23,6 @@ ADMIN = {"X-Admin-Key": "operator-key-for-tests"}
 def _config(monkeypatch):
     monkeypatch.setattr(settings, "ADMIN_KEY", "operator-key-for-tests")
     monkeypatch.setattr(settings, "BILLING_SELF_SERVE", False)
-    monkeypatch.setattr(settings, "PAY_FX_RATE", 4.4)
     monkeypatch.setattr(settings, "PAY_CURRENCY", "MYR")
     assert payments.enabled(), "frontend/pay/duitnow-qr.png should ship with the repo"
 
@@ -52,8 +51,9 @@ def test_pay_config_lists_prices_in_local_currency():
     c = client.get("/billing/pay-config", headers=headers).json()
     assert c["enabled"] is True and c["currency"] == "MYR"
     assert c["qr_image"] == "/pay/duitnow-qr.png"
-    assert c["prices"]["pro"]["1"] == round(billing.PLANS["pro"]["price_usd"] * 4.4, 2)
-    assert c["prices"]["team"]["12"] == round(billing.PLANS["team"]["price_usd"] * 12 * 4.4, 2)
+    assert c["prices"]["pro"]["1"] == 29.0                          # RM29 / month
+    assert c["prices"]["team"]["1"] == 99.0                         # RM99 / month
+    assert c["prices"]["team"]["12"] == 99.0 * 12
     assert client.get("/pay/duitnow-qr.png").status_code == 200       # the image is served
 
 

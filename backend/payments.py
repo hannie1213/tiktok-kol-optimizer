@@ -19,7 +19,7 @@ that one click instead of a chat conversation:
 Paid terms expire: the plan lapses to Free at the end of the term
 (repo.plan_get), and paying again while active extends from the current end.
 
-Configuration: PAY_QR_IMAGE, PAY_PAYEE_NAME, PAY_CURRENCY, PAY_FX_RATE,
+Configuration: PAY_QR_IMAGE, PAY_PAYEE_NAME,
 OPERATOR_EMAIL (backend/settings.py). The feature is on when the QR image
 file exists under frontend/.
 
@@ -65,13 +65,12 @@ def _now() -> datetime:
 
 
 def enabled() -> bool:
-    return (settings.PAY_FX_RATE > 0
-            and os.path.isfile(os.path.join(_FRONTEND_DIR, settings.PAY_QR_IMAGE)))
+    return (os.path.isfile(os.path.join(_FRONTEND_DIR, settings.PAY_QR_IMAGE)))
 
 
 def list_price(plan: str, months: int) -> float:
     """Price of a term in the payment currency, before the uniqueness discount."""
-    return round(PLANS[plan]["price_usd"] * months * settings.PAY_FX_RATE, 2)
+    return round(PLANS[plan]["price_myr"] * months, 2)
 
 
 def _unique_amount(plan: str, months: int) -> float:
@@ -128,7 +127,7 @@ def pay_config(_t: str = Depends(require_tenant)):
         "currency": settings.PAY_CURRENCY,
         "terms": list(TERMS),
         "prices": {pid: {str(m): list_price(pid, m) for m in TERMS}
-                   for pid, p in PLANS.items() if p["price_usd"] > 0} if on else {},
+                   for pid, p in PLANS.items() if p["price_myr"] > 0} if on else {},
     }
 
 
@@ -138,7 +137,7 @@ def create_order(req: OrderRequest, tenant_id: str = Depends(require_owner)):
     order already open, so reopening the dialog doesn't change the amount."""
     if not enabled():
         raise HTTPException(status_code=503, detail="QR payment is not available right now — contact us to upgrade.")
-    if req.plan not in PLANS or PLANS[req.plan]["price_usd"] <= 0:
+    if req.plan not in PLANS or PLANS[req.plan]["price_myr"] <= 0:
         raise HTTPException(status_code=422, detail=f"Unknown paid plan: {req.plan}")
     if req.months not in TERMS:
         raise HTTPException(status_code=422, detail=f"months must be one of {list(TERMS)}")

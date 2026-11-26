@@ -125,7 +125,7 @@ def overview():
     demo = sum(r["demo"] for r in rows)
     # One paying customer per workspace: invited members share the owner's plan.
     paying = [r for r in rows if not r["demo"] and r["plan"] != "free" and r["role"] != "member"]
-    mrr = sum(PLANS.get(r["plan"], PLANS["free"])["price_usd"] for r in paying)
+    mrr = sum(PLANS.get(r["plan"], PLANS["free"])["price_myr"] for r in paying)
     now = datetime.now(timezone.utc)
     soon = (now + timedelta(days=7)).isoformat()
     month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0).isoformat()
@@ -143,7 +143,7 @@ def overview():
         "real_users": len(rows) - demo,
         "paid_users": len(paying),
         "demo_users": demo,
-        "mrr_usd": mrr,
+        "mrr_myr": mrr,
         "optimize_runs_month": sum(r["optimize_runs"] for r in rows),
         "agent_messages_month": sum(r["agent_messages"] for r in rows),
     }
@@ -169,7 +169,7 @@ def set_plan(req: PlanChange, request: Request, background: BackgroundTasks):
         raise HTTPException(status_code=404, detail="No account with that email")
 
     before = repo.plan_info(user["tenant_id"])
-    paid = PLANS[req.plan]["price_usd"] > 0
+    paid = PLANS[req.plan]["price_myr"] > 0
     expires_at = None
     if paid and req.months:
         # A renewal of a permanent grant is the one case term_end keeps
@@ -443,9 +443,8 @@ def status():
             "enabled": payments.enabled(),
             "payee": settings.PAY_PAYEE_NAME or None,
             "currency": settings.PAY_CURRENCY,
-            "fx_rate": settings.PAY_FX_RATE,
             "prices": {pid: payments.list_price(pid, 1)
-                       for pid, p in PLANS.items() if p["price_usd"] > 0},
+                       for pid, p in PLANS.items() if p["price_myr"] > 0},
         },
         "copilot": {"enabled": copilot_key,
                     "model": os.environ.get("AGENT_MODEL", "deepseek-chat")},

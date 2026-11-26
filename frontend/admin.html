@@ -486,7 +486,7 @@
                 document.getElementById('last-sync').textContent = '更新于 ' + new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
                 document.getElementById('k-real').textContent = ov.real_users;
                 document.getElementById('k-paid').textContent = ov.paid_users;
-                document.getElementById('k-mrr').textContent = '$' + (ov.mrr_usd ?? 0);
+                document.getElementById('k-mrr').textContent = 'RM' + (ov.mrr_myr ?? 0);
                 document.getElementById('k-demo').textContent = ov.demo_users;
                 document.getElementById('k-runs').textContent = ov.optimize_runs_month;
                 document.getElementById('k-chats').textContent = ov.agent_messages_month ?? 0;
@@ -738,7 +738,7 @@
                     `数据库：${esc(st.database)}${st.database === 'sqlite' ? '（仅适合单机试用）' : ''}`],
                 ['扫码收款', chip(st.payments.enabled, '已开启', '未开启'),
                     st.payments.enabled
-                        ? `收款人 ${esc(st.payments.payee || '未设置 PAY_PAYEE_NAME')} · 汇率 ${st.payments.fx_rate}<br>${esc(prices)}`
+                        ? `收款人 ${esc(st.payments.payee || '未设置 PAY_PAYEE_NAME')}<br>${esc(prices)}`
                         : '缺少收款码图片 frontend/pay/duitnow-qr.png'],
                 ['邮件', chip(st.email.enabled, '已开启', '未配置'),
                     st.email.enabled

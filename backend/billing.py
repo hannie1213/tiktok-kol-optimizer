@@ -39,7 +39,9 @@ from backend.auth import require_owner, require_tenant
 
 router = APIRouter()
 
-# Plan catalog. None = unlimited. Prices in USD/month.
+# Plan catalog. None = unlimited. Prices in MYR (Malaysian ringgit) / month —
+# the subscription is sold to the SEA seller community and paid by DuitNow QR.
+# (Optimizer budgets and GMV stay in USD; only subscription prices are MYR.)
 # Tiers differentiate on the two metered axes — optimization runs and AI Copilot
 # chats — both of which carry a real marginal cost. The creator library is
 # unlimited on every plan (max_creators stays in the schema so a cap could
@@ -47,7 +49,7 @@ router = APIRouter()
 PLANS = {
     "free": {
         "name": "Free",
-        "price_usd": 0,
+        "price_myr": 0,
         "max_creators": None,
         "monthly_optimizations": 10,
         "monthly_agent_messages": 20,
@@ -64,7 +66,7 @@ PLANS = {
     },
     "pro": {
         "name": "Pro",
-        "price_usd": 5,
+        "price_myr": 29,
         "max_creators": None,
         "monthly_optimizations": 300,
         "monthly_agent_messages": 500,
@@ -82,7 +84,7 @@ PLANS = {
     },
     "team": {
         "name": "Team",
-        "price_usd": 20,
+        "price_myr": 99,
         "max_creators": None,
         "monthly_optimizations": None,
         "monthly_agent_messages": None,
@@ -212,7 +214,7 @@ def checkout(req: CheckoutRequest, tenant_id: str = Depends(require_owner)):
     current = repo.plan_get(tenant_id)
     if req.plan == current:
         raise HTTPException(status_code=409, detail="You are already on this plan")
-    if PLANS[req.plan]["price_usd"] > 0 and not settings.BILLING_SELF_SERVE:
+    if PLANS[req.plan]["price_myr"] > 0 and not settings.BILLING_SELF_SERVE:
         raise HTTPException(
             status_code=402,
             detail=f"The {PLANS[req.plan]['name']} plan is activated after payment — "
