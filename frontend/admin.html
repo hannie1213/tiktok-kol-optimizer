@@ -113,7 +113,7 @@
         .row-actions .btn { padding: 5px 10px; font-size: 12px; }
         .empty { text-align: center; padding: 40px; color: var(--mut); font-size: 13px; }
 
-        .chip.ok { background: rgba(237,238,240,.14); color: #7ef3b0; }
+        .chip.ok { background: rgba(110,139,194,.16); color: var(--ink); }
         .chip.warn { background: rgba(199,203,210,.14); color: #ffd666; }
         .chip.bad { background: rgba(255,92,114,.14); color: #ffb3bf; }
         .chip.mute { background: rgba(138,137,127,.15); color: #b5b3a9; }
@@ -140,7 +140,7 @@
 
         /* Toast */
         #toast { position: fixed; top: 20px; right: 20px; z-index: 999; padding: 12px 20px; border-radius: 10px; font-size: 13.5px; font-weight: 600; display: none; box-shadow: 0 16px 40px -16px rgba(0,0,0,.6); }
-        #toast.ok { background: #0e3d22; color: #7ef3b0; border: 1px solid rgba(237,238,240,.4); }
+        #toast.ok { background: #0E1428; color: #EDEEF0; border: 1px solid rgba(237,238,240,.3); }
         #toast.err { background: #46121c; color: #ffb3bf; border: 1px solid rgba(255,92,114,.4); }
 
         @media (max-width: 960px) {
@@ -248,6 +248,17 @@
         <div class="card">
             <div class="status-grid" id="status-grid"><div class="status-item" style="color:var(--mut)">加载中…</div></div>
             <div class="blockers" id="blockers" style="display:none"></div>
+        </div>
+
+        <!-- ── Receiving QR (private: stored in the database, never in the repo) ── -->
+        <div class="card" id="qr-card" style="display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin-bottom:18px">
+            <img id="qr-preview" alt="" style="width:96px;height:96px;object-fit:contain;border-radius:10px;background:#fff;display:none" />
+            <div style="flex:1;min-width:220px">
+                <div style="font-weight:700">收款码 <span id="qr-state" class="chip mute">读取中…</span></div>
+                <p style="font-size:12px;color:var(--mut);margin:4px 0 0">上传你的 DuitNow / TNG 收款码（PNG / JPG，2 MB 以内）。图片保存在数据库里，不在代码仓库，也没有公开网址，只有已登录的商家在付款弹窗里能看到。</p>
+            </div>
+            <label class="btn" style="cursor:pointer">上传 / 更换<input id="qr-file" type="file" accept="image/png,image/jpeg,image/webp" style="display:none" onchange="uploadQr(this)" /></label>
+            <button class="btn danger" id="qr-del" style="display:none" onclick="deleteQr()">删除</button>
         </div>
 
         <!-- ── Payments ── -->
@@ -479,7 +490,7 @@
                 renderStatus(st);
                 renderAudit(au.entries);
                 renderGrowth(gr);
-                loadPool(); loadAnnouncement(); loadNewsAdmin();
+                loadPool(); loadAnnouncement(); loadNewsAdmin(); loadQr();
                 const pending = ov.pending_orders ?? 0;
                 document.getElementById('orders-count').textContent = pending ? `(${pending})` : '';
                 document.getElementById('k-pending').textContent = pending;
@@ -664,6 +675,34 @@
                     : '<tr><td colspan="8" class="empty">达人池里还没有达人。商家安装浏览器扩展并浏览达人主页后，这里会出现记录。</td></tr>';
             } catch (_) { /* shown on next refresh */ }
         }
+        // ── Receiving QR ──
+        async function loadQr() {
+            try {
+                const d = await req('/admin/pay-qr');
+                const img = document.getElementById('qr-preview'), st = document.getElementById('qr-state');
+                img.style.display = d.uploaded ? '' : 'none';
+                if (d.uploaded) img.src = d.data_url;
+                st.className = 'chip ' + (d.uploaded ? 'ok' : 'warn');
+                st.textContent = d.uploaded ? '已上传 · ' + fmtDate(d.updated_at) : '未上传（扫码收款关闭）';
+                document.getElementById('qr-del').style.display = d.uploaded ? '' : 'none';
+            } catch (_) { /* shown on next refresh */ }
+        }
+        async function uploadQr(input) {
+            const f = input.files && input.files[0]; input.value = '';
+            if (!f) return;
+            const fd = new FormData(); fd.append('file', f);
+            try {
+                const r = await fetch(API + '/admin/pay-qr', { method: 'POST', headers: { 'X-Admin-Key': KEY }, body: fd });
+                if (!r.ok) { const e = await r.json().catch(() => ({})); throw new Error(e.detail || ('HTTP ' + r.status)); }
+                toast('收款码已更新'); loadQr(); loadAll(true);
+            } catch (e) { toast('上传失败：' + e.message, 'err'); }
+        }
+        async function deleteQr() {
+            if (!confirm('删除收款码？删除后商家无法扫码付款，升级按钮会改为 WhatsApp / 微信联系。')) return;
+            try { await req('/admin/pay-qr', { method: 'DELETE' }); toast('已删除收款码'); loadQr(); loadAll(true); }
+            catch (e) { toast('删除失败：' + e.message, 'err'); }
+        }
+
         const POOL_STATUS = { pending: '待核实', public: '已公开', hidden: '已隐藏' };
         async function setPool(i, status) {
             const r = POOL[i]; if (!r) return;
@@ -755,7 +794,7 @@
                 ['扫码收款', chip(st.payments.enabled, '已开启', '未开启'),
                     st.payments.enabled
                         ? `收款人 ${esc(st.payments.payee || '未设置 PAY_PAYEE_NAME')}<br>${esc(prices)}`
-                        : '缺少收款码图片 frontend/pay/duitnow-qr.png'],
+                        : '还没有上传收款码（在「付款订单」上方上传）'],
                 ['邮件', chip(st.email.enabled, '已开启', '未配置'),
                     st.email.enabled
                         ? `发件人 ${esc(st.email.from || '')}<br>付款通知邮箱：${st.email.operator_email_set ? '已设置' : '未设置 OPERATOR_EMAIL'}`
@@ -785,7 +824,7 @@
         // ── Audit trail ──
         const AUDIT_LABELS = {
             'jobs.run': '手动运行定时任务', 'user.suspend': '停用账号', 'user.unsuspend': '恢复账号',
-            'announcement.set': '发布公告', 'announcement.clear': '撤下公告', 'pool.delete': '删除达人池记录', 'pool.public': '公开达人池记录', 'pool.hidden': '隐藏达人池记录', 'pool.pending': '达人池记录改回待核实',
+            'announcement.set': '发布公告', 'announcement.clear': '撤下公告', 'pool.delete': '删除达人池记录', 'pay.qr_upload': '上传收款码', 'pay.qr_delete': '删除收款码', 'pool.public': '公开达人池记录', 'pool.hidden': '隐藏达人池记录', 'pool.pending': '达人池记录改回待核实',
             'plan.set': '设置套餐', 'plan.grant': '接口开通套餐', 'order.confirm': '确认到账', 'order.reject': '驳回付款',
             'user.delete': '删除账号', 'user.reset_password': '重置密码', 'demo.cleanup': '清理 Demo'
         };

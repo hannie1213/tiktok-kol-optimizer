@@ -50,9 +50,8 @@ MAX_UPLOAD_BYTES = int(float(os.environ.get("MAX_UPLOAD_MB", "10")) * 1024 * 102
 
 
 # ── QR payment (see backend/payments.py) ──────────────────────────
-# Path of the receiving QR image inside frontend/. The feature is on when the
-# file exists; delete the file (or point this at nothing) to switch it off.
-PAY_QR_IMAGE = (os.environ.get("PAY_QR_IMAGE") or "pay/duitnow-qr.png").strip().lstrip("/")
+# The receiving QR image is uploaded in the admin console and stored in the
+# database (never in the repository); scan-to-pay is on once one is uploaded.
 PAY_PAYEE_NAME = (os.environ.get("PAY_PAYEE_NAME") or "").strip()
 # Plan prices in backend/billing.py are set in ringgit, so orders are always MYR.
 PAY_CURRENCY = "MYR"

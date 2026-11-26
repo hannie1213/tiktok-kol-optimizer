@@ -19,9 +19,11 @@ that one click instead of a chat conversation:
 Paid terms expire: the plan lapses to Free at the end of the term
 (repo.plan_get), and paying again while active extends from the current end.
 
-Configuration: PAY_QR_IMAGE, PAY_PAYEE_NAME,
-OPERATOR_EMAIL (backend/settings.py). The feature is on when the QR image
-file exists under frontend/.
+Configuration: PAY_PAYEE_NAME, OPERATOR_EMAIL (backend/settings.py). The
+receiving QR code is uploaded by the operator in the admin console and kept in
+the database — never in the repository or a public URL. The feature is on
+once a QR code has been uploaded; signed-in merchants fetch the image from
+GET /billing/pay-qr.
 
 Endpoints
 ---------
@@ -30,30 +32,36 @@ Endpoints
   GET  /billing/orders                   My recent orders
   POST /billing/orders/{no}/submit       "I've paid" + transaction reference
   POST /billing/orders/{no}/cancel       Withdraw an unpaid order
+  GET  /billing/pay-qr                   The receiving QR image (signed-in accounts only)
+  POST /admin/pay-qr                     Operator: upload / replace the QR image
+  DELETE /admin/pay-qr                   Operator: remove it (turns scan-to-pay off)
   GET  /admin/orders                     Operator: orders (default: awaiting confirmation)
   POST /admin/orders/{no}/confirm        Operator: payment received → activate
   POST /admin/orders/{no}/reject         Operator: not received (with a note)
 """
+import base64
 import logging
-import os
 import random
 import re
 import secrets
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, Request
+from fastapi import APIRouter, BackgroundTasks, Depends, File, HTTPException, Query, Request, UploadFile
+from fastapi.responses import Response
 from pydantic import BaseModel, Field
 
 from backend import mailer, ratelimit, repo, settings
-from backend.admin import _require_admin
+from backend.admin import _audit, _require_admin
 from backend.auth import DEMO_SUFFIX, require_owner, require_tenant
 from backend.billing import PLANS, TERMS, term_end
 
 router = APIRouter()
 log = logging.getLogger("kol.pay")
 
-_FRONTEND_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "frontend")
+_QR_KEY = "pay_qr"                        # system setting holding the uploaded image
+_QR_MAX_BYTES = 2 * 1024 * 1024
+_QR_TYPES = {b"\x89PNG\r\n\x1a\n": "image/png", b"\xff\xd8\xff": "image/jpeg", b"RIFF": "image/webp"}
 _PENDING_TTL = timedelta(hours=24)       # unpaid orders lapse after this
 _MAX_OPEN_ORDERS = 3
 _ORDER_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"     # no 0/O, 1/I
@@ -64,8 +72,35 @@ def _now() -> datetime:
     return datetime.now(timezone.utc)
 
 
+def _qr() -> Optional[dict]:
+    doc = repo.system_get(_QR_KEY)
+    return doc if doc and doc.get("data") else None
+
+
 def enabled() -> bool:
-    return (os.path.isfile(os.path.join(_FRONTEND_DIR, settings.PAY_QR_IMAGE)))
+    return _qr() is not None
+
+
+def _sniff(data: bytes) -> Optional[str]:
+    for magic, mime in _QR_TYPES.items():
+        if data.startswith(magic) and (mime != "image/webp" or data[8:12] == b"WEBP"):
+            return mime
+    return None
+
+
+def store_qr(data: bytes) -> dict:
+    """Validate and save the receiving QR image (used by the admin upload)."""
+    if not data:
+        raise HTTPException(status_code=422, detail="The file is empty.")
+    if len(data) > _QR_MAX_BYTES:
+        raise HTTPException(status_code=413, detail="The image is larger than 2 MB.")
+    mime = _sniff(data)
+    if not mime:
+        raise HTTPException(status_code=422, detail="Upload a PNG, JPEG or WebP image.")
+    now = _now().isoformat()
+    repo.system_set(_QR_KEY, {"mime": mime, "data": base64.b64encode(data).decode("ascii"),
+                              "size": len(data), "updated_at": now}, now)
+    return {"mime": mime, "size": len(data), "updated_at": now}
 
 
 def list_price(plan: str, months: int) -> float:
@@ -122,13 +157,23 @@ def pay_config(_t: str = Depends(require_tenant)):
     on = enabled()
     return {
         "enabled": on,
-        "qr_image": "/" + settings.PAY_QR_IMAGE if on else None,
+        "qr_image": "/billing/pay-qr" if on else None,
         "payee": settings.PAY_PAYEE_NAME or None,
         "currency": settings.PAY_CURRENCY,
         "terms": list(TERMS),
         "prices": {pid: {str(m): list_price(pid, m) for m in TERMS}
                    for pid, p in PLANS.items() if p["price_myr"] > 0} if on else {},
     }
+
+
+@router.get("/billing/pay-qr")
+def pay_qr(_t: str = Depends(require_tenant)):
+    """The receiving QR image. Signed-in accounts only, never cached by shared caches."""
+    qr = _qr()
+    if not qr:
+        raise HTTPException(status_code=404, detail="Scan-to-pay is not set up.")
+    return Response(base64.b64decode(qr["data"]), media_type=qr.get("mime") or "image/png",
+                    headers={"Cache-Control": "private, no-store", "X-Content-Type-Options": "nosniff"})
 
 
 @router.post("/billing/orders")
@@ -211,6 +256,32 @@ def cancel_order(order_no: str, tenant_id: str = Depends(require_owner)):
 # ── Operator side ─────────────────────────────────────────────────
 class RejectRequest(BaseModel):
     note: str = Field("", max_length=255)
+
+
+@router.get("/admin/pay-qr", dependencies=[Depends(_require_admin)])
+def admin_qr_info():
+    """Whether a QR code is uploaded (and the image itself for the console preview)."""
+    qr = _qr()
+    if not qr:
+        return {"uploaded": False}
+    return {"uploaded": True, "mime": qr.get("mime"), "size": qr.get("size"),
+            "updated_at": qr.get("updated_at"),
+            "data_url": f"data:{qr.get('mime') or 'image/png'};base64,{qr['data']}"}
+
+
+@router.post("/admin/pay-qr", dependencies=[Depends(_require_admin)])
+async def admin_qr_upload(request: Request, file: UploadFile = File(...)):
+    data = await file.read(_QR_MAX_BYTES + 1)
+    info = store_qr(data)
+    _audit(request, "pay.qr_upload", "", f"{info['mime']} {info['size']} bytes")
+    return {"status": "ok", **info}
+
+
+@router.delete("/admin/pay-qr", dependencies=[Depends(_require_admin)])
+def admin_qr_delete(request: Request):
+    repo.system_set(_QR_KEY, None)
+    _audit(request, "pay.qr_delete")
+    return {"status": "ok"}
 
 
 @router.get("/admin/orders", dependencies=[Depends(_require_admin)])

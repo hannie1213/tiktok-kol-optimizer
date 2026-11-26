@@ -4532,6 +4532,20 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
             try { const r = await fetch(`${API}/billing/pay-config`); if (r.ok) PAY_CFG = await r.json(); } catch (_) {}
             return PAY_CFG;
         }
+        // The QR image is private: fetch it with the session token, then show it from memory.
+        let PAY_QR_URL = null;
+        async function loadPayQr(src) {
+            const img = document.getElementById('pay-qr-img');
+            if (!img || !src) return;
+            if (PAY_QR_URL) { img.src = PAY_QR_URL; return; }
+            try {
+                const r = await fetch(API + src);
+                if (!r.ok) return;
+                PAY_QR_URL = URL.createObjectURL(await r.blob());
+                const el = document.getElementById('pay-qr-img');
+                if (el) el.src = PAY_QR_URL;
+            } catch (_) { /* the amount and order number still show */ }
+        }
         function payMoney(o) { return `${o.currency === 'MYR' ? 'RM' : esc(o.currency) + ' '}${Number(o.amount).toFixed(2)}`; }
         async function myOrders() {
             try { const r = await fetch(`${API}/billing/orders`); if (r.ok) return (await r.json()).orders || []; } catch (_) {}
@@ -4585,11 +4599,12 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
             const terms = cfg.terms.map(m => `<button onclick="payChangeTerm(${m})" class="btn ${m === o.months ? 'btn-primary' : 'btn-outline'} text-[12px] py-1 px-3">${T('qr.term', { m })}</button>`).join('');
             const rejected = o.status === 'rejected'
                 ? `<div class="rounded-lg p-2 mb-3 text-[12px]" style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.35);color:#fca5a5">${T('qr.rejected')}${o.note ? ' — ' + esc(o.note) : ''}</div>` : '';
+            setTimeout(() => loadPayQr(cfg.qr_image), 0);
             qr.innerHTML = `
                 ${rejected}
                 <div class="flex items-center gap-2 mb-3">${terms}</div>
                 <div class="flex gap-4 items-start mb-3">
-                    <img src="${esc(cfg.qr_image)}" alt="Payment QR" style="width:168px;border-radius:10px;background:#fff;flex-shrink:0" />
+                    <img id="pay-qr-img" alt="Payment QR" style="width:168px;min-height:168px;border-radius:10px;background:#fff;flex-shrink:0" />
                     <div class="space-y-xs" style="min-width:0">
                         <p class="text-[10px] text-on-surface-variant uppercase tracking-wider">${T('qr.payExactly')}</p>
                         <p class="font-data-mono font-bold" style="font-size:24px;color:var(--accent);line-height:1.1">${payMoney(o)}</p>
