@@ -29,42 +29,50 @@
         .note { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; font-size: 13.5px; }
         .zh { border-left: 2px solid var(--line); padding-left: 14px; margin-top: 10px; font-size: 14px; }
         nav a { margin-right: 14px; font-size: 13.5px; }
+        /* One language at a time, following the console's language (kol_lang). */
+        html[lang="en"] .zh { display: none; }
+        html[lang="zh-CN"] main > p:not(.zh), html[lang="zh-CN"] main > ul { display: none; }
+        html[lang="zh-CN"] .zh { border-left: 0; padding-left: 0; margin-top: 6px; font-size: 15px; }
+        html[lang="zh-CN"] .zh.note { border: 1px solid var(--line); padding: 14px 16px; font-size: 13.5px; }
+        .lang-btn { background: none; border: 1px solid var(--line); border-radius: 99px; color: var(--mut); font: 12px var(--font-ui); padding: 5px 12px; cursor: pointer; margin-left: 12px; }
     </style>
 </head>
 <body>
 <main>
     <header>
-        <h1>Terms &amp; Privacy</h1>
-        <a href="./">← Back to Lumio</a>
+        <h1 data-zh="服务条款与隐私政策">Terms &amp; Privacy</h1>
+        <span><a href="./" data-zh="← 返回 Lumio">← Back to Lumio</a><button class="lang-btn" id="lang-btn" type="button" onclick="setLang(document.documentElement.lang === 'en' ? 'zh' : 'en')">中文</button></span>
     </header>
-    <p>Last updated: 26 November 2026 · 最后更新：2026 年 11 月 26 日</p>
-    <nav><a href="#terms">Terms of Service · 服务条款</a><a href="#privacy">Privacy Policy · 隐私政策</a></nav>
+    <p>Last updated: 26 November 2026</p>
+    <p class="zh">最后更新：2026 年 11 月 26 日</p>
+    <nav><a href="#terms" data-zh="服务条款">Terms of Service</a><a href="#privacy" data-zh="隐私政策">Privacy Policy</a></nav>
 
     <p class="note">The English text is the authoritative version; the Chinese summaries are provided for convenience. Questions about either document can be sent through the WhatsApp / WeChat contact shown under <b>Plan &amp; Billing</b> in the console.</p>
+    <p class="zh note">以英文版本为准，中文内容为便于阅读提供的译文摘要。对任一文件有疑问，可通过控制台「套餐与账单」中显示的 WhatsApp / 微信联系方式联系我们。</p>
 
-    <h2 id="terms">Terms of Service</h2>
+    <h2 id="terms" data-zh="服务条款">Terms of Service</h2>
 
-    <h3>1. The service</h3>
+    <h3 data-zh="1. 服务说明">1. The service</h3>
     <p>Lumio ("the service") is a planning tool that helps merchants shortlist creators (KOLs) for social-commerce campaigns under a budget. Lumio is an independent product and is not affiliated with, endorsed by or sponsored by any e-commerce or social platform.</p>
     <p class="zh">Lumio 是一款帮助商家在预算内筛选带货达人的规划工具，为独立产品，与任何电商或社交平台均无隶属、赞助或认可关系。</p>
 
-    <h3>2. Estimates, not guarantees</h3>
+    <h3 data-zh="2. 估算而非保证">2. Estimates, not guarantees</h3>
     <p>GMV, ROI, creator scores and every other figure the service produces are model estimates based on the data in your library. They are not promises of sales results, and they are not financial or legal advice. Creator prices marked "est." are inferred, not real quotes. Creators labelled as synthetic are demo placeholders and are not real people. You are responsible for your own campaign decisions and for verifying creators before you contract with them.</p>
-    <p class="zh">平台给出的 GMV、ROI、达人评分等均为基于你的达人库数据的模型估算，不构成销售结果承诺，也不构成财务或法律建议。标注"est."的报价为推算值；标注为 synthetic 的达人为演示占位数据，并非真实达人。投放决策及合作前的达人核实由你自行负责。</p>
+    <p class="zh">平台给出的 GMV、ROI、达人评分等均为基于你的达人库数据的模型估算，不构成销售结果承诺，也不构成财务或法律建议。标注「估算」的报价为推算值；标注为 synthetic 的达人为演示占位数据，并非真实达人。投放决策及合作前的达人核实由你自行负责。</p>
 
-    <h3>3. Your account</h3>
+    <h3 data-zh="3. 你的账号">3. Your account</h3>
     <p>You must give a working email address and keep your password confidential. You are responsible for activity under your account. One-click demo sessions are temporary: they and their data are deleted automatically, usually within 48 hours.</p>
     <p class="zh">请使用有效邮箱注册并妥善保管密码，你对账号下的操作负责。一键演示会话为临时账号，其数据通常会在 48 小时内自动删除。</p>
 
-    <h3>4. Your data</h3>
+    <h3 data-zh="4. 你的数据">4. Your data</h3>
     <p>The creator lists, prices, ratings and campaign results you upload remain yours. You confirm that you have the right to upload them and that doing so does not breach any agreement you have with a data provider. We use your data only to operate the service for you.</p>
     <p class="zh">你上传的达人名单、报价、评分与投放结果归你所有。你确认自己有权上传这些数据，且不违反你与数据提供方的任何协议。我们仅为向你提供服务而使用这些数据。</p>
 
-    <h3>5. Plans, quotas and payment</h3>
+    <h3 data-zh="5. 套餐、配额与付款">5. Plans, quotas and payment</h3>
     <p>The Free plan is free. Paid plans are sold in terms of 1, 3 or 12 months at the price shown in the console at the time you pay, in the currency shown there. You pay by scanning our QR code and submitting your transaction reference; the plan is activated once we have confirmed the payment, and returns to Free at the end of the term unless you renew. Monthly quotas reset on the first day of each calendar month (UTC) and unused quota does not roll over. You may downgrade to Free at any time; payments already made for the current term are non-refundable unless the law requires otherwise or we could not deliver the service.</p>
     <p class="zh">免费版永久免费。付费套餐按 1 / 3 / 12 个月的周期出售，价格与币种以付款时控制台显示为准。你通过扫描我们的收款码付款并提交交易参考号，我们确认到账后开通；周期结束后如未续费将自动降回免费版。每月配额于每个自然月（UTC）首日重置，未用完的额度不结转。你可随时降级为免费版；除法律另有规定或我们未能提供服务外，当前周期已付费用不予退还。</p>
 
-    <h3>6. Acceptable use</h3>
+    <h3 data-zh="6. 使用规范">6. Acceptable use</h3>
     <ul>
         <li>Do not attempt to access another merchant's data, probe or disrupt the service, or bypass quotas and rate limits.</li>
         <li>Do not upload unlawful content, or personal data you are not entitled to process.</li>
@@ -72,17 +80,17 @@
     </ul>
     <p class="zh">不得尝试访问其他商家的数据、探测或干扰服务、绕过配额与限流；不得上传违法内容或你无权处理的个人数据；未经书面同意不得转售或转发布本服务。</p>
 
-    <h3>7. Availability, liability and termination</h3>
+    <h3 data-zh="7. 可用性、责任与终止">7. Availability, liability and termination</h3>
     <p>The service is provided "as is", without warranties of any kind. To the extent the law allows, our total liability for any claim is limited to the fees you paid in the three months before the claim arose, and we are not liable for lost profits or indirect losses. You can delete your account at any time under Plan &amp; Billing → Account. We may suspend or close accounts that breach these terms.</p>
     <p class="zh">服务按"现状"提供，不作任何形式的保证。在法律允许的范围内，我们对任何索赔的责任总额以索赔发生前三个月你已支付的费用为限，且不对利润损失或间接损失负责。你可随时在"套餐与账单 → 账号"中注销账号；对违反本条款的账号，我们可暂停或关闭。</p>
 
-    <h3>8. Changes</h3>
+    <h3 data-zh="8. 条款变更">8. Changes</h3>
     <p>We may update these terms as the service evolves. Material changes will be announced in the console before they take effect; continuing to use the service afterwards means you accept them.</p>
     <p class="zh">条款可能随服务演进而更新，重大变更会在生效前于控制台内公告；之后继续使用即视为接受。</p>
 
-    <h2 id="privacy">Privacy Policy</h2>
+    <h2 id="privacy" data-zh="隐私政策">Privacy Policy</h2>
 
-    <h3>What we collect</h3>
+    <h3 data-zh="我们收集哪些信息">What we collect</h3>
     <ul>
         <li><b>Account:</b> your email address and a salted hash of your password (we never store the password itself).</li>
         <li><b>Workspace data:</b> the creator library, prices, ratings, saved campaigns and results you add, and your plan and monthly usage counts.</li>
@@ -95,19 +103,19 @@
     </ul>
     <p class="zh">我们收集：账号信息（邮箱及加盐哈希后的密码，不保存明文密码）；付款记录（套餐、金额、交易参考号，以及你自愿上传的付款截图）；加入共享达人池后通过浏览器插件采集的达人公开主页数据；注册时使用的推荐码及试用记录；工作区数据（达人库、报价、评分、已保存的投放活动与结果、套餐及当月用量）；你发送给 AI 助手的消息；用于安全、限流与排障的技术日志（请求时间、路径、状态码、IP 地址）；以及你在"即将上线"集成中登记的邮箱。</p>
 
-    <h3>How we use it</h3>
+    <h3 data-zh="我们如何使用">How we use it</h3>
     <p>To run the service for you, enforce plan quotas, keep the service secure, activate plans after payment, and contact you about your account. We do not sell your data and we do not use it for advertising. Each merchant's workspace is isolated from every other merchant's.</p>
     <p class="zh">用途仅限于：为你提供服务、执行套餐配额、保障安全、确认付款后开通套餐，以及就账号事宜与你联系。我们不出售你的数据，也不将其用于广告。各商家的工作区彼此隔离。</p>
 
-    <h3>What the operator can see</h3>
+    <h3 data-zh="运营者能看到什么">What the operator can see</h3>
     <p>Each workspace is private to its members. To support you and run billing, the Lumio operator can see your account email, team members, plan, payment orders (including any receipt screenshot), monthly usage, and counts of creators, campaigns, messages and contracts. The operator's view of your activity shows only who did what kind of action and when (for example "saved a campaign"), never the names of creators, campaigns or contracts, your notes, or the text of your messages. Operator actions are recorded in an audit log.</p>
     <p class="zh">运营者能看到什么：每个工作区只对其成员开放。为提供支持和处理账单，Lumio 运营者能看到你的账号邮箱、团队成员、套餐、付款订单（含你上传的付款截图）、当月用量，以及达人、投放活动、消息、合同的数量。运营者看到的活动记录只有"谁在什么时间做了哪类操作"（例如"保存了投放活动"），看不到达人名、活动名、合同名、备注或消息内容。运营者的操作会记入审计日志。</p>
 
-    <h3>The shared creator pool</h3>
+    <h3 data-zh="共享达人池">The shared creator pool</h3>
     <p>Joining the shared creator pool is optional and off until a workspace owner switches it on (Explore → Share with the pool). When it is on, public profile numbers captured with the browser extension are added to the pool that every Lumio workspace can browse, and a creator becomes visible to everyone once two workspaces have captured the same profile independently or the operator has checked it. We record that a capture happened with a keyed hash of the workspace, not the workspace itself, so the pool never shows, and our records can't easily reveal, which merchant captured a creator. Nothing from your private library, prices, ratings or campaigns is ever shared. When the switch is off, your captures stay visible to your workspace only. You can switch it off at any time; deleting your workspace removes its capture records.</p>
     <p class="zh">共享达人池：是否加入完全自愿，默认关闭，需要工作区所有者在「发现达人 → 加入共享达人池」中开启。开启后，通过浏览器插件采集的达人公开主页数据会进入所有 Lumio 工作区都能浏览的共享池；同一达人被两个工作区独立采集或经运营者核实后，才会对所有人显示。我们只用工作区的加密哈希来记录"有人采集过"，不记录是哪个工作区，因此共享池不会显示、我们的记录也难以反查是哪位商家采集的。你私有达人库中的名单、报价、评分和投放数据永远不会被共享。关闭时，你采集的达人只有你自己的工作区可见。你可以随时关闭；注销工作区会同时删除其采集记录。</p>
 
-    <h3>Who else processes it</h3>
+    <h3 data-zh="第三方处理方">Who else processes it</h3>
     <ul>
         <li><b>AI model provider:</b> copilot messages, together with the summaries of your library that are needed to answer them, are sent to our LLM provider (currently DeepSeek) to generate replies. Do not put sensitive personal information into the copilot.</li>
         <li><b>Hosting and infrastructure providers</b> that run our servers and database.</li>
@@ -118,21 +126,40 @@
     </ul>
     <p class="zh">第三方处理方：AI 模型服务商（目前为 DeepSeek）——助手消息及回答所需的达人库摘要会发送给它以生成回复，请勿在助手中输入敏感个人信息；托管我们服务器与数据库的基础设施服务商；向你的邮箱发送账号邮件（邮箱验证、密码重置、安全与套餐通知）的邮件投递服务商；AI 视频服务商（Replicate）——接收你提交的视频描述及可选商品图，生成的视频可能存放在对象存储服务商（Cloudflare R2）；若运营者开启了付款提醒，Telegram 会收到你提交订单的订单号、套餐、金额、参考号和账号邮箱；以及浏览器加载应用时访问的字体/脚本 CDN（Google Fonts、Fontshare、cdnjs），它们会获知你的 IP 地址。</p>
 
-    <h3>Storage on your device</h3>
+    <h3 data-zh="你设备上的存储">Storage on your device</h3>
     <p>We use your browser's local storage to keep you signed in and remember your language. We do not use advertising or tracking cookies.</p>
     <p class="zh">我们使用浏览器本地存储保持登录状态并记住语言偏好，不使用广告或跟踪类 Cookie。</p>
 
-    <h3>Retention and deletion</h3>
+    <h3 data-zh="保留与删除">Retention and deletion</h3>
     <p>Your data is kept while your account exists. Deleting your account (Plan &amp; Billing → Account) permanently removes the account and its workspace data from the live database immediately; residual copies in backups expire on the backup rotation schedule. Demo sessions are deleted automatically. Technical logs are kept for a limited period.</p>
     <p class="zh">账号存续期间我们保留你的数据。注销账号（套餐与账单 → 账号）会立即从线上数据库永久删除账号及其工作区数据，备份中的残留副本随备份轮换周期过期。演示会话自动删除。技术日志仅保留有限时间。</p>
 
-    <h3>Your choices</h3>
+    <h3 data-zh="你的权利">Your choices</h3>
     <p>You can export your creator library from the console, change your password, and delete your account at any time. To request access to, correction of, or deletion of anything else we hold about you, contact us through the channel shown under Plan &amp; Billing.</p>
     <p class="zh">你可随时在控制台导出达人库、修改密码或注销账号。如需查阅、更正或删除我们持有的其他与你相关的信息，请通过"套餐与账单"中显示的联系方式联系我们。</p>
 
-    <h3>Security</h3>
+    <h3 data-zh="安全">Security</h3>
     <p>Passwords are hashed, sessions are signed tokens that are invalidated when you change your password, access to other merchants' data is blocked at the database-query level, and sign-in is rate limited. No system is perfectly secure; tell us promptly if you suspect unauthorised access to your account.</p>
     <p class="zh">密码以哈希形式存储；登录会话为签名令牌，修改密码后旧会话立即失效；跨商家数据访问在数据库查询层被阻断；登录接口有限流保护。任何系统都无法保证绝对安全，如怀疑账号被未授权访问，请尽快告知我们。</p>
 </main>
+<script>
+    // Same language as the console (localStorage kol_lang), else ?lang=, else the browser's.
+    (function () {
+        const els = [...document.querySelectorAll('[data-zh]')];
+        els.forEach(el => { el.dataset.en = el.innerHTML; });
+        window.setLang = function (l) {
+            const zh = l === 'zh';
+            document.documentElement.lang = zh ? 'zh-CN' : 'en';
+            els.forEach(el => { el.innerHTML = zh ? el.dataset.zh : el.dataset.en; });
+            document.title = zh ? 'Lumio — 服务条款与隐私政策' : 'Lumio — Terms & Privacy';
+            document.getElementById('lang-btn').textContent = zh ? 'EN' : '中文';
+            try { localStorage.setItem('kol_lang', zh ? 'zh' : 'en'); } catch (_) { /* private mode */ }
+        };
+        let l = new URLSearchParams(location.search).get('lang');
+        try { l = l || localStorage.getItem('kol_lang'); } catch (_) { /* private mode */ }
+        l = l || ((navigator.language || '').toLowerCase().startsWith('zh') ? 'zh' : 'en');
+        setLang(l === 'zh' ? 'zh' : 'en');
+    })();
+</script>
 </body>
 </html>

@@ -195,7 +195,7 @@
         <div class="card">
             <h1 style="display:flex;align-items:center;gap:10px"><svg class="lumio-mark" width="30" height="30" viewBox="0 0 40 40" aria-hidden="true"><defs><linearGradient id="amA" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".45" stop-color="#BFC3CA"/><stop offset=".7" stop-color="#7E838C"/><stop offset="1" stop-color="#E6E8EB"/></linearGradient></defs><rect width="40" height="40" rx="10" fill="#0A0A0B"/><rect x=".5" y=".5" width="39" height="39" rx="9.5" fill="none" stroke="url(#amA)" stroke-opacity=".55"/><circle cx="20" cy="20" r="10" fill="none" stroke="url(#amA)" stroke-width="1.6"/><path class="lumio-star" d="M27.07 8.6Q27.07 12.93 31.4 12.93Q27.07 12.93 27.07 17.26Q27.07 12.93 22.74 12.93Q27.07 12.93 27.07 8.6Z" fill="#FFFFFF"/><circle cx="12.6" cy="27.6" r=".9" fill="#FFFFFF" fill-opacity=".55"/></svg><span>运营后台</span></h1>
             <p>输入管理密钥（服务端环境变量 <code style="font-family: var(--font-ui);color:var(--cy)">ADMIN_KEY</code>）。密钥只保存在本浏览器的 sessionStorage。</p>
-            <input id="key-input" type="password" placeholder="Admin Key" onkeydown="if(event.key==='Enter')login()" autofocus />
+            <input id="key-input" type="password" placeholder="管理密钥" onkeydown="if(event.key==='Enter')login()" autofocus />
             <button class="btn primary" style="width:100%" onclick="login()">进入后台</button>
             <p class="err" id="gate-err">密钥错误或服务端未配置管理密钥。</p>
         </div>
@@ -227,7 +227,7 @@
         </div>
 
         <!-- ── Growth ── -->
-        <h2 class="sec"><span class="n">GROWTH</span>增长与激活 <span style="font-size:12px;color:var(--mut);font-weight:400">不含 Demo 账号</span></h2>
+        <h2 class="sec"><span class="n">01</span>增长与激活 <span style="font-size:12px;color:var(--mut);font-weight:400">不含 Demo 账号</span></h2>
         <div class="growth">
             <div class="card" style="padding:20px 22px">
                 <h3>激活漏斗</h3>
@@ -244,7 +244,7 @@
         </div>
 
         <!-- ── System status ── -->
-        <h2 class="sec"><span class="n">00 / SYSTEM</span>系统状态</h2>
+        <h2 class="sec"><span class="n">02</span>系统状态</h2>
         <div class="card">
             <div class="status-grid" id="status-grid"><div class="status-item" style="color:var(--mut)">加载中…</div></div>
             <div class="blockers" id="blockers" style="display:none"></div>
@@ -262,7 +262,7 @@
         </div>
 
         <!-- ── Payments ── -->
-        <h2 class="sec"><span class="n">01 / PAYMENTS</span>付款订单
+        <h2 class="sec"><span class="n">03</span>付款订单
             <span class="spacer"></span>
             <input id="order-search" type="search" placeholder="搜索订单号 / 邮箱 / 参考号…" oninput="renderOrders()" style="width:250px;display:none" />
             <span class="seg">
@@ -280,7 +280,7 @@
         </div>
 
         <!-- ── Users ── -->
-        <h2 class="sec"><span class="n">02 / USERS</span>用户列表</h2>
+        <h2 class="sec"><span class="n">04</span>用户列表</h2>
         <div class="toolbar">
             <input id="search" type="search" placeholder="搜索邮箱…" oninput="renderUsers()" />
             <label><input id="hide-demo" type="checkbox" checked onchange="renderUsers()" /> 隐藏 Demo 账号</label>
@@ -311,11 +311,11 @@
         </div>
 
         <!-- ── Announcement ── -->
-        <h2 class="sec"><span class="n">NOTICE</span>全站公告 <span style="font-size:12px;color:var(--mut);font-weight:400">显示在每个商家控制台顶部，商家可以关闭；两栏都留空即撤下</span></h2>
+        <h2 class="sec"><span class="n">05</span>全站公告 <span style="font-size:12px;color:var(--mut);font-weight:400">显示在每个商家控制台顶部，商家可以关闭；两栏都留空即撤下</span></h2>
         <div class="card" style="padding:18px 20px">
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
                 <input id="an-zh" maxlength="300" placeholder="中文内容，例如：今晚 02:00–03:00 系统维护" style="width:100%" />
-                <input id="an-en" maxlength="300" placeholder="English text (shown to English-language users)" style="width:100%" />
+                <input id="an-en" maxlength="300" placeholder="英文内容（显示给使用英文界面的商家）" style="width:100%" />
             </div>
             <div style="display:flex;align-items:center;gap:12px;margin-top:12px;flex-wrap:wrap">
                 <select id="an-level"><option value="info">普通通知</option><option value="warn">重要提醒（橙色）</option></select>
@@ -326,7 +326,7 @@
         </div>
 
         <!-- ── Shared creator pool ── -->
-        <h2 class="sec"><span class="n">POOL</span>共享达人池
+        <h2 class="sec"><span class="n">06</span>共享达人池
             <span id="pool-total" style="font-size:12px;color:var(--mut);font-weight:400"></span>
             <span class="spacer"></span>
             <select id="pool-status" onchange="loadPool()" style="width:auto">
@@ -346,7 +346,7 @@
         </div>
 
         <!-- ── Industry news ── -->
-        <h2 class="sec"><span class="n">NEWS</span>行业资讯
+        <h2 class="sec"><span class="n">07</span>行业资讯
             <span style="font-size:12px;color:var(--mut);font-weight:400">显示在商家控制台「行业资讯」页，RSS 每小时自动抓取</span>
             <span class="spacer"></span>
             <button class="btn" onclick="refreshNews(this)">↻ 立即抓取</button>
@@ -379,7 +379,7 @@
         </div>
 
         <!-- ── Audit trail ── -->
-        <h2 class="sec"><span class="n">03 / AUDIT</span>操作日志 <span style="font-size:12px;color:var(--mut);font-family: var(--font-ui);font-weight:400">最近 100 条后台操作</span></h2>
+        <h2 class="sec"><span class="n">08</span>操作日志 <span style="font-size:12px;color:var(--mut);font-family: var(--font-ui);font-weight:400">最近 100 条后台操作</span></h2>
         <div class="card" style="overflow-x:auto">
             <table>
                 <thead>
@@ -390,7 +390,7 @@
         </div>
 
         <!-- ── Interests ── -->
-        <h2 class="sec"><span class="n">04 / LEADS</span>API 意向登记</h2>
+        <h2 class="sec"><span class="n">09</span>API 意向登记</h2>
         <div class="card" style="overflow-x:auto">
             <table>
                 <thead>
@@ -417,8 +417,8 @@
         const PLAN_NAMES = { free: 'Free', pro: 'Pro', team: 'Team' };
         const PLAN_RANK = { free: 0, pro: 1, team: 2 };
         const INTEGRATIONS = {
-            tiktok_creator: 'Creator Marketplace',
-            tiktok_shop: 'Shop API',
+            tiktok_creator: '达人市场 API',
+            tiktok_shop: '店铺 API',
             third_party: '第三方分析平台'
         };
 
@@ -431,12 +431,13 @@
         async function req(path, opts = {}) {
             opts.headers = Object.assign({}, opts.headers, {
                 'X-Admin-Key': KEY,
+                'X-Lang': 'zh',   // the operator console is Chinese: server errors come back in Chinese
                 'Content-Type': 'application/json'
             });
             const r = await fetch(API + path, opts);
             if (r.status === 403) throw new Error('AUTH');
             if (r.status === 429) throw new Error('THROTTLED');
-            if (!r.ok) { const e = await r.json().catch(() => ({})); throw new Error(e.detail || ('HTTP ' + r.status)); }
+            if (!r.ok) { const e = await r.json().catch(() => ({})); throw new Error(e.detail || ('请求失败（' + r.status + '）')); }
             return r.json();
         }
 
@@ -692,8 +693,8 @@
             if (!f) return;
             const fd = new FormData(); fd.append('file', f);
             try {
-                const r = await fetch(API + '/admin/pay-qr', { method: 'POST', headers: { 'X-Admin-Key': KEY }, body: fd });
-                if (!r.ok) { const e = await r.json().catch(() => ({})); throw new Error(e.detail || ('HTTP ' + r.status)); }
+                const r = await fetch(API + '/admin/pay-qr', { method: 'POST', headers: { 'X-Admin-Key': KEY, 'X-Lang': 'zh' }, body: fd });
+                if (!r.ok) { const e = await r.json().catch(() => ({})); throw new Error(e.detail || ('请求失败（' + r.status + '）')); }
                 toast('收款码已更新'); loadQr(); loadAll(true);
             } catch (e) { toast('上传失败：' + e.message, 'err'); }
         }
@@ -1000,7 +1001,7 @@
         // Payment screenshots need the admin key, so fetch them and open the image locally.
         async function viewProof(no) {
             try {
-                const r = await fetch(`${API}/admin/orders/${encodeURIComponent(no)}/proof`, { headers: { 'X-Admin-Key': KEY } });
+                const r = await fetch(`${API}/admin/orders/${encodeURIComponent(no)}/proof`, { headers: { 'X-Admin-Key': KEY, 'X-Lang': 'zh' } });
                 if (!r.ok) { toast('截图读取失败', 'err'); return; }
                 const url = URL.createObjectURL(await r.blob());
                 const w = window.open(url, '_blank', 'noopener');

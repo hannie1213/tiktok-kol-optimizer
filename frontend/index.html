@@ -1349,17 +1349,17 @@
                 <svg class="lumio-mark" width="34" height="34" viewBox="0 0 40 40" aria-hidden="true"><defs><linearGradient id="lmD" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".45" stop-color="#BFC3CA"/><stop offset=".7" stop-color="#7E838C"/><stop offset="1" stop-color="#E6E8EB"/></linearGradient></defs><rect width="40" height="40" rx="10" fill="#0A0A0B"/><rect x=".5" y=".5" width="39" height="39" rx="9.5" fill="none" stroke="url(#lmD)" stroke-opacity=".55"/><circle cx="20" cy="20" r="10" fill="none" stroke="url(#lmD)" stroke-width="1.6"/><path class="lumio-star" d="M27.07 8.6Q27.07 12.93 31.4 12.93Q27.07 12.93 27.07 17.26Q27.07 12.93 22.74 12.93Q27.07 12.93 27.07 8.6Z" fill="#FFFFFF"/><circle cx="12.6" cy="27.6" r=".9" fill="#FFFFFF" fill-opacity=".55"/></svg>
                 <span class="wordmark" style="font-size:16px">Lumio</span>
             </div>
-            <p id="auth-title" style="font-size:20px;font-weight:800;margin:14px 0 2px">Sign in</p>
+            <p id="auth-title" data-noi18n style="font-size:20px;font-weight:800;margin:14px 0 2px">Sign in</p>
             <p id="auth-sub" style="font-size:12.5px;color:#7B8794;margin-bottom:18px" data-i18n="auth.sub">Each merchant gets a private, isolated creator library.</p>
             <div style="display:flex;flex-direction:column;gap:12px">
                 <input id="auth-email" type="email" placeholder="you@company.com" autocomplete="username" class="form-input" style="width:100%" data-i18n-ph="auth.phEmail" />
                 <input id="auth-password" type="password" placeholder="Password (min 8 chars)" autocomplete="current-password" class="form-input" style="width:100%" onkeydown="if(event.key==='Enter')authSubmit()" data-i18n-ph="auth.phPass" />
                 <p id="auth-error" style="display:none;font-size:12px;color:#ef4444;margin:-4px 0 0"></p>
-                <button id="auth-submit" onclick="authSubmit()" class="btn btn-primary" style="width:100%;justify-content:center;padding:11px">Sign in</button>
+                <button id="auth-submit" data-noi18n onclick="authSubmit()" class="btn btn-primary" style="width:100%;justify-content:center;padding:11px">Sign in</button>
             </div>
             <p id="auth-switch-row" style="font-size:12.5px;color:#7B8794;text-align:center;margin-top:16px">
-                <span id="auth-switch-text">No account yet?</span>
-                <button onclick="authToggleMode()" id="auth-switch-btn" style="color:#BFC3CA;font-weight:700;background:none;border:none;cursor:pointer">Create one</button>
+                <span id="auth-switch-text" data-noi18n>No account yet?</span>
+                <button onclick="authToggleMode()" id="auth-switch-btn" data-noi18n style="color:#BFC3CA;font-weight:700;background:none;border:none;cursor:pointer">Create one</button>
             </p>
             <p id="auth-forgot-row" style="font-size:12px;text-align:center;margin-top:8px">
                 <button onclick="forgotPassword()" style="color:#7B8794;background:none;border:none;cursor:pointer;text-decoration:underline" data-i18n="auth.forgot">Forgot your password?</button>
@@ -1403,7 +1403,7 @@
                 <a href="#pricing" data-i18n="nav.pricing">pricing</a>
             </div>
             <div style="display:flex;align-items:center;gap:10px">
-                <button class="lp-lang" id="lp-lang-btn" type="button" onclick="toggleLang()" title="Switch language / 切换语言">中文</button>
+                <button class="lp-lang" id="lp-lang-btn" type="button" onclick="toggleLang()" title="Switch language / 切换语言" data-noi18n>中文</button>
                 <button class="lp-nav-cta" onclick="enterApp()"><span data-i18n="nav.launch">launch console</span> <span class="material-symbols-outlined">north_east</span></button>
             </div>
         </nav>
@@ -1459,7 +1459,7 @@
                     <div class="lp-row">
                         <span class="idx">03</span>
                         <h3 data-i18n="f3.h">AI campaign copilot</h3>
-                        <p data-i18n="f3.p">A full campaign is one chat away — ask in plain English or 中文 and the copilot picks your lineup, browses your creator library and reviews past campaigns for you.</p>
+                        <p data-i18n="f3.p">A full campaign is one chat away — ask in plain English or Chinese and the copilot picks your lineup, browses your creator library and reviews past campaigns for you.</p>
                         <span class="arr material-symbols-outlined">north_east</span>
                     </div>
                     <div class="lp-row">
@@ -1493,7 +1493,7 @@
                             <li><span class="material-symbols-outlined">bolt</span><span data-i18n-html="cp.b1"><b>Runs real optimizations from chat</b> — "$3,000 on beauty in Indonesia" returns a bookable lineup with predicted GMV &amp; ROI.</span></li>
                             <li><span class="material-symbols-outlined">groups</span><span data-i18n-html="cp.b2"><b>Knows your creator library</b> — filters, compares and recommends from the KOLs you actually work with.</span></li>
                             <li><span class="material-symbols-outlined">query_stats</span><span data-i18n-html="cp.b3"><b>Reviews your campaigns</b> — predicted vs. actual GMV, accuracy, and what to change next time.</span></li>
-                            <li><span class="material-symbols-outlined">translate</span><span data-i18n-html="cp.b4"><b>Speaks 中文 &amp; English</b> — answers in whichever language you write.</span></li>
+                            <li><span class="material-symbols-outlined">translate</span><span data-i18n-html="cp.b4"><b>Speaks Chinese &amp; English</b> — answers in whichever language you write.</span></li>
                         </ul>
                         <button class="lp-btn lp-btn-primary" onclick="enterApp()" data-i18n="cp.cta">chat with your copilot — free</button>
                     </div>
@@ -1595,19 +1595,19 @@
                         <p data-i18n="footer.tag">AI-powered creator selection for social commerce. Put every dollar behind the creators who actually sell.</p>
                         <button class="lp-foot-cta" type="button" onclick="enterApp()"><span data-i18n="cta.start">start optimizing free</span> <span class="material-symbols-outlined">north_east</span></button>
                     </div>
-                    <nav class="lp-foot-col" aria-label="Product">
+                    <nav class="lp-foot-col" aria-label="Product" data-i18n-aria="footer.h1">
                         <h4 data-i18n="footer.h1">Product</h4>
                         <a href="#features" data-i18n="nav.cap">capabilities</a>
                         <a href="#copilot" data-i18n="nav.copilot">ai copilot</a>
                         <a href="#how" data-i18n="nav.how">how it works</a>
                         <a href="#pricing" data-i18n="nav.pricing">pricing</a>
                     </nav>
-                    <nav class="lp-foot-col" aria-label="Get started">
+                    <nav class="lp-foot-col" aria-label="Get started" data-i18n-aria="footer.h2">
                         <h4 data-i18n="footer.h2">Get started</h4>
                         <a href="#" onclick="enterApp();return false" data-i18n="nav.launch">launch console</a>
                         <a href="#" onclick="enterDemo(this);return false" data-i18n="cta.demo">see live demo</a>
                     </nav>
-                    <nav class="lp-foot-col" aria-label="Legal">
+                    <nav class="lp-foot-col" aria-label="Legal" data-i18n-aria="footer.h3">
                         <h4 data-i18n="footer.h3">Legal</h4>
                         <a href="./legal.html#terms" data-i18n="footer.terms">Terms</a>
                         <a href="./legal.html#privacy" data-i18n="footer.privacy">Privacy</a>
@@ -1624,7 +1624,7 @@
     <!-- ═══════════ SIDEBAR ═══════════ -->
     <aside
         class="h-screen w-[280px] fixed left-0 top-0 border-r border-outline-variant bg-surface-container flex flex-col py-lg px-md z-50">
-        <button id="nav-collapse" type="button" onclick="toggleNavCollapse()" aria-label="Collapse sidebar" aria-expanded="true" title="Collapse sidebar"><span class="material-symbols-outlined">chevron_left</span></button>
+        <button id="nav-collapse" data-noi18n type="button" onclick="toggleNavCollapse()" aria-label="Collapse sidebar" aria-expanded="true" title="Collapse sidebar"><span class="material-symbols-outlined">chevron_left</span></button>
         <button id="brand-home" type="button" onclick="backToLanding()" title="Back to home" data-i18n-title="tt.home"
             class="flex items-center gap-md mb-xl px-xs w-full text-left group">
             <svg class="lumio-mark" width="36" height="36" viewBox="0 0 40 40" aria-hidden="true"><defs><linearGradient id="lmC" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".45" stop-color="#BFC3CA"/><stop offset=".7" stop-color="#7E838C"/><stop offset="1" stop-color="#E6E8EB"/></linearGradient></defs><rect width="40" height="40" rx="10" fill="#0A0A0B"/><rect x=".5" y=".5" width="39" height="39" rx="9.5" fill="none" stroke="url(#lmC)" stroke-opacity=".55"/><circle cx="20" cy="20" r="10" fill="none" stroke="url(#lmC)" stroke-width="1.6"/><path class="lumio-star" d="M27.07 8.6Q27.07 12.93 31.4 12.93Q27.07 12.93 27.07 17.26Q27.07 12.93 22.74 12.93Q27.07 12.93 27.07 8.6Z" fill="#FFFFFF"/><circle cx="12.6" cy="27.6" r=".9" fill="#FFFFFF" fill-opacity=".55"/></svg>
@@ -1666,8 +1666,8 @@
                 <span id="account-email" class="text-[12px] text-on-surface-variant truncate flex-1" title="">—</span>
                 <span id="plan-badge" class="hidden text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider cursor-pointer flex-shrink-0"
                     style="background:rgba(var(--good-rgb),0.12);color:var(--good);border:1px solid rgba(var(--good-rgb),0.3)"
-                    title="View plan & usage" data-i18n-title="tt.plan" onclick="showPage('billing')">Free</span>
-                <button onclick="toggleLang()" title="Switch language / 切换语言" class="text-outline hover:text-primary transition-colors flex items-center gap-1 flex-shrink-0">
+                    title="View plan & usage" data-i18n-title="tt.plan" data-noi18n onclick="showPage('billing')">Free</span>
+                <button onclick="toggleLang()" title="Switch language / 切换语言" data-noi18n class="text-outline hover:text-primary transition-colors flex items-center gap-1 flex-shrink-0">
                     <span class="material-symbols-outlined text-[16px]">language</span>
                     <span id="side-lang-label" class="text-[10px] font-bold">中文</span>
                 </button>
@@ -1686,8 +1686,8 @@
         <header
             class="sticky top-0 z-40 flex justify-between items-center px-margin-desktop h-16 bg-background/80 backdrop-blur-xl border-b border-outline-variant">
             <div style="display:flex;align-items:center;gap:10px;min-width:0">
-                <button id="nav-toggle" type="button" onclick="toggleNav()" aria-label="Menu"><span class="material-symbols-outlined">menu</span></button>
-                <h2 id="page-title" class="font-headline-lg text-headline-lg text-on-surface">Optimizer Dashboard</h2>
+                <button id="nav-toggle" type="button" onclick="toggleNav()" aria-label="Menu" data-i18n-aria="tt.menu"><span class="material-symbols-outlined">menu</span></button>
+                <h2 id="page-title" data-noi18n class="font-headline-lg text-headline-lg text-on-surface">Optimizer Dashboard</h2>
             </div>
             <div class="flex items-center gap-md">
                 <div id="error-banner"
@@ -1702,7 +1702,7 @@
             </div>
         </header>
 
-        <div id="notice-bar" style="display:none"><span class="material-symbols-outlined">campaign</span><span id="notice-text" style="flex:1"></span><button type="button" onclick="dismissNotice()" aria-label="Dismiss"><span class="material-symbols-outlined">close</span></button></div>
+        <div id="notice-bar" style="display:none"><span class="material-symbols-outlined">campaign</span><span id="notice-text" style="flex:1"></span><button type="button" onclick="dismissNotice()" aria-label="Dismiss" data-i18n-aria="tt.dismiss"><span class="material-symbols-outlined">close</span></button></div>
 
         <!-- ════ PAGE: DASHBOARD ════ -->
         <div id="page-dashboard" class="p-margin-desktop space-y-xl">
@@ -1734,7 +1734,7 @@
                         <button id="country-trigger" type="button" onclick="toggleCountryDropdown()"
                             class="w-full border rounded-lg p-sm text-body-base flex justify-between items-center text-left"
                             style="background:var(--bg2);color:var(--ink);border-color:var(--line);outline:none">
-                            <span id="country-display" class="truncate" data-i18n="c.ALL">🌏 All Countries</span>
+                            <span id="country-display" class="truncate" data-noi18n>🌏 All Countries</span>
                             <span class="material-symbols-outlined text-[16px] text-on-surface-variant flex-shrink-0 ml-1" style="transition:transform .2s" id="country-chevron">expand_more</span>
                         </button>
                         <div id="country-dropdown" class="hidden absolute left-0 right-0 rounded-xl border overflow-hidden"
@@ -1829,7 +1829,7 @@
                             <div>
                                 <h3 class="font-headline-lg text-headline-lg text-on-surface" data-i18n="d.recTeam">Your Recommended KOL Team
                                 </h3>
-                                <p id="biz-subtitle" class="text-on-surface-variant text-body-base mt-1">Optimized
+                                <p id="biz-subtitle" data-noi18n class="text-on-surface-variant text-body-base mt-1">Optimized
                                     portfolio</p>
                             </div>
                             <div class="flex items-center gap-xs text-secondary">
@@ -1855,7 +1855,7 @@
                                     Investment</p>
                                 <p id="biz-roi" class="font-headline-lg text-headline-lg text-on-surface font-bold">—
                                 </p>
-                                <p id="biz-roi-sub" class="text-[11px] text-on-surface-variant mt-1">GMV / Cost</p>
+                                <p id="biz-roi-sub" data-noi18n class="text-[11px] text-on-surface-variant mt-1">GMV / Cost</p>
                             </div>
                         </div>
                         <!-- How far to trust this forecast: range, estimated quotes, concentration -->
@@ -1953,27 +1953,27 @@
                                 </h3>
                                 <div class="flex flex-wrap gap-md">
                                     <span class="flex items-center gap-xs text-[10px] text-on-surface-variant font-bold uppercase">
-                                        <span class="w-2.5 h-2.5 rounded-full inline-block flex-shrink-0" style="background:#BFC3CA"></span> GA
+                                        <span class="w-2.5 h-2.5 rounded-full inline-block flex-shrink-0" style="background:#BFC3CA"></span> <span data-i18n="algo.s.ga">GA</span>
                                         <span id="lv-ga" class="font-data-mono text-on-surface opacity-60 normal-case font-medium"></span>
                                     </span>
                                     <span class="flex items-center gap-xs text-[10px] text-on-surface-variant font-bold uppercase">
-                                        <span class="w-2.5 h-2.5 rounded-full inline-block flex-shrink-0" style="background:#6E8BC2"></span> Tabu
+                                        <span class="w-2.5 h-2.5 rounded-full inline-block flex-shrink-0" style="background:#6E8BC2"></span> <span data-i18n="algo.s.ts">Tabu</span>
                                         <span id="lv-ts" class="font-data-mono text-on-surface opacity-60 normal-case font-medium"></span>
                                     </span>
                                     <span class="flex items-center gap-xs text-[10px] text-on-surface-variant font-bold uppercase">
-                                        <span class="w-2.5 h-2.5 rounded-full inline-block flex-shrink-0" style="background:#80858E"></span> Greedy
+                                        <span class="w-2.5 h-2.5 rounded-full inline-block flex-shrink-0" style="background:#80858E"></span> <span data-i18n="algo.s.gr">Greedy</span>
                                         <span id="lv-gr" class="font-data-mono text-on-surface opacity-60 normal-case font-medium"></span>
                                     </span>
                                     <span class="flex items-center gap-xs text-[10px] text-on-surface-variant font-bold uppercase">
-                                        <span class="w-2.5 h-2.5 rounded-full inline-block flex-shrink-0" style="background:var(--good)"></span> SA
+                                        <span class="w-2.5 h-2.5 rounded-full inline-block flex-shrink-0" style="background:var(--good)"></span> <span data-i18n="algo.s.sa">SA</span>
                                         <span id="lv-sa" class="font-data-mono text-on-surface opacity-60 normal-case font-medium"></span>
                                     </span>
                                     <span class="flex items-center gap-xs text-[10px] text-on-surface-variant font-bold uppercase">
-                                        <span class="w-2.5 h-2.5 rounded-full inline-block flex-shrink-0" style="background:#9AA0AA"></span> HC
+                                        <span class="w-2.5 h-2.5 rounded-full inline-block flex-shrink-0" style="background:#9AA0AA"></span> <span data-i18n="algo.s.hc">HC</span>
                                         <span id="lv-hc" class="font-data-mono text-on-surface opacity-60 normal-case font-medium"></span>
                                     </span>
                                     <span class="flex items-center gap-xs text-[10px] text-on-surface-variant font-bold uppercase">
-                                        <span class="w-2.5 h-2.5 rounded-full inline-block flex-shrink-0 border border-dashed" style="border-color:var(--dim)"></span> Random
+                                        <span class="w-2.5 h-2.5 rounded-full inline-block flex-shrink-0 border border-dashed" style="border-color:var(--dim)"></span> <span data-i18n="algo.s.rs">Random</span>
                                         <span id="lv-rs" class="font-data-mono text-on-surface opacity-60 normal-case font-medium"></span>
                                     </span>
                                 </div>
@@ -2036,7 +2036,7 @@
                             </div>
                             <div class="flex items-end gap-md flex-shrink-0">
                                 <div class="flex flex-col gap-xs">
-                                    <label class="text-[10px] text-on-surface-variant uppercase" title="Optional GMV goal — the simulator tells you how many creators reach it" data-i18n="d.targetGmv">Target GMV (optional)</label>
+                                    <label class="text-[10px] text-on-surface-variant uppercase" title="Optional GMV goal — the simulator tells you how many creators reach it" data-i18n-title="tt.simTarget" data-i18n="d.targetGmv">Target GMV (optional)</label>
                                     <input id="sim-target" type="number" min="0" placeholder="e.g. 150000" data-i18n-ph="ph.target"
                                         class="w-32 border border-outline-variant rounded-lg p-xs text-body-base outline-none focus:ring-1 focus:ring-primary text-center"
                                         style="background:var(--bg2);color:var(--ink);border-color:var(--line)" />
@@ -2176,11 +2176,11 @@
                             <button onclick="openAddModal()" class="btn btn-primary flex items-center gap-1 text-[12px] py-1 px-2">
                                 <span class="material-symbols-outlined text-[14px]">person_add</span><span data-i18n="cr.add">Add</span>
                             </button>
-                            <label class="btn btn-outline flex items-center gap-1 text-[12px] py-1 px-2 cursor-pointer" title="Import creators from a .csv or .xlsx file. Headers are matched flexibly; category/market can be inferred from the file name (e.g. Beauty_MY.xlsx).">
+                            <label class="btn btn-outline flex items-center gap-1 text-[12px] py-1 px-2 cursor-pointer" data-i18n-title="tt.import" title="Import creators from a .csv or .xlsx file. Headers are matched flexibly; category/market can be inferred from the file name (e.g. Beauty_MY.xlsx).">
                                 <span class="material-symbols-outlined text-[14px]">upload_file</span><span data-i18n="cr.import">Import CSV / Excel</span>
                                 <input type="file" accept=".csv,.xlsx" onchange="importCSV(this)" class="hidden" />
                             </label>
-                            <label class="btn btn-outline flex items-center gap-1 text-[12px] py-1 px-2 cursor-pointer" title="Bulk-replace estimated prices with real negotiated quotes. Upload a .csv/.xlsx with a price/cost column and an id, profile_url, or name to match creators. Clears the 'est.' badge on matched rows.">
+                            <label class="btn btn-outline flex items-center gap-1 text-[12px] py-1 px-2 cursor-pointer" data-i18n-title="tt.backfill" title="Bulk-replace estimated prices with real negotiated quotes. Upload a .csv/.xlsx with a price/cost column and an id, profile_url, or name to match creators. Clears the 'est.' badge on matched rows.">
                                 <span class="material-symbols-outlined text-[14px]">price_check</span><span data-i18n="cr.backfill">Backfill Prices</span>
                                 <input type="file" accept=".csv,.xlsx" onchange="backfillCosts(this)" class="hidden" />
                             </label>
@@ -2437,7 +2437,7 @@
                     <div><label class="form-label" data-i18n="sv.offer">Offer (optional)</label><input id="sv-offer" class="form-input" maxlength="160" data-i18n-ph="sv.phOffer" placeholder="e.g. RM39, free shipping this week" /></div>
                     <div class="sc-row">
                         <div><label class="form-label" data-i18n="sc.length">Length</label><select id="sv-length" class="form-input"><option value="15">15s</option><option value="20" selected>20s</option><option value="30">30s</option><option value="45">45s</option></select></div>
-                        <div><label class="form-label" data-i18n="sv.capLang">Caption language</label><select id="sv-lang" class="form-input"><option>English</option><option>Bahasa Melayu</option><option>Bahasa Indonesia</option><option>ไทย (Thai)</option><option>Tiếng Việt</option><option>Filipino</option><option>中文</option></select></div>
+                        <div><label class="form-label" data-i18n="sv.capLang">Caption language</label><select id="sv-lang" class="form-input"><option value="English" data-i18n="lang.en">English</option><option value="Bahasa Melayu" data-i18n="lang.ms">Bahasa Melayu</option><option value="Bahasa Indonesia" data-i18n="lang.id">Bahasa Indonesia</option><option value="ไทย (Thai)" data-i18n="lang.th">ไทย (Thai)</option><option value="Tiếng Việt" data-i18n="lang.vi">Tiếng Việt</option><option value="Filipino" data-i18n="lang.fil">Filipino</option><option value="中文" data-i18n="lang.zh">Chinese</option></select></div>
                     </div>
                     <div>
                         <label class="form-label" data-i18n="sv.photos">Product photos (optional, up to 8)</label>
@@ -2469,10 +2469,10 @@
                     <div><label class="form-label" data-i18n="sc.points">Selling points</label><textarea id="sc-points" class="form-input" rows="4" maxlength="1200" data-i18n-ph="sc.phPoints" placeholder="One per line: key ingredient, who it is for, what makes it different, current offer…"></textarea></div>
                     <div class="sc-row">
                         <div><label class="form-label" data-i18n="sc.format">Format</label><select id="sc-format" class="form-input"><option value="video" data-i18n="sc.video">Short video</option><option value="live" data-i18n="sc.live">Livestream segment</option></select></div>
-                        <div><label class="form-label" data-i18n="sc.length">Length</label><select id="sc-length" class="form-input"><option value="15">15s</option><option value="30" selected>30s</option><option value="60">60s</option><option value="180">3 min</option></select></div>
+                        <div><label class="form-label" data-i18n="sc.length">Length</label><select id="sc-length" class="form-input"><option value="15">15s</option><option value="30" selected>30s</option><option value="60">60s</option><option value="180" data-i18n="sc.3min">3 min</option></select></div>
                     </div>
                     <div class="sc-row">
-                        <div><label class="form-label" data-i18n="sc.spoken">Spoken language</label><select id="sc-spoken" class="form-input"><option>English</option><option>Bahasa Melayu</option><option>Bahasa Indonesia</option><option>ไทย (Thai)</option><option>Tiếng Việt</option><option>Filipino</option><option>中文</option></select></div>
+                        <div><label class="form-label" data-i18n="sc.spoken">Spoken language</label><select id="sc-spoken" class="form-input"><option value="English" data-i18n="lang.en">English</option><option value="Bahasa Melayu" data-i18n="lang.ms">Bahasa Melayu</option><option value="Bahasa Indonesia" data-i18n="lang.id">Bahasa Indonesia</option><option value="ไทย (Thai)" data-i18n="lang.th">ไทย (Thai)</option><option value="Tiếng Việt" data-i18n="lang.vi">Tiếng Việt</option><option value="Filipino" data-i18n="lang.fil">Filipino</option><option value="中文" data-i18n="lang.zh">Chinese</option></select></div>
                         <div><label class="form-label" data-i18n="sc.tone">Tone</label><input id="sc-tone" class="form-input" maxlength="80" data-i18n-ph="sc.phTone" placeholder="e.g. playful, honest review" /></div>
                     </div>
                     <button id="sc-gen-btn" class="btn btn-primary" style="justify-content:center" onclick="genScript()"><span class="material-symbols-outlined">auto_awesome</span><span data-i18n="sc.genBtn">Generate script</span></button>
@@ -2490,7 +2490,7 @@
                     <div><label class="form-label" data-i18n="sc.points">Selling points</label><textarea id="op-points" class="form-input" rows="4" maxlength="1200" data-i18n-ph="sc.phPoints" placeholder="One per line: key ingredient, who it is for, what makes it different, current offer…"></textarea></div>
                     <div class="sc-row">
                         <div><label class="form-label" data-i18n="op.audience">Audience</label><input id="op-audience" class="form-input" maxlength="160" data-i18n-ph="op.phAudience" placeholder="e.g. students, new mums" /></div>
-                        <div><label class="form-label" data-i18n="op.lang">Write in</label><select id="op-lang" class="form-input"><option>English</option><option>Bahasa Melayu</option><option>Bahasa Indonesia</option><option>ไทย (Thai)</option><option>Tiếng Việt</option><option>Filipino</option><option>中文</option></select></div>
+                        <div><label class="form-label" data-i18n="op.lang">Write in</label><select id="op-lang" class="form-input"><option value="English" data-i18n="lang.en">English</option><option value="Bahasa Melayu" data-i18n="lang.ms">Bahasa Melayu</option><option value="Bahasa Indonesia" data-i18n="lang.id">Bahasa Indonesia</option><option value="ไทย (Thai)" data-i18n="lang.th">ไทย (Thai)</option><option value="Tiếng Việt" data-i18n="lang.vi">Tiếng Việt</option><option value="Filipino" data-i18n="lang.fil">Filipino</option><option value="中文" data-i18n="lang.zh">Chinese</option></select></div>
                     </div>
                     <button id="op-btn" class="btn btn-primary" style="justify-content:center" onclick="genOps()"><span class="material-symbols-outlined">auto_awesome</span><span data-i18n="op.btn">Write it</span></button>
                 </div>
@@ -2776,11 +2776,11 @@
                     <div class="ext-step"><i>1</i><div style="flex:1"><b data-i18n="ext.s1">Download and unzip</b><span data-i18n="ext.s1d">A small Chrome / Edge extension. Unzip it and keep the folder somewhere you won't delete.</span><div><button class="btn btn-quiet" style="margin-top:8px" onclick="downloadFile('/extension/download','lumio-capture.zip')"><span class="material-symbols-outlined">download</span><span data-i18n="ext.download">Download extension</span></button></div></div></div>
                     <div class="ext-step"><i>2</i><div style="flex:1"><b data-i18n="ext.s2">Load it in your browser</b><span data-i18n-html="ext.s2d">Open <code>chrome://extensions</code> (Edge: <code>edge://extensions</code>), switch on <b>Developer mode</b>, click <b>Load unpacked</b> and choose the unzipped <code>lumio-capture</code> folder.</span>
                         <div class="ext-mock ext-mock-page" aria-hidden="true">
-                            <div class="em-bar"><span class="em-dots"><i></i><i></i><i></i></span><span class="em-url">chrome://extensions</span></div>
+                            <div class="em-bar"><span class="em-dots"><i></i><i></i><i></i></span><span class="em-url" data-noi18n>chrome://extensions</span></div>
                             <div class="em-body">
                                 <div class="em-row"><b data-i18n="ext.mExt">Extensions</b><span class="em-toggle"><span data-i18n="ext.mDev">Developer mode</span><i class="on"></i></span></div>
                                 <div class="em-row"><span class="em-btn hl" data-i18n="ext.mLoad">Load unpacked</span><span class="em-btn" data-i18n="ext.mPack">Pack extension</span></div>
-                                <div class="em-card"><img src="data:image/png;base64,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" alt=""><div><b>Lumio Creator Capture</b><small>lumio-capture</small></div><i class="on"></i></div>
+                                <div class="em-card"><img src="data:image/png;base64,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" alt=""><div data-noi18n><b>Lumio Creator Capture</b><small>lumio-capture</small></div><i class="on"></i></div>
                             </div>
                         </div>
                         <span class="ext-tip" data-i18n="ext.s2tip">Tip: click the puzzle icon in the toolbar and pin Lumio so it is always one click away.</span>
@@ -2795,9 +2795,9 @@
                 <div class="ext-pane hidden" data-ext-pane="use">
                     <div class="ext-use">
                         <div class="ext-mock ext-mock-tt" aria-hidden="true">
-                            <div class="em-bar"><span class="em-dots"><i></i><i></i><i></i></span><span class="em-url">tiktok.com/@glowup.sg</span><span class="em-ico">✓</span></div>
+                            <div class="em-bar"><span class="em-dots"><i></i><i></i><i></i></span><span class="em-url" data-noi18n>tiktok.com/@glowup.sg</span><span class="em-ico">✓</span></div>
                             <div class="em-body">
-                                <div class="em-prof"><span class="em-ava"></span><div><b>Glow Up SG</b><small>@glowup.sg</small><div class="em-nums"><span><b>1.3M</b> <em data-i18n="ex.followers">followers</em></span><span><b>18.2M</b> <em data-i18n="ex.likes">likes</em></span></div></div></div>
+                                <div class="em-prof" data-noi18n><span class="em-ava"></span><div><b>Glow Up SG</b><small>@glowup.sg</small><div class="em-nums"><span><b>1.3M</b> <em data-i18n="ex.followers">followers</em></span><span><b>18.2M</b> <em data-i18n="ex.likes">likes</em></span></div></div></div>
                                 <div class="em-grid"><i></i><i></i><i></i><i></i></div>
                                 <div class="em-toast"><span>✦</span><span data-i18n="ext.mToast">Added to Lumio: @glowup.sg</span></div>
                             </div>
@@ -2852,7 +2852,7 @@
                     </div>
                     <div class="st-row" style="border-top:1px solid var(--hair);padding-top:18px">
                         <div><p class="st-k" data-i18n="st.lang">Language</p><p class="st-d" data-i18n="st.langNote">Emails we send you follow this language too.</p></div>
-                        <div class="seg" id="st-lang">
+                        <div class="seg" id="st-lang" data-noi18n>
                             <button data-v="zh" onclick="if(LANG!=='zh')toggleLang()">中文</button>
                             <button data-v="en" onclick="if(LANG!=='en')toggleLang()">English</button>
                         </div>
@@ -2956,7 +2956,7 @@
     <div id="api-connect-modal" class="modal-overlay hidden" onclick="if(event.target===this)closeApiModal()">
         <div class="glass-card rounded-xl p-6 w-[500px]">
             <div class="flex justify-between items-center mb-5">
-                <h3 id="api-modal-title" class="font-headline-sm text-on-surface flex items-center gap-2">
+                <h3 id="api-modal-title" data-noi18n class="font-headline-sm text-on-surface flex items-center gap-2">
                     <span class="material-symbols-outlined text-primary">api</span>Connect Integration
                 </h3>
                 <button onclick="closeApiModal()" class="text-outline hover:text-white">
@@ -2979,7 +2979,7 @@
             <div class="space-y-sm p-md rounded-xl bg-surface-container-low">
                 <p class="text-[11px] text-outline uppercase tracking-wider font-semibold" data-i18n="api.interest">Register Early Access Interest</p>
                 <div class="flex gap-2">
-                    <input id="api-interest-email" type="email" placeholder="your@email.com" class="form-input flex-1 text-sm" />
+                    <input id="api-interest-email" type="email" placeholder="your@email.com" data-i18n-ph="ph.yourEmail" class="form-input flex-1 text-sm" />
                     <button onclick="submitApiInterest()" class="btn btn-primary text-sm px-md" data-i18n="api.notify">Notify Me</button>
                 </div>
                 <p id="api-interest-confirm" class="text-[11px] text-primary hidden" data-i18n="api.registered">✓ Registered! We'll reach out when this integration is live.</p>
@@ -3039,7 +3039,7 @@
                     </select></div>
             </div>
             <div class="flex gap-3 mt-6 justify-end"><button onclick="closeModal()"
-                    class="btn btn-outline" data-i18n="m.cancel">Cancel</button><button id="modal-submit" class="btn btn-primary">Save
+                    class="btn btn-outline" data-i18n="m.cancel">Cancel</button><button id="modal-submit" data-noi18n class="btn btn-primary">Save
                     Creator</button></div>
         </div>
     </div>
@@ -3294,7 +3294,7 @@
     </div>
 
     <!-- ═══════════ AI COPILOT ═══════════ -->
-    <button id="agent-fab" onclick="agToggle()" title="AI Copilot">
+    <button id="agent-fab" onclick="agToggle()" title="AI Copilot" data-i18n-title="tt.copilot" data-i18n-aria="tt.copilot" aria-label="AI Copilot">
         <span class="material-symbols-outlined">smart_toy</span>
     </button>
     <div id="agent-panel" class="hidden">
@@ -3689,12 +3689,19 @@
             window.fetch = function (url, opts) {
                 opts = opts || {};
                 const u = typeof url === 'string' ? url : (url && url.url) || '';
-                if ((API && u.startsWith(API)) || u.startsWith('/')) {
+                const ours = (API && u.startsWith(API)) || u.startsWith('/');
+                if (ours) {
                     // X-Lang lets the server localise generated text (e.g. "why this creator" reasons).
                     opts.headers = Object.assign({}, opts.headers, { 'X-Lang': LANG },
                         AUTH_TOKEN ? { 'Authorization': 'Bearer ' + AUTH_TOKEN } : {});
                 }
+                const sentLang = LANG;
                 return _fetch(url, opts).then(r => {
+                    // The language was switched while this read was in flight: the answer is in
+                    // the old language (server-written text) and would land on top of the page
+                    // applyLang() just re-rendered. Ask again in the language now in use.
+                    if (ours && sentLang !== LANG && (!opts.method || opts.method === 'GET') && !/[?&]lang=/.test(u))
+                        return window.fetch(url, Object.assign({}, opts, { headers: Object.assign({}, opts.headers, { 'X-Lang': LANG }) }));
                     if (r.status === 401 && typeof u === 'string' && !u.includes('/auth/')) handleAuthExpired();
                     // 402 = plan quota hit — surface the reason and route to the upgrade page.
                     if (r.status === 402 && typeof u === 'string' && !u.includes('/billing/')) {
@@ -3815,7 +3822,7 @@
                 'feat.sub': 'Not just a list of creators — a campaign brain that predicts outcomes, explains its reasoning, and lets you review results anytime.',
                 'f1.h': 'Smart budget allocation', 'f1.p': 'Enter your budget, category and target markets — the algorithm solves for the optimal lineup across thousands of creators, maximizing predicted GMV within your constraints.',
                 'f2.h': 'GMV prediction engine', 'f2.p': 'Estimates each creator\'s sales contribution from followers, engagement, fit and audience overlap — with a clear, explainable "why this creator".',
-                'f3.h': 'AI campaign copilot', 'f3.p': 'A full campaign is one chat away — ask in plain English or 中文 and the copilot picks your lineup, browses your creator library and reviews past campaigns for you.',
+                'f3.h': 'AI campaign copilot', 'f3.p': 'A full campaign is one chat away — ask in plain English or Chinese and the copilot picks your lineup, browses your creator library and reviews past campaigns for you.',
                 'f4.h': 'Aggressive / balanced / safe plans', 'f4.p': 'Generate three risk-profile plans in one click, auto-scaled by budget cap — choose confidently between pushing volume and playing it safe.',
                 'f5.h': 'Predicted vs. actual review', 'f5.p': 'Save a campaign, then log real GMV — the system computes prediction accuracy automatically, turning every campaign into an optimizable asset.',
                 'f6.h': 'Flexible creator data sources', 'f6.p': 'Manual entry and bulk CSV import, with reserved API slots for creator marketplaces, shop platforms and more.',
@@ -3824,7 +3831,7 @@
                 'cp.b1': '<b>Runs real optimizations from chat</b> — "$3,000 on beauty in Indonesia" returns a bookable lineup with predicted GMV & ROI.',
                 'cp.b2': '<b>Knows your creator library</b> — filters, compares and recommends from the KOLs you actually work with.',
                 'cp.b3': '<b>Reviews your campaigns</b> — predicted vs. actual GMV, accuracy, and what to change next time.',
-                'cp.b4': '<b>Speaks 中文 & English</b> — answers in whichever language you write.',
+                'cp.b4': '<b>Speaks Chinese & English</b> — answers in whichever language you write.',
                 'cp.cta': 'chat with your copilot — free', 'cp.title': 'Lumio copilot', 'cp.live': 'live in your console',
                 'cp.u1': 'I have $3,000 for beauty in Indonesia — who should I book?',
                 'cp.t1': 'run_optimization — budget $3,000 · Indonesia · beauty',
@@ -3894,7 +3901,7 @@
                 'cp.b4': '<b>中英文双语</b>——你用什么语言问，它就用什么语言答。',
                 'cp.cta': '免费和助手聊聊', 'cp.title': 'Lumio 投放助手', 'cp.live': '已内置于控制台',
                 'cp.u1': '我有 $3,000 想在印尼投美妆，该找哪些达人？',
-                'cp.t1': 'run_optimization — 预算 $3,000 · 印尼 · 美妆',
+                'cp.t1': '运行优化引擎 — 预算 $3,000 · 印尼 · 美妆',
                 'cp.a1': '<b>搞定——已选出 7 位达人。</b><br>预测 GMV <b>$11,400</b> · ROI <b>3.8×</b><br>首选：一位印尼美妆达人——89 万粉丝，互动率 7.2%。<br>要看稳健版还是激进版方案？',
                 'cp.u2': '预算砍到 $2,000 会怎样？',
                 'sec3.num': '03 / 流程', 'sec3.h': '从预算到阵容<br><em>只需三步</em>',
@@ -4143,6 +4150,27 @@
         });
         // Category / country display names + benchmark-note fragments
         Object.assign(I18N.en, {
+            // ── language-switch audit (2026-11) ──
+            'doc.title': 'Lumio — AI KOL Optimizer for TikTok Shop sellers',
+            'plan.desc.Aggressive': 'Maximize GMV with up to 120% budget. Best for growth campaigns.',
+            'plan.desc.Balanced': 'Optimal GMV–ROI trade-off within budget. Recommended default.',
+            'plan.desc.Safe': '80% budget cap for a conservative, efficient portfolio.',
+            'algo.s.ga': 'GA', 'algo.s.ts': 'Tabu', 'algo.s.gr': 'Greedy', 'algo.s.sa': 'SA', 'algo.s.hc': 'HC', 'algo.s.rs': 'Random',
+            'tt.import': 'Import creators from a .csv or .xlsx file. Headers are matched flexibly; category/market can be inferred from the file name (e.g. Beauty_MY.xlsx).',
+            'tt.backfill': "Bulk-replace estimated prices with real negotiated quotes. Upload a .csv/.xlsx with a price/cost column and an id, profile_url, or name to match creators. Clears the 'est.' badge on matched rows.",
+            'tt.simTarget': 'Optional GMV goal — the simulator tells you how many creators reach it',
+            'tt.copilot': 'AI Copilot', 'tt.menu': 'Menu', 'tt.dismiss': 'Dismiss',
+            'ph.yourEmail': 'your@email.com', 'sc.3min': '3 min',
+            'wa.upgrade': "Hi Lumio! I'd like to upgrade to the {n} plan (RM{p}/mo). Account: {e}",
+            'wa.payment': 'Hi Lumio! About my payment {o} — account: {e}',
+            'wa.forgot': 'Hi Lumio! I forgot my password. Account: {e}',
+            't.simFail': 'Simulation failed — please try again.',
+            'api.f.appId': 'App ID', 'api.f.appIdPh': 'Your App ID', 'api.f.appSecret': 'App Secret', 'api.f.appSecretPh': 'Your App Secret',
+            'api.f.shopId': 'Shop ID', 'api.f.shopIdPh': 'Your Shop ID', 'api.f.token': 'Access Token', 'api.f.tokenPh': 'Partner Access Token',
+            'api.f.platform': 'Platform', 'api.f.platformPh': 'e.g. AsiaKOL, Cube Asia, Nox…', 'api.f.key': 'API Key', 'api.f.keyPh': 'Platform API Key',
+            'lang.en': 'English', 'lang.ms': 'Bahasa Melayu', 'lang.id': 'Bahasa Indonesia', 'lang.th': 'Thai (ไทย)', 'lang.vi': 'Vietnamese (Tiếng Việt)', 'lang.fil': 'Filipino', 'lang.zh': 'Chinese',
+            'act.d.creators': '{n} creators', 'act.d.gmv': 'actual GMV {g}', 'act.d.unassigned': 'unassigned',
+            'feat.clips': '{n} AI video clips / month',
             'catn.beauty': 'Beauty & Cosmetics', 'catn.fashion': 'Fashion & Lifestyle', 'catn.home': 'Home & Living', 'catn.fmcg': 'FMCG',
             'catn.accessories': 'Accessories', 'catn.muslim_fashion': 'Muslim Fashion', 'catn.kitchen': 'Kitchenware', 'catn.appliances': 'Appliances', 'catn.electronics': 'Electronics', 'catn.mother_baby': 'Mother & Baby', 'catn.health': 'Health & Wellness', 'catn.sports_outdoor': 'Sports & Outdoor', 'catn.pet': 'Pet Supplies', 'catn.toys': 'Toys & Hobbies', 'catn.automotive': 'Automotive',
             'con.MY': 'Malaysia', 'con.ID': 'Indonesia', 'con.TH': 'Thailand', 'con.PH': 'Philippines', 'con.SG': 'Singapore', 'con.VN': 'Vietnam',
@@ -4169,10 +4197,31 @@
             'k.rep': 'Track record', 'k.repDelivery': 'actual GMV {x}× the forecast over {n} campaign(s)', 'k.repRating': 'your rating {r}/5',
             'k.repNote': 'The optimizer already adjusts this creator\'s forecast from the same data.', 'k.repNone': 'Record campaign results or rate this creator to build a track record.',
             'pl.waTip': 'Send the invitation template on WhatsApp', 'pl.waDefault': 'Hi {n}! We would love to work with you on a TikTok campaign. Are you open to a collaboration?',
-            'sale.soon': '{e} in {d} days', 'sale.today': '{e} is today', 'sale.approx': 'date may shift', 'sale.plan': 'Plan a lineup',
+            'sale.soon': '{e} in {d} days', 'sale.soon1': '{e} is tomorrow', 'sale.today': '{e} is today', 'sale.approx': 'date may shift', 'sale.plan': 'Plan a lineup',
             'sale.tip': 'Lock in creator slots 2–3 weeks ahead and stock up. Rates rise as the date gets closer.'
         });
         Object.assign(I18N.zh, {
+            // ── 语言切换排查（2026-11）──
+            'doc.title': 'Lumio — TikTok Shop 卖家的 AI 达人投放优化',
+            'plan.desc.Aggressive': '以最多 120% 预算冲刺最高 GMV，适合增长期投放。',
+            'plan.desc.Balanced': '预算内 GMV 与 ROI 的最优平衡，推荐默认方案。',
+            'plan.desc.Safe': '预算上限 80%，保守稳健、效率优先的阵容。',
+            'algo.s.ga': '遗传', 'algo.s.ts': '禁忌', 'algo.s.gr': '贪心', 'algo.s.sa': '退火', 'algo.s.hc': '爬山', 'algo.s.rs': '随机',
+            'tt.import': '从 .csv 或 .xlsx 文件导入达人。表头会自动匹配；品类和市场可以从文件名识别（例如 Beauty_MY.xlsx）。',
+            'tt.backfill': '用真实谈好的报价批量替换估算价格。上传带价格/费用列，以及 id、主页链接或名字的 .csv/.xlsx 来匹配达人，匹配上的行会去掉「估算」标记。',
+            'tt.simTarget': '可选的 GMV 目标——模拟器会告诉你需要多少位达人才能达到',
+            'tt.copilot': 'AI 投放助手', 'tt.menu': '菜单', 'tt.dismiss': '关闭',
+            'ph.yourEmail': '你的邮箱', 'sc.3min': '3 分钟',
+            'wa.upgrade': '你好 Lumio！我想升级到 {n}（每月 RM{p}）。账号：{e}',
+            'wa.payment': '你好 Lumio！关于我的付款订单 {o}，账号：{e}',
+            'wa.forgot': '你好 Lumio！我忘记密码了。账号：{e}',
+            't.simFail': '模拟失败，请重试。',
+            'api.f.appId': 'App ID', 'api.f.appIdPh': '你的 App ID', 'api.f.appSecret': 'App 密钥', 'api.f.appSecretPh': '你的 App 密钥',
+            'api.f.shopId': '店铺 ID', 'api.f.shopIdPh': '你的店铺 ID', 'api.f.token': '访问令牌', 'api.f.tokenPh': '合作伙伴访问令牌',
+            'api.f.platform': '平台', 'api.f.platformPh': '例如 AsiaKOL、Cube Asia、Nox…', 'api.f.key': 'API 密钥', 'api.f.keyPh': '平台 API 密钥',
+            'lang.en': '英语', 'lang.ms': '马来语', 'lang.id': '印尼语', 'lang.th': '泰语', 'lang.vi': '越南语', 'lang.fil': '菲律宾语', 'lang.zh': '中文',
+            'act.d.creators': '{n} 位达人', 'act.d.gmv': '实际 GMV {g}', 'act.d.unassigned': '未指派',
+            'feat.clips': '每月 {n} 条 AI 视频',
             'catn.beauty': '美妆个护', 'catn.fashion': '服饰生活', 'catn.home': '家居生活', 'catn.fmcg': '快消品',
             'catn.accessories': '时尚配件', 'catn.muslim_fashion': '穆斯林时尚', 'catn.kitchen': '厨房用品', 'catn.appliances': '家用电器', 'catn.electronics': '手机数码', 'catn.mother_baby': '母婴用品', 'catn.health': '保健健康', 'catn.sports_outdoor': '运动户外', 'catn.pet': '宠物用品', 'catn.toys': '玩具爱好', 'catn.automotive': '汽车配件',
             'con.MY': '马来西亚', 'con.ID': '印度尼西亚', 'con.TH': '泰国', 'con.PH': '菲律宾', 'con.SG': '新加坡', 'con.VN': '越南',
@@ -4199,7 +4248,7 @@
             'k.rep': '信誉分', 'k.repDelivery': '{n} 次投放实际 GMV 为预测的 {x}×', 'k.repRating': '你的评分 {r}/5',
             'k.repNote': '优化器已据此自动调整该达人的预测。', 'k.repNone': '记录投放结果或给达人评分后，这里会显示信誉分。',
             'pl.waTip': '用邀约模板一键发 WhatsApp', 'pl.waDefault': 'Hi {n}！我们想邀请你合作一次 TikTok 推广，有兴趣聊聊吗？',
-            'sale.soon': '距 {e} 还有 {d} 天', 'sale.today': '今天就是 {e}', 'sale.approx': '日期以官方公布为准', 'sale.plan': '规划达人组合',
+            'sale.soon': '距 {e} 还有 {d} 天', 'sale.soon1': '{e} 就在明天', 'sale.today': '今天就是 {e}', 'sale.approx': '日期以官方公布为准', 'sale.plan': '规划达人组合',
             'sale.tip': '提前 2–3 周锁定达人档期并备货，越临近报价越高。'
         });
         // Translate a dynamic string with {placeholder} interpolation.
@@ -4230,7 +4279,14 @@
                 const v = d[el.dataset.i18nPh];
                 if (v != null) el.placeholder = v;
             });
+            document.querySelectorAll('[data-i18n-aria]').forEach(el => {
+                const v = d[el.dataset.i18nAria];
+                if (v != null) el.setAttribute('aria-label', v);
+            });
             document.documentElement.lang = LANG === 'zh' ? 'zh-CN' : 'en';
+            document.title = d['doc.title'];
+            try { refreshCountryDisplay(); } catch (_) { /* defined later on the very first call */ }
+            try { const pb = document.getElementById('plan-badge'); if (pb && BILLING) pb.textContent = planLabel(BILLING.plan, BILLING.plan_name); } catch (_) { /* billing not loaded yet */ }
             try { showNotice(); } catch (_) { /* config not loaded yet on the very first call */ }
             try { fillCategorySelects(); } catch (_) { /* list not defined yet on the very first call */ }
             try { renderSales(); } catch (_) { /* defined later on the very first call */ }
@@ -4253,7 +4309,7 @@
             try {
                 if (AUTH_TOKEN) {
                     if (lastOptimizeData && lastPayload) {
-                        renderDashboard(lastOptimizeData, lastPayload);
+                        renderDashboard(lastOptimizeData, lastPayload, true);
                         if (allPlansData) renderPlans(allPlansData, lastOptimizeData);
                     }
                     const act = document.querySelector('.nav-item.active');
@@ -4263,13 +4319,21 @@
                     if (page === 'billing') loadBilling();
                     if (page === 'guide') loadGuide();
                     if (page === 'news') loadNews(0);
+                    if (page === 'settings') loadSettings();
+                    // open detail panels re-draw too, so nothing stays in the old language
+                    const open = id => { const el = document.getElementById(id); return el && !el.classList.contains('hidden'); };
+                    if (open('kol-detail-overlay') && currentKolId != null) openKolDetail(currentKolId);
+                    if (open('campaign-detail-modal') && currentCampaignId != null) openCampaignDetail(currentCampaignId);
+                    if (open('api-connect-modal') && currentApiType) openApiConnectModal(currentApiType);
                 }
             } catch (e) { /* ignore */ }
         }
         function toggleLang() {
             LANG = LANG === 'zh' ? 'en' : 'zh';
-            localStorage.setItem('kol_lang', LANG);
+            try { localStorage.setItem('kol_lang', LANG); } catch (_) { /* private mode */ }
             applyLang();
+            // emails and the browser extension follow the account's language
+            if (AUTH_TOKEN) fetch(`${API}/auth/lang`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ lang: LANG }) }).catch(() => {});
         }
         applyLang();
         let currentView = 'business';
@@ -4344,7 +4408,7 @@
         function refreshCountryDisplay() {
             const selected = [...document.querySelectorAll('.country-cb:checked')].map(cb => cb.value);
             const el = document.getElementById('country-display');
-            el.textContent = selected.length === 0 ? '🌏 All Countries'
+            el.textContent = selected.length === 0 ? T('c.ALL')
                 : selected.length <= 3 ? selected.map(c => COUNTRY_LABELS[c]).join(' · ')
                 : selected.slice(0, 2).map(c => COUNTRY_LABELS[c]).join(' · ') + ` +${selected.length - 2}`;
         }
@@ -4401,7 +4465,7 @@
                 slot.innerHTML = `<div class="glass-card rounded-xl p-md flex flex-wrap items-center gap-md" style="border-color:rgba(110,139,194,.45)">
                     <span class="material-symbols-outlined text-[26px]" style="color:#6E8BC2">event_upcoming</span>
                     <div style="flex:1;min-width:220px">
-                        <p class="text-[14px] font-bold text-on-surface">${ev.map(e => T(e.days ? 'sale.soon' : 'sale.today', { e: e[LANG === 'zh' ? 'zh' : 'en'], d: e.days }) + (e.approx ? ` <span class="text-[11px] font-normal text-on-surface-variant">(${T('sale.approx')})</span>` : '')).join(' · ')}</p>
+                        <p class="text-[14px] font-bold text-on-surface">${ev.map(e => T(e.days ? (e.days === 1 ? 'sale.soon1' : 'sale.soon') : 'sale.today', { e: e[LANG === 'zh' ? 'zh' : 'en'], d: e.days }) + (e.approx ? ` <span class="text-[11px] font-normal text-on-surface-variant">(${T('sale.approx')})</span>` : '')).join(' · ')}</p>
                         <p class="text-[12px] text-on-surface-variant">${T('sale.tip')}</p>
                     </div>
                     ${slot.closest('#page-dashboard') ? '' : `<button class="btn btn-outline" onclick="showPage('dashboard')">${T('sale.plan')}</button>`}
@@ -4414,7 +4478,7 @@
             if (LANG !== 'zh') return f;
             if (FEAT_ZH[f]) return FEAT_ZH[f];
             const m = /^(\d+) AI video clips? \/ month$/.exec(f);
-            return m ? `每月 ${m[1]} 条 AI 视频` : f;
+            return m ? T('feat.clips', { n: m[1] }) : f;
         }
         const FEAT_ZH = {
             '10 optimization runs / month': '每月 10 次优化',
@@ -4433,6 +4497,8 @@
             'Priority support': '优先支持',
         };
 
+        // "Free" / "Pro" / "Team" in the interface language (server sends the English name).
+        const planLabel = (id, fallback) => (I18N[LANG] && I18N[LANG]['plan.' + String(id || '').toLowerCase()]) || fallback || id || '';
         // Fetch plan + usage and keep the sidebar badge in sync. Silent on failure.
         async function refreshBilling() {
             if (!AUTH_TOKEN) return null;
@@ -4441,7 +4507,7 @@
                 if (!r.ok) return null;
                 BILLING = await r.json();
                 const badge = document.getElementById('plan-badge');
-                if (badge) { badge.textContent = BILLING.plan_name; badge.classList.remove('hidden'); }
+                if (badge) { badge.textContent = planLabel(BILLING.plan, BILLING.plan_name); badge.classList.remove('hidden'); }
                 return BILLING;
             } catch (_) { return null; }
         }
@@ -4575,7 +4641,7 @@
             const color = { paid: 'var(--good)', submitted: '#80858E', pending: 'var(--teal)', rejected: '#ef4444' };
             document.getElementById('orders-list').innerHTML = ORDER_HISTORY.map(o => `<div class="flex items-center gap-3">
                 <span class="text-on-surface-variant" style="width:86px">${esc((o.decided_at || o.created_at || '').slice(0, 10))}</span>
-                <span style="flex:1;min-width:0">${esc(o.plan_name)} · ${T('ord.months', { m: Number(o.months) })} <span class="text-on-surface-variant">· ${esc(o.order_no)}</span></span>
+                <span style="flex:1;min-width:0">${esc(planLabel(o.plan, o.plan_name))} · ${T('ord.months', { m: Number(o.months) })} <span class="text-on-surface-variant">· ${esc(o.order_no)}</span></span>
                 <span style="font-variant-numeric:tabular-nums">${payMoney(o)}</span>
                 <span style="width:104px;text-align:right;color:${color[o.status] || 'var(--mut)'}">${T('ord.' + o.status)}</span>
                 <span style="width:76px;text-align:right">${o.status === 'paid' ? `<button class="btn" data-no="${esc(o.order_no)}" onclick="printReceipt(this.dataset.no)">${T('ord.receipt')}</button>` : ''}</span>
@@ -4603,7 +4669,7 @@ button{margin-top:22px;padding:9px 16px;border:1px solid #111;background:#fff;bo
 ${line(T('rc.no'), esc(o.order_no))}
 ${line(T('rc.date'), esc((o.decided_at || '').slice(0, 10)))}
 ${line(T('rc.to'), esc(AUTH_EMAIL || ''))}
-${line(T('rc.item'), T('rc.line', { p: esc(o.plan_name), m: Number(o.months) }))}
+${line(T('rc.item'), T('rc.line', { p: esc(planLabel(o.plan, o.plan_name)), m: Number(o.months) }))}
 ${line(T('rc.method'), 'DuitNow QR')}
 ${line(T('rc.ref'), esc(o.reference || '—'))}
 ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
@@ -4701,7 +4767,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
             document.getElementById('pay-plan-name').textContent = `${T('plan.' + id)} — RM${price}${T('per.month')}`;
             document.getElementById('pay-account-email').textContent = AUTH_EMAIL || '—';
             document.getElementById('pay-wc-id').textContent = PAY_CONTACT.wechat;
-            const msg = encodeURIComponent(`Hi Lumio! I'd like to upgrade to the ${name} plan (RM${price}/mo). Account: ${AUTH_EMAIL || ''}`);
+            const msg = encodeURIComponent(T('wa.upgrade', { n: name, p: price, e: AUTH_EMAIL || '' }));
             document.getElementById('pay-wa-link').href = `https://wa.me/${PAY_CONTACT.whatsapp}?text=${msg}`;
             document.getElementById('pay-modal').classList.remove('hidden');
             initQrPay(id);
@@ -4767,7 +4833,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
         }
         function renderQrPay() {
             const o = PAY_ORDER, cfg = PAY_CFG, qr = document.getElementById('pay-qr');
-            const wa = `https://wa.me/${PAY_CONTACT.whatsapp}?text=${encodeURIComponent('Hi Lumio! About my payment ' + o.order_no + ' — account: ' + (AUTH_EMAIL || ''))}`;
+            const wa = `https://wa.me/${PAY_CONTACT.whatsapp}?text=${encodeURIComponent(T('wa.payment', { o: o.order_no, e: AUTH_EMAIL || '' }))}`;
             const help = `<p class="text-[11px] text-on-surface-variant/70 mt-3">${T('qr.help')} <a href="${wa}" target="_blank" rel="noopener" style="color:var(--teal)">WhatsApp</a></p>`;
             if (o.status === 'submitted') {
                 qr.innerHTML = `
@@ -4845,7 +4911,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
             if (!o) { box.style.display = 'none'; return; }
             const icon = { pending: 'qr_code_2', submitted: 'hourglass_top', rejected: 'error' }[o.status];
             const color = { pending: '#D9DCE1', submitted: '#80858E', rejected: '#ef4444' }[o.status];
-            const vars = { n: esc(o.order_no), a: payMoney(o), p: esc(o.plan_name) };
+            const vars = { n: esc(o.order_no), a: payMoney(o), p: esc(planLabel(o.plan, o.plan_name)) };
             box.style.display = 'flex';
             box.innerHTML = `<span class="material-symbols-outlined text-[18px]" style="color:${color}">${icon}</span>
                 <span style="flex:1">${T('qr.banner.' + o.status, vars)}</span>
@@ -4853,7 +4919,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
         }
         function resumePay(planId) {
             const p = BILLING && BILLING.plans[planId];
-            if (p) openPayModal(planId, p.name, p.price_myr);
+            if (p) openPayModal(planId, planLabel(planId, p.name), p.price_myr);
         }
         // ── Account: password change, deletion, forgot-password help ──
         async function changePassword() {
@@ -5058,7 +5124,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
                 } catch (_) { authNote(T('t.netFail')); return; }
             }
             // No email on this server (or it failed): operator-assisted recovery.
-            const msg = encodeURIComponent(`Hi Lumio! I forgot my password. Account: ${email}`);
+            const msg = encodeURIComponent(T('wa.forgot', { e: email }));
             const e = document.getElementById('auth-error');
             e.innerHTML = T('auth.forgotHelp', { wa: `https://wa.me/${PAY_CONTACT.whatsapp}?text=${msg}`, wc: PAY_CONTACT.wechat });
             e.style.color = '#7B8794'; e.style.display = 'block';
@@ -5071,7 +5137,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
             const p = BILLING && BILLING.plans[id];
             if (!p) return;
             // Paid plans are fulfilled manually during early access.
-            if (p.price_myr > 0) { openPayModal(id, p.name, p.price_myr); return; }
+            if (p.price_myr > 0) { openPayModal(id, planLabel(id, p.name), p.price_myr); return; }
             if (!confirm(T('b.confirmFree'))) return;
             try {
                 const r = await fetch(`${API}/billing/checkout`, {
@@ -5620,7 +5686,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
         const videoLength = () => VID.board.scenes.reduce((a, sc) => a + Number(sc.seconds || 0), 0);
         function wrapCaption(ctx, text, maxW) {
             // Latin text wraps on spaces; CJK has none, so it may break between any two characters.
-            const tokens = String(text).match(/[　-鿿＀-￯]|[^\s　-鿿＀-￯]+|\s+/g) || [];
+            const tokens = String(text).match(/[\u3000-\u9fff\uff00-\uffef]|[^\s\u3000-\u9fff\uff00-\uffef]+|\s+/g) || [];
             const lines = []; let line = '';
             tokens.forEach(tok => {
                 if (/^\s+$/.test(tok)) { if (line) line += ' '; return; }
@@ -5947,9 +6013,9 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
             return String(text)
                 .replace(/\b([a-z]+) -> ([a-z]+)\b/g, (_, a, b) => `${stage(a)} → ${stage(b)}`)
                 .replace(/^(whatsapp|email|copy)\b/, (_, c) => stage(c))
-                .replace(/(\d+) creators?/, '$1 位达人')
-                .replace(/actual GMV ([\d,]+)/, '实际 GMV $1')
-                .replace(/^unassigned$/, '未指派');
+                .replace(/(\d+) creators?/, (_, n) => T('act.d.creators', { n }))
+                .replace(/actual GMV ([\d,]+)/, (_, g) => T('act.d.gmv', { g }))
+                .replace(/^unassigned$/, () => T('act.d.unassigned'));
         }
         async function loadActivity() {
             const d = await apiJson('/activity');
@@ -6183,7 +6249,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
                     const isBaseline = key === 'random_search';
                     const tr = document.createElement('tr');
                     tr.className = isRecommended ? 'sa-highlight' : '';
-                    tr.innerHTML = `<td class="px-md py-md"><div class="font-bold text-on-surface text-sm">${r.algorithm}${isBaseline ? ' <span class="text-[10px] text-outline">' + T('d.baseline') + '</span>' : ''}</div><div class="text-[10px] text-on-surface-variant/70">${descs[key]}</div></td><td class="px-md py-md text-right font-data-mono ${isRecommended ? 'text-secondary' : 'text-on-surface-variant'}">${fmt(r.total_gmv)}</td><td class="px-md py-md text-right font-data-mono text-on-surface-variant">${r.roi.toFixed(2)}x</td>`;
+                    tr.innerHTML = `<td class="px-md py-md"><div class="font-bold text-on-surface text-sm">${algoName(r.algorithm)}${isBaseline ? ' <span class="text-[10px] text-outline">' + T('d.baseline') + '</span>' : ''}</div><div class="text-[10px] text-on-surface-variant/70">${descs[key]}</div></td><td class="px-md py-md text-right font-data-mono ${isRecommended ? 'text-secondary' : 'text-on-surface-variant'}">${fmt(r.total_gmv)}</td><td class="px-md py-md text-right font-data-mono text-on-surface-variant">${r.roi.toFixed(2)}x</td>`;
                     tbody.appendChild(tr);
                 });
 
@@ -6193,7 +6259,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
                 { key: 'greedy_ranking',    label: 'Greedy Ranking',      color: '#80858E', style: 'LP relaxation + 2-OPT local swap' },
                 { key: 'simulated_annealing', label: 'Simulated Annealing', color: '#EDEEF0', style: 'thermal exploration' },
                 { key: 'hill_climber',      label: 'Hill Climber',        color: '#9AA0AA', style: 'greedy descent' },
-            ].filter(a => !!results[a.key]).map(a => ({ ...a, gmv: results[a.key].total_gmv, obj: results[a.key].objective }));
+            ].filter(a => !!results[a.key]).map(a => ({ ...a, label: algoName(a.label), gmv: results[a.key].total_gmv, obj: results[a.key].objective }));
             if (!allResults.length) return;
             // "Best" is the true-objective winner (GMV net of overlap); GMV stays the displayed figure.
             const best = allResults.reduce((a, b) => b.obj > a.obj ? b : a);
@@ -6209,8 +6275,11 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
             if (convNote) convNote.innerHTML = noteHtml;
         }
 
+        // "Why this creator" lines come from the server in both languages, so a lineup
+        // that was optimised in one language reads right after switching to the other.
+        const kolReasons = k => (k && k.reasons_i18n && k.reasons_i18n[LANG]) || (k && k.reasons) || [];
         function bizKolCard(kol, totalGmv) {
-            const tier = kol.tier || 'Micro', reasons = (kol.reasons || []).slice(0, 3), contrib = totalGmv > 0 ? ((kol.expected_gmv / totalGmv) * 100).toFixed(1) : 0;
+            const tier = kol.tier || 'Micro', reasons = kolReasons(kol).slice(0, 3), contrib = totalGmv > 0 ? ((kol.expected_gmv / totalGmv) * 100).toFixed(1) : 0;
             const reasonsHtml = reasons.map(r => `<div style="margin:4px 0;font-size:12px;color:var(--mut)">✓ ${r}</div>`).join('');
             // Enhanced fields from /kol/{id}
             const enh = enhancedKolMap[kol.id] || {};
@@ -6236,7 +6305,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
         }
 
         function techKolCard(kol) {
-            const tier = kol.tier || 'Micro', reasons = (kol.reasons || []).slice(0, 3);
+            const tier = kol.tier || 'Micro', reasons = kolReasons(kol).slice(0, 3);
             const reasonsHtml = reasons.length ? `<div class="mt-md text-[11px] text-on-surface-variant/80 bg-surface-container-low p-md rounded-lg border border-outline-variant/30">${reasons.map(r => `<div class="mb-1">✓ ${r}</div>`).join('')}</div>` : '';
             const enh = enhancedKolMap[kol.id] || {};
             const rank = enh.cost_effectiveness_rank || '—';
@@ -6309,7 +6378,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
                 </div>
                 <span class="plan-active-badge text-[11px] font-bold" style="display:none">● ${T('b.active')}</span>
             </div>
-            <p class="text-[11px] text-on-surface-variant">${p.description}</p>
+            <p class="text-[11px] text-on-surface-variant">${I18N[LANG]['plan.desc.' + p.plan_name] || p.description}</p>
             <div class="grid grid-cols-2 gap-sm">
                 <div><p class="text-[10px] text-on-surface-variant uppercase">GMV</p><p class="font-title-md text-secondary font-bold font-data-mono">${fmt(p.total_gmv)}</p></div>
                 <div><p class="text-[10px] text-on-surface-variant uppercase">ROI</p><p class="font-title-md text-on-surface font-data-mono">${p.roi.toFixed(2)}x</p></div>
@@ -6414,7 +6483,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
             return `${cat}${T('d.campaign')} · ${countryDisplay} · ${count}${T('d.creators')}`;
         }
 
-        function renderDashboard(data, payload) {
+        function renderDashboard(data, payload, keepView) {
             if (data.candidates === 0) { showError(T('d.noCreators')); return; }
             document.getElementById('empty-state').classList.add('hidden');
             document.getElementById('results-section').classList.remove('hidden');
@@ -6448,7 +6517,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
             // ── Technical view ──
             const recommended = getRecommendedResult(data.results);
             const recommendedName = recommended ? recommended.algorithm : data.best_algorithm;
-            document.getElementById('m-algo').textContent = recommendedName;
+            document.getElementById('m-algo').textContent = algoName(recommendedName);
             document.getElementById('m-gmv').textContent = fmt(data.total_gmv);
             document.getElementById('m-cost').textContent = fmt(data.total_cost);
             document.getElementById('m-util').textContent = (data.total_cost / payload.budget * 100).toFixed(1) + T('d.util');
@@ -6474,7 +6543,8 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
             techGrid.innerHTML = sorted.map(techKolCard).join('');
             techGrid.querySelectorAll('.why-btn').forEach(btn => { btn.addEventListener('click', () => { btn.closest('.kol-card').querySelector('.why-panel').classList.toggle('hidden'); }); });
 
-            setView('business');
+            // a new run opens on the business view; a language switch keeps the view you were on
+            setView(keepView ? currentView : 'business');
         }
 
         // ══════════ CREATOR POOL SIMULATOR ══════════
@@ -6492,7 +6562,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ budget, seed: getSeed(), target_gmv })
                 });
-                if (!r.ok) { const e = await r.json(); throw new Error(typeof e.detail === 'string' ? e.detail : 'Simulation failed'); }
+                if (!r.ok) { const e = await r.json(); throw new Error(typeof e.detail === 'string' ? e.detail : T('t.simFail')); }
                 renderSimulation(await r.json());
             } catch (e) {
                 showError('⚠️ ' + e.message);
@@ -6640,7 +6710,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
             document.getElementById('kd-risk-dot').className = `risk-dot ${riskLevel}`;
 
             // Reasons
-            const reasons = d.reasons || [];
+            const reasons = kolReasons(d);
             document.getElementById('kd-reasons').innerHTML = reasons.length
                 ? reasons.map((r, i) => `<div class="flex items-start gap-sm text-body-base text-on-surface-variant"><span class="text-secondary font-bold">${i + 1}.</span><span>${r}</span></div>`).join('')
                 : '<p class="text-on-surface-variant">' + T('k.noReasons') + '</p>';
@@ -6654,13 +6724,15 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
         let guideCache = {};   // per-language cache
         async function loadGuide() {
             const body = document.getElementById('guide-body');
-            if (guideCache[LANG]) { renderGuide(guideCache[LANG]); return; }
+            const lang = LANG;
+            if (guideCache[lang]) { renderGuide(guideCache[lang]); return; }
             body.innerHTML = `<p class="text-[12px] text-on-surface-variant">${T('k.loading')}</p>`;
             try {
-                const r = await fetch(`${API}/guide?lang=${LANG}`);
+                const r = await fetch(`${API}/guide?lang=${lang}`);
                 if (!r.ok) throw new Error();
                 const d = await r.json();
-                guideCache[LANG] = d;
+                guideCache[lang] = d;
+                if (lang !== LANG) return;   // switched language meanwhile — that load renders instead
                 renderGuide(d);
             } catch (e) { body.innerHTML = `<p class="text-[12px]" style="color:#ef4444">${T('t.netFail')}</p>`; }
         }
@@ -6832,22 +6904,22 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
             tiktok_creator: {
                 icon: 'movie',
                 fields: [
-                    { label: 'App ID', placeholder: 'Your App ID' },
-                    { label: 'App Secret', placeholder: 'Your App Secret', type: 'password' }
+                    { label: 'api.f.appId', placeholder: 'api.f.appIdPh' },
+                    { label: 'api.f.appSecret', placeholder: 'api.f.appSecretPh', type: 'password' }
                 ]
             },
             tiktok_shop: {
                 icon: 'storefront',
                 fields: [
-                    { label: 'Shop ID', placeholder: 'Your Shop ID' },
-                    { label: 'Access Token', placeholder: 'Partner Access Token', type: 'password' }
+                    { label: 'api.f.shopId', placeholder: 'api.f.shopIdPh' },
+                    { label: 'api.f.token', placeholder: 'api.f.tokenPh', type: 'password' }
                 ]
             },
             third_party: {
                 icon: 'bar_chart_4_bars',
                 fields: [
-                    { label: 'Platform', placeholder: 'e.g. AsiaKOL, Cube Asia, Nox...' },
-                    { label: 'API Key', placeholder: 'Platform API Key', type: 'password' }
+                    { label: 'api.f.platform', placeholder: 'api.f.platformPh' },
+                    { label: 'api.f.key', placeholder: 'api.f.keyPh', type: 'password' }
                 ]
             }
         };
@@ -6860,8 +6932,8 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
             var body = document.getElementById('api-modal-body');
             body.innerHTML = '<p class="text-sm text-on-surface-variant leading-relaxed mb-3">' + (API_MODAL_INFO[type] ? T('api.d.' + type) : '') + '</p>' +
                 (info.fields || []).map(function(f) {
-                    return '<div class="space-y-xs"><label class="text-[12px] text-outline uppercase tracking-wider">' + f.label +
-                        '</label><input type="' + (f.type || 'text') + '" placeholder="' + f.placeholder +
+                    return '<div class="space-y-xs"><label class="text-[12px] text-outline uppercase tracking-wider">' + T(f.label) +
+                        '</label><input type="' + (f.type || 'text') + '" placeholder="' + T(f.placeholder) +
                         '" class="form-input w-full opacity-50 cursor-not-allowed" disabled /></div>';
                 }).join('');
             document.getElementById('api-interest-email').value = '';
@@ -6935,7 +7007,7 @@ ${cfg && cfg.payee ? line(T('rc.payee'), esc(cfg.payee)) : ''}
             document.getElementById('sc-name').value = `${catName(lastPayload.category)} ${countryLabel} ${d.toLocaleDateString(LANG === 'zh' ? 'zh-CN' : 'en-US', {month:'short', year:'numeric'})}`;
             document.getElementById('sc-pred-gmv').textContent = fmt(totalGmv);
             document.getElementById('sc-cost').textContent = fmt(totalCost);
-            document.getElementById('sc-algo').textContent = lastOptimizeData.best_algorithm;
+            document.getElementById('sc-algo').textContent = algoName(lastOptimizeData.best_algorithm);
             document.getElementById('sc-kols').textContent = kols.length + T('d.creators');
             document.getElementById('save-campaign-modal').classList.remove('hidden');
         }

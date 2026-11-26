@@ -367,6 +367,22 @@ def me(tenant_id: str = Depends(require_tenant)):
             "email_enabled": mailer.enabled()}
 
 
+class LangIn(BaseModel):
+    lang: str = Field(..., max_length=8)
+
+
+@router.post("/auth/lang")
+def set_lang(req: LangIn, tenant_id: str = Depends(require_tenant)):
+    """Remember the console language on the account, so emails (and the
+    browser extension) follow what the merchant switched to — not just the
+    language they happened to sign in with."""
+    user = current_user()
+    lang = "zh" if req.lang.lower().startswith("zh") else "en"
+    if user and not user["email"].endswith(DEMO_SUFFIX):
+        repo.user_update(user["email"], lang=lang)
+    return {"lang": lang}
+
+
 def _account_or_403(tenant_id: str) -> dict:
     """The signed-in user's row; demo/fallback sessions have no manageable account."""
     user = current_user()

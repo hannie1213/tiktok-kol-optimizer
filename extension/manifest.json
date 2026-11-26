@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Lumio Creator Capture",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Adds the TikTok creator profiles you open to your Lumio Explore pool, so your team can find and shortlist them.",
   "permissions": ["storage", "alarms"],
   "host_permissions": ["https://www.tiktok.com/*"],
