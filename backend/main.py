@@ -25,6 +25,8 @@ import uuid
 import contextvars
 from typing import Dict, List, Optional
 from fastapi import FastAPI, HTTPException, Query, Depends, Request
+from fastapi.encoders import jsonable_encoder
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
@@ -145,6 +147,20 @@ async def _localised_http_error(request: Request, exc: StarletteHTTPException):
                         content={"detail": i18n.localise(exc.detail, request.headers.get("x-lang"))},
                         headers=getattr(exc, "headers", None))
 
+@app.exception_handler(RequestValidationError)
+async def _localised_validation_error(request: Request, exc: RequestValidationError):
+    """Malformed input gets one readable sentence (in the console's language)
+    instead of pydantic's English error list, which the UI would otherwise show
+    verbatim — or as "[object Object]"."""
+    errs = exc.errors()
+    first = errs[0] if errs else {}
+    field = next((str(p) for p in reversed(first.get("loc") or []) if isinstance(p, str) and p != "body"), "")
+    msg = str(first.get("msg") or "invalid value")
+    text = f"Please check {field}: {msg}" if field else f"Please check your input: {msg}"
+    return JSONResponse(status_code=422, content={"detail": i18n.localise(text, request.headers.get("x-lang")),
+                                                  "errors": jsonable_encoder(errs)})
+
+
 # UI language of the calling client (X-Lang header, set by the frontend).
 # Server-generated text — e.g. the "why this creator" reasons — follows it.
 _LANG_VAR = contextvars.ContextVar("ui_lang", default="en")
@@ -189,7 +205,8 @@ async def _harden(request: Request, call_next):
         # Anything a route didn't handle: log the traceback, never leak it.
         log.exception("unhandled error rid=%s %s %s", rid, request.method, request.url.path)
         return JSONResponse(status_code=500, headers={"X-Request-ID": rid}, content={
-            "detail": "Something went wrong on our side. Please try again.", "request_id": rid})
+            "detail": i18n.localise("Something went wrong on our side. Please try again.",
+                                    request.headers.get("x-lang")), "request_id": rid})
 
     ms = (time.perf_counter() - started) * 1000
     if response.status_code >= 500 or ms > 5000:
@@ -262,6 +279,9 @@ class KOLResult(BaseModel):
     tier: str = ""
     creator_score: float = 0.0
     reasons: List[str] = []
+    # Both languages, so a console that switches language after the run can
+    # re-render the "why this creator" lines without asking the server again.
+    reasons_i18n: Dict[str, List[str]] = {}
     age_group: str = ""
     gender_ratio: float = 0.5
     source: str = "fastmoss"          # "fastmoss" (real import) | "synthetic" (demo fill)
@@ -445,11 +465,11 @@ def _dict_to_kol(d: dict) -> KOL:
     return KOL(**{k: v for k, v in d.items() if k in _KOL_FIELDS})
 
 
-def _rating_reason(rating: Optional[int]) -> Optional[str]:
+def _rating_reason(rating: Optional[int], lang: Optional[str] = None) -> Optional[str]:
     """Localised 'you've worked with them before' line for the reasons list."""
     if not rating:
         return None
-    zh = _LANG_VAR.get() == "zh"
+    zh = (lang or _LANG_VAR.get()) == "zh"
     if rating >= 4:
         return (f"你对 TA 的历史合作评分为 {rating}★ —— 已优先复用" if zh
                 else f"You rated past collaborations {rating}★ — prioritised for re-booking")
@@ -461,10 +481,14 @@ def _rating_reason(rating: Optional[int]) -> Optional[str]:
 
 def to_kol_result(k: KOL, score: float, all_kols: List[KOL]) -> KOLResult:
     meta = _kol_meta().get(k.id, {})
-    reasons = generate_reasons(k, all_kols, lang=_LANG_VAR.get())
-    rr = _rating_reason(meta.get("rating"))
-    if rr:
-        reasons.insert(0, rr)
+    both = {}
+    for lang in ("en", "zh"):
+        rs = generate_reasons(k, all_kols, lang=lang)
+        rr = _rating_reason(meta.get("rating"), lang)
+        if rr:
+            rs.insert(0, rr)
+        both[lang] = rs
+    reasons = both[_LANG_VAR.get()]
     return KOLResult(
         id=k.id,
         name=k.name,
@@ -484,6 +508,7 @@ def to_kol_result(k: KOL, score: float, all_kols: List[KOL]) -> KOLResult:
         gender_ratio=k.gender_ratio,
         creator_score=score,
         reasons=reasons,
+        reasons_i18n=both,
         source=meta.get("source", "fastmoss"),
         cost_estimated=meta.get("cost_estimated", False),
         content_type=meta.get("content_type", "both"),

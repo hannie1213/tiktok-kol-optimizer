@@ -197,7 +197,8 @@ def extension_version() -> str:
 def extension_ping(user: dict = Depends(capture_user)):
     """Lets the extension check its connection code when it connects, show
     which account it sends to, and notice when a newer build is available."""
-    return {"ok": True, "email": user["email"], "latest_version": extension_version()}
+    return {"ok": True, "email": user["email"], "latest_version": extension_version(),
+            "lang": user.get("lang") or "en"}
 
 
 # ── Capture ───────────────────────────────────────────────────────

@@ -5,7 +5,12 @@
 (function () {
     'use strict';
     const REPEAT_AFTER_MS = 6 * 60 * 60 * 1000;      // don't re-send the same profile for 6 hours
-    const zh = (navigator.language || '').toLowerCase().startsWith('zh');
+    // Same language as the popup: the user's pick, else their Lumio account's, else the browser's.
+    let zh = (navigator.language || '').toLowerCase().startsWith('zh');
+    try {
+        chrome.storage.local.get(['lang', 'siteLang'], v => { const l = (v && (v.lang || v.siteLang)) || ''; if (l) zh = l === 'zh'; });
+        chrome.storage.onChanged.addListener(ch => { if (ch.lang || ch.siteLang) chrome.storage.local.get(['lang', 'siteLang'], v => { const l = v.lang || v.siteLang; if (l) zh = l === 'zh'; }); });
+    } catch (_) { /* extension reloaded underneath the page */ }
     let lastPath = null, timer = null;
 
     function read() { return LumioExtract.extractProfile(document, location.pathname); }

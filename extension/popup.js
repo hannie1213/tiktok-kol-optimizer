@@ -1,6 +1,8 @@
 'use strict';
-const zh = (navigator.language || '').toLowerCase().startsWith('zh');
-const TEXT = zh ? {
+// Language: what the user picked here, else the language of their Lumio account
+// (learned when the code is checked), else the browser's.
+const BROWSER_LANG = (navigator.language || '').toLowerCase().startsWith('zh') ? 'zh' : 'en';
+const TEXTS = { zh: {
     sub: '达人采集助手',
     intro: '打开 TikTok 达人主页时，把页面上公开显示的账号、粉丝数、获赞数发送到 Lumio 的「发现达人」，方便团队查找和筛选。',
     codeLabel: '连接码', connect: '连接', connecting: '正在验证…',
@@ -16,7 +18,8 @@ const TEXT = zh ? {
     last: '上次采集', reload: '请刷新这个页面后再试。',
     today: '今日采集', total: '累计采集', queue: '待重试', flush: n => `立即重试 ${n} 条`, flushed: n => `已补发 ${n} 条`,
     update: v => `插件有新版本 ${v}，请到 Lumio 网站「发现达人」重新下载安装。`, openSite: '打开 Lumio', guide: '使用说明',
-} : {
+    switchTo: 'EN', switchTitle: 'Switch to English',
+}, en: {
     sub: 'Creator Capture',
     intro: 'When you open a TikTok creator\'s profile, sends the handle, follower and like counts shown on that page to Lumio\'s Explore pool, so your team can find and shortlist them.',
     codeLabel: 'Connection code', connect: 'Connect', connecting: 'Checking…',
@@ -32,7 +35,18 @@ const TEXT = zh ? {
     last: 'Last capture', reload: 'Reload this page and try again.',
     today: 'Today', total: 'All time', queue: 'Waiting', flush: n => `Retry ${n} now`, flushed: n => `Sent ${n}`,
     update: v => `Version ${v} is available. Download it again from Lumio's Explore page.`, openSite: 'Open Lumio', guide: 'How to use',
-};
+    switchTo: '中文', switchTitle: '切换到中文',
+} };
+let LANG = BROWSER_LANG;
+let TEXT = TEXTS[LANG];
+async function loadLang() {
+    const { lang, siteLang } = await chrome.storage.local.get(['lang', 'siteLang']);
+    const next = TEXTS[lang] ? lang : TEXTS[siteLang] ? siteLang : BROWSER_LANG;
+    const changed = next !== LANG;
+    LANG = next; TEXT = TEXTS[LANG];
+    document.documentElement.lang = LANG === 'zh' ? 'zh-CN' : 'en';
+    return changed;
+}
 const $ = id => document.getElementById(id);
 const fmt = n => n >= 1e6 ? (n / 1e6).toFixed(1) + 'M' : n >= 1e3 ? (n / 1e3).toFixed(1) + 'K' : String(n || 0);
 const today = () => new Date().toISOString().slice(0, 10);
@@ -60,7 +74,7 @@ function newer(a, b) {
 // Asks the server who this code belongs to. Returns {ok, email, latest_version} or {ok:false, error}.
 async function ping(api, token) {
     try {
-        const res = await fetch(api + '/extension/ping', { headers: { Authorization: 'Bearer ' + token } });
+        const res = await fetch(api + '/extension/ping', { headers: { Authorization: 'Bearer ' + token, 'X-Lang': LANG } });
         if (res.status === 401 || res.status === 403) return { ok: false, error: 'bad-code' };
         if (!res.ok) return { ok: false, error: 'network' };
         return { ok: true, ...(await res.json()) };
@@ -86,7 +100,9 @@ function labels() {
     [['t-sub', 'sub'], ['t-intro', 'intro'], ['t-code-label', 'codeLabel'], ['connect', 'connect'], ['t-where', 'where'],
      ['t-connected', 'connected'], ['capture', 'capture'], ['t-auto', 'auto'], ['t-toast', 'toast'], ['t-auto-note', 'autoNote'],
      ['disconnect', 'disconnect'], ['t-expired', 'expired'], ['reconnect', 'reconnect'], ['t-today', 'today'],
-     ['t-total', 'total'], ['t-queue', 'queue'], ['open-site', 'openSite'], ['open-guide', 'guide'], ['open-guide2', 'guide']].forEach(([id, k]) => set(id, k));
+     ['t-total', 'total'], ['t-queue', 'queue'], ['open-site', 'openSite'], ['open-guide', 'guide'], ['open-guide2', 'guide'],
+     ['lang-switch', 'switchTo']].forEach(([id, k]) => set(id, k));
+    $('lang-switch').title = TEXT.switchTitle;
 }
 
 async function render() {
@@ -141,7 +157,8 @@ async function refresh() {
     if (!api || !token) return;
     const r = await ping(api, token);
     if (r.ok) {
-        await chrome.storage.local.set({ email: r.email, latest: r.latest_version, authError: false });
+        await chrome.storage.local.set({ email: r.email, latest: r.latest_version, authError: false, siteLang: r.lang || null });
+        if (await loadLang()) labels();
         chrome.action.setBadgeText({ text: '' });
     } else if (r.error === 'bad-code') {
         await chrome.storage.local.set({ authError: true });
@@ -163,7 +180,8 @@ async function connect() {
         if (!granted) { msg.className = 'bad'; msg.textContent = TEXT.denied; return; }
         const r = await ping(parsed.api, parsed.token);
         if (!r.ok) { msg.className = 'bad'; msg.textContent = r.error === 'bad-code' ? TEXT.rejected : TEXT.network; return; }
-        await chrome.storage.local.set({ api: parsed.api, token: parsed.token, email: r.email, latest: r.latest_version, authError: false });
+        await chrome.storage.local.set({ api: parsed.api, token: parsed.token, email: r.email, latest: r.latest_version, authError: false, siteLang: r.lang || null });
+        if (await loadLang()) labels();
         chrome.action.setBadgeText({ text: '' });
         $('code').value = '';
         sendBg({ type: 'lumio-flush' });                    // anything saved while the old code was expired
@@ -217,5 +235,11 @@ $('disconnect').addEventListener('click', async () => {
     render();
 });
 
-labels();
-render().then(refresh);
+$('lang-switch').addEventListener('click', async () => {
+    await chrome.storage.local.set({ lang: LANG === 'zh' ? 'en' : 'zh' });   // an explicit choice wins from now on
+    await loadLang();
+    labels();
+    render();
+});
+
+loadLang().then(() => { labels(); return render(); }).then(refresh);

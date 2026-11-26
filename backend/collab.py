@@ -32,6 +32,7 @@ from pydantic import BaseModel, Field
 
 from backend import activity, ratelimit, repo
 from backend.auth import current_user, require_tenant
+from engine.scoring.explainer import _CATEGORY_NAME, _COUNTRY_NAME
 
 router = APIRouter()
 
@@ -128,14 +129,18 @@ def _money(v) -> str:
     return "$" + format(round(v or 0), ",")
 
 
-def _values(tenant_id: str, c: dict, k: dict, entry: dict, extra: Optional[dict] = None) -> dict:
+def _values(tenant_id: str, c: dict, k: dict, entry: dict, extra: Optional[dict] = None,
+            lang: str = "en") -> dict:
     owner = repo.user_find_by_tenant(tenant_id)
     me = current_user()
     fee = entry.get("fee")
+    cat = str(k.get("category") or c.get("category") or "")
+    country = k.get("country", "")
     values = {
         "creator_name": k.get("name", ""), "campaign_name": c.get("name", ""),
-        "category": str(k.get("category") or c.get("category") or "").replace("_", " "),
-        "country": k.get("country", ""), "followers": format(int(k.get("followers") or 0), ","),
+        # Category and market read naturally in the template's language.
+        "category": _CATEGORY_NAME.get(lang, {}).get(cat) or cat.replace("_", " "),
+        "country": _COUNTRY_NAME.get(lang, {}).get(country) or country, "followers": format(int(k.get("followers") or 0), ","),
         "fee": _money(fee if fee is not None else k.get("cost")),
         "planned_cost": _money(k.get("cost")), "predicted_gmv": _money(k.get("predicted_gmv")),
         "sender": (me or owner or {}).get("email", ""),
@@ -149,6 +154,24 @@ def _fill(body: str, values: dict) -> str:
     """Substitute known {variables}; unknown ones are left visible so the
     merchant notices and fixes them rather than sending a blank."""
     return _VAR.sub(lambda m: str(values[m.group(1)]) if m.group(1) in values else m.group(0), body)
+
+
+def _starter_in(row: Optional[dict], kind: str, lang: str) -> Optional[dict]:
+    """An untouched starter template follows the interface language.
+
+    Starters are seeded once, in whatever language the console used on that
+    first visit. Until the merchant edits one (an edit drops the `starter`
+    flag), show it — and fill it — in the language in use now, so a workspace
+    that switches to Chinese doesn't keep English starters (and vice versa)."""
+    if not row or not row.get("starter"):
+        return row
+    for src in _STARTERS.values():
+        pairs = src.get(kind) or []
+        for i, (name, body) in enumerate(pairs):
+            if row.get("name") == name and row.get("body") == body:
+                name2, body2 = _STARTERS[lang][kind][i]
+                return {**row, "name": name2, "body": body2}
+    return row
 
 
 def _seed(tenant_id: str, kind: str, lang: str):
@@ -172,6 +195,7 @@ def list_templates(request: Request, kind: str = Query("message"), tenant_id: st
         repo.doc_add(tenant_id, store + "_seeded", {}, _now())
         _seed(tenant_id, kind, _lang(request))
         rows = repo.docs_list(tenant_id, store)
+    rows = [_starter_in(r, kind, _lang(request)) for r in rows]
     return {"templates": rows, "variables": sorted(_values(tenant_id, {}, {}, {}).keys())
             + (["deliverables", "start_date", "end_date"] if kind == "contract" else [])}
 
@@ -206,12 +230,13 @@ class RenderIn(BaseModel):
 
 
 @router.post("/templates/{template_id}/render")
-def render_template(template_id: int, req: RenderIn, tenant_id: str = Depends(require_tenant)):
-    t = repo.doc_get(tenant_id, _kind(req.kind), template_id)
+def render_template(template_id: int, req: RenderIn, request: Request, tenant_id: str = Depends(require_tenant)):
+    lang = _lang(request)
+    t = _starter_in(repo.doc_get(tenant_id, _kind(req.kind), template_id), req.kind, lang)
     if not t:
         raise HTTPException(status_code=404, detail="Template not found")
     c, k, entry = _collab(tenant_id, req.campaign_id, req.kol_id)
-    return {"text": _fill(t["body"], _values(tenant_id, c, k, entry)), "contact": entry.get("contact") or ""}
+    return {"text": _fill(t["body"], _values(tenant_id, c, k, entry, lang=lang)), "contact": entry.get("contact") or ""}
 
 
 # ── Message log ───────────────────────────────────────────────────
@@ -283,18 +308,20 @@ class ContractUpdate(BaseModel):
 
 
 @router.post("/contracts")
-def create_contract(req: ContractIn, tenant_id: str = Depends(require_tenant)):
-    t = repo.doc_get(tenant_id, "contract_template", req.template_id)
+def create_contract(req: ContractIn, request: Request, tenant_id: str = Depends(require_tenant)):
+    lang = _lang(request)
+    zh = lang == "zh"
+    t = _starter_in(repo.doc_get(tenant_id, "contract_template", req.template_id), "contract", lang)
     if not t:
         raise HTTPException(status_code=404, detail="Contract template not found")
     if repo.docs_count(tenant_id, "contract") >= 2000:
         raise HTTPException(status_code=409, detail="Contract limit reached.")
     c, k, entry = _collab(tenant_id, req.campaign_id, req.kol_id)
     values = _values(tenant_id, c, k, entry, {
-        "deliverables": req.deliverables.strip() or "[deliverables]",
-        "start_date": req.start_date.strip() or "[start date]",
-        "end_date": req.end_date.strip() or "[end date]",
-    })
+        "deliverables": req.deliverables.strip() or ("[交付内容]" if zh else "[deliverables]"),
+        "start_date": req.start_date.strip() or ("[开始日期]" if zh else "[start date]"),
+        "end_date": req.end_date.strip() or ("[结束日期]" if zh else "[end date]"),
+    }, lang=lang)
     me = current_user()
     number = "C-" + datetime.now(timezone.utc).strftime("%y%m") + f"-{repo.docs_count(tenant_id, 'contract') + 1:03d}"
     saved = repo.doc_add(tenant_id, "contract", {

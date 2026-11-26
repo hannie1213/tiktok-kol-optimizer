@@ -49,6 +49,24 @@ def test_starter_templates_are_seeded_once_in_the_users_language():
     assert client.get("/templates?kind=message", headers=en).json()["templates"][0]["name"] == "First invitation"
 
 
+def test_untouched_starters_follow_the_language_in_use():
+    h, _, _ = _account("en")
+    first = client.get("/templates?kind=message", headers=h).json()["templates"][0]
+    assert first["name"] == "First invitation"
+    zh = dict(h, **{"X-Lang": "zh"})
+    assert client.get("/templates?kind=message", headers=zh).json()["templates"][0]["name"] == "首次邀约"
+
+    # filled in Chinese, with the market and category in Chinese too
+    cid = _campaign(h)
+    text = client.post(f"/templates/{first['id']}/render", headers=zh,
+                       json={"kind": "message", "campaign_id": cid, "kol_id": 1}).json()["text"]
+    assert "Aina Beauty" in text and "马来西亚" in text and "Hi " not in text
+
+    # once edited, it is the merchant's own text and stays as written
+    client.put(f"/templates/{first['id']}", headers=h, json={"kind": "message", "name": "Mine", "body": "Hello {creator_name}"})
+    assert client.get("/templates?kind=message", headers=zh).json()["templates"][0]["name"] == "Mine"
+
+
 def test_template_crud_and_isolation():
     h, _, _ = _account()
     r = client.post("/templates", headers=h, json={"kind": "message", "name": " Promo ", "body": "Hi {creator_name}"})
@@ -77,7 +95,7 @@ def test_render_fills_variables_from_the_collaboration():
     r = client.post(f"/templates/{t['id']}/render", headers=h,
                     json={"kind": "message", "campaign_id": cid, "kol_id": 1})
     assert r.status_code == 200
-    assert r.json()["text"] == f"Hi Aina Beauty, Raya push, $850, 480,000, MY, {email}, {{mystery}}"
+    assert r.json()["text"] == f"Hi Aina Beauty, Raya push, $850, 480,000, Malaysia, {email}, {{mystery}}"
     assert r.json()["contact"] == "+60 12-345 6789"
     # no fee agreed yet -> the planned cost stands in
     r2 = client.post(f"/templates/{t['id']}/render", headers=h,

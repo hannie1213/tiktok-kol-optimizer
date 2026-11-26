@@ -42,11 +42,14 @@ async function enqueue(profile) {
 async function post(profile) {
     const { api, token } = await settings();
     if (!api || !token) return { ok: false, error: 'not-connected' };
+    // Server messages come back in the language the popup shows.
+    const { lang, siteLang } = await chrome.storage.local.get(['lang', 'siteLang']);
+    const xLang = lang || siteLang || ((navigator.language || '').toLowerCase().startsWith('zh') ? 'zh' : 'en');
     let res;
     try {
         res = await fetch(api.replace(/\/+$/, '') + '/pool/capture', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token, 'X-Lang': xLang },
             body: JSON.stringify(profile),
         });
     } catch (_) {
